@@ -74,6 +74,7 @@ import {
   GradeLevelDefinition
 } from '@/lib/hrmStore';
 import dynamic from 'next/dynamic';
+import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDistributionMap';
 
 const EmployeeModal = dynamic(() => import('@/components/hrm/EmployeeModal'), { ssr: false });
 const ContractPdfModal = dynamic(() => import('@/components/hrm/ContractPdfModal'), { ssr: false });
@@ -171,7 +172,7 @@ export default function HRMPage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES'>('PROFILE');
+  const [activeTab, setActiveTab] = useState<'PROFILE' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('PROFILE');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -745,6 +746,15 @@ export default function HRMPage() {
           }`}
         >
           🏅 Chức Danh & Chức Vụ ({jobTitlesList.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('MAP')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'MAP' ? 'bg-indigo-600 text-white shadow-sm' : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100'
+          }`}
+        >
+          🗺️ Bản Đồ Phân Bổ Nhân Sự
         </button>
       </div>
 
@@ -1511,6 +1521,11 @@ export default function HRMPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB 8: BẢN ĐỒ PHÂN BỔ NHÂN SỰ KINH DOANH VIỆT NAM (GIS HEATMAP) */}
+      {activeTab === 'MAP' && (
+        <VietnamEmployeeDistributionMap employees={employees} />
       )}
 
       {/* MODAL 1: THÊM ỨNG VIÊN MỚI TRONG PHỄU TUYỂN DỤNG */}
