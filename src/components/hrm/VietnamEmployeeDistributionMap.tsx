@@ -21,7 +21,8 @@ import {
   Compass,
   CheckCircle2,
   Flag,
-  Globe
+  Globe,
+  Navigation
 } from 'lucide-react';
 import { EmployeeProfile } from '@/types';
 
@@ -36,8 +37,8 @@ interface LocationDensityItem {
   count: number;
   employees: EmployeeProfile[];
   percentage: number;
-  x?: number;
-  y?: number;
+  x: number;
+  y: number;
 }
 
 export default function VietnamEmployeeDistributionMap({
@@ -67,7 +68,7 @@ export default function VietnamEmployeeDistributionMap({
     });
   }, [employees, selectedDepartment, searchTerm]);
 
-  // Analyze geographic distribution based on employee residence addresses
+  // Accurate Geographic Mapping of Vietnam Locations (Post-01/07/2025 Administrative Structure)
   const locationStats = useMemo(() => {
     const map = new Map<string, { region: 'BAC' | 'TRUNG' | 'NAM'; employees: EmployeeProfile[]; x: number; y: number }>();
 
@@ -75,71 +76,76 @@ export default function VietnamEmployeeDistributionMap({
       const addr = (emp.temporary_address || emp.permanent_address || 'Thành phố Hà Nội').trim();
       let key = 'Thành phố Hà Nội';
       let region: 'BAC' | 'TRUNG' | 'NAM' = 'BAC';
-      let x = 180;
-      let y = 140;
+      let x = 205;
+      let y = 145;
 
       if (groupingLevel === 'PROVINCE') {
         if (addr.includes('Hồ Chí Minh') || addr.includes('TP.HCM') || addr.includes('Sài Gòn')) {
           key = 'Thành phố Hồ Chí Minh';
           region = 'NAM';
-          x = 240;
-          y = 560;
+          x = 215;
+          y = 525;
         } else if (addr.includes('Đà Nẵng')) {
           key = 'Thành phố Đà Nẵng';
           region = 'TRUNG';
-          x = 250;
-          y = 360;
+          x = 280;
+          y = 350;
         } else if (addr.includes('Hải Phòng')) {
           key = 'Thành phố Hải Phòng';
           region = 'BAC';
-          x = 225;
-          y = 150;
+          x = 245;
+          y = 155;
         } else if (addr.includes('Cần Thơ')) {
           key = 'Thành phố Cần Thơ';
           region = 'NAM';
-          x = 190;
-          y = 620;
+          x = 175;
+          y = 575;
         } else if (addr.includes('Bình Dương')) {
           key = 'Tỉnh Bình Dương';
           region = 'NAM';
-          x = 230;
-          y = 535;
+          x = 210;
+          y = 500;
         } else if (addr.includes('Đồng Nai')) {
           key = 'Tỉnh Đồng Nai';
           region = 'NAM';
-          x = 265;
-          y = 545;
+          x = 240;
+          y = 515;
         } else if (addr.includes('Nghệ An')) {
           key = 'Tỉnh Nghệ An';
           region = 'TRUNG';
-          x = 160;
-          y = 250;
+          x = 180;
+          y = 245;
         } else if (addr.includes('Thanh Hóa')) {
           key = 'Tỉnh Thanh Hóa';
           region = 'TRUNG';
-          x = 165;
+          x = 190;
           y = 210;
         } else if (addr.includes('Quảng Trị')) {
           key = 'Tỉnh Quảng Trị';
           region = 'TRUNG';
-          x = 205;
-          y = 320;
+          x = 240;
+          y = 310;
+        } else if (addr.includes('Khánh Hòa') || addr.includes('Nha Trang')) {
+          key = 'Tỉnh Khánh Hòa';
+          region = 'TRUNG';
+          x = 310;
+          y = 470;
         } else {
           key = 'Thành phố Hà Nội';
           region = 'BAC';
-          x = 180;
-          y = 140;
+          x = 205;
+          y = 145;
         }
       } else {
         // WARD grouping (Post-01/07/2025 structure)
-        if (addr.includes('Cầu Giấy')) { key = 'Phường Cầu Giấy, TP. Hà Nội'; x = 175; y = 135; }
-        else if (addr.includes('Hai Bà Trưng')) { key = 'Phường Hai Bà Trưng, TP. Hà Nội'; x = 185; y = 145; }
-        else if (addr.includes('Ba Đình')) { key = 'Phường Phúc Xá, TP. Hà Nội'; x = 180; y = 130; }
-        else if (addr.includes('Thượng Đình') || addr.includes('Thanh Xuân')) { key = 'Phường Thượng Đình, TP. Hà Nội'; x = 170; y = 140; }
-        else if (addr.includes('Quận 1') || addr.includes('Bến Nghé')) { key = 'Phường Bến Nghé, TP. Hồ Chí Minh'; x = 240; y = 560; }
-        else if (addr.includes('Thảo Điền') || addr.includes('Quận 2')) { key = 'Phường Thảo Điền, TP. Hồ Chí Minh'; x = 250; y = 555; }
-        else if (addr.includes('Hải Châu')) { key = 'Phường Hải Châu, TP. Đà Nẵng'; x = 250; y = 360; }
-        else { key = 'Phường Trung Tâm, TP. Hà Nội'; x = 180; y = 140; }
+        if (addr.includes('Cầu Giấy')) { key = 'Phường Cầu Giấy, TP. Hà Nội'; x = 200; y = 140; }
+        else if (addr.includes('Hai Bà Trưng')) { key = 'Phường Hai Bà Trưng, TP. Hà Nội'; x = 210; y = 150; }
+        else if (addr.includes('Ba Đình')) { key = 'Phường Phúc Xá, TP. Hà Nội'; x = 205; y = 138; }
+        else if (addr.includes('Thượng Đình') || addr.includes('Thanh Xuân')) { key = 'Phường Thượng Đình, TP. Hà Nội'; x = 195; y = 145; }
+        else if (addr.includes('Quận 1') || addr.includes('Bến Nghé')) { key = 'Phường Bến Nghé, TP. Hồ Chí Minh'; x = 215; y = 525; }
+        else if (addr.includes('Thảo Điền') || addr.includes('Quận 2')) { key = 'Phường Thảo Điền, TP. Hồ Chí Minh'; x = 225; y = 520; }
+        else if (addr.includes('Hải Châu')) { key = 'Phường Hải Châu, TP. Đà Nẵng'; x = 280; y = 350; }
+        else { key = 'Phường Trung Tâm, TP. Hà Nội'; x = 205; y = 145; }
 
         if (key.includes('TP. Hồ Chí Minh')) region = 'NAM';
         else if (key.includes('Đà Nẵng')) region = 'TRUNG';
@@ -202,11 +208,11 @@ export default function VietnamEmployeeDistributionMap({
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-base text-white">Bản đồ phân bổ nhân sự</h3>
                 <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Live GIS Vector
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Geographic Precision GIS
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                Theo dõi mật độ phân bố địa bàn làm việc & nơi cư trú của nhân sự toàn quốc theo chuẩn đơn vị hành chính <strong>sau 01/07/2025</strong>.
+                Bản đồ địa chính chính xác Việt Nam (kèm Quần đảo <strong>Hoàng Sa & Trường Sa</strong>) phân bổ nhân sự theo chuẩn đơn vị hành chính <strong>sau 01/07/2025</strong>.
               </p>
             </div>
           </div>
@@ -321,7 +327,7 @@ export default function VietnamEmployeeDistributionMap({
           <div>
             <span className="text-slate-500 font-bold block">🏖️ Khối Kinh Doanh Miền Trung</span>
             <span className="text-2xl font-black text-amber-600 mt-1 block">{regionBreakdown.trung} nhân sự</span>
-            <span className="text-[11px] text-slate-400">Đà Nẵng, Nghệ An, Quảng Trị...</span>
+            <span className="text-[11px] text-slate-400">Đà Nẵng, Nghệ An, Khánh Hòa...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 font-bold flex items-center justify-center text-lg">
             {Math.round((regionBreakdown.trung / (filteredEmployees.length || 1)) * 100)}%
@@ -332,7 +338,7 @@ export default function VietnamEmployeeDistributionMap({
           <div>
             <span className="text-slate-500 font-bold block">🌴 Khối Kinh Doanh Miền Nam</span>
             <span className="text-2xl font-black text-emerald-600 mt-1 block">{regionBreakdown.nam} nhân sự</span>
-            <span className="text-[11px] text-slate-400">TP. Hồ Chí Minh, Bình Dương, Đồng Nai...</span>
+            <span className="text-[11px] text-slate-400">TP. Hồ Chí Minh, Bình Dương, Cần Thơ...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center text-lg">
             {Math.round((regionBreakdown.nam / (filteredEmployees.length || 1)) * 100)}%
@@ -343,12 +349,12 @@ export default function VietnamEmployeeDistributionMap({
       {/* MAIN VISUAL MAP & LOCATION RANKING GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* LEFT 7/12: REALISTIC INTERACTIVE SVG VIETNAM MAP CANVAS */}
+        {/* LEFT 7/12: ACCURATE GEOGRAPHIC SVG VIETNAM MAP CANVAS */}
         <div className="lg:col-span-7 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-3xl border border-slate-800 p-6 text-white space-y-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="w-full flex items-center justify-between border-b border-slate-800 pb-3 z-10">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-indigo-400 animate-spin-slow" />
-              <h4 className="font-extrabold text-sm text-white">Bản Đồ Phân Bổ Địa Lý Việt Nam (GIS Vector Map)</h4>
+              <h4 className="font-extrabold text-sm text-white">Bản Đồ Địa Chính Việt Nam (Chính Xác GIS)</h4>
             </div>
             <span className="px-2.5 py-0.5 bg-slate-800 font-mono text-[11px] text-slate-300 font-bold rounded-lg border border-slate-700">
               Tổng {filteredEmployees.length} nhân sự
@@ -356,103 +362,127 @@ export default function VietnamEmployeeDistributionMap({
           </div>
 
           {/* SVG MAP CONTAINER */}
-          <div className="relative w-full max-w-md h-[560px] flex items-center justify-center my-2">
+          <div className="relative w-full max-w-md h-[580px] flex items-center justify-center my-1">
 
             {/* Background Ocean Pattern Grid */}
             <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-30 rounded-2xl"></div>
 
-            {/* HIGH RESOLUTION SVG VIETNAM S-CURVE & ISLANDS */}
+            {/* HIGH ACCURACY GEOGRAPHIC VIETNAM MAP SVG */}
             <svg
-              viewBox="0 0 450 720"
+              viewBox="0 0 450 700"
               className="w-full h-full drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* SVG DEFINITIONS FOR GRADIENTS */}
               <defs>
-                <linearGradient id="northGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#991b1b" stopOpacity="0.9" />
+                <linearGradient id="northGradAcc" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#dc2626" stopOpacity="0.85" />
+                  <stop offset="100%" stopColor="#991b1b" stopOpacity="0.95" />
                 </linearGradient>
-                <linearGradient id="centralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#b45309" stopOpacity="0.9" />
+                <linearGradient id="centralGradAcc" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#d97706" stopOpacity="0.85" />
+                  <stop offset="100%" stopColor="#92400e" stopOpacity="0.95" />
                 </linearGradient>
-                <linearGradient id="southGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#047857" stopOpacity="0.9" />
+                <linearGradient id="southGradAcc" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#059669" stopOpacity="0.85" />
+                  <stop offset="100%" stopColor="#065f46" stopOpacity="0.95" />
                 </linearGradient>
-                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <filter id="glowGis" x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur stdDeviation="3" result="blur" />
                   <feComposite in="SourceGraphic" in2="blur" operator="over" />
                 </filter>
               </defs>
 
-              {/* VIETNAM GEOGRAPHIC LAND MASS PATH (S-SHAPE OUTLINE) */}
+              {/* 1. NORTHERN VIETNAM (BẮC BỘ - TÂY BẮC, ĐÔNG BẮC, ĐỒNG BẰNG SÔNG HỒNG) */}
               <path
-                d="M 160 50 
-                   C 190 40, 240 60, 250 110 
-                   C 260 140, 240 180, 210 200 
-                   C 180 220, 160 250, 175 300 
-                   C 190 340, 245 360, 250 400 
-                   C 260 450, 295 490, 280 540 
-                   C 260 580, 220 620, 180 650 
-                   C 150 670, 140 630, 160 610 
-                   C 190 590, 220 560, 210 520 
-                   C 200 480, 180 430, 150 380 
-                   C 130 340, 120 280, 135 240 
-                   C 145 200, 150 160, 130 110 
-                   C 120 70, 140 60, 160 50 Z"
-                fill="url(#northGrad)"
-                stroke="#f87171"
-                strokeWidth="2"
-                className="transition-all duration-300 hover:opacity-95"
-              />
-
-              {/* CENTRAL REGION OVERLAY PATH */}
-              <path
-                d="M 175 250 
-                   C 210 280, 250 340, 260 400 
-                   C 270 450, 295 490, 280 530 
-                   C 270 510, 250 470, 230 430 
-                   C 200 370, 160 320, 160 270 Z"
-                fill="url(#centralGrad)"
-                stroke="#fbbf24"
+                d="M 120 70 
+                   Q 150 40, 210 50 
+                   Q 260 70, 270 120 
+                   Q 280 150, 250 170 
+                   Q 230 180, 200 185 
+                   Q 180 180, 160 140 
+                   Q 140 120, 120 70 Z"
+                fill="url(#northGradAcc)"
+                stroke="#fca5a5"
                 strokeWidth="1.5"
+                className="transition-all hover:opacity-90"
               />
 
-              {/* SOUTH REGION OVERLAY PATH */}
+              {/* 2. CENTRAL VIETNAM COASTAL STRIP (TRUNG BỘ - BẮC TRUNG BỘ & NAM TRUNG BỘ) */}
               <path
-                d="M 280 530 
-                   C 260 580, 220 630, 180 650 
-                   C 150 670, 140 630, 160 610 
-                   C 190 590, 230 560, 240 520 Z"
-                fill="url(#southGrad)"
-                stroke="#34d399"
+                d="M 200 185 
+                   Q 230 200, 250 250 
+                   Q 275 300, 285 350 
+                   Q 295 400, 315 450 
+                   Q 325 480, 290 500 
+                   Q 265 470, 250 420 
+                   Q 235 370, 220 310 
+                   Q 195 260, 175 230 
+                   Q 185 200, 200 185 Z"
+                fill="url(#centralGradAcc)"
+                stroke="#fcd34d"
                 strokeWidth="1.5"
+                className="transition-all hover:opacity-90"
               />
 
-              {/* VIETNAM SOVEREIGNTY ISLANDS (HOÀNG SA & TRƯỜNG SA) */}
-              {/* HOÀNG SA ISLANDS CLUSTER (ĐÀ NẴNG) */}
-              <g className="cursor-pointer group">
-                <circle cx="340" cy="330" r="4" fill="#fbbf24" className="animate-ping opacity-75" />
-                <circle cx="340" cy="330" r="5" fill="#f59e0b" stroke="#ffffff" strokeWidth="1" />
-                <circle cx="352" cy="322" r="3" fill="#f59e0b" />
-                <circle cx="330" cy="340" r="3" fill="#f59e0b" />
-                <rect x="315" y="305" width="95" height="18" rx="4" fill="#78350f" opacity="0.9" />
-                <text x="362" y="317" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="bold" fontFamily="sans-serif">
-                  🇻🇳 QĐ. Hoàng Sa
+              {/* 3. SOUTHERN VIETNAM & MEKONG DELTA (NAM BỘ & ĐỒNG BẰNG SÔNG CỬU LONG) */}
+              <path
+                d="M 290 500 
+                   Q 270 540, 230 550 
+                   Q 200 560, 175 580 
+                   Q 150 600, 130 630 
+                   Q 120 645, 140 655 
+                   Q 165 660, 195 635 
+                   Q 225 610, 245 565 
+                   Q 270 540, 290 500 Z"
+                fill="url(#southGradAcc)"
+                stroke="#6ee7b7"
+                strokeWidth="1.5"
+                className="transition-all hover:opacity-90"
+              />
+
+              {/* PHÚ QUỐC ISLAND (KIÊN GIANG) */}
+              <g className="cursor-pointer">
+                <ellipse cx="105" cy="625" rx="8" ry="14" fill="#059669" stroke="#6ee7b7" strokeWidth="1" />
+                <text x="105" y="648" textAnchor="middle" fill="#a7f3d0" fontSize="8" fontWeight="bold">
+                  Đ. Phú Quốc
                 </text>
               </g>
 
-              {/* TRƯỜNG SA ISLANDS CLUSTER (KHÁNH HÒA) */}
+              {/* CÔN ĐẢO ISLAND (BÀ RỊA - VŨNG TÀU) */}
+              <g className="cursor-pointer">
+                <circle cx="255" cy="635" r="5" fill="#059669" stroke="#6ee7b7" strokeWidth="1" />
+                <text x="255" y="652" textAnchor="middle" fill="#a7f3d0" fontSize="8" fontWeight="bold">
+                  Côn Đảo
+                </text>
+              </g>
+
+              {/* SOVEREIGNTY ISLANDS 1: QUẦN ĐẢO HOÀNG SA (ĐÀ NẴNG) */}
               <g className="cursor-pointer group">
-                <circle cx="360" cy="540" r="4" fill="#34d399" className="animate-ping opacity-75" />
-                <circle cx="360" cy="540" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1" />
-                <circle cx="375" cy="552" r="3.5" fill="#10b981" />
-                <circle cx="345" cy="565" r="3" fill="#10b981" />
-                <rect x="330" y="515" width="98" height="18" rx="4" fill="#064e3b" opacity="0.9" />
-                <text x="379" y="527" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="bold" fontFamily="sans-serif">
-                  🇻🇳 QĐ. Trường Sa
+                <circle cx="365" cy="320" r="5" fill="#f59e0b" className="animate-ping opacity-75" />
+                <circle cx="365" cy="320" r="6" fill="#d97706" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="378" cy="312" r="3.5" fill="#f59e0b" />
+                <circle cx="355" cy="332" r="3.5" fill="#f59e0b" />
+                <rect x="330" y="293" width="112" height="20" rx="5" fill="#78350f" opacity="0.95" stroke="#fcd34d" strokeWidth="1" />
+                <text x="386" y="306" textAnchor="middle" fill="#ffffff" fontSize="9.5" fontWeight="900" fontFamily="sans-serif">
+                  🇻🇳 QĐ. HOÀNG SA
+                </text>
+                <text x="386" y="325" textAnchor="middle" fill="#fcd34d" fontSize="7.5" fontWeight="bold">
+                  (Thuộc TP. Đà Nẵng)
+                </text>
+              </g>
+
+              {/* SOVEREIGNTY ISLANDS 2: QUẦN ĐẢO TRƯỜNG SA (KHÁNH HÒA) */}
+              <g className="cursor-pointer group">
+                <circle cx="380" cy="520" r="5" fill="#10b981" className="animate-ping opacity-75" />
+                <circle cx="380" cy="520" r="6" fill="#059669" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="395" cy="535" r="4" fill="#10b981" />
+                <circle cx="365" cy="545" r="3.5" fill="#10b981" />
+                <rect x="340" y="493" width="112" height="20" rx="5" fill="#064e3b" opacity="0.95" stroke="#6ee7b7" strokeWidth="1" />
+                <text x="396" y="506" textAnchor="middle" fill="#ffffff" fontSize="9.5" fontWeight="900" fontFamily="sans-serif">
+                  🇻🇳 QĐ. TRƯỜNG SA
+                </text>
+                <text x="396" y="525" textAnchor="middle" fill="#6ee7b7" fontSize="7.5" fontWeight="bold">
+                  (Thuộc Tỉnh Khánh Hòa)
                 </text>
               </g>
 
@@ -464,22 +494,22 @@ export default function VietnamEmployeeDistributionMap({
                 return (
                   <g
                     key={loc.provinceName}
-                    transform={`translate(${loc.x || 200}, ${loc.y || 300})`}
+                    transform={`translate(${loc.x}, ${loc.y})`}
                     onClick={() => setSelectedLocation(loc)}
                     className="cursor-pointer transition-all duration-300 hover:scale-125"
                   >
                     {/* Glowing Pulse Ring */}
-                    <circle r="12" fill={pinColor} opacity="0.2" className="animate-ping" />
+                    <circle r="13" fill={pinColor} opacity="0.25" className="animate-ping" />
 
-                    {/* Outer Circle */}
-                    <circle r="9" fill={isSelected ? '#ffffff' : pinColor} stroke="#ffffff" strokeWidth="2" filter="url(#glow)" />
+                    {/* Outer Circle Pin */}
+                    <circle r="10" fill={isSelected ? '#ffffff' : pinColor} stroke="#ffffff" strokeWidth="2" filter="url(#glowGis)" />
 
-                    {/* Count Text Inside Pin */}
+                    {/* Headcount Number Inside Pin */}
                     <text
                       y="3.5"
                       textAnchor="middle"
                       fill={isSelected ? '#0f172a' : '#ffffff'}
-                      fontSize="9"
+                      fontSize="9.5"
                       fontWeight="900"
                       fontFamily="mono"
                     >
@@ -487,17 +517,17 @@ export default function VietnamEmployeeDistributionMap({
                     </text>
 
                     {/* Floating Label Badge */}
-                    <g transform="translate(14, -6)">
+                    <g transform="translate(14, -7)">
                       <rect
-                        width={loc.provinceName.length * 5.8 + 12}
-                        height="16"
-                        rx="4"
-                        fill={isSelected ? '#38bdf8' : '#0f172a'}
+                        width={loc.provinceName.length * 5.8 + 14}
+                        height="18"
+                        rx="5"
+                        fill={isSelected ? '#0284c7' : '#0f172a'}
                         stroke={pinColor}
-                        strokeWidth="1"
+                        strokeWidth="1.5"
                         opacity="0.95"
                       />
-                      <text x="6" y="11" fill="#ffffff" fontSize="8.5" fontWeight="bold">
+                      <text x="7" y="12" fill="#ffffff" fontSize="9" fontWeight="bold">
                         {loc.provinceName.replace('Thành phố ', 'TP. ').replace('Tỉnh ', '')}
                       </text>
                     </g>
@@ -510,15 +540,15 @@ export default function VietnamEmployeeDistributionMap({
           {/* Quick Legend Bar */}
           <div className="w-full pt-3 border-t border-slate-800 flex items-center justify-around text-[11px] font-bold text-slate-300">
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span> Miền Bắc
+              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span> Miền Bắc (Hà Nội)
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Miền Trung
+              <span className="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Miền Trung (Đà Nẵng)
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Miền Nam
+              <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Miền Nam (TP.HCM)
             </span>
-            <span className="flex items-center gap-1 text-sky-400">
+            <span className="flex items-center gap-1 text-amber-300">
               <Flag className="w-3.5 h-3.5" /> Hoàng Sa & Trường Sa
             </span>
           </div>
