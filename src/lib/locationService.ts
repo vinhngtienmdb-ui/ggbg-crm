@@ -32,7 +32,8 @@ let cachedProvinces: NewProvince[] | null = null;
 const cachedWardsMap: Record<string, NewWard[]> = {};
 
 /**
- * Fallback static list of key post-01/07/2025 Vietnam Provinces
+ * Fallback static list of Official 34 Post-01/07/2025 Vietnam Provinces & Cities
+ * Reference: Resolution 202/2025/QH15 & Thư Viện Pháp Luật (ban-do-34-tinh-thanh.pdf)
  */
 export const FALLBACK_NEW_PROVINCES: NewProvince[] = [
   { code: '01', name: 'Hà Nội', type: 'Thành phố' },
@@ -40,28 +41,33 @@ export const FALLBACK_NEW_PROVINCES: NewProvince[] = [
   { code: '48', name: 'Đà Nẵng', type: 'Thành phố' },
   { code: '31', name: 'Hải Phòng', type: 'Thành phố' },
   { code: '92', name: 'Cần Thơ', type: 'Thành phố' },
+  { code: '46', name: 'Thừa Thiên Huế', type: 'Thành phố' },
+  { code: '22', name: 'Quảng Ninh', type: 'Tỉnh' },
   { code: '26', name: 'Vĩnh Phúc', type: 'Tỉnh' },
   { code: '27', name: 'Bắc Ninh', type: 'Tỉnh' },
   { code: '30', name: 'Hải Dương', type: 'Tỉnh' },
   { code: '33', name: 'Hưng Yên', type: 'Tỉnh' },
+  { code: '34', name: 'Thái Bình', type: 'Tỉnh' },
   { code: '35', name: 'Ninh Bình', type: 'Tỉnh' },
+  { code: '36', name: 'Nam Định', type: 'Tỉnh' },
   { code: '38', name: 'Thanh Hóa', type: 'Tỉnh' },
   { code: '40', name: 'Nghệ An', type: 'Tỉnh' },
   { code: '42', name: 'Hà Tĩnh', type: 'Tỉnh' },
+  { code: '44', name: 'Quảng Bình', type: 'Tỉnh' },
   { code: '45', name: 'Quảng Trị', type: 'Tỉnh' },
-  { code: '46', name: 'Thừa Thiên Huế', type: 'Thành phố' },
+  { code: '49', name: 'Quảng Nam', type: 'Tỉnh' },
   { code: '51', name: 'Quảng Ngãi', type: 'Tỉnh' },
   { code: '52', name: 'Bình Định', type: 'Tỉnh' },
+  { code: '54', name: 'Phú Yên', type: 'Tỉnh' },
   { code: '56', name: 'Khánh Hòa', type: 'Tỉnh' },
+  { code: '58', name: 'Ninh Thuận', type: 'Tỉnh' },
   { code: '60', name: 'Lâm Đồng', type: 'Tỉnh' },
+  { code: '62', name: 'Gia Lai', type: 'Tỉnh' },
   { code: '66', name: 'Đắk Lắk', type: 'Tỉnh' },
   { code: '74', name: 'Bình Dương', type: 'Tỉnh' },
   { code: '75', name: 'Đồng Nai', type: 'Tỉnh' },
   { code: '77', name: 'Bà Rịa - Vũng Tàu', type: 'Tỉnh' },
   { code: '80', name: 'Long An', type: 'Tỉnh' },
-  { code: '82', name: 'Tiền Giang', type: 'Tỉnh' },
-  { code: '86', name: 'Vĩnh Long', type: 'Tỉnh' },
-  { code: '87', name: 'Đồng Tháp', type: 'Tỉnh' },
   { code: '89', name: 'An Giang', type: 'Tỉnh' },
   { code: '91', name: 'Kiên Giang', type: 'Tỉnh' },
 ];
