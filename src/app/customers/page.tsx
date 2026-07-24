@@ -43,6 +43,7 @@ import {
   Tag
 } from 'lucide-react';
 import { Customer, CustomerEntityType, CustomerType, CustomerTier, KycDocument, LifecycleStage } from '@/types';
+import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 
 function maskIdentification(val?: string, showFull: boolean = false): string {
   if (!val) return 'Chưa cập nhật';
@@ -282,6 +283,25 @@ export default function CustomersPage() {
     ecom_platforms: ['Shopee', 'TikTokShop'],
   });
 
+  // Vietnam Administrative Units Address States (Post-01/07/2025 Structure)
+  const [createAddressData, setCreateAddressData] = useState<VietnamAddressValue>({
+    provinceCode: '01',
+    provinceName: 'Thành phố Hà Nội',
+    wardCode: '00154',
+    wardName: 'Phường Thượng Đình',
+    detailAddress: 'Số 188 Nguyễn Trãi',
+    fullAddress: 'Số 188 Nguyễn Trãi, Phường Thượng Đình, Thành phố Hà Nội',
+  });
+
+  const [editAddressData, setEditAddressData] = useState<VietnamAddressValue>({
+    provinceCode: '01',
+    provinceName: 'Thành phố Hà Nội',
+    wardCode: '00154',
+    wardName: 'Phường Thượng Đình',
+    detailAddress: 'Số 188 Nguyễn Trãi',
+    fullAddress: 'Số 188 Nguyễn Trãi, Phường Thượng Đình, Thành phố Hà Nội',
+  });
+
   const handleOpenCreateModal = () => {
     const nextCode = `KH-${8800 + customers.length + 1}`;
     setCreateForm({
@@ -332,7 +352,7 @@ export default function CustomersPage() {
       id_card_issue_place: createForm.id_card_issue_place.trim(),
       phone: createForm.phone.trim(),
       email: createForm.email.trim(),
-      address: createForm.address.trim(),
+      address: createAddressData.fullAddress || createForm.address.trim(),
       customer_type: createForm.customer_type,
       tier: createForm.tier,
       lifecycle_stage: createForm.lifecycle_stage,
@@ -1484,6 +1504,16 @@ export default function CustomersPage() {
                     value={createForm.email}
                     onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                  />
+                </div>
+
+                {/* Vietnam Administrative Units Address Picker (Post-01/07/2025 Standard) */}
+                <div className="md:col-span-3">
+                  <VietnamAddressPicker
+                    value={createAddressData}
+                    onChange={setCreateAddressData}
+                    required
+                    label="Địa Chỉ Trụ Sở / Liên Hệ (Chuẩn Mới Sau 01/07/2025)"
                   />
                 </div>
 

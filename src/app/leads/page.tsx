@@ -41,6 +41,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Lead, VoIPCallLog, LeadSource, Customer, CustomerEntityType } from '@/types';
+import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 import dynamic from 'next/dynamic';
 
 const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
@@ -232,6 +233,16 @@ export default function LeadsPage() {
   const [estimatedBudget, setEstimatedBudget] = useState<string>('150000000');
   const [assignedSaleName, setAssignedSaleName] = useState('Trần Văn Hoàng (Đội 1)');
   const [formError, setFormError] = useState('');
+
+  // Vietnam Administrative Units Address State (Post-01/07/2025 Structure)
+  const [addressData, setAddressData] = useState<VietnamAddressValue>({
+    provinceCode: '01',
+    provinceName: 'Thành phố Hà Nội',
+    wardCode: '00154',
+    wardName: 'Phường Thượng Đình',
+    detailAddress: 'Số 188 Nguyễn Trãi',
+    fullAddress: 'Số 188 Nguyễn Trãi, Phường Thượng Đình, Thành phố Hà Nội',
+  });
 
   // AUTO CREATE LEAD FROM CUSTOMER DIRECTORY LISTENER
   useEffect(() => {
@@ -1006,6 +1017,14 @@ export default function LeadsPage() {
                   />
                 </div>
               </div>
+
+              {/* Vietnam Administrative Address Picker (Post-01/07/2025 Standard) */}
+              <VietnamAddressPicker
+                value={addressData}
+                onChange={setAddressData}
+                required
+                label="Địa Chỉ Khách Hàng / Lead (Chuẩn Mới Sau 01/07/2025)"
+              />
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button
