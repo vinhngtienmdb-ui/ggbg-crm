@@ -370,3 +370,65 @@ export function changeEmployeeStatus(
 export function getOrgChartTree(): OrgNode {
   return INITIAL_ORG_TREE;
 }
+
+// ==================== HRM JOB TITLES & POSITIONS MANAGEMENT ====================
+export interface JobTitleDefinition {
+  id: string;
+  code: string;
+  name: string;
+  department: string;
+  rank_level: number; // 1: Ban Giám Đốc, 2: Quản Lý & Trưởng Phòng, 3: Chuyên Viên Thực Thao, 4: Thử Việc
+  description: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export const INITIAL_JOB_TITLES: JobTitleDefinition[] = [
+  { id: 'jt_1', code: 'DIR_SALES', name: 'Giám Đốc Kinh Doanh', department: 'Phòng Kinh Doanh 1', rank_level: 1, description: 'Chịu trách nhiệm chiến lược doanh số toàn công ty', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_2', code: 'MGR_SALES', name: 'Trưởng Phòng Kinh Doanh', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý phòng kinh doanh & điều phối KPI đội nhóm', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_3', code: 'LEAD_SALES', name: 'Trưởng Nhóm Sale', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý đội sale & giao chỉ tiêu GMV hàng tháng', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_4', code: 'EXEC_SALES', name: 'Chuyên Viên Sale', department: 'Phòng Kinh Doanh 1', rank_level: 3, description: 'Chăm sóc Lead & tư vấn chốt hợp đồng', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_5', code: 'MGR_HR', name: 'Quản Lý HR', department: 'Phòng Nhân Sự (HR)', rank_level: 2, description: 'Quản lý hồ sơ nhân sự, tuyển dụng & đánh giá 360°', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_6', code: 'SPEC_CSKH', name: 'Specialist CSKH', department: 'Phòng CSKH', rank_level: 3, description: 'Tiếp nhận live chat đa kênh & hỗ trợ khách hàng', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_7', code: 'SPEC_OPS', name: 'Chuyên Viên Tối Ưu Gian Hàng', department: 'Phòng Vận Hành TMĐT', rank_level: 3, description: 'Quản lý gian hàng Shopee, TikTok Shop, Lazada', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_8', code: 'AUDITOR_SYS', name: 'Chuyên Viên Kiểm Toán', department: 'Phòng Kiểm Toán & An Ninh', rank_level: 3, description: 'Kiểm tra nhật ký hệ thống & bảo mật dữ liệu', is_active: true, created_at: '2025-01-01' },
+];
+
+let jobTitles = [...INITIAL_JOB_TITLES];
+
+export function getJobTitles(): JobTitleDefinition[] {
+  return jobTitles;
+}
+
+export function syncJobTitlesToSystem() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('ggbg_hrm_job_titles_updated', { detail: { jobTitles } }));
+  }
+}
+
+export function createJobTitle(newTitle: Omit<JobTitleDefinition, 'id' | 'created_at'>): JobTitleDefinition {
+  const created: JobTitleDefinition = {
+    ...newTitle,
+    id: `jt_${Date.now()}`,
+    created_at: new Date().toISOString().split('T')[0],
+  };
+  jobTitles = [created, ...jobTitles];
+  syncJobTitlesToSystem();
+  return created;
+}
+
+export function updateJobTitle(id: string, fields: Partial<JobTitleDefinition>): JobTitleDefinition | undefined {
+  const idx = jobTitles.findIndex((jt) => jt.id === id);
+  if (idx !== -1) {
+    jobTitles[idx] = { ...jobTitles[idx], ...fields };
+    syncJobTitlesToSystem();
+    return jobTitles[idx];
+  }
+  return undefined;
+}
+
+export function deleteJobTitle(id: string): boolean {
+  jobTitles = jobTitles.filter((jt) => jt.id !== id);
+  syncJobTitlesToSystem();
+  return true;
+}
