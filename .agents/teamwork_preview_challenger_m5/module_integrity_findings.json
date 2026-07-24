@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-07-22T07:13:31.340Z",
+  "modulesTested": [],
+  "findings": [
+    {
+      "severity": "MEDIUM",
+      "moduleName": "Customer 360",
+      "description": "Phone masking toggle missing in customers page",
+      "evidence": ""
+    },
+    {
+      "severity": "HIGH",
+      "moduleName": "Performance",
+      "description": "Performance grade calculation or rating_grade missing in performanceStore",
+      "evidence": ""
+    }
+  ]
+}

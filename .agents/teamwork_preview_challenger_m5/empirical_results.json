@@ -1,0 +1,269 @@
+{
+  "timestamp": "2026-07-22T07:13:00.805Z",
+  "build_status": "FAILED",
+  "type_check_status": "FAILED",
+  "server_running": false,
+  "routes": [
+    {
+      "category": "route",
+      "name": "GET /",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 129
+      },
+      "latencyMs": 129
+    },
+    {
+      "category": "route",
+      "name": "GET /login",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "location": null,
+        "latencyMs": 864
+      },
+      "latencyMs": 864
+    },
+    {
+      "category": "route",
+      "name": "GET /customers",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 32
+      },
+      "latencyMs": 32
+    },
+    {
+      "category": "route",
+      "name": "GET /leads",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 17
+      },
+      "latencyMs": 17
+    },
+    {
+      "category": "route",
+      "name": "GET /hrm",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 9
+      },
+      "latencyMs": 9
+    },
+    {
+      "category": "route",
+      "name": "GET /products",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 23
+      },
+      "latencyMs": 23
+    },
+    {
+      "category": "route",
+      "name": "GET /kpis",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 18
+      },
+      "latencyMs": 18
+    },
+    {
+      "category": "route",
+      "name": "GET /performance",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 36
+      },
+      "latencyMs": 36
+    },
+    {
+      "category": "route",
+      "name": "GET /settings/users",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 22
+      },
+      "latencyMs": 22
+    },
+    {
+      "category": "route",
+      "name": "GET /settings/rbac",
+      "passed": true,
+      "details": {
+        "expectedStatus": 307,
+        "actualStatus": 307,
+        "location": "/login",
+        "latencyMs": 20
+      },
+      "latencyMs": 20
+    }
+  ],
+  "api_endpoints": [
+    {
+      "category": "api",
+      "name": "GET /api/auth/me",
+      "passed": false,
+      "details": {
+        "expectedStatus": 401,
+        "actualStatus": 500,
+        "latencyMs": 519,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 519
+    },
+    {
+      "category": "api",
+      "name": "GET /api/hrm",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "latencyMs": 741,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 741
+    },
+    {
+      "category": "api",
+      "name": "GET /api/kpis",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "latencyMs": 458,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 458
+    },
+    {
+      "category": "api",
+      "name": "GET /api/performance",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "latencyMs": 531,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 531
+    },
+    {
+      "category": "api",
+      "name": "GET /api/products",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "latencyMs": 524,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 524
+    },
+    {
+      "category": "api",
+      "name": "GET /api/rbac",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "latencyMs": 513,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 513
+    },
+    {
+      "category": "api",
+      "name": "GET /api/users",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "latencyMs": 486,
+        "sampleBody": "Internal Server Error"
+      },
+      "latencyMs": 486
+    }
+  ],
+  "edge_cases": [
+    {
+      "category": "edge_case",
+      "name": "Auth: Invalid Password Reject",
+      "passed": false,
+      "details": {
+        "expectedStatus": 401,
+        "actualStatus": 500,
+        "body": "Internal Server Error"
+      },
+      "latencyMs": 311
+    },
+    {
+      "category": "edge_case",
+      "name": "Auth: Locked Account Reject",
+      "passed": false,
+      "details": {
+        "expectedStatus": 403,
+        "actualStatus": 500,
+        "body": "Internal Server Error"
+      },
+      "latencyMs": 261
+    },
+    {
+      "category": "edge_case",
+      "name": "Auth: Super Admin Valid Login & HTTP-Only Cookie",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "setCookieHeader": "",
+        "hasHttpOnly": false,
+        "hasSessionCookie": false
+      },
+      "latencyMs": 345
+    },
+    {
+      "category": "edge_case",
+      "name": "Auth: GET /api/auth/me with Valid Session Cookie",
+      "passed": false,
+      "details": {
+        "expectedStatus": 200,
+        "actualStatus": 500,
+        "body": "Internal Server Error"
+      },
+      "latencyMs": 279
+    }
+  ],
+  "summary": {
+    "total_tests": 21,
+    "passed": 9,
+    "failed": 12,
+    "avg_latency_ms": 291,
+    "latency_exceeded_count": 6
+  }
+}
