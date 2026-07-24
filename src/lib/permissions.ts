@@ -23,7 +23,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
     groupKey: 'overview_reports',
     items: [
       {
-        name: 'Tổng Quan Hệ Thống',
+        name: 'Tổng Quan',
         href: '/',
         iconName: 'LayoutDashboard',
         allowedRoles: [
@@ -69,7 +69,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         ],
       },
       {
-        name: 'Quản Lý Lead & Phễu',
+        name: 'Quản Lý Lead',
         href: '/leads',
         iconName: 'UserCheck',
         moduleKey: 'leads',
@@ -84,7 +84,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         ],
       },
       {
-        name: 'Live Chat CSKH Đa Kênh',
+        name: 'CSKH',
         href: '/chat',
         iconName: 'MessageSquare',
         moduleKey: 'chat',
@@ -106,7 +106,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'SALES_REP', 'SALE_EXEC', 'TEAM_LEADER'],
       },
       {
-        name: 'Sản Phẩm & Dịch Vụ',
+        name: 'Sản Phẩm',
         href: '/products',
         iconName: 'Package',
         moduleKey: 'products',

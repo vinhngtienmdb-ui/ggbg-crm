@@ -21,8 +21,8 @@ export default function MobileBottomNav({ onToggleMobileSidebar }: MobileBottomN
   const navItems = [
     { name: 'Tổng Quan', href: '/', icon: LayoutDashboard },
     { name: 'Khách Hàng', href: '/customers', icon: Users, moduleKey: 'customers' as const },
-    { name: 'Leads', href: '/leads', icon: UserCheck, moduleKey: 'leads' as const },
-    { name: 'Live Chat', href: '/chat', icon: MessageSquare, moduleKey: 'chat' as const },
+    { name: 'Quản Lý Lead', href: '/leads', icon: UserCheck, moduleKey: 'leads' as const },
+    { name: 'CSKH', href: '/chat', icon: MessageSquare, moduleKey: 'chat' as const },
   ];
 
   // Filter items based on permission & toggles

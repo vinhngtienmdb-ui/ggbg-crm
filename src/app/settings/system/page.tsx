@@ -379,13 +379,13 @@ export default function SystemSettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               {[
                 { key: 'customers', name: 'Quản Lý Khách Hàng 360°', path: '/customers', desc: 'Hồ sơ KYC B2B/B2C, bảo mật mask SĐT & công nợ' },
-                { key: 'leads', name: 'Quản Lý Lead & Phễu 7 Bước', path: '/leads', desc: 'Phễu Kanban, Webhook lead real-time & chống trùng SĐT' },
-                { key: 'chat', name: 'Live Chat CSKH Đa Kênh', path: '/chat', desc: 'Tích hợp Zalo OA, Zalo Personal, FB Fanpage & AI Co-Pilot' },
+                { key: 'leads', name: 'Quản Lý Lead', path: '/leads', desc: 'Phễu Kanban, Webhook lead real-time & chống trùng SĐT' },
+                { key: 'chat', name: 'CSKH', path: '/chat', desc: 'Tích hợp Zalo OA, Zalo Personal, FB Fanpage & AI Co-Pilot' },
                 { key: 'stores', name: 'Gian Hàng Đa Sàn TMĐT', path: '/stores', desc: 'Chỉ số sức khỏe Store Rating (Shopee, TikTok, Lazada, Amazon)' },
                 { key: 'finance', name: 'Báo Cáo Tài Chính & P&L', path: '/finance', desc: 'Thống kê lợi nhuận gộp P&L và tự động gửi nhắc nợ' },
                 { key: 'contracts', name: 'Quản Lý Hợp Đồng PDF', path: '/contracts', desc: 'Xuất file Hợp đồng PDF có con dấu đỏ điện tử & QR Code' },
                 { key: 'hrm', name: 'Quản Lý Nhân Sự HRM', path: '/hrm', desc: 'Hồ sơ nhân viên, duyệt onboard & sơ đồ cây OrgChart' },
-                { key: 'products', name: 'Sản Phẩm & Dịch Vụ', path: '/products', desc: 'Gói dịch vụ vận hành TMĐT & thuộc tính động JSONB' },
+                { key: 'products', name: 'Sản Phẩm', path: '/products', desc: 'Gói dịch vụ vận hành TMĐT & thuộc tính động JSONB' },
                 { key: 'kpis', name: 'Quản Lý KPIs Đa Cấp', path: '/kpis', desc: 'Giao chỉ tiêu GMV, Lead, phút gọi & tính % tiến độ' },
                 { key: 'performance', name: 'Chấm Điểm Hiệu Suất S/A/B/C/D', path: '/performance', desc: 'Xếp loại hiệu suất nhân sự định kỳ từ ngày 1-5' },
                 { key: 'reviews', name: 'Đánh Giá 360° Năng Lực', path: '/reviews', desc: 'Đánh giá đa chiều tự đánh giá / quản lý / đồng nghiệp' },
