@@ -372,11 +372,14 @@ export type GranularPermission =
 export type DataScopeBoundary = 'ALL_COMPANY' | 'DEPARTMENT' | 'TEAM' | 'OWNER_ONLY';
 
 export interface RoleMatrixDefinition {
-  role: UserRole;
+  role: UserRole | string;
   role_name: string;
   description: string;
   data_scope: DataScopeBoundary;
   permissions: GranularPermission[];
+  rank_level?: number; // 1: Executive / Ban Giám Đốc, 2: Management / Quản Lý, 3: Operational / Chuyên Viên, 4: Entry / Thử Việc
+  hrm_position_name?: string;
+  is_custom?: boolean;
 }
 
 // ==================== EXTENDED SYSTEM CONFIGURATION ====================

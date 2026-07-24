@@ -23,6 +23,8 @@ export const INITIAL_ROLE_MATRIX: RoleMatrixDefinition[] = [
     role_name: 'Super Admin (Quản Trị Tối Cao)',
     description: 'Toàn quyền truy cập mọi phân hệ và cấu hình hệ thống toàn công ty.',
     data_scope: 'ALL_COMPANY',
+    rank_level: 1,
+    hrm_position_name: 'Giám Đốc Công Nghệ / Super Admin',
     permissions: [
       'leads:read', 'leads:create', 'leads:update', 'leads:delete', 'leads:assign',
       'customers:read', 'customers:edit', 'customers:export',
@@ -31,9 +33,11 @@ export const INITIAL_ROLE_MATRIX: RoleMatrixDefinition[] = [
   },
   {
     role: 'DIRECTOR',
-    role_name: 'Sales Director (Giám Đốc Bán Hàng)',
+    role_name: 'Sales Director (Giám Đốc Kinh Doanh)',
     description: 'Xem/Sửa toàn bộ dữ liệu công ty, quản lý chỉ tiêu KPI, cấu hình ma trận RBAC.',
     data_scope: 'ALL_COMPANY',
+    rank_level: 1,
+    hrm_position_name: 'Giám Đốc Kinh Doanh',
     permissions: [
       'leads:read', 'leads:create', 'leads:update', 'leads:delete', 'leads:assign',
       'customers:read', 'customers:edit', 'customers:export',
@@ -41,10 +45,36 @@ export const INITIAL_ROLE_MATRIX: RoleMatrixDefinition[] = [
     ],
   },
   {
+    role: 'SALES_MANAGER',
+    role_name: 'Trưởng Phòng Kinh Doanh',
+    description: 'Quản lý doanh số toàn phòng kinh doanh, giao KPI & điều phối đội nhóm.',
+    data_scope: 'DEPARTMENT',
+    rank_level: 2,
+    hrm_position_name: 'Trưởng Phòng Kinh Doanh',
+    permissions: [
+      'leads:read', 'leads:create', 'leads:update', 'leads:assign',
+      'customers:read', 'customers:edit', 'customers:export',
+      'teams:manage', 'ai:use'
+    ],
+  },
+  {
+    role: 'HR_MANAGER',
+    role_name: 'Quản Lý HR (Trưởng Phòng Nhân Sự)',
+    description: 'Quản lý hồ sơ nhân sự, quy trình tuyển dụng onboarding & đánh giá hiệu suất.',
+    data_scope: 'ALL_COMPANY',
+    rank_level: 2,
+    hrm_position_name: 'Quản Lý HR',
+    permissions: [
+      'customers:read', 'teams:manage', 'ai:use'
+    ],
+  },
+  {
     role: 'TEAM_LEADER',
-    role_name: 'Team Lead (Trưởng Phòng / Trưởng Nhóm)',
+    role_name: 'Team Lead (Trưởng Nhóm Sale)',
     description: 'Xem/Quản lý dữ liệu thuộc Đội mình phụ trách, gán Lead cho thành viên trong team.',
     data_scope: 'TEAM',
+    rank_level: 2,
+    hrm_position_name: 'Trưởng Nhóm Sale',
     permissions: [
       'leads:read', 'leads:create', 'leads:update', 'leads:assign',
       'customers:read', 'customers:edit', 'customers:export',
@@ -53,9 +83,11 @@ export const INITIAL_ROLE_MATRIX: RoleMatrixDefinition[] = [
   },
   {
     role: 'SALE_EXEC',
-    role_name: 'Sales Executive (NVKD)',
-    description: 'Chỉ xem và tương tác với các Lead/Customer do chính mình được phân công (assigned_to = auth.uid()).',
+    role_name: 'Sales Executive (NVKD / Chuyên Viên Sale)',
+    description: 'Chỉ xem và tương tác với các Lead/Customer do chính mình được phân công.',
     data_scope: 'OWNER_ONLY',
+    rank_level: 3,
+    hrm_position_name: 'Chuyên Viên Sale',
     permissions: [
       'leads:read', 'leads:create', 'leads:update',
       'customers:read', 'customers:edit', 'ai:use'
@@ -63,12 +95,25 @@ export const INITIAL_ROLE_MATRIX: RoleMatrixDefinition[] = [
   },
   {
     role: 'CSKH',
-    role_name: 'Chuyên Viên CSKH',
+    role_name: 'Specialist CSKH',
     description: 'Chăm sóc và tương tác khách hàng được phân công trong phạm vi phòng ban.',
     data_scope: 'DEPARTMENT',
+    rank_level: 3,
+    hrm_position_name: 'Specialist CSKH',
     permissions: [
       'leads:read', 'leads:update',
       'customers:read', 'customers:edit', 'ai:use'
+    ],
+  },
+  {
+    role: 'AUDITOR',
+    role_name: 'Chuyên Viên Kiểm Toán Hệ Thống',
+    description: 'Tra cứu nhật ký thao tác audit logs và kiểm soát tuân thủ an toàn dữ liệu.',
+    data_scope: 'ALL_COMPANY',
+    rank_level: 3,
+    hrm_position_name: 'Chuyên Viên Kiểm Toán',
+    permissions: [
+      'customers:read', 'audit:read'
     ],
   },
 ];
@@ -79,8 +124,45 @@ export function getRoleMatrix(): RoleMatrixDefinition[] {
   return roleMatrix;
 }
 
+export function syncRolesFromHrmPositions(hrmPositions: string[]): RoleMatrixDefinition[] {
+  hrmPositions.forEach((posName) => {
+    if (!posName) return;
+    const exists = roleMatrix.some(
+      (rm) => rm.hrm_position_name?.toLowerCase() === posName.toLowerCase() || rm.role_name.toLowerCase().includes(posName.toLowerCase())
+    );
+    if (!exists) {
+      const generatedRoleKey = `HRM_${posName.toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
+      let inferredRank = 3;
+      if (posName.toLowerCase().includes('giám đốc') || posName.toLowerCase().includes('director')) inferredRank = 1;
+      else if (posName.toLowerCase().includes('trưởng') || posName.toLowerCase().includes('quản lý') || posName.toLowerCase().includes('manager')) inferredRank = 2;
+      else if (posName.toLowerCase().includes('thử việc') || posName.toLowerCase().includes('intern')) inferredRank = 4;
+
+      roleMatrix.push({
+        role: generatedRoleKey,
+        role_name: `${posName} (Đồng Bộ HRM)`,
+        description: `Chức danh đồng bộ trực tiếp từ hệ thống HRM`,
+        data_scope: inferredRank === 1 ? 'ALL_COMPANY' : inferredRank === 2 ? 'TEAM' : 'OWNER_ONLY',
+        rank_level: inferredRank,
+        hrm_position_name: posName,
+        is_custom: true,
+        permissions: ['leads:read', 'customers:read', 'ai:use'],
+      });
+    }
+  });
+
+  return roleMatrix;
+}
+
+export function addCustomRoleMatrix(newRole: RoleMatrixDefinition): RoleMatrixDefinition[] {
+  const exists = roleMatrix.some((rm) => rm.role === newRole.role);
+  if (!exists) {
+    roleMatrix.push(newRole);
+  }
+  return roleMatrix;
+}
+
 export function updateRolePermissionToggle(
-  role: UserRole,
+  role: UserRole | string,
   permission: GranularPermission,
   enabled: boolean
 ): RoleMatrixDefinition[] {
@@ -101,7 +183,7 @@ export function updateRolePermissionToggle(
   return roleMatrix;
 }
 
-export function updateRoleDataScope(role: UserRole, data_scope: DataScopeBoundary): RoleMatrixDefinition[] {
+export function updateRoleDataScope(role: UserRole | string, data_scope: DataScopeBoundary): RoleMatrixDefinition[] {
   roleMatrix = roleMatrix.map((rm) => (rm.role === role ? { ...rm, data_scope } : rm));
   return roleMatrix;
 }
