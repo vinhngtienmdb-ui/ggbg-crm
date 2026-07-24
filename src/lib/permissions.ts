@@ -113,6 +113,23 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'SALES_REP', 'SALE_EXEC', 'TEAM_LEADER'],
       },
       {
+        name: 'Bản đồ phân bổ nhân sự',
+        href: '/hr-map',
+        iconName: 'MapPin',
+        moduleKey: 'hrm',
+        allowedRoles: [
+          'SUPER_ADMIN',
+          'DIRECTOR',
+          'SALES_MANAGER',
+          'SALES_REP',
+          'SALE_EXEC',
+          'TEAM_LEADER',
+          'CSKH',
+          'AUDITOR',
+          'HR_MANAGER',
+        ],
+      },
+      {
         name: 'Quản Lý Hợp Đồng PDF',
         href: '/contracts',
         iconName: 'FileText',
