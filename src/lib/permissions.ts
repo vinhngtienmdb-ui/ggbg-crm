@@ -45,13 +45,6 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         moduleKey: 'finance',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'AUDITOR'],
       },
-      {
-        name: 'Nhật Ký Kiểm Toán',
-        href: '/audit',
-        iconName: 'ShieldAlert',
-        moduleKey: 'audit',
-        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'AUDITOR'],
-      },
     ],
   },
   {
@@ -185,6 +178,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
     groupName: 'Quản Trị & Cấu Hình',
     groupKey: 'admin_settings',
     items: [
+      {
+        name: 'Nhật Ký Hệ Thống',
+        href: '/audit',
+        iconName: 'ShieldAlert',
+        moduleKey: 'audit',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'AUDITOR'],
+      },
       {
         name: 'Quản Lý Tài Khoản',
         href: '/settings/users',

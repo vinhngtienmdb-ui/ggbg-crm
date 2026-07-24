@@ -389,7 +389,7 @@ export default function SystemSettingsPage() {
                 { key: 'kpis', name: 'Quản Lý KPIs Đa Cấp', path: '/kpis', desc: 'Giao chỉ tiêu GMV, Lead, phút gọi & tính % tiến độ' },
                 { key: 'performance', name: 'Chấm Điểm Hiệu Suất S/A/B/C/D', path: '/performance', desc: 'Xếp loại hiệu suất nhân sự định kỳ từ ngày 1-5' },
                 { key: 'reviews', name: 'Đánh Giá 360° Năng Lực', path: '/reviews', desc: 'Đánh giá đa chiều tự đánh giá / quản lý / đồng nghiệp' },
-                { key: 'audit', name: 'Nhật Ký Kiểm Toán Audit Trail', path: '/audit', desc: 'Ghi vết 100% thời gian thực thao tác của tất cả người dùng' },
+                { key: 'audit', name: 'Nhật Ký Hệ Thống Audit Trail', path: '/audit', desc: 'Ghi vết 100% thời gian thực thao tác của tất cả người dùng' },
               ].map((mod) => {
                 const isEnabled = toggles[mod.key as keyof typeof toggles];
                 return (

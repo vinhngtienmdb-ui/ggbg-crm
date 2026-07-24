@@ -72,7 +72,7 @@ export default function AuditTrailPage() {
             <span>System Audit Trail & Security Center</span>
           </div>
           <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
-            Nhật Ký Kiểm Toán Hệ Thống & Bảo Mật Thao Tác
+            Nhật Ký Hệ Thống & Bảo Mật Thao Tác
           </h1>
           <p className="text-slate-400 text-xs mt-1">
             Ghi vết 100% thời gian thực mọi hành vi của tài khoản người dùng trên hệ thống CRM.
