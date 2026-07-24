@@ -439,13 +439,42 @@ export default function OmnichannelChatPage() {
             <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
               <button
                 type="button"
+                onClick={async () => {
+                  const lastCustMsg = activeChat?.messages.filter(m => m.sender_type === 'CUSTOMER').pop()?.content || activeChat?.last_message;
+                  try {
+                    const res = await fetch('/api/ai/sentiment', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        message_text: lastCustMsg,
+                        customer_name: activeChat?.customer_name,
+                        channel: activeChat?.channel_name,
+                      }),
+                    });
+                    const data = await res.json();
+                    if (data.success && data.data.suggested_reply) {
+                      setInputMessage(data.data.suggested_reply);
+                    }
+                  } catch {
+                    // fallback
+                  }
+                }}
+                className="p-2 rounded-lg text-xs font-semibold flex items-center gap-1 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
+                title="AI Co-Pilot Phân Tích & Gợi Ý Phản Hồi Chốt Đơn"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span className="hidden sm:inline">AI Co-Pilot</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setShowMacrosMenu(!showMacrosMenu)}
-                className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${
-                  showMacrosMenu ? 'bg-purple-600 text-white shadow-md' : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
+                className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                  showMacrosMenu ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
                 }`}
                 title="Mở Thư Viện Câu Trả Lời Mẫu"
               >
-                <Zap className="w-4 h-4 text-purple-600 fill-purple-600" />
+                <Zap className="w-3.5 h-3.5 text-purple-600" />
                 <span className="hidden sm:inline">Mẫu CSKH</span>
               </button>
 

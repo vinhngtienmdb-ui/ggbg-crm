@@ -18,6 +18,7 @@ import {
   Building2,
   Settings,
   MessageSquare,
+  PieChart,
   X
 } from 'lucide-react';
 
@@ -31,6 +32,7 @@ const menuItems = [
   { name: 'Quản Lý Khách Hàng', href: '/customers', icon: Users },
   { name: 'Quản Lý Lead & Phễu', href: '/leads', icon: UserCheck },
   { name: 'Live Chat CSKH Đa Kênh', href: '/chat', icon: MessageSquare },
+  { name: 'Báo Cáo Tài Chính', href: '/finance', icon: PieChart },
   { name: 'Quản Lý Nhân Sự', href: '/hrm', icon: Briefcase },
   { name: 'Sản Phẩm & Dịch Vụ', href: '/products', icon: Package },
   { name: 'Quản Lý KPIs', href: '/kpis', icon: TrendingUp },
