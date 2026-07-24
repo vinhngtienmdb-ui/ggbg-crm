@@ -27,6 +27,14 @@ export default function HrMapPage() {
             >
               📄 Xem Bản Đồ 34 Tỉnh Thành PDF (Thư Viện Pháp Luật)
             </a>
+            <a
+              href="https://github.com/nguyenduy1133/Free-GIS-Data"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-300 rounded-full text-xs font-bold hover:bg-slate-200 transition-colors flex items-center gap-1"
+            >
+              🌐 Dữ Liệu Vector nguyenduy1133/Free-GIS-Data
+            </a>
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Theo dõi phân bổ địa lý & mật độ lực lượng kinh doanh trên toàn quốc theo Tỉnh/Thành phố và Phường/Xã

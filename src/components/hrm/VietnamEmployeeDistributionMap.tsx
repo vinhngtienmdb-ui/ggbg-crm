@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   MapPin,
   Users,
@@ -22,9 +22,12 @@ import {
   CheckCircle2,
   Flag,
   Globe,
-  Navigation
+  Loader2,
+  ExternalLink
 } from 'lucide-react';
 import { EmployeeProfile } from '@/types';
+
+const GEOJSON_DATA_URL = 'https://raw.githubusercontent.com/nguyenduy1133/Free-GIS-Data/main/Vietnam%20Administrative%20Divisions%20(Pre-2025)%20-%20%C4%90%C6%A1n%20v%E1%BB%8B%20h%C3%A0nh%20ch%C3%ADnh%20Vi%E1%BB%87t%20Nam%20(Tr%C6%B0%E1%BB%9Bc%202025)/Provinces_included_Paracel_SpratlyIslands_combine.geojson';
 
 interface VietnamEmployeeDistributionMapProps {
   employees: EmployeeProfile[];
@@ -37,8 +40,20 @@ interface LocationDensityItem {
   count: number;
   employees: EmployeeProfile[];
   percentage: number;
-  x: number;
-  y: number;
+  lon: number;
+  lat: number;
+}
+
+interface GeoJsonFeature {
+  type: string;
+  properties: {
+    Name?: string;
+    [key: string]: any;
+  };
+  geometry: {
+    type: string;
+    coordinates: any[];
+  };
 }
 
 export default function VietnamEmployeeDistributionMap({
@@ -49,6 +64,37 @@ export default function VietnamEmployeeDistributionMap({
   const [selectedRegionFilter, setSelectedRegionFilter] = useState<'ALL' | 'BAC' | 'TRUNG' | 'NAM'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<LocationDensityItem | null>(null);
+
+  // GeoJSON state fetched from nguyenduy1133/Free-GIS-Data
+  const [geoFeatures, setGeoFeatures] = useState<GeoJsonFeature[]>([]);
+  const [isLoadingGeo, setIsLoadingGeo] = useState<boolean>(true);
+  const [geoError, setGeoError] = useState<string | null>(null);
+
+  // Fetch real GIS GeoJSON boundaries from nguyenduy1133/Free-GIS-Data
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingGeo(true);
+    fetch(GEOJSON_DATA_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error('Không thể tải dữ liệu GeoJSON từ nguyenduy1133/Free-GIS-Data');
+        return res.json();
+      })
+      .then((data) => {
+        if (isMounted && data && data.features) {
+          setGeoFeatures(data.features);
+          setIsLoadingGeo(false);
+        }
+      })
+      .catch((err) => {
+        console.warn('GeoJSON fetch fallback:', err);
+        if (isMounted) {
+          setGeoError('Đang hiển thị chế độ xemGIS mặc định');
+          setIsLoadingGeo(false);
+        }
+      });
+
+    return () => { isMounted = false; };
+  }, []);
 
   // Filter employees by department & search term
   const filteredEmployees = useMemo(() => {
@@ -68,84 +114,84 @@ export default function VietnamEmployeeDistributionMap({
     });
   }, [employees, selectedDepartment, searchTerm]);
 
-  // Accurate Geographic Mapping of Vietnam Locations (Post-01/07/2025 Administrative Structure)
+  // Real GIS Location Coordinates (GeoJSON standard)
   const locationStats = useMemo(() => {
-    const map = new Map<string, { region: 'BAC' | 'TRUNG' | 'NAM'; employees: EmployeeProfile[]; x: number; y: number }>();
+    const map = new Map<string, { region: 'BAC' | 'TRUNG' | 'NAM'; employees: EmployeeProfile[]; lon: number; lat: number }>();
 
     filteredEmployees.forEach((emp) => {
       const addr = (emp.temporary_address || emp.permanent_address || 'Thành phố Hà Nội').trim();
       let key = 'Thành phố Hà Nội';
       let region: 'BAC' | 'TRUNG' | 'NAM' = 'BAC';
-      let x = 205;
-      let y = 145;
+      let lon = 105.8342;
+      let lat = 21.0278;
 
       if (groupingLevel === 'PROVINCE') {
         if (addr.includes('Hồ Chí Minh') || addr.includes('TP.HCM') || addr.includes('Sài Gòn')) {
           key = 'Thành phố Hồ Chí Minh';
           region = 'NAM';
-          x = 215;
-          y = 525;
+          lon = 106.6297;
+          lat = 10.8231;
         } else if (addr.includes('Đà Nẵng')) {
           key = 'Thành phố Đà Nẵng';
           region = 'TRUNG';
-          x = 280;
-          y = 350;
+          lon = 108.2022;
+          lat = 16.0544;
         } else if (addr.includes('Hải Phòng')) {
           key = 'Thành phố Hải Phòng';
           region = 'BAC';
-          x = 245;
-          y = 155;
+          lon = 106.6881;
+          lat = 20.8449;
         } else if (addr.includes('Cần Thơ')) {
           key = 'Thành phố Cần Thơ';
           region = 'NAM';
-          x = 175;
-          y = 575;
+          lon = 105.7862;
+          lat = 10.0452;
         } else if (addr.includes('Bình Dương')) {
           key = 'Tỉnh Bình Dương';
           region = 'NAM';
-          x = 210;
-          y = 500;
+          lon = 106.6575;
+          lat = 11.1604;
         } else if (addr.includes('Đồng Nai')) {
           key = 'Tỉnh Đồng Nai';
           region = 'NAM';
-          x = 240;
-          y = 515;
+          lon = 107.0843;
+          lat = 11.0528;
         } else if (addr.includes('Nghệ An')) {
           key = 'Tỉnh Nghệ An';
           region = 'TRUNG';
-          x = 180;
-          y = 245;
+          lon = 104.9200;
+          lat = 19.3800;
         } else if (addr.includes('Thanh Hóa')) {
           key = 'Tỉnh Thanh Hóa';
           region = 'TRUNG';
-          x = 190;
-          y = 210;
+          lon = 105.7700;
+          lat = 19.8000;
         } else if (addr.includes('Quảng Trị')) {
           key = 'Tỉnh Quảng Trị';
           region = 'TRUNG';
-          x = 240;
-          y = 310;
+          lon = 107.0000;
+          lat = 16.7500;
         } else if (addr.includes('Khánh Hòa') || addr.includes('Nha Trang')) {
           key = 'Tỉnh Khánh Hòa';
           region = 'TRUNG';
-          x = 310;
-          y = 470;
+          lon = 109.1967;
+          lat = 12.2388;
         } else {
           key = 'Thành phố Hà Nội';
           region = 'BAC';
-          x = 205;
-          y = 145;
+          lon = 105.8342;
+          lat = 21.0278;
         }
       } else {
         // WARD grouping (Post-01/07/2025 structure)
-        if (addr.includes('Cầu Giấy')) { key = 'Phường Cầu Giấy, TP. Hà Nội'; x = 200; y = 140; }
-        else if (addr.includes('Hai Bà Trưng')) { key = 'Phường Hai Bà Trưng, TP. Hà Nội'; x = 210; y = 150; }
-        else if (addr.includes('Ba Đình')) { key = 'Phường Phúc Xá, TP. Hà Nội'; x = 205; y = 138; }
-        else if (addr.includes('Thượng Đình') || addr.includes('Thanh Xuân')) { key = 'Phường Thượng Đình, TP. Hà Nội'; x = 195; y = 145; }
-        else if (addr.includes('Quận 1') || addr.includes('Bến Nghé')) { key = 'Phường Bến Nghé, TP. Hồ Chí Minh'; x = 215; y = 525; }
-        else if (addr.includes('Thảo Điền') || addr.includes('Quận 2')) { key = 'Phường Thảo Điền, TP. Hồ Chí Minh'; x = 225; y = 520; }
-        else if (addr.includes('Hải Châu')) { key = 'Phường Hải Châu, TP. Đà Nẵng'; x = 280; y = 350; }
-        else { key = 'Phường Trung Tâm, TP. Hà Nội'; x = 205; y = 145; }
+        if (addr.includes('Cầu Giấy')) { key = 'Phường Cầu Giấy, TP. Hà Nội'; lon = 105.7900; lat = 21.0350; }
+        else if (addr.includes('Hai Bà Trưng')) { key = 'Phường Hai Bà Trưng, TP. Hà Nội'; lon = 105.8500; lat = 21.0100; }
+        else if (addr.includes('Ba Đình')) { key = 'Phường Phúc Xá, TP. Hà Nội'; lon = 105.8400; lat = 21.0400; }
+        else if (addr.includes('Thượng Đình') || addr.includes('Thanh Xuân')) { key = 'Phường Thượng Đình, TP. Hà Nội'; lon = 105.8100; lat = 20.9950; }
+        else if (addr.includes('Quận 1') || addr.includes('Bến Nghé')) { key = 'Phường Bến Nghé, TP. Hồ Chí Minh'; lon = 106.7000; lat = 10.7750; }
+        else if (addr.includes('Thảo Điền') || addr.includes('Quận 2')) { key = 'Phường Thảo Điền, TP. Hồ Chí Minh'; lon = 106.7300; lat = 10.8000; }
+        else if (addr.includes('Hải Châu')) { key = 'Phường Hải Châu, TP. Đà Nẵng'; lon = 108.2200; lat = 16.0600; }
+        else { key = 'Phường Trung Tâm, TP. Hà Nội'; lon = 105.8342; lat = 21.0278; }
 
         if (key.includes('TP. Hồ Chí Minh')) region = 'NAM';
         else if (key.includes('Đà Nẵng')) region = 'TRUNG';
@@ -153,7 +199,7 @@ export default function VietnamEmployeeDistributionMap({
       }
 
       if (!map.has(key)) {
-        map.set(key, { region, employees: [], x, y });
+        map.set(key, { region, employees: [], lon, lat });
       }
       map.get(key)!.employees.push(emp);
     });
@@ -168,8 +214,8 @@ export default function VietnamEmployeeDistributionMap({
         count: val.employees.length,
         employees: val.employees,
         percentage: Math.round((val.employees.length / total) * 100),
-        x: val.x,
-        y: val.y,
+        lon: val.lon,
+        lat: val.lat,
       });
     });
 
@@ -193,6 +239,31 @@ export default function VietnamEmployeeDistributionMap({
     return { bac, trung: Math.max(0, trung), nam };
   }, [filteredEmployees]);
 
+  // Convert Lon/Lat coordinate into SVG Canvas X, Y coordinates
+  const projectCoords = (lon: number, lat: number) => {
+    // Geographic Bounding Box for Vietnam GIS Map
+    const minLon = 101.5;
+    const maxLon = 117.5;
+    const minLat = 7.0;
+    const maxLat = 23.8;
+    const svgWidth = 480;
+    const svgHeight = 650;
+
+    const x = ((lon - minLon) / (maxLon - minLon)) * svgWidth;
+    const y = svgHeight - ((lat - minLat) / (maxLat - minLat)) * svgHeight;
+    return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+  };
+
+  // Convert GeoJSON Polygon Ring into SVG SVG path string
+  const renderPolygonPath = (ring: number[][]) => {
+    return ring
+      .map((pt, idx) => {
+        const { x, y } = projectCoords(pt[0], pt[1]);
+        return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ') + ' Z';
+  };
+
   const uniqueDepartments = Array.from(new Set(employees.map((e) => e.department).filter(Boolean)));
 
   return (
@@ -205,14 +276,14 @@ export default function VietnamEmployeeDistributionMap({
               <MapIcon className="w-6 h-6 text-indigo-400" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="font-extrabold text-base text-white">Bản đồ phân bổ nhân sự</h3>
                 <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Geographic Precision GIS
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> nguyenduy1133/Free-GIS-Data
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                Bản đồ địa chính chính xác Việt Nam (kèm Quần đảo <strong>Hoàng Sa & Trường Sa</strong>) phân bổ nhân sự theo chuẩn đơn vị hành chính <strong>sau 01/07/2025</strong>.
+                Tích hợp dữ liệu GIS vector chính xác từ <strong>nguyenduy1133/Free-GIS-Data</strong> (bao gồm 63 tỉnh/thành & Quần đảo <strong>Hoàng Sa, Trường Sa</strong>).
               </p>
             </div>
           </div>
@@ -349,147 +420,124 @@ export default function VietnamEmployeeDistributionMap({
       {/* MAIN VISUAL MAP & LOCATION RANKING GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* LEFT 7/12: ACCURATE GEOGRAPHIC SVG VIETNAM MAP CANVAS */}
+        {/* LEFT 7/12: REAL GEOJSON MAP FROM NGUYENDUY1133/FREE-GIS-DATA */}
         <div className="lg:col-span-7 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-3xl border border-slate-800 p-6 text-white space-y-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="w-full flex items-center justify-between border-b border-slate-800 pb-3 z-10">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-indigo-400 animate-spin-slow" />
-              <h4 className="font-extrabold text-sm text-white">Bản Đồ Địa Chính Việt Nam (Chính Xác GIS)</h4>
+              <h4 className="font-extrabold text-sm text-white flex items-center gap-1.5">
+                Bản Đồ Vector GIS Việt Nam 
+                <a
+                  href="https://github.com/nguyenduy1133/Free-GIS-Data"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-sky-400 hover:underline flex items-center gap-1 font-mono ml-2"
+                >
+                  nguyenduy1133/Free-GIS-Data <ExternalLink className="w-3 h-3" />
+                </a>
+              </h4>
             </div>
             <span className="px-2.5 py-0.5 bg-slate-800 font-mono text-[11px] text-slate-300 font-bold rounded-lg border border-slate-700">
               Tổng {filteredEmployees.length} nhân sự
             </span>
           </div>
 
-          {/* SVG MAP CONTAINER */}
+          {/* MAP CANVAS WITH REAL GEOJSON POLYGONS */}
           <div className="relative w-full max-w-md h-[580px] flex items-center justify-center my-1">
+            {isLoadingGeo && (
+              <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center space-y-3">
+                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                <p className="text-xs font-bold text-slate-300">Đang nạp dữ liệu GeoJSON từ nguyenduy1133/Free-GIS-Data...</p>
+              </div>
+            )}
 
-            {/* Background Ocean Pattern Grid */}
+            {/* Ocean Grid Background */}
             <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-30 rounded-2xl"></div>
 
-            {/* HIGH ACCURACY GEOGRAPHIC VIETNAM MAP SVG */}
+            {/* SVG RENDERING REAL GEOJSON PROVINCES */}
             <svg
-              viewBox="0 0 450 700"
+              viewBox="0 0 480 650"
               className="w-full h-full drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>
-                <linearGradient id="northGradAcc" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#dc2626" stopOpacity="0.85" />
-                  <stop offset="100%" stopColor="#991b1b" stopOpacity="0.95" />
-                </linearGradient>
-                <linearGradient id="centralGradAcc" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#d97706" stopOpacity="0.85" />
-                  <stop offset="100%" stopColor="#92400e" stopOpacity="0.95" />
-                </linearGradient>
-                <linearGradient id="southGradAcc" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#059669" stopOpacity="0.85" />
-                  <stop offset="100%" stopColor="#065f46" stopOpacity="0.95" />
-                </linearGradient>
                 <filter id="glowGis" x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur stdDeviation="3" result="blur" />
                   <feComposite in="SourceGraphic" in2="blur" operator="over" />
                 </filter>
               </defs>
 
-              {/* AUTHENTIC GEOGRAPHIC VIETNAM S-CURVE COASTLINE & BOUNDARY (34 PROVINCES POST-01/07/2025) */}
-              <path
-                d="M 95,75 
-                   C 120,55 165,35 215,42 
-                   C 245,46 270,60 280,95 
-                   C 285,120 270,140 245,155 
-                   C 220,165 200,180 185,205 
-                   C 165,235 170,270 200,310 
-                   C 225,335 260,345 275,360 
-                   C 290,380 295,410 298,445 
-                   C 300,470 290,495 270,515 
-                   C 245,525 220,535 200,555 
-                   C 175,575 145,605 125,635 
-                   C 115,650 100,640 105,625 
-                   C 115,600 110,575 130,550 
-                   C 150,530 185,515 195,490 
-                   C 210,450 205,400 185,350 
-                   C 160,300 145,260 140,225 
-                   C 135,190 140,150 115,115 
-                   C 100,95 90,85 95,75 Z"
-                fill="url(#northGradAcc)"
-                stroke="#fca5a5"
-                strokeWidth="2"
-                className="transition-all hover:opacity-95 drop-shadow-md"
-              />
+              {/* RENDER REAL GEOGRAPHIC POLYGONS FETCHED FROM NGUYENDUY1133/FREE-GIS-DATA */}
+              {geoFeatures.map((feature, featIdx) => {
+                const name = feature.properties?.Name || '';
+                const geomType = feature.geometry?.type;
+                const coords = feature.geometry?.coordinates || [];
 
-              {/* CENTRAL & HIGHLANDS REGIONAL OVERLAY */}
-              <path
-                d="M 185,205 
-                   C 165,235 170,270 200,310 
-                   C 225,335 260,345 275,360 
-                   C 290,380 295,410 298,445 
-                   C 300,470 290,495 270,515 
-                   C 245,525 225,505 235,465 
-                   C 245,425 230,375 205,330 
-                   C 185,290 170,255 185,205 Z"
-                fill="url(#centralGradAcc)"
-                stroke="#fcd34d"
-                strokeWidth="1.5"
-              />
+                let fillColor = '#1e293b'; // Default slate
+                let strokeColor = '#475569';
 
-              {/* SOUTH & MEKONG DELTA REGIONAL OVERLAY */}
-              <path
-                d="M 270,515 
-                   C 245,525 220,535 200,555 
-                   C 175,575 145,605 125,635 
-                   C 115,650 100,640 105,625 
-                   C 115,600 110,575 130,550 
-                   C 150,530 185,515 195,490 
-                   C 220,500 250,510 270,515 Z"
-                fill="url(#southGradAcc)"
-                stroke="#6ee7b7"
-                strokeWidth="1.5"
-              />
+                if (name.includes('Paracel') || name.includes('Hoang Sa') || name.includes('Hoàng Sa')) {
+                  fillColor = '#d97706';
+                  strokeColor = '#fbbf24';
+                } else if (name.includes('Spratly') || name.includes('Truong Sa') || name.includes('Trường Sa')) {
+                  fillColor = '#059669';
+                  strokeColor = '#34d399';
+                } else {
+                  // Standard provinces
+                  fillColor = '#0f172a';
+                  strokeColor = '#334155';
+                }
 
-              {/* PHÚ QUỐC ISLAND (KIÊN GIANG) */}
-              <g className="cursor-pointer">
-                <ellipse cx="105" cy="625" rx="8" ry="14" fill="#059669" stroke="#6ee7b7" strokeWidth="1" />
-                <text x="105" y="648" textAnchor="middle" fill="#a7f3d0" fontSize="8" fontWeight="bold">
-                  Đ. Phú Quốc
-                </text>
-              </g>
+                if (geomType === 'Polygon') {
+                  return (
+                    <g key={featIdx} className="hover:opacity-80 transition-opacity">
+                      {coords.map((ring, rIdx) => (
+                        <path
+                          key={rIdx}
+                          d={renderPolygonPath(ring)}
+                          fill={fillColor}
+                          stroke={strokeColor}
+                          strokeWidth="0.8"
+                        />
+                      ))}
+                    </g>
+                  );
+                } else if (geomType === 'MultiPolygon') {
+                  return (
+                    <g key={featIdx} className="hover:opacity-80 transition-opacity">
+                      {coords.map((poly, pIdx) =>
+                        poly.map((ring: number[][], rIdx: number) => (
+                          <path
+                            key={`${pIdx}-${rIdx}`}
+                            d={renderPolygonPath(ring)}
+                            fill={fillColor}
+                            stroke={strokeColor}
+                            strokeWidth="0.8"
+                          />
+                        ))
+                      )}
+                    </g>
+                  );
+                }
+                return null;
+              })}
 
-              {/* CÔN ĐẢO ISLAND (BÀ RỊA - VŨNG TÀU) */}
-              <g className="cursor-pointer">
-                <circle cx="255" cy="635" r="5" fill="#059669" stroke="#6ee7b7" strokeWidth="1" />
-                <text x="255" y="652" textAnchor="middle" fill="#a7f3d0" fontSize="8" fontWeight="bold">
-                  Côn Đảo
-                </text>
-              </g>
-
-              {/* SOVEREIGNTY ISLANDS 1: QUẦN ĐẢO HOÀNG SA (ĐÀ NẴNG) */}
-              <g className="cursor-pointer group">
-                <circle cx="365" cy="320" r="5" fill="#f59e0b" className="animate-ping opacity-75" />
-                <circle cx="365" cy="320" r="6" fill="#d97706" stroke="#ffffff" strokeWidth="1.5" />
-                <circle cx="378" cy="312" r="3.5" fill="#f59e0b" />
-                <circle cx="355" cy="332" r="3.5" fill="#f59e0b" />
-                <rect x="330" y="293" width="112" height="20" rx="5" fill="#78350f" opacity="0.95" stroke="#fcd34d" strokeWidth="1" />
-                <text x="386" y="306" textAnchor="middle" fill="#ffffff" fontSize="9.5" fontWeight="900" fontFamily="sans-serif">
+              {/* SOVEREIGNTY ISLAND BADGES (HOÀNG SA & TRƯỜNG SA) */}
+              <g transform="translate(320, 270)" className="cursor-pointer group">
+                <circle r="6" fill="#f59e0b" className="animate-ping opacity-75" />
+                <circle r="7" fill="#d97706" stroke="#ffffff" strokeWidth="1.5" />
+                <rect x="-5" y="-30" width="115" height="20" rx="5" fill="#78350f" opacity="0.95" stroke="#fcd34d" strokeWidth="1" />
+                <text x="52" y="-17" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="900">
                   🇻🇳 QĐ. HOÀNG SA
                 </text>
-                <text x="386" y="325" textAnchor="middle" fill="#fcd34d" fontSize="7.5" fontWeight="bold">
-                  (Thuộc TP. Đà Nẵng)
-                </text>
               </g>
 
-              {/* SOVEREIGNTY ISLANDS 2: QUẦN ĐẢO TRƯỜNG SA (KHÁNH HÒA) */}
-              <g className="cursor-pointer group">
-                <circle cx="380" cy="520" r="5" fill="#10b981" className="animate-ping opacity-75" />
-                <circle cx="380" cy="520" r="6" fill="#059669" stroke="#ffffff" strokeWidth="1.5" />
-                <circle cx="395" cy="535" r="4" fill="#10b981" />
-                <circle cx="365" cy="545" r="3.5" fill="#10b981" />
-                <rect x="340" y="493" width="112" height="20" rx="5" fill="#064e3b" opacity="0.95" stroke="#6ee7b7" strokeWidth="1" />
-                <text x="396" y="506" textAnchor="middle" fill="#ffffff" fontSize="9.5" fontWeight="900" fontFamily="sans-serif">
+              <g transform="translate(360, 480)" className="cursor-pointer group">
+                <circle r="6" fill="#10b981" className="animate-ping opacity-75" />
+                <circle r="7" fill="#059669" stroke="#ffffff" strokeWidth="1.5" />
+                <rect x="-5" y="-30" width="115" height="20" rx="5" fill="#064e3b" opacity="0.95" stroke="#6ee7b7" strokeWidth="1" />
+                <text x="52" y="-17" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="900">
                   🇻🇳 QĐ. TRƯỜNG SA
-                </text>
-                <text x="396" y="525" textAnchor="middle" fill="#6ee7b7" fontSize="7.5" fontWeight="bold">
-                  (Thuộc Tỉnh Khánh Hòa)
                 </text>
               </g>
 
@@ -497,16 +545,17 @@ export default function VietnamEmployeeDistributionMap({
               {locationStats.map((loc) => {
                 const isSelected = selectedLocation?.provinceName === loc.provinceName;
                 const pinColor = loc.region === 'BAC' ? '#ef4444' : loc.region === 'TRUNG' ? '#f59e0b' : '#10b981';
+                const { x, y } = projectCoords(loc.lon, loc.lat);
 
                 return (
                   <g
                     key={loc.provinceName}
-                    transform={`translate(${loc.x}, ${loc.y})`}
+                    transform={`translate(${x}, ${y})`}
                     onClick={() => setSelectedLocation(loc)}
                     className="cursor-pointer transition-all duration-300 hover:scale-125"
                   >
                     {/* Glowing Pulse Ring */}
-                    <circle r="13" fill={pinColor} opacity="0.25" className="animate-ping" />
+                    <circle r="13" fill={pinColor} opacity="0.3" className="animate-ping" />
 
                     {/* Outer Circle Pin */}
                     <circle r="10" fill={isSelected ? '#ffffff' : pinColor} stroke="#ffffff" strokeWidth="2" filter="url(#glowGis)" />
@@ -547,13 +596,13 @@ export default function VietnamEmployeeDistributionMap({
           {/* Quick Legend Bar */}
           <div className="w-full pt-3 border-t border-slate-800 flex items-center justify-around text-[11px] font-bold text-slate-300">
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span> Miền Bắc (Hà Nội)
+              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span> Miền Bắc
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Miền Trung (Đà Nẵng)
+              <span className="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Miền Trung
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Miền Nam (TP.HCM)
+              <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Miền Nam
             </span>
             <span className="flex items-center gap-1 text-amber-300">
               <Flag className="w-3.5 h-3.5" /> Hoàng Sa & Trường Sa
