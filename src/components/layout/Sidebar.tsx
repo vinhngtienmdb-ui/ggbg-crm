@@ -25,25 +25,34 @@ import {
   X
 } from 'lucide-react';
 
+import { useModuleToggles, ModuleToggles } from '@/context/ModuleToggleContext';
+
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-const menuItems = [
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  moduleKey?: keyof ModuleToggles;
+}
+
+const menuItems: MenuItem[] = [
   { name: 'Tổng Quan Hệ Thống', href: '/', icon: LayoutDashboard },
-  { name: 'Quản Lý Khách Hàng', href: '/customers', icon: Users },
-  { name: 'Quản Lý Lead & Phễu', href: '/leads', icon: UserCheck },
-  { name: 'Live Chat CSKH Đa Kênh', href: '/chat', icon: MessageSquare },
-  { name: 'Gian Hàng Đa Sàn TMĐT', href: '/stores', icon: ShoppingBag },
-  { name: 'Báo Cáo Tài Chính', href: '/finance', icon: PieChart },
-  { name: 'Quản Lý Hợp Đồng PDF', href: '/contracts', icon: FileText },
-  { name: 'Quản Lý Nhân Sự', href: '/hrm', icon: Briefcase },
-  { name: 'Sản Phẩm & Dịch Vụ', href: '/products', icon: Package },
-  { name: 'Quản Lý KPIs', href: '/kpis', icon: TrendingUp },
-  { name: 'Chấm Điểm Hiệu Suất', href: '/performance', icon: Award },
-  { name: 'Đánh Giá 360°', href: '/reviews', icon: Users },
-  { name: 'Nhật Ký Kiểm Toán', href: '/audit', icon: ShieldAlert },
+  { name: 'Quản Lý Khách Hàng', href: '/customers', icon: Users, moduleKey: 'customers' },
+  { name: 'Quản Lý Lead & Phễu', href: '/leads', icon: UserCheck, moduleKey: 'leads' },
+  { name: 'Live Chat CSKH Đa Kênh', href: '/chat', icon: MessageSquare, moduleKey: 'chat' },
+  { name: 'Gian Hàng Đa Sàn TMĐT', href: '/stores', icon: ShoppingBag, moduleKey: 'stores' },
+  { name: 'Báo Cáo Tài Chính', href: '/finance', icon: PieChart, moduleKey: 'finance' },
+  { name: 'Quản Lý Hợp Đồng PDF', href: '/contracts', icon: FileText, moduleKey: 'contracts' },
+  { name: 'Quản Lý Nhân Sự', href: '/hrm', icon: Briefcase, moduleKey: 'hrm' },
+  { name: 'Sản Phẩm & Dịch Vụ', href: '/products', icon: Package, moduleKey: 'products' },
+  { name: 'Quản Lý KPIs', href: '/kpis', icon: TrendingUp, moduleKey: 'kpis' },
+  { name: 'Chấm Điểm Hiệu Suất', href: '/performance', icon: Award, moduleKey: 'performance' },
+  { name: 'Đánh Giá 360°', href: '/reviews', icon: Users, moduleKey: 'reviews' },
+  { name: 'Nhật Ký Kiểm Toán', href: '/audit', icon: ShieldAlert, moduleKey: 'audit' },
   { name: 'Quản Lý Tài Khoản', href: '/settings/users', icon: UserCog },
   { name: 'Phân Quyền Truy Cập', href: '/settings/rbac', icon: ShieldCheck },
   { name: 'Cấu Hình Hệ Thống', href: '/settings/system', icon: Settings },
@@ -52,6 +61,11 @@ const menuItems = [
 export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { toggles } = useModuleToggles();
+
+  const visibleMenuItems = menuItems.filter(
+    (item) => !item.moduleKey || toggles[item.moduleKey] !== false
+  );
 
   return (
     <>
@@ -101,7 +115,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <div className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             Phân Hệ Chức Năng
           </div>
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (

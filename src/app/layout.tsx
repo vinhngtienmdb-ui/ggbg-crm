@@ -7,6 +7,7 @@ import Header from '@/components/layout/Header';
 import VoIPCallModal from '@/components/telephony/VoIPCallModal';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
 import { usePathname } from 'next/navigation';
 
 function AppLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +58,9 @@ export default function RootLayout({
       <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans">
         <ThemeProvider>
           <AuthProvider>
-            <AppLayout>{children}</AppLayout>
+            <ModuleToggleProvider>
+              <AppLayout>{children}</AppLayout>
+            </ModuleToggleProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

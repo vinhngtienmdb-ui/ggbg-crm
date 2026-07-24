@@ -29,6 +29,7 @@ import {
   Bot
 } from 'lucide-react';
 import { SystemConfig, getSystemConfig, saveSystemConfig } from '@/lib/systemConfigStore';
+import { useModuleToggles } from '@/context/ModuleToggleContext';
 
 interface TestResult {
   service: string;
@@ -41,7 +42,8 @@ interface TestResult {
 export default function SystemSettingsPage() {
   const [config, setConfig] = useState<SystemConfig>(getSystemConfig());
   const [saveToast, setSaveToast] = useState('');
-  const [activeTab, setActiveTab] = useState<'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT'>('INFRASTRUCTURE');
+  const [activeTab, setActiveTab] = useState<'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT'>('MODULE_TOGGLES');
+  const { toggles, toggleModule, resetToggles } = useModuleToggles();
 
   // Secret Masking Toggles
   const [showKeys, setShowKeys] = useState<{ [key: string]: boolean }>({});
@@ -244,8 +246,17 @@ export default function SystemSettingsPage() {
         </span>
       </div>
 
-      {/* 5 CONFIGURATION TABS NAVIGATION */}
+      {/* CONFIGURATION TABS NAVIGATION */}
       <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 overflow-x-auto touch-scroll sleek-scrollbar">
+        <button
+          onClick={() => setActiveTab('MODULE_TOGGLES')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+            activeTab === 'MODULE_TOGGLES' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Sliders className="w-4 h-4 text-purple-400" /> 🎛️ Phân Hệ Tính Năng
+        </button>
+
         <button
           onClick={() => setActiveTab('INFRASTRUCTURE')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
@@ -293,6 +304,81 @@ export default function SystemSettingsPage() {
       </div>
 
       <form onSubmit={(e) => handleSave(e, `Lưu cấu hình tab ${activeTab}`)} className="space-y-6">
+        {/* ==================== TAB 0: MODULE FEATURE TOGGLES ==================== */}
+        {activeTab === 'MODULE_TOGGLES' && (
+          <div className="space-y-5">
+            <div className="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-purple-600" /> Quản Lý Phân Hệ Tính Năng (Module Feature Toggles)
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Bật/tắt các phân hệ chức năng trên hệ thống. Phân hệ bị tắt sẽ tự động ẩn hoàn toàn khỏi Sidebar navigation.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={resetToggles}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded text-xs border border-slate-200"
+              >
+                Khôi Phục Mặc Định (Bật Tất Cả)
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {[
+                { key: 'customers', name: 'Quản Lý Khách Hàng 360°', path: '/customers', desc: 'Hồ sơ KYC B2B/B2C, bảo mật mask SĐT & công nợ' },
+                { key: 'leads', name: 'Quản Lý Lead & Phễu 7 Bước', path: '/leads', desc: 'Phễu Kanban, Webhook lead real-time & chống trùng SĐT' },
+                { key: 'chat', name: 'Live Chat CSKH Đa Kênh', path: '/chat', desc: 'Tích hợp Zalo OA, Zalo Personal, FB Fanpage & AI Co-Pilot' },
+                { key: 'stores', name: 'Gian Hàng Đa Sàn TMĐT', path: '/stores', desc: 'Chỉ số sức khỏe Store Rating (Shopee, TikTok, Lazada, Amazon)' },
+                { key: 'finance', name: 'Báo Cáo Tài Chính & P&L', path: '/finance', desc: 'Thống kê lợi nhuận gộp P&L và tự động gửi nhắc nợ' },
+                { key: 'contracts', name: 'Quản Lý Hợp Đồng PDF', path: '/contracts', desc: 'Xuất file Hợp đồng PDF có con dấu đỏ điện tử & QR Code' },
+                { key: 'hrm', name: 'Quản Lý Nhân Sự HRM', path: '/hrm', desc: 'Hồ sơ nhân viên, duyệt onboard & sơ đồ cây OrgChart' },
+                { key: 'products', name: 'Sản Phẩm & Dịch Vụ', path: '/products', desc: 'Gói dịch vụ vận hành TMĐT & thuộc tính động JSONB' },
+                { key: 'kpis', name: 'Quản Lý KPIs Đa Cấp', path: '/kpis', desc: 'Giao chỉ tiêu GMV, Lead, phút gọi & tính % tiến độ' },
+                { key: 'performance', name: 'Chấm Điểm Hiệu Suất S/A/B/C/D', path: '/performance', desc: 'Xếp loại hiệu suất nhân sự định kỳ từ ngày 1-5' },
+                { key: 'reviews', name: 'Đánh Giá 360° Năng Lực', path: '/reviews', desc: 'Đánh giá đa chiều tự đánh giá / quản lý / đồng nghiệp' },
+                { key: 'audit', name: 'Nhật Ký Kiểm Toán Audit Trail', path: '/audit', desc: 'Ghi vết 100% thời gian thực thao tác của tất cả người dùng' },
+              ].map((mod) => {
+                const isEnabled = toggles[mod.key as keyof typeof toggles];
+                return (
+                  <div
+                    key={mod.key}
+                    className={`p-4 rounded-lg border transition-all flex items-center justify-between gap-4 ${
+                      isEnabled ? 'bg-white border-slate-200/80 shadow-2xs' : 'bg-slate-50 border-slate-200 opacity-60'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900 text-xs">{mod.name}</span>
+                        <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                          {mod.path}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1">{mod.desc}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleModule(mod.key as keyof typeof toggles)}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        isEnabled ? 'bg-blue-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                          isEnabled ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ==================== TAB 1: INFRASTRUCTURE (R2, SUPABASE, VOIP) ==================== */}
         {activeTab === 'INFRASTRUCTURE' && (
           <div className="space-y-6">
