@@ -175,8 +175,8 @@ export default function UserAccountsPage() {
               <h3 className="font-bold text-base text-white">Tài Khoản Super Admin Mặc Định</h3>
               <span className="px-2 py-0.5 bg-amber-500 text-slate-900 rounded text-[10px] font-black uppercase">Active</span>
             </div>
-            <p className="text-xs text-slate-300 font-mono mt-0.5">
-              Username: <span className="text-amber-400 font-bold">admin</span> (admin@ggbingo.vn) • Mật khẩu: <span className="text-amber-400 font-bold">GGBG@2026#</span>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Tài khoản quản trị tối cao của hệ thống • Đã bảo mật thông tin xác thực
             </p>
           </div>
         </div>
