@@ -47,7 +47,8 @@ import {
   ChevronRight,
   FileCheck,
   X,
-  MessageSquare
+  MessageSquare,
+  Award
 } from 'lucide-react';
 import { EmployeeProfile, EmployeeApprovalStatus, Candidate, CandidateAuditLog, RecruitmentStage } from '@/types';
 import {
@@ -62,7 +63,15 @@ import {
   getJobTitles,
   createJobTitle,
   deleteJobTitle,
-  JobTitleDefinition
+  JobTitleDefinition,
+  getPositionCategories,
+  createPositionCategory,
+  deletePositionCategory,
+  PositionCategoryDefinition,
+  getGradeLevels,
+  createGradeLevel,
+  deleteGradeLevel,
+  GradeLevelDefinition
 } from '@/lib/hrmStore';
 import dynamic from 'next/dynamic';
 
@@ -167,19 +176,43 @@ export default function HRMPage() {
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
 
+  // Sub-Tab inside Tab 7: TITLES (Chức danh chuyên môn), POSITIONS (Chức vụ quản lý), GRADES (Cấp bậc G1-G6)
+  const [jobSubTab, setJobSubTab] = useState<'TITLES' | 'POSITIONS' | 'GRADES'>('TITLES');
+
   // Job Titles Management & Real-Time Auto Sync State
   const [jobTitlesList, setJobTitlesList] = useState<JobTitleDefinition[]>(() => getJobTitles());
+  const [positionsList, setPositionsList] = useState<PositionCategoryDefinition[]>(() => getPositionCategories());
+  const [gradeLevelsList, setGradeLevelsList] = useState<GradeLevelDefinition[]>(() => getGradeLevels());
+
   const [isJobTitleModalOpen, setIsJobTitleModalOpen] = useState(false);
   const [jobTitleSearchTerm, setJobTitleSearchTerm] = useState('');
   const [newJtCode, setNewJtCode] = useState('');
   const [newJtName, setNewJtName] = useState('');
+  const [newJtPosName, setNewJtPosName] = useState('Chuyên Viên / Nhân Viên');
+  const [newJtGradeCode, setNewJtGradeCode] = useState('G4');
   const [newJtDept, setNewJtDept] = useState('Phòng Kinh Doanh 1');
   const [newJtRank, setNewJtRank] = useState<number>(3);
   const [newJtDesc, setNewJtDesc] = useState('');
 
+  // Position Modal Form State
+  const [isPositionModalOpen, setIsPositionModalOpen] = useState(false);
+  const [newPosCode, setNewPosCode] = useState('');
+  const [newPosName, setNewPosName] = useState('');
+  const [newPosDesc, setNewPosDesc] = useState('');
+
+  // Grade Level Modal Form State
+  const [isGradeModalOpen, setIsGradeModalOpen] = useState(false);
+  const [newGrCode, setNewGrCode] = useState('');
+  const [newGrName, setNewGrName] = useState('');
+  const [newGrMinSal, setNewGrMinSal] = useState<number>(10000000);
+  const [newGrMaxSal, setNewGrMaxSal] = useState<number>(20000000);
+  const [newGrDesc, setNewGrDesc] = useState('');
+
   React.useEffect(() => {
     const handleSync = () => {
       setJobTitlesList([...getJobTitles()]);
+      setPositionsList([...getPositionCategories()]);
+      setGradeLevelsList([...getGradeLevels()]);
     };
     window.addEventListener('ggbg_hrm_job_titles_updated', handleSync);
     return () => window.removeEventListener('ggbg_hrm_job_titles_updated', handleSync);
@@ -193,6 +226,8 @@ export default function HRMPage() {
     createJobTitle({
       code,
       name: newJtName.trim(),
+      position_name: newJtPosName,
+      grade_code: newJtGradeCode,
       department: newJtDept,
       rank_level: newJtRank,
       description: newJtDesc.trim() || 'Chức danh công việc mới tại HRM',
@@ -212,6 +247,61 @@ export default function HRMPage() {
     deleteJobTitle(id);
     setJobTitlesList([...getJobTitles()]);
     setStatusToast(`Đã xóa & cập nhật tự động chức danh "${name}".`);
+    setTimeout(() => setStatusToast(''), 4000);
+  };
+
+  const handleCreatePositionSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPosName.trim()) return;
+
+    const code = newPosCode.trim() || `POS_${newPosName.toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
+    createPositionCategory({
+      code,
+      name: newPosName.trim(),
+      description: newPosDesc.trim() || 'Cấp chức vụ quản lý hành chính trong doanh nghiệp',
+    });
+
+    setPositionsList([...getPositionCategories()]);
+    setIsPositionModalOpen(false);
+    setNewPosCode('');
+    setNewPosName('');
+    setNewPosDesc('');
+    setStatusToast(`⚡ Đã khởi tạo & tự động đồng bộ chức vụ "${newPosName.trim()}"!`);
+    setTimeout(() => setStatusToast(''), 4000);
+  };
+
+  const handleDeletePositionSubmit = (id: string, name: string) => {
+    deletePositionCategory(id);
+    setPositionsList([...getPositionCategories()]);
+    setStatusToast(`Đã xóa chức vụ "${name}".`);
+    setTimeout(() => setStatusToast(''), 4000);
+  };
+
+  const handleCreateGradeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGrCode.trim() || !newGrName.trim()) return;
+
+    createGradeLevel({
+      code: newGrCode.trim().toUpperCase(),
+      name: newGrName.trim(),
+      min_salary: newGrMinSal,
+      max_salary: newGrMaxSal,
+      description: newGrDesc.trim() || 'Khung cấp bậc & băng ngạch năng lực nhân sự',
+    });
+
+    setGradeLevelsList([...getGradeLevels()]);
+    setIsGradeModalOpen(false);
+    setNewGrCode('');
+    setNewGrName('');
+    setNewGrDesc('');
+    setStatusToast(`⚡ Đã khởi tạo cấp bậc băng ngạch "${newGrCode.trim().toUpperCase()}"!`);
+    setTimeout(() => setStatusToast(''), 4000);
+  };
+
+  const handleDeleteGradeSubmit = (id: string, code: string) => {
+    deleteGradeLevel(id);
+    setGradeLevelsList([...getGradeLevels()]);
+    setStatusToast(`Đã xóa cấp bậc "${code}".`);
     setTimeout(() => setStatusToast(''), 4000);
   };
 
@@ -1175,7 +1265,7 @@ export default function HRMPage() {
         />
       )}
 
-      {/* TAB 7: QUẢN LÝ CHỨC DANH & CHỨC VỤ - REAL-TIME AUTO SYNC */}
+      {/* TAB 7: QUẢN LÝ CHỨC DANH, CHỨC VỤ & CẤP BẬC (G1-G6) - REAL-TIME AUTO SYNC */}
       {activeTab === 'JOB_TITLES' && (
         <div className="space-y-6">
           {/* Header & Auto-Sync Alert */}
@@ -1186,91 +1276,145 @@ export default function HRMPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-base text-white">Quản Lý Danh Mục Chức Danh & Chức Vụ</h3>
+                  <h3 className="font-extrabold text-base text-white">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
                   <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Real-Time Auto Synced
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Auto Synced
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                  Tất cả chức danh / chức vụ tạo mới tại đây sẽ <strong>TỰ ĐỘNG ĐỒNG BỘ 100% THỜI GIAN THỰC</strong> sang Phân Quyền (RBAC), Hồ Sơ Nhân Sự, Cấp Tài Khoản User và Giao Chỉ Tiêu KPI mà không cần thao tác thủ công.
+                  Phân biệt rõ <strong>Chức Vụ</strong> (Giám Đốc, Trưởng Phòng...), <strong>Chức Danh</strong> (GĐ Kinh Doanh, GĐ Thị Trường...) và <strong>Khung Cấp Bậc</strong> (G1 ➔ G6 tùy biến). Tự động đồng bộ 100% thời gian thực sang RBAC & System Users.
                 </p>
               </div>
             </div>
 
+            {/* Quick Create Buttons depending on SubTab */}
+            {jobSubTab === 'TITLES' && (
+              <button
+                onClick={() => setIsJobTitleModalOpen(true)}
+                className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95 shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                Tạo Chức Danh Mới
+              </button>
+            )}
+
+            {jobSubTab === 'POSITIONS' && (
+              <button
+                onClick={() => setIsPositionModalOpen(true)}
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95 shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                Tạo Chức Vụ Mới
+              </button>
+            )}
+
+            {jobSubTab === 'GRADES' && (
+              <button
+                onClick={() => setIsGradeModalOpen(true)}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                Tạo Cấp Bậc G-Series
+              </button>
+            )}
+          </div>
+
+          {/* Sub-Tab Navigation Bar */}
+          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 w-fit text-xs font-extrabold">
             <button
-              onClick={() => setIsJobTitleModalOpen(true)}
-              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95 shrink-0"
+              onClick={() => setJobSubTab('TITLES')}
+              className={`px-4 py-2 rounded-xl transition-all ${
+                jobSubTab === 'TITLES' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+              }`}
             >
-              <Plus className="w-4 h-4" />
-              Tạo Chức Danh Mới
+              🏅 1. Quản Lý Chức Danh ({jobTitlesList.length})
+            </button>
+
+            <button
+              onClick={() => setJobSubTab('POSITIONS')}
+              className={`px-4 py-2 rounded-xl transition-all ${
+                jobSubTab === 'POSITIONS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              🏢 2. Quản Lý Chức Vụ ({positionsList.length})
+            </button>
+
+            <button
+              onClick={() => setJobSubTab('GRADES')}
+              className={`px-4 py-2 rounded-xl transition-all ${
+                jobSubTab === 'GRADES' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              📊 3. Khung Cấp Bậc (G1 - G6) ({gradeLevelsList.length})
             </button>
           </div>
 
-          {/* Job Titles Table & Cards */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-              <div>
-                <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-purple-600" /> Danh Mục Chức Danh Đã Định Nghĩa
-                </h4>
-                <p className="text-xs text-slate-500 mt-0.5">Hiển thị {jobTitlesList.length} chức danh chuẩn toàn hệ thống</p>
+          {/* SUB-TAB 1: CHỨC DANH CHUYÊN MÔN (JOB TITLES) */}
+          {jobSubTab === 'TITLES' && (
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-purple-600" /> Danh Mục Chức Danh Chuyên Môn
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường, Trưởng Phòng Kinh Doanh...
+                  </p>
+                </div>
+
+                <div className="relative w-full sm:w-72">
+                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={jobTitleSearchTerm}
+                    onChange={(e) => setJobTitleSearchTerm(e.target.value)}
+                    placeholder="Tìm theo mã, tên chức danh..."
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  />
+                </div>
               </div>
 
-              <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={jobTitleSearchTerm}
-                  onChange={(e) => setJobTitleSearchTerm(e.target.value)}
-                  placeholder="Tìm theo mã, tên chức danh, phòng ban..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
-                />
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
-                    <th className="p-3.5">Mã Chức Vụ</th>
-                    <th className="p-3.5">Tên Chức Danh / Chức Vụ</th>
-                    <th className="p-3.5">Thuộc Phòng Ban</th>
-                    <th className="p-3.5">Phân Cấp / Level</th>
-                    <th className="p-3.5 text-center">Số Nhân Sự Nắm Giữ</th>
-                    <th className="p-3.5 text-center">Trạng Thái Đồng Bộ</th>
-                    <th className="p-3.5 text-right">Thao Tác</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {jobTitlesList
-                    .filter((jt) => {
-                      if (!jobTitleSearchTerm.trim()) return true;
-                      const term = jobTitleSearchTerm.toLowerCase();
-                      return (
-                        jt.name.toLowerCase().includes(term) ||
-                        jt.code.toLowerCase().includes(term) ||
-                        jt.department.toLowerCase().includes(term)
-                      );
-                    })
-                    .map((jt) => {
-                      const empCount = employees.filter((e) => e.position.toLowerCase() === jt.name.toLowerCase()).length;
-                      return (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
+                      <th className="p-3.5">Mã Chức Danh</th>
+                      <th className="p-3.5">Tên Chức Danh Chuyên Môn</th>
+                      <th className="p-3.5">Chức Vụ Tương Ứng</th>
+                      <th className="p-3.5">Cấp Bậc Băng Ngạch</th>
+                      <th className="p-3.5">Thuộc Phòng Ban</th>
+                      <th className="p-3.5 text-center">Trạng Thái Đồng Bộ</th>
+                      <th className="p-3.5 text-right">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {jobTitlesList
+                      .filter((jt) => {
+                        if (!jobTitleSearchTerm.trim()) return true;
+                        const term = jobTitleSearchTerm.toLowerCase();
+                        return (
+                          jt.name.toLowerCase().includes(term) ||
+                          jt.code.toLowerCase().includes(term) ||
+                          jt.department.toLowerCase().includes(term)
+                        );
+                      })
+                      .map((jt) => (
                         <tr key={jt.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="p-3.5 font-mono font-bold text-purple-700">{jt.code}</td>
                           <td className="p-3.5">
                             <p className="font-bold text-slate-900">{jt.name}</p>
                             <p className="text-[11px] text-slate-500">{jt.description}</p>
                           </td>
-                          <td className="p-3.5 text-slate-700 font-medium">{jt.department}</td>
-                          <td className="p-3.5">{renderRankBadge(jt.rank_level)}</td>
-                          <td className="p-3.5 text-center">
-                            <span className="px-2.5 py-1 bg-slate-100 font-bold rounded-full text-slate-800 text-[11px]">
-                              {empCount} nhân sự
+                          <td className="p-3.5 font-bold text-blue-700">{jt.position_name || 'N/A'}</td>
+                          <td className="p-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-mono font-bold rounded border border-emerald-200">
+                              {jt.grade_code || 'G4'}
                             </span>
                           </td>
+                          <td className="p-3.5 text-slate-700 font-medium">{jt.department}</td>
                           <td className="p-3.5 text-center">
                             <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Tự Động Đồng Bộ RBAC
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Auto-Synced RBAC
                             </span>
                           </td>
                           <td className="p-3.5 text-right">
@@ -1282,12 +1426,90 @@ export default function HRMPage() {
                             </button>
                           </td>
                         </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* SUB-TAB 2: CHỨC VỤ QUẢN LÝ (POSITIONS) */}
+          {jobSubTab === 'POSITIONS' && (
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-blue-600" /> Danh Mục Chức Vụ Hành Chính / Quản Lý
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Chuyên Viên / Nhân Viên, Thử Việc...
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {positionsList.map((pos) => (
+                  <div key={pos.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono text-[11px] font-bold rounded border border-blue-200">
+                        {pos.code}
+                      </span>
+                      <button
+                        onClick={() => handleDeletePositionSubmit(pos.id, pos.name)}
+                        className="text-red-600 hover:text-red-800 text-[11px] font-bold"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                    <h5 className="font-extrabold text-sm text-slate-900">{pos.name}</h5>
+                    <p className="text-xs text-slate-500 leading-relaxed">{pos.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SUB-TAB 3: KHUNG CẤP BẬC G-SERIES (GRADE LEVELS) */}
+          {jobSubTab === 'GRADES' && (
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <Award className="w-4 h-4 text-emerald-600" /> Thang Cấp Bậc & Khung Băng Ngạch Năng Lực (G-Series)
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Tùy biến cấp bậc G1, G2, G3, G4, G5, G6... tương ứng với dải lương trần / sàn doanh nghiệp
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {gradeLevelsList.map((gr) => (
+                  <div key={gr.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 bg-emerald-600 text-white font-mono text-xs font-black rounded">
+                        {gr.code}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteGradeSubmit(gr.id, gr.code)}
+                        className="text-red-600 hover:text-red-800 text-[11px] font-bold"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                    <h5 className="font-extrabold text-xs text-slate-900">{gr.name}</h5>
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800">
+                      <span>Dải Lương: </span>
+                      <span className="text-emerald-700">{gr.min_salary.toLocaleString('vi-VN')} ₫</span>
+                      <span> - </span>
+                      <span className="text-emerald-700">{gr.max_salary.toLocaleString('vi-VN')} ₫</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">{gr.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1532,7 +1754,7 @@ export default function HRMPage() {
         </div>
       )}
 
-      {/* MODAL: THÊM CHỨC DANH & CHỨC VỤ MỚI HỆ THỐNG HRM */}
+      {/* MODAL 1: THÊM CHỨC DANH MỚI (JOB TITLE) */}
       {isJobTitleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -1542,8 +1764,8 @@ export default function HRMPage() {
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base">Khai Báo Chức Danh / Chức Vụ Mới</h3>
-                  <p className="text-[11px] text-purple-300">Tự động đồng bộ 100% sang RBAC & System Users</p>
+                  <h3 className="font-bold text-base">Khai Báo Chức Danh Chuyên Môn Mới</h3>
+                  <p className="text-[11px] text-purple-300">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
                 </div>
               </div>
               <button onClick={() => setIsJobTitleModalOpen(false)} className="text-slate-400 hover:text-white">
@@ -1553,25 +1775,57 @@ export default function HRMPage() {
 
             <form onSubmit={handleCreateJobTitleSubmit} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mã Chức Vụ (Code):</label>
-                <input
-                  type="text"
-                  value={newJtCode}
-                  onChange={(e) => setNewJtCode(e.target.value)}
-                  placeholder="VD: MKT_LEAD, OPS_SPEC... (Tự tạo nếu trống)"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Tên Chức Danh / Chức Vụ *:</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Tên Chức Danh Chuyên Môn *:</label>
                 <input
                   type="text"
                   required
                   value={newJtName}
                   onChange={(e) => setNewJtName(e.target.value)}
-                  placeholder="VD: Trưởng Phòng Marketing, Chuyên Viên Vận Hành Ops..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                  placeholder="VD: Giám Đốc Kinh Doanh, Trưởng Phòng HR..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Chức Vụ Hành Chính:</label>
+                  <select
+                    value={newJtPosName}
+                    onChange={(e) => setNewJtPosName(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-blue-700 focus:outline-none"
+                  >
+                    {positionsList.map((p) => (
+                      <option key={p.id} value={p.name}>
+                        🏢 {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Khung Cấp Bậc (Grade):</label>
+                  <select
+                    value={newJtGradeCode}
+                    onChange={(e) => setNewJtGradeCode(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-emerald-700 focus:outline-none"
+                  >
+                    {gradeLevelsList.map((g) => (
+                      <option key={g.id} value={g.code}>
+                        📊 {g.code} ({g.name})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mã Chức Danh (Code):</label>
+                <input
+                  type="text"
+                  value={newJtCode}
+                  onChange={(e) => setNewJtCode(e.target.value)}
+                  placeholder="VD: DIR_SALES, MGR_HR... (Tự tạo nếu trống)"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                 />
               </div>
 
@@ -1584,6 +1838,7 @@ export default function HRMPage() {
                 >
                   <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
                   <option value="Phòng Kinh Doanh 2">Phòng Kinh Doanh 2</option>
+                  <option value="Phòng Marketing">Phòng Marketing</option>
                   <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
                   <option value="Phòng Nhân Sự (HR)">Phòng Nhân Sự (HR)</option>
                   <option value="Phòng CSKH">Phòng CSKH</option>
@@ -1593,26 +1848,12 @@ export default function HRMPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Phân Cấp / Level:</label>
-                <select
-                  value={newJtRank}
-                  onChange={(e) => setNewJtRank(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                >
-                  <option value={1}>🔴 Cấp 1: Ban Giám Đốc (Executive)</option>
-                  <option value={2}>🔵 Cấp 2: Quản Lý & Trưởng Phòng (Management)</option>
-                  <option value={3}>🟢 Cấp 3: Chuyên Viên Thực Thao (Operational)</option>
-                  <option value={4}>🟡 Cấp 4: Nhân Sự Mới & Thử Việc (Entry)</option>
-                </select>
-              </div>
-
-              <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Mô Tả Trách Nhiệm:</label>
                 <textarea
                   rows={2}
                   value={newJtDesc}
                   onChange={(e) => setNewJtDesc(e.target.value)}
-                  placeholder="Nhập mô tả nhiệm vụ công việc..."
+                  placeholder="Mô tả phạm vi chiến lược / công việc chuyên môn..."
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                 />
               </div>
@@ -1630,7 +1871,184 @@ export default function HRMPage() {
                   className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-purple-600/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
-                  Tạo & Tự Đồng Bộ
+                  Tạo Chức Danh
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: THÊM CHỨC VỤ MỚI (POSITION) */}
+      {isPositionModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-300">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base">Khai Báo Chức Vụ Quản Lý Mới</h3>
+                  <p className="text-[11px] text-blue-300">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
+                </div>
+              </div>
+              <button onClick={() => setIsPositionModalOpen(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreatePositionSubmit} className="p-6 space-y-4 text-xs">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Tên Chức Vụ Hành Chính *:</label>
+                <input
+                  type="text"
+                  required
+                  value={newPosName}
+                  onChange={(e) => setNewPosName(e.target.value)}
+                  placeholder="VD: Phó Giám Đốc, Trưởng Bộ Phận, Trợ Lý Executive..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mã Chức Vụ (Code):</label>
+                <input
+                  type="text"
+                  value={newPosCode}
+                  onChange={(e) => setNewPosCode(e.target.value)}
+                  placeholder="VD: POS_VP, POS_HEAD... (Tự tạo nếu trống)"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mô Tả Vai Trò:</label>
+                <textarea
+                  rows={2}
+                  value={newPosDesc}
+                  onChange={(e) => setNewPosDesc(e.target.value)}
+                  placeholder="Mô tả quyền hạn quản lý hành chính..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPositionModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                >
+                  Hủy Bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  Tạo Chức Vụ
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: THÊM CẤP BẬC G-SERIES MỚI (GRADE LEVEL) */}
+      {isGradeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-emerald-500/20 border border-emerald-400/30 rounded-xl text-emerald-300">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base">Khai Báo Cấp Bậc (Grade Matrix) Mới</h3>
+                  <p className="text-[11px] text-emerald-300">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
+                </div>
+              </div>
+              <button onClick={() => setIsGradeModalOpen(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateGradeSubmit} className="p-6 space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mã Cấp Bậc (Grade Code) *:</label>
+                  <input
+                    type="text"
+                    required
+                    value={newGrCode}
+                    onChange={(e) => setNewGrCode(e.target.value)}
+                    placeholder="VD: G1, G2, G3, G7..."
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-emerald-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tên Gọi Ngạch Bậc *:</label>
+                  <input
+                    type="text"
+                    required
+                    value={newGrName}
+                    onChange={(e) => setNewGrName(e.target.value)}
+                    placeholder="VD: G7 - Chuyên Gia Cao Cấp..."
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mức Lương Sàn (Sàn VNĐ):</label>
+                  <input
+                    type="number"
+                    value={newGrMinSal}
+                    onChange={(e) => setNewGrMinSal(Number(e.target.value))}
+                    step={500000}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mức Lương Trần (Trần VNĐ):</label>
+                  <input
+                    type="number"
+                    value={newGrMaxSal}
+                    onChange={(e) => setNewGrMaxSal(Number(e.target.value))}
+                    step={500000}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mô Tả Năng Lực Năng Định:</label>
+                <textarea
+                  rows={2}
+                  value={newGrDesc}
+                  onChange={(e) => setNewGrDesc(e.target.value)}
+                  placeholder="Mô tả yêu cầu tiêu chuẩn kinh nghiệm & năng lực..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsGradeModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                >
+                  Hủy Bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  Tạo Cấp Bậc G-Series
                 </button>
               </div>
             </form>

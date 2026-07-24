@@ -371,11 +371,96 @@ export function getOrgChartTree(): OrgNode {
   return INITIAL_ORG_TREE;
 }
 
-// ==================== HRM JOB TITLES & POSITIONS MANAGEMENT ====================
+// ==================== 1. CHỨC VỤ (POSITIONS / ADMINISTRATIVE ROLES) ====================
+export interface PositionCategoryDefinition {
+  id: string;
+  code: string;
+  name: string; // Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...
+  description: string;
+  created_at: string;
+}
+
+export const INITIAL_POSITIONS: PositionCategoryDefinition[] = [
+  { id: 'pos_1', code: 'POS_DIR', name: 'Giám Đốc', description: 'Cấp điều hành tối cao công ty và quản lý các khối', created_at: '2025-01-01' },
+  { id: 'pos_2', code: 'POS_HEAD', name: 'Trưởng Phòng', description: 'Quản lý điều hành phòng ban chuyên môn', created_at: '2025-01-01' },
+  { id: 'pos_3', code: 'POS_LEAD', name: 'Trưởng Nhóm', description: 'Quản lý đội ngũ tác nghiệp trực tiếp', created_at: '2025-01-01' },
+  { id: 'pos_4', code: 'POS_STAFF', name: 'Chuyên Viên / Nhân Viên', description: 'Nhân sự thực thi công việc chuyên môn', created_at: '2025-01-01' },
+  { id: 'pos_5', code: 'POS_INTERN', name: 'Thử Việc / Thực Tập Sinh', description: 'Nhân sự mới nhận việc hoặc đang thử thách năng lực', created_at: '2025-01-01' },
+];
+
+let positionCategories = [...INITIAL_POSITIONS];
+
+export function getPositionCategories(): PositionCategoryDefinition[] {
+  return positionCategories;
+}
+
+export function createPositionCategory(newPos: Omit<PositionCategoryDefinition, 'id' | 'created_at'>): PositionCategoryDefinition {
+  const created: PositionCategoryDefinition = {
+    ...newPos,
+    id: `pos_${Date.now()}`,
+    created_at: new Date().toISOString().split('T')[0],
+  };
+  positionCategories = [created, ...positionCategories];
+  syncJobTitlesToSystem();
+  return created;
+}
+
+export function deletePositionCategory(id: string): boolean {
+  positionCategories = positionCategories.filter((p) => p.id !== id);
+  syncJobTitlesToSystem();
+  return true;
+}
+
+// ==================== 2. CẤP BẬC / NĂNG LỰC (GRADE LEVELS: G1, G2, G3...) ====================
+export interface GradeLevelDefinition {
+  id: string;
+  code: string; // G1, G2, G3, G4, G5, G6...
+  name: string;
+  min_salary: number;
+  max_salary: number;
+  description: string;
+  created_at: string;
+}
+
+export const INITIAL_GRADE_LEVELS: GradeLevelDefinition[] = [
+  { id: 'gr_1', code: 'G1', name: 'G1 - Ban Điều Hành Tối Cao', min_salary: 40000000, max_salary: 120000000, description: 'Cấp độ quyết định chiến lược doanh nghiệp & đầu tư', created_at: '2025-01-01' },
+  { id: 'gr_2', code: 'G2', name: 'G2 - Quản Lý Cấp Cao', min_salary: 25000000, max_salary: 50000000, description: 'Cấp độ Giám đốc khối & Trưởng phòng trọng điểm', created_at: '2025-01-01' },
+  { id: 'gr_3', code: 'G3', name: 'G3 - Quản Lý Cấp Trung / Team Lead', min_salary: 15000000, max_salary: 30000000, description: 'Cấp độ Trưởng nhóm & Quản lý đội ngũ', created_at: '2025-01-01' },
+  { id: 'gr_4', code: 'G4', name: 'G4 - Chuyên Viên Senior', min_salary: 11000000, max_salary: 20000000, description: 'Chuyên viên lành nghề, xử lý tác nghiệp độc lập', created_at: '2025-01-01' },
+  { id: 'gr_5', code: 'G5', name: 'G5 - Chuyên Viên Junior / Executive', min_salary: 8000000, max_salary: 13000000, description: 'Nhân sự thực thi công việc định kỳ', created_at: '2025-01-01' },
+  { id: 'gr_6', code: 'G6', name: 'G6 - Thử Việc & Intern', min_salary: 5000000, max_salary: 9000000, description: 'Nhân sự mới gia nhập đang đào tạo onboarding', created_at: '2025-01-01' },
+];
+
+let gradeLevels = [...INITIAL_GRADE_LEVELS];
+
+export function getGradeLevels(): GradeLevelDefinition[] {
+  return gradeLevels;
+}
+
+export function createGradeLevel(newGrade: Omit<GradeLevelDefinition, 'id' | 'created_at'>): GradeLevelDefinition {
+  const created: GradeLevelDefinition = {
+    ...newGrade,
+    id: `gr_${Date.now()}`,
+    created_at: new Date().toISOString().split('T')[0],
+  };
+  gradeLevels = [...gradeLevels, created];
+  syncJobTitlesToSystem();
+  return created;
+}
+
+export function deleteGradeLevel(id: string): boolean {
+  gradeLevels = gradeLevels.filter((g) => g.id !== id);
+  syncJobTitlesToSystem();
+  return true;
+}
+
+// ==================== 3. CHỨC DANH CHUYÊN MÔN (JOB TITLES) ====================
 export interface JobTitleDefinition {
   id: string;
   code: string;
-  name: string;
+  name: string; // Giám Đốc Kinh Doanh, Giám Đốc Thị Trường, Trưởng Phòng Kinh Doanh...
+  position_name: string; // Giám Đốc, Trưởng Phòng...
+  grade_code: string; // G1, G2, G3...
   department: string;
   rank_level: number; // 1: Ban Giám Đốc, 2: Quản Lý & Trưởng Phòng, 3: Chuyên Viên Thực Thao, 4: Thử Việc
   description: string;
@@ -384,14 +469,15 @@ export interface JobTitleDefinition {
 }
 
 export const INITIAL_JOB_TITLES: JobTitleDefinition[] = [
-  { id: 'jt_1', code: 'DIR_SALES', name: 'Giám Đốc Kinh Doanh', department: 'Phòng Kinh Doanh 1', rank_level: 1, description: 'Chịu trách nhiệm chiến lược doanh số toàn công ty', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_2', code: 'MGR_SALES', name: 'Trưởng Phòng Kinh Doanh', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý phòng kinh doanh & điều phối KPI đội nhóm', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_3', code: 'LEAD_SALES', name: 'Trưởng Nhóm Sale', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý đội sale & giao chỉ tiêu GMV hàng tháng', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_4', code: 'EXEC_SALES', name: 'Chuyên Viên Sale', department: 'Phòng Kinh Doanh 1', rank_level: 3, description: 'Chăm sóc Lead & tư vấn chốt hợp đồng', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_5', code: 'MGR_HR', name: 'Quản Lý HR', department: 'Phòng Nhân Sự (HR)', rank_level: 2, description: 'Quản lý hồ sơ nhân sự, tuyển dụng & đánh giá 360°', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_6', code: 'SPEC_CSKH', name: 'Specialist CSKH', department: 'Phòng CSKH', rank_level: 3, description: 'Tiếp nhận live chat đa kênh & hỗ trợ khách hàng', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_7', code: 'SPEC_OPS', name: 'Chuyên Viên Tối Ưu Gian Hàng', department: 'Phòng Vận Hành TMĐT', rank_level: 3, description: 'Quản lý gian hàng Shopee, TikTok Shop, Lazada', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_8', code: 'AUDITOR_SYS', name: 'Chuyên Viên Kiểm Toán', department: 'Phòng Kiểm Toán & An Ninh', rank_level: 3, description: 'Kiểm tra nhật ký hệ thống & bảo mật dữ liệu', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_1', code: 'DIR_SALES', name: 'Giám Đốc Kinh Doanh', position_name: 'Giám Đốc', grade_code: 'G1', department: 'Phòng Kinh Doanh 1', rank_level: 1, description: 'Chịu trách nhiệm chiến lược doanh số toàn công ty', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_2', code: 'DIR_MKT', name: 'Giám Đốc Thị Trường', position_name: 'Giám Đốc', grade_code: 'G1', department: 'Phòng Marketing', rank_level: 1, description: 'Phát triển thương hiệu & mở rộng thị phần đa sàn TMĐT', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_3', code: 'MGR_SALES', name: 'Trưởng Phòng Kinh Doanh', position_name: 'Trưởng Phòng', grade_code: 'G2', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý phòng kinh doanh & điều phối KPI đội nhóm', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_4', code: 'LEAD_SALES', name: 'Trưởng Nhóm Sale', position_name: 'Trưởng Nhóm', grade_code: 'G3', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý đội sale & giao chỉ tiêu GMV hàng tháng', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_5', code: 'EXEC_SALES', name: 'Chuyên Viên Sale', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G4', department: 'Phòng Kinh Doanh 1', rank_level: 3, description: 'Chăm sóc Lead & tư vấn chốt hợp đồng', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_6', code: 'MGR_HR', name: 'Quản Lý HR', position_name: 'Trưởng Phòng', grade_code: 'G2', department: 'Phòng Nhân Sự (HR)', rank_level: 2, description: 'Quản lý hồ sơ nhân sự, tuyển dụng & đánh giá 360°', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_7', code: 'SPEC_CSKH', name: 'Specialist CSKH', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G5', department: 'Phòng CSKH', rank_level: 3, description: 'Tiếp nhận live chat đa kênh & hỗ trợ khách hàng', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_8', code: 'SPEC_OPS', name: 'Chuyên Viên Tối Ưu Gian Hàng', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G4', department: 'Phòng Vận Hành TMĐT', rank_level: 3, description: 'Quản lý gian hàng Shopee, TikTok Shop, Lazada', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_9', code: 'AUDITOR_SYS', name: 'Chuyên Viên Kiểm Toán', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G4', department: 'Phòng Kiểm Toán & An Ninh', rank_level: 3, description: 'Kiểm tra nhật ký hệ thống & bảo mật dữ liệu', is_active: true, created_at: '2025-01-01' },
 ];
 
 let jobTitles = [...INITIAL_JOB_TITLES];
@@ -402,7 +488,11 @@ export function getJobTitles(): JobTitleDefinition[] {
 
 export function syncJobTitlesToSystem() {
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('ggbg_hrm_job_titles_updated', { detail: { jobTitles } }));
+    window.dispatchEvent(
+      new CustomEvent('ggbg_hrm_job_titles_updated', {
+        detail: { jobTitles, positions: positionCategories, grades: gradeLevels },
+      })
+    );
   }
 }
 
