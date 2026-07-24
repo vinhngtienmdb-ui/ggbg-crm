@@ -19,6 +19,9 @@ import {
   Settings,
   MessageSquare,
   PieChart,
+  ShoppingBag,
+  ShieldAlert,
+  FileText,
   X
 } from 'lucide-react';
 
@@ -32,12 +35,15 @@ const menuItems = [
   { name: 'Quản Lý Khách Hàng', href: '/customers', icon: Users },
   { name: 'Quản Lý Lead & Phễu', href: '/leads', icon: UserCheck },
   { name: 'Live Chat CSKH Đa Kênh', href: '/chat', icon: MessageSquare },
+  { name: 'Gian Hàng Đa Sàn TMĐT', href: '/stores', icon: ShoppingBag },
   { name: 'Báo Cáo Tài Chính', href: '/finance', icon: PieChart },
+  { name: 'Quản Lý Hợp Đồng PDF', href: '/contracts', icon: FileText },
   { name: 'Quản Lý Nhân Sự', href: '/hrm', icon: Briefcase },
   { name: 'Sản Phẩm & Dịch Vụ', href: '/products', icon: Package },
   { name: 'Quản Lý KPIs', href: '/kpis', icon: TrendingUp },
   { name: 'Chấm Điểm Hiệu Suất', href: '/performance', icon: Award },
   { name: 'Đánh Giá 360°', href: '/reviews', icon: Users },
+  { name: 'Nhật Ký Kiểm Toán', href: '/audit', icon: ShieldAlert },
   { name: 'Quản Lý Tài Khoản', href: '/settings/users', icon: UserCog },
   { name: 'Phân Quyền Truy Cập', href: '/settings/rbac', icon: ShieldCheck },
   { name: 'Cấu Hình Hệ Thống', href: '/settings/system', icon: Settings },
