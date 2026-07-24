@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { SystemConfig, getSystemConfig, saveSystemConfig } from '@/lib/systemConfigStore';
 import { useModuleToggles } from '@/context/ModuleToggleContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface TestResult {
   service: string;
@@ -40,6 +41,8 @@ interface TestResult {
 }
 
 export default function SystemSettingsPage() {
+  const { user, simulatedRole } = useAuth();
+  const isAdmin = Boolean(user?.is_super_admin || user?.role === 'SUPER_ADMIN' || simulatedRole === 'SUPER_ADMIN');
   const [config, setConfig] = useState<SystemConfig>(getSystemConfig());
   const [saveToast, setSaveToast] = useState('');
   const [activeTab, setActiveTab] = useState<'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT'>('MODULE_TOGGLES');
@@ -307,6 +310,39 @@ export default function SystemSettingsPage() {
         {/* ==================== TAB 0: MODULE FEATURE TOGGLES ==================== */}
         {activeTab === 'MODULE_TOGGLES' && (
           <div className="space-y-5">
+            {/* System-wide Admin Permission Banner */}
+            {isAdmin ? (
+              <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-medium flex items-center justify-between shadow-2xs">
+                <div className="flex items-center gap-2.5">
+                  <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
+                  <div>
+                    <p className="font-bold text-blue-950">Quyền Quản Trị Viên (Admin Privileges Active)</p>
+                    <p className="text-[11px] text-blue-700 mt-0.5">
+                      Bật/tắt các phân hệ chức năng sẽ lập tức áp dụng và đồng bộ trên toàn bộ hệ thống cho tất cả người dùng.
+                    </p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-bold shrink-0">
+                  SYSTEM-WIDE ADMIN
+                </span>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-medium flex items-center justify-between shadow-2xs">
+                <div className="flex items-center gap-2.5">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                  <div>
+                    <p className="font-bold text-amber-950">Quyền Hạn Hạn Chế (Chỉ Xem)</p>
+                    <p className="text-[11px] text-amber-800 mt-0.5">
+                      Việc bật/tắt chức năng chỉ do Admin làm, áp dụng thay đổi cho toàn hệ thống. Tài khoản hiện tại không có quyền thay đổi.
+                    </p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-bold shrink-0">
+                  READ-ONLY
+                </span>
+              </div>
+            )}
+
             <div className="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
@@ -319,8 +355,22 @@ export default function SystemSettingsPage() {
 
               <button
                 type="button"
-                onClick={resetToggles}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded text-xs border border-slate-200"
+                onClick={() => {
+                  if (!isAdmin) {
+                    setSaveToast('⛔ Thao tác bị từ chối: Việc bật/tắt chức năng chỉ do Admin làm!');
+                    setTimeout(() => setSaveToast(''), 4000);
+                    return;
+                  }
+                  resetToggles();
+                  setSaveToast('Đã khôi phục bật tất cả phân hệ chức năng cho toàn hệ thống!');
+                  setTimeout(() => setSaveToast(''), 4000);
+                }}
+                disabled={!isAdmin}
+                className={`px-3 py-1.5 font-semibold rounded text-xs border transition-all ${
+                  isAdmin
+                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 cursor-pointer'
+                    : 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-60'
+                }`}
               >
                 Khôi Phục Mặc Định (Bật Tất Cả)
               </button>
@@ -361,10 +411,21 @@ export default function SystemSettingsPage() {
 
                     <button
                       type="button"
-                      onClick={() => toggleModule(mod.key as keyof typeof toggles)}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        isEnabled ? 'bg-blue-600' : 'bg-slate-300'
-                      }`}
+                      onClick={() => {
+                        if (!isAdmin) {
+                          setSaveToast('⛔ Thao tác bị từ chối: Việc bật/tắt chức năng chỉ do Admin làm, áp dụng thay đổi cho toàn hệ thống!');
+                          setTimeout(() => setSaveToast(''), 4000);
+                          return;
+                        }
+                        toggleModule(mod.key as keyof typeof toggles);
+                        setSaveToast(`Đã ${isEnabled ? 'TẮT' : 'BẬT'} phân hệ [${mod.name}] áp dụng thay đổi cho toàn hệ thống!`);
+                        setTimeout(() => setSaveToast(''), 4000);
+                      }}
+                      disabled={!isAdmin}
+                      title={isAdmin ? `Bật/Tắt phân hệ ${mod.name}` : 'Việc bật/tắt chức năng chỉ do Admin làm'}
+                      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        !isAdmin ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                      } ${isEnabled ? 'bg-blue-600' : 'bg-slate-300'}`}
                     >
                       <span
                         className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${

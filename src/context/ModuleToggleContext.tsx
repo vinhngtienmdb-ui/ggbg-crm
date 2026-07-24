@@ -43,7 +43,7 @@ const ModuleToggleContext = createContext<ModuleToggleContextType | undefined>(u
 export function ModuleToggleProvider({ children }: { children: React.ReactNode }) {
   const [toggles, setToggles] = useState<ModuleToggles>(DEFAULT_TOGGLES);
 
-  useEffect(() => {
+  const syncTogglesFromStorage = () => {
     try {
       const saved = localStorage.getItem('ggbg_module_toggles');
       if (saved) {
@@ -52,6 +52,28 @@ export function ModuleToggleProvider({ children }: { children: React.ReactNode }
     } catch {
       // ignore
     }
+  };
+
+  useEffect(() => {
+    syncTogglesFromStorage();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ggbg_module_toggles' || !e.key) {
+        syncTogglesFromStorage();
+      }
+    };
+
+    const handleCustomSync = () => {
+      syncTogglesFromStorage();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('ggbg_module_toggles_updated', handleCustomSync);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('ggbg_module_toggles_updated', handleCustomSync);
+    };
   }, []);
 
   const toggleModule = (moduleKey: keyof ModuleToggles) => {
@@ -59,6 +81,7 @@ export function ModuleToggleProvider({ children }: { children: React.ReactNode }
       const updated = { ...prev, [moduleKey]: !prev[moduleKey] };
       try {
         localStorage.setItem('ggbg_module_toggles', JSON.stringify(updated));
+        window.dispatchEvent(new Event('ggbg_module_toggles_updated'));
       } catch {
         // ignore
       }
@@ -70,6 +93,7 @@ export function ModuleToggleProvider({ children }: { children: React.ReactNode }
     setToggles(DEFAULT_TOGGLES);
     try {
       localStorage.setItem('ggbg_module_toggles', JSON.stringify(DEFAULT_TOGGLES));
+      window.dispatchEvent(new Event('ggbg_module_toggles_updated'));
     } catch {
       // ignore
     }
