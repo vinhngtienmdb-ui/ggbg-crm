@@ -113,6 +113,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'SALES_REP', 'SALE_EXEC', 'TEAM_LEADER'],
       },
       {
+        name: 'Sản Phẩm & Dịch Vụ',
+        href: '/products',
+        iconName: 'Package',
+        moduleKey: 'products',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'SALES_REP', 'SALE_EXEC', 'TEAM_LEADER'],
+      },
+      {
         name: 'Quản Lý Hợp Đồng PDF',
         href: '/contracts',
         iconName: 'FileText',
@@ -141,13 +148,6 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         iconName: 'Briefcase',
         moduleKey: 'hrm',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER'],
-      },
-      {
-        name: 'Sản Phẩm & Dịch Vụ',
-        href: '/products',
-        iconName: 'Package',
-        moduleKey: 'products',
-        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'SALES_REP', 'SALE_EXEC', 'TEAM_LEADER'],
       },
       {
         name: 'Quản Lý KPIs',
