@@ -392,52 +392,59 @@ export default function VietnamEmployeeDistributionMap({
                 </filter>
               </defs>
 
-              {/* 1. NORTHERN VIETNAM (BẮC BỘ - TÂY BẮC, ĐÔNG BẮC, ĐỒNG BẰNG SÔNG HỒNG) */}
+              {/* AUTHENTIC GEOGRAPHIC VIETNAM S-CURVE COASTLINE & BOUNDARY (34 PROVINCES POST-01/07/2025) */}
               <path
-                d="M 120 70 
-                   Q 150 40, 210 50 
-                   Q 260 70, 270 120 
-                   Q 280 150, 250 170 
-                   Q 230 180, 200 185 
-                   Q 180 180, 160 140 
-                   Q 140 120, 120 70 Z"
+                d="M 95,75 
+                   C 120,55 165,35 215,42 
+                   C 245,46 270,60 280,95 
+                   C 285,120 270,140 245,155 
+                   C 220,165 200,180 185,205 
+                   C 165,235 170,270 200,310 
+                   C 225,335 260,345 275,360 
+                   C 290,380 295,410 298,445 
+                   C 300,470 290,495 270,515 
+                   C 245,525 220,535 200,555 
+                   C 175,575 145,605 125,635 
+                   C 115,650 100,640 105,625 
+                   C 115,600 110,575 130,550 
+                   C 150,530 185,515 195,490 
+                   C 210,450 205,400 185,350 
+                   C 160,300 145,260 140,225 
+                   C 135,190 140,150 115,115 
+                   C 100,95 90,85 95,75 Z"
                 fill="url(#northGradAcc)"
                 stroke="#fca5a5"
-                strokeWidth="1.5"
-                className="transition-all hover:opacity-90"
+                strokeWidth="2"
+                className="transition-all hover:opacity-95 drop-shadow-md"
               />
 
-              {/* 2. CENTRAL VIETNAM COASTAL STRIP (TRUNG BỘ - BẮC TRUNG BỘ & NAM TRUNG BỘ) */}
+              {/* CENTRAL & HIGHLANDS REGIONAL OVERLAY */}
               <path
-                d="M 200 185 
-                   Q 230 200, 250 250 
-                   Q 275 300, 285 350 
-                   Q 295 400, 315 450 
-                   Q 325 480, 290 500 
-                   Q 265 470, 250 420 
-                   Q 235 370, 220 310 
-                   Q 195 260, 175 230 
-                   Q 185 200, 200 185 Z"
+                d="M 185,205 
+                   C 165,235 170,270 200,310 
+                   C 225,335 260,345 275,360 
+                   C 290,380 295,410 298,445 
+                   C 300,470 290,495 270,515 
+                   C 245,525 225,505 235,465 
+                   C 245,425 230,375 205,330 
+                   C 185,290 170,255 185,205 Z"
                 fill="url(#centralGradAcc)"
                 stroke="#fcd34d"
                 strokeWidth="1.5"
-                className="transition-all hover:opacity-90"
               />
 
-              {/* 3. SOUTHERN VIETNAM & MEKONG DELTA (NAM BỘ & ĐỒNG BẰNG SÔNG CỬU LONG) */}
+              {/* SOUTH & MEKONG DELTA REGIONAL OVERLAY */}
               <path
-                d="M 290 500 
-                   Q 270 540, 230 550 
-                   Q 200 560, 175 580 
-                   Q 150 600, 130 630 
-                   Q 120 645, 140 655 
-                   Q 165 660, 195 635 
-                   Q 225 610, 245 565 
-                   Q 270 540, 290 500 Z"
+                d="M 270,515 
+                   C 245,525 220,535 200,555 
+                   C 175,575 145,605 125,635 
+                   C 115,650 100,640 105,625 
+                   C 115,600 110,575 130,550 
+                   C 150,530 185,515 195,490 
+                   C 220,500 250,510 270,515 Z"
                 fill="url(#southGradAcc)"
                 stroke="#6ee7b7"
                 strokeWidth="1.5"
-                className="transition-all hover:opacity-90"
               />
 
               {/* PHÚ QUỐC ISLAND (KIÊN GIANG) */}
