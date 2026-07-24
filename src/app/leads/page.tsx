@@ -41,8 +41,10 @@ import {
   Zap
 } from 'lucide-react';
 import { Lead, VoIPCallLog, LeadSource, Customer, CustomerEntityType } from '@/types';
-import BulkLeadImportModal from '@/components/leads/BulkLeadImportModal';
-import ChannelAnalyticsDrawer from '@/components/leads/ChannelAnalyticsDrawer';
+import dynamic from 'next/dynamic';
+
+const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
+const ChannelAnalyticsDrawer = dynamic(() => import('@/components/leads/ChannelAnalyticsDrawer'), { ssr: false });
 
 interface StageDefinition {
   id: string;

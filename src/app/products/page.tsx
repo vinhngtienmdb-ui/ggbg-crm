@@ -23,8 +23,10 @@ import {
 } from 'lucide-react';
 import { ProductPackage, EcomPlatform } from '@/types';
 import { getProducts, createProduct, updateProduct, deleteProduct, ECOM_PLATFORM_OPTIONS } from '@/lib/productStore';
-import ProductPackageModal from '@/components/products/ProductPackageModal';
-import JsonbSchemaBuilderModal from '@/components/products/JsonbSchemaBuilderModal';
+import dynamic from 'next/dynamic';
+
+const ProductPackageModal = dynamic(() => import('@/components/products/ProductPackageModal'), { ssr: false });
+const JsonbSchemaBuilderModal = dynamic(() => import('@/components/products/JsonbSchemaBuilderModal'), { ssr: false });
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<ProductPackage[]>(() => getProducts());

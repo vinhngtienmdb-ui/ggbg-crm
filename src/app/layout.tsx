@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import './globals.css';
+import dynamic from 'next/dynamic';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
-import VoIPCallModal from '@/components/telephony/VoIPCallModal';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
 import { usePathname } from 'next/navigation';
+
+const VoIPCallModal = dynamic(() => import('@/components/telephony/VoIPCallModal'), { ssr: false });
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);

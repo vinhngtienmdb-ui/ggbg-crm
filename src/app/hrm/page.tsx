@@ -60,9 +60,11 @@ import {
   approveBySalesDirector,
   rejectEmployeeApproval
 } from '@/lib/hrmStore';
-import EmployeeModal from '@/components/hrm/EmployeeModal';
-import ContractPdfModal from '@/components/hrm/ContractPdfModal';
-import OrgChartTree from '@/components/hrm/OrgChartTree';
+import dynamic from 'next/dynamic';
+
+const EmployeeModal = dynamic(() => import('@/components/hrm/EmployeeModal'), { ssr: false });
+const ContractPdfModal = dynamic(() => import('@/components/hrm/ContractPdfModal'), { ssr: false });
+const OrgChartTree = dynamic(() => import('@/components/hrm/OrgChartTree'), { ssr: false });
 
 interface OnboardingTask {
   id: string;

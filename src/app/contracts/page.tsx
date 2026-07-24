@@ -13,7 +13,9 @@ import {
   Calendar,
   Sparkles
 } from 'lucide-react';
-import OfficialContractPdfModal from '@/components/contracts/OfficialContractPdfModal';
+import dynamic from 'next/dynamic';
+
+const OfficialContractPdfModal = dynamic(() => import('@/components/contracts/OfficialContractPdfModal'), { ssr: false });
 
 interface ContractItem {
   id: string;

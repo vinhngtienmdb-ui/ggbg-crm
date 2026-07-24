@@ -31,8 +31,10 @@ import {
   updateFormulaWeights,
   runAutomatedBatchEvaluation,
 } from '@/lib/performanceStore';
-import ScorecardModal from '@/components/performance/ScorecardModal';
-import FormulaConfigModal from '@/components/performance/FormulaConfigModal';
+import dynamic from 'next/dynamic';
+
+const ScorecardModal = dynamic(() => import('@/components/performance/ScorecardModal'), { ssr: false });
+const FormulaConfigModal = dynamic(() => import('@/components/performance/FormulaConfigModal'), { ssr: false });
 
 export default function PerformancePage() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');

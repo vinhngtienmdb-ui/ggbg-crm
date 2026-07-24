@@ -29,7 +29,9 @@ import {
   get360Criteria,
   update360Criteria,
 } from '@/lib/review360Store';
-import Review360Modal from '@/components/reviews/Review360Modal';
+import dynamic from 'next/dynamic';
+
+const Review360Modal = dynamic(() => import('@/components/reviews/Review360Modal'), { ssr: false });
 
 export default function Review360Page() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Quý 3/2026');

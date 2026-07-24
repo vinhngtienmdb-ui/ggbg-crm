@@ -40,8 +40,10 @@ import {
   INITIAL_CHAT_CONVERSATIONS,
   DEFAULT_QUICK_REPLIES
 } from '@/lib/chatStore';
-import QuickCreateCustomerModal from '@/components/chat/QuickCreateCustomerModal';
-import QuickCreateLeadModal from '@/components/chat/QuickCreateLeadModal';
+import dynamic from 'next/dynamic';
+
+const QuickCreateCustomerModal = dynamic(() => import('@/components/chat/QuickCreateCustomerModal'), { ssr: false });
+const QuickCreateLeadModal = dynamic(() => import('@/components/chat/QuickCreateLeadModal'), { ssr: false });
 
 export default function OmnichannelChatPage() {
   const [conversations, setConversations] = useState<ChatConversation[]>(INITIAL_CHAT_CONVERSATIONS);
