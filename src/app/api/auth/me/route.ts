@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { findUserByUsernameOrEmail } from '@/lib/userStore';
+import { findUserForAuth } from '@/lib/authRepo';
 import { verifySession, SESSION_COOKIE } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export async function GET() {
     }
 
     // Đối chiếu trạng thái tài khoản hiện tại
-    const currentAccount = findUserByUsernameOrEmail(userData.username);
+    const currentAccount = await findUserForAuth(userData.username);
     if (currentAccount) {
       const statusUpper = (currentAccount.account_status || 'ACTIVE').toUpperCase();
       if (statusUpper === 'LOCKED' || statusUpper === 'INACTIVE' || statusUpper === 'SUSPENDED') {

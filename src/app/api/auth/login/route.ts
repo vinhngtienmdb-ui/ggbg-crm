@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { findUserByUsernameOrEmail } from '@/lib/userStore';
+import { findUserForAuth } from '@/lib/authRepo';
 import { verifyPassword } from '@/lib/password';
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE } from '@/lib/session';
 
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = findUserByUsernameOrEmail(username);
+    const user = await findUserForAuth(username);
     const passwordOk = user ? await verifyPassword(password, user.password_hash) : false;
 
     if (!user || !passwordOk) {
