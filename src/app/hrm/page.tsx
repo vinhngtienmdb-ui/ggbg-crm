@@ -1080,7 +1080,7 @@ export default function HRMPage() {
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                     <th className="p-4">Mã UV & Họ Tên</th>
                     <th className="p-4">Vị Trí & Phòng Ban</th>
                     <th className="p-4">SĐT & Email</th>
@@ -1156,9 +1156,9 @@ export default function HRMPage() {
       {activeTab === 'CONTRACTS' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800">
-              <p className="text-xs text-slate-400 font-bold uppercase">Hạ Tầng Lưu Trữ Hợp Đồng</p>
-              <p className="text-sm font-bold text-emerald-400 mt-1 flex items-center gap-1">
+            <div className="p-4 bg-emerald-50 text-slate-900 rounded-2xl border border-emerald-100">
+              <p className="text-xs text-emerald-700 font-bold uppercase">Hạ Tầng Lưu Trữ Hợp Đồng</p>
+              <p className="text-sm font-bold text-emerald-700 mt-1 flex items-center gap-1">
                 <Lock className="w-4 h-4" /> Đã Mã Hóa An Toàn Bảo Mật
               </p>
             </div>
@@ -1177,7 +1177,7 @@ export default function HRMPage() {
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-200 font-bold text-slate-600">
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-4">Số Hợp Đồng</th>
                   <th className="p-4">Nhân Sự</th>
                   <th className="p-4">Loại HĐ</th>
@@ -1279,19 +1279,19 @@ export default function HRMPage() {
       {activeTab === 'JOB_TITLES' && (
         <div className="space-y-6">
           {/* Header & Auto-Sync Alert */}
-          <div className="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white p-6 rounded-3xl border border-purple-800/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="gg-hero p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
-                <Briefcase className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-200 text-purple-700 flex items-center justify-center font-bold text-xl shadow-sm shrink-0">
+                <Briefcase className="w-6 h-6 text-purple-600" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-base text-white">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
-                  <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Auto Synced
+                  <h3 className="font-extrabold text-base text-slate-900">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
+                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span> Auto Synced
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
                   Phân biệt rõ <strong>Chức Vụ</strong> (Giám Đốc, Trưởng Phòng...), <strong>Chức Danh</strong> (GĐ Kinh Doanh, GĐ Thị Trường...) và <strong>Khung Cấp Bậc</strong> (G1 ➔ G6 tùy biến). Tự động đồng bộ 100% thời gian thực sang RBAC & System Users.
                 </p>
               </div>
@@ -1387,7 +1387,7 @@ export default function HRMPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
+                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                       <th className="p-3.5">Mã Chức Danh</th>
                       <th className="p-3.5">Tên Chức Danh Chuyên Môn</th>
                       <th className="p-3.5">Chức Vụ Tương Ứng</th>
@@ -1532,12 +1532,12 @@ export default function HRMPage() {
       {isNewCandModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-blue-400" />
+                <UserPlus className="w-5 h-5 text-blue-600" />
                 <h3 className="font-bold text-base">Thêm Ứng Viên Tuyển Dụng Mới</h3>
               </div>
-              <button onClick={() => setIsNewCandModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsNewCandModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>

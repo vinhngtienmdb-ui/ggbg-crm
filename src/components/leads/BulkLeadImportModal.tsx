@@ -199,16 +199,16 @@ export default function BulkLeadImportModal({
           ) : previewRows.length > 0 ? (
             <div className="space-y-4">
               {/* Validation Summary Bar */}
-              <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div className="p-4 bg-slate-50 text-slate-900 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-4">
-                  <span className="font-bold text-blue-300">Tổng số: {previewRows.length} Dòng</span>
-                  <span className="font-bold text-emerald-400">✓ Hợp lệ: {validRowsCount}</span>
+                  <span className="font-bold text-blue-700">Tổng số: {previewRows.length} Dòng</span>
+                  <span className="font-bold text-emerald-600">✓ Hợp lệ: {validRowsCount}</span>
                   {duplicateRowsCount > 0 && (
-                    <span className="font-bold text-red-400">⚠️ Trùng SĐT: {duplicateRowsCount}</span>
+                    <span className="font-bold text-red-600">⚠️ Trùng SĐT: {duplicateRowsCount}</span>
                   )}
                 </div>
 
-                <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-500">
                   <input
                     type="checkbox"
                     checked={skipDuplicates}
@@ -223,7 +223,7 @@ export default function BulkLeadImportModal({
               <div className="border border-slate-200 rounded-2xl overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                       <th className="p-3">Họ Và Tên</th>
                       <th className="p-3">Số Điện Thoại</th>
                       <th className="p-3">Công Ty / Email</th>
