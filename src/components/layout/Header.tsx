@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
   Search,
@@ -18,10 +18,39 @@ import {
   Crown,
   Briefcase,
   Headphones,
-  FileCheck
+  FileCheck,
+  FileClock,
+  UserCheck,
+  Info,
+  CheckCheck
 } from 'lucide-react';
 import { UserRole } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
+import GlobalSearch from './GlobalSearch';
+
+type NotificationType = 'contract' | 'approval' | 'system';
+
+interface AppNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  link: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+const NOTIF_ICON: Record<NotificationType, React.ReactNode> = {
+  contract: <FileClock className="w-4 h-4 text-amber-600" />,
+  approval: <UserCheck className="w-4 h-4 text-blue-600" />,
+  system: <Info className="w-4 h-4 text-slate-500" />,
+};
+
+function formatNotifTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
 
 interface HeaderProps {
   onOpenPhoneModal?: () => void;
@@ -37,12 +66,99 @@ const ROLE_OPTIONS: { id: UserRole; label: string; icon: React.ReactNode; badgeC
 ];
 
 export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: HeaderProps) {
-  const [unreadCount] = useState(5);
+  const router = useRouter();
   const { user, logout, simulatedRole, setSimulatedRole } = useAuth();
   const { themeMode, toggleTheme, densityMode, toggleDensity } = useTheme();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
 
+  // Tìm kiếm toàn cục ⌘K
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Trung tâm thông báo
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifRef = useRef<HTMLDivElement>(null);
+
   const activeRoleObj = ROLE_OPTIONS.find(r => r.id === simulatedRole) || ROLE_OPTIONS[0];
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const res = await fetch('/api/notifications');
+      if (!res.ok) return;
+      const data = await res.json();
+      setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
+      setUnreadCount(typeof data.unread === 'number' ? data.unread : 0);
+    } catch {
+      // giữ nguyên trạng thái hiện tại nếu lỗi
+    }
+  }, []);
+
+  // Nạp thông báo khi mount
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Nạp lại mỗi khi mở dropdown
+  useEffect(() => {
+    if (isNotifOpen) fetchNotifications();
+  }, [isNotifOpen, fetchNotifications]);
+
+  // Phím tắt mở tìm kiếm ⌘K / Ctrl+K
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setIsSearchOpen((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Đóng dropdown thông báo khi click ra ngoài
+  useEffect(() => {
+    if (!isNotifOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setIsNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, [isNotifOpen]);
+
+  const handleMarkAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+    try {
+      await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAllRead: true }),
+      });
+    } catch {
+      // best-effort
+    }
+  };
+
+  const handleNotifClick = async (n: AppNotification) => {
+    setIsNotifOpen(false);
+    if (!n.is_read) {
+      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, is_read: true } : x)));
+      setUnreadCount((c) => Math.max(0, c - 1));
+      try {
+        await fetch('/api/notifications', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: n.id }),
+        });
+      } catch {
+        // best-effort
+      }
+    }
+    if (n.link) router.push(n.link);
+  };
 
   return (
     <header className="h-14 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs gap-2">
@@ -56,17 +172,18 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="relative w-full">
+        <button
+          type="button"
+          onClick={() => setIsSearchOpen(true)}
+          className="relative w-full flex items-center pl-9 pr-12 py-1.5 bg-slate-100/70 hover:bg-white border border-slate-200/80 rounded-lg text-xs text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left"
+          title="Tìm kiếm toàn cục (⌘K)"
+        >
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="w-full pl-9 pr-12 py-1.5 bg-slate-100/70 focus:bg-white border border-slate-200/80 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-          />
+          <span>Tìm kiếm khách hàng, lead, nhân sự...</span>
           <span className="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono font-medium text-slate-400 px-1.5 py-0.5 bg-slate-200/60 rounded border border-slate-300/50">
             ⌘K
           </span>
-        </div>
+        </button>
       </div>
 
       {/* Right Controls */}
@@ -158,15 +275,73 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
         </button>
 
         {/* Notifications */}
-        <div className="relative">
-          <button className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors relative">
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setIsNotifOpen((v) => !v)}
+            className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors relative"
+            title="Thông báo"
+          >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-red-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center border border-white">
-                {unreadCount}
+              <span className="absolute top-1 right-1 min-w-[14px] h-3.5 px-0.5 bg-red-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center border border-white">
+                {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
           </button>
+
+          {isNotifOpen && (
+            <div className="absolute right-0 mt-2 w-[22rem] max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-xl border border-slate-200 z-50 animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-extrabold text-slate-900">Thông Báo</p>
+                  <p className="text-[11px] text-slate-500">
+                    {unreadCount > 0 ? `${unreadCount} thông báo chưa đọc` : 'Bạn đã đọc hết thông báo'}
+                  </p>
+                </div>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    Đánh dấu đã đọc tất cả
+                  </button>
+                )}
+              </div>
+
+              <div className="max-h-[60vh] overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="px-4 py-10 text-center">
+                    <Bell className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+                    <p className="text-sm font-semibold text-slate-500">Chưa có thông báo</p>
+                    <p className="text-xs text-slate-400 mt-1">Các cảnh báo hệ thống sẽ hiển thị tại đây.</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <button
+                      key={n.id}
+                      onClick={() => handleNotifClick(n)}
+                      className={`w-full flex items-start gap-3 px-4 py-3 text-left border-b border-slate-50 last:border-b-0 transition-colors ${
+                        n.is_read ? 'hover:bg-slate-50' : 'bg-blue-50/40 hover:bg-blue-50'
+                      }`}
+                    >
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+                        {NOTIF_ICON[n.type] ?? NOTIF_ICON.system}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-slate-900 truncate">{n.title}</span>
+                          {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />}
+                        </span>
+                        <span className="block text-[11px] text-slate-500 leading-snug mt-0.5">{n.body}</span>
+                        <span className="block text-[10px] text-slate-400 font-mono mt-1">{formatNotifTime(n.created_at)}</span>
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="h-5 w-[1px] bg-slate-200 mx-0.5"></div>
@@ -194,6 +369,9 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
           </button>
         </div>
       </div>
+
+      {/* Command palette tìm kiếm toàn cục */}
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   );
 }
