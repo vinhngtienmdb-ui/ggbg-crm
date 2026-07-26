@@ -5,11 +5,25 @@ import { Customer } from '@/types';
  * dữ liệu mẫu ban đầu. Tách khỏi trang UI để tái sử dụng ở lớp dữ liệu
  * (customersRepo) — dùng làm store in-memory khi chưa bật Supabase.
  */
+/**
+ * Một tương tác/sự kiện trên dòng thời gian chăm sóc khách hàng (Activity Timeline).
+ * type quyết định icon + màu chấm hiển thị ở view chi tiết khách hàng.
+ */
+export interface CustomerActivity {
+  id: string;
+  type: 'CALL' | 'EMAIL' | 'MEETING' | 'NOTE' | 'CONTRACT' | 'STAGE';
+  title: string;
+  note?: string;
+  actor?: string;
+  timestamp: string; // ISO string hoặc chuỗi ngày giờ parse được bởi Date
+}
+
 export interface ExtendedCustomer extends Customer {
   bank_account?: string;
   bank_name?: string;
   credit_limit?: number;
   notes?: string;
+  activities?: CustomerActivity[];
 }
 
 export const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
@@ -51,6 +65,40 @@ export const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
     notes: 'Khách hàng VIP agency ưu tiên hỗ trợ 24/7',
     tags: ['Doanh số cao', 'Hợp đồng 2 năm'],
     created_at: '2026-01-15',
+    activities: [
+      {
+        id: 'act_c1_1',
+        type: 'STAGE',
+        title: 'Nâng hạng vòng đời lên VIP',
+        note: 'Doanh số quý vượt mốc 3 tỷ, tự động nâng hạng VIP.',
+        actor: 'Hệ thống',
+        timestamp: '2026-06-20T09:15:00',
+      },
+      {
+        id: 'act_c1_2',
+        type: 'CONTRACT',
+        title: 'Ký gia hạn hợp đồng dịch vụ 2 năm',
+        note: 'Hợp đồng HDLD_KH8801.pdf đã được ký số thành công.',
+        actor: 'Đỗ Thị Quyên (Ops Leader)',
+        timestamp: '2026-05-12T14:30:00',
+      },
+      {
+        id: 'act_c1_3',
+        type: 'MEETING',
+        title: 'Họp review kế hoạch GMV Q3',
+        note: 'Chốt mục tiêu tăng trưởng GMV 15% và bổ sung sàn Lazada.',
+        actor: 'Trần Văn Hoàng (Sale Exec)',
+        timestamp: '2026-04-28T10:00:00',
+      },
+      {
+        id: 'act_c1_4',
+        type: 'CALL',
+        title: 'Gọi điện chăm sóc định kỳ',
+        note: 'Khách hài lòng với hiệu suất vận hành, không có khiếu nại.',
+        actor: 'Trần Văn Hoàng (Sale Exec)',
+        timestamp: '2026-03-15T16:45:00',
+      },
+    ],
   },
   {
     id: 'c2',
@@ -91,6 +139,32 @@ export const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
     notes: 'Gian hàng hot trên GGBingoVN Platform',
     tags: ['GGBingoVN Merchant'],
     created_at: '2026-02-10',
+    activities: [
+      {
+        id: 'act_c2_1',
+        type: 'EMAIL',
+        title: 'Gửi email báo cáo doanh số tháng 6',
+        note: 'Đính kèm bảng phân tích GMV theo từng sàn TMĐT.',
+        actor: 'Nguyễn Quốc Tuấn (Sale Senior)',
+        timestamp: '2026-07-02T08:20:00',
+      },
+      {
+        id: 'act_c2_2',
+        type: 'NOTE',
+        title: 'Ghi chú: khách quan tâm gói quảng cáo TikTokShop',
+        note: 'Cần chuẩn bị proposal booking KOC cho chiến dịch tháng 8.',
+        actor: 'Phạm Minh Đức (Ops Specialist)',
+        timestamp: '2026-06-18T11:05:00',
+      },
+      {
+        id: 'act_c2_3',
+        type: 'CALL',
+        title: 'Tư vấn onboarding gian hàng mới',
+        note: 'Hướng dẫn thiết lập kho và cấu hình vận chuyển GGBingoVN.',
+        actor: 'Nguyễn Quốc Tuấn (Sale Senior)',
+        timestamp: '2026-02-11T15:40:00',
+      },
+    ],
   },
   {
     id: 'c3',

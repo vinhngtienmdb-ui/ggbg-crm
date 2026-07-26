@@ -42,10 +42,13 @@ import {
   ShoppingBag,
   Coins,
   Calendar,
-  Tag
+  Tag,
+  Clock,
+  MessageSquare,
+  Users2
 } from 'lucide-react';
 import { CustomerEntityType, CustomerType, CustomerTier, KycDocument, LifecycleStage } from '@/types';
-import { ExtendedCustomer, INITIAL_CUSTOMERS } from '@/lib/customerStore';
+import { ExtendedCustomer, INITIAL_CUSTOMERS, CustomerActivity } from '@/lib/customerStore';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 
 function maskIdentification(val?: string, showFull: boolean = false): string {
@@ -119,6 +122,65 @@ export default function CustomersPage() {
   // VIEW DETAIL MODAL STATE (NÚT XEM CHI TIẾT)
   const [isViewDetailModalOpen, setIsViewDetailModalOpen] = useState(false);
   const [selectedViewCustomer, setSelectedViewCustomer] = useState<ExtendedCustomer | null>(null);
+
+  // ACTIVITY TIMELINE — Ô THÊM TƯƠNG TÁC NHANH TRONG VIEW CHI TIẾT
+  const [newActivityType, setNewActivityType] = useState<CustomerActivity['type']>('NOTE');
+  const [newActivityContent, setNewActivityContent] = useState('');
+
+  const handleAddActivity = () => {
+    if (!selectedViewCustomer) return;
+    const content = newActivityContent.trim();
+    if (!content) {
+      setToastMessage('⚠️ Vui lòng nhập nội dung tương tác trước khi lưu!');
+      setTimeout(() => setToastMessage(''), 4000);
+      return;
+    }
+
+    const newActivity: CustomerActivity = {
+      id: `act_${Date.now()}`,
+      type: newActivityType,
+      title: content,
+      actor: user?.name || user?.email || 'Người dùng CRM',
+      timestamp: new Date().toISOString(),
+    };
+
+    const updatedActivities = [...(selectedViewCustomer.activities || []), newActivity];
+    const updatedCustomer: ExtendedCustomer = { ...selectedViewCustomer, activities: updatedActivities };
+
+    setCustomers((prev) => prev.map((c) => (c.id === updatedCustomer.id ? updatedCustomer : c)));
+    setSelectedViewCustomer(updatedCustomer);
+    syncCustomerToApi('PATCH', { id: updatedCustomer.id, activities: updatedActivities });
+
+    setNewActivityContent('');
+    setNewActivityType('NOTE');
+    setToastMessage('✅ Đã ghi nhận tương tác mới vào dòng thời gian khách hàng!');
+    setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  // Cấu hình icon + màu sắc theo loại tương tác (dùng cho chấm & nhãn timeline)
+  const ACTIVITY_META: Record<
+    CustomerActivity['type'],
+    { label: string; Icon: React.ComponentType<{ className?: string }>; dot: string; iconBg: string; iconText: string }
+  > = {
+    CALL: { label: 'Cuộc gọi', Icon: PhoneCall, dot: 'bg-emerald-500', iconBg: 'bg-emerald-50 border-emerald-200', iconText: 'text-emerald-600' },
+    EMAIL: { label: 'Email', Icon: Mail, dot: 'bg-blue-500', iconBg: 'bg-blue-50 border-blue-200', iconText: 'text-blue-600' },
+    MEETING: { label: 'Cuộc họp', Icon: Users2, dot: 'bg-violet-500', iconBg: 'bg-violet-50 border-violet-200', iconText: 'text-violet-600' },
+    NOTE: { label: 'Ghi chú', Icon: MessageSquare, dot: 'bg-slate-400', iconBg: 'bg-slate-100 border-slate-200', iconText: 'text-slate-600' },
+    CONTRACT: { label: 'Hợp đồng', Icon: FileCheck, dot: 'bg-amber-500', iconBg: 'bg-amber-50 border-amber-200', iconText: 'text-amber-600' },
+    STAGE: { label: 'Vòng đời', Icon: Target, dot: 'bg-cyan-500', iconBg: 'bg-cyan-50 border-cyan-200', iconText: 'text-cyan-600' },
+  };
+
+  const formatActivityTime = (ts: string) => {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts;
+    return d.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   // EDIT CUSTOMER MODAL STATE (NÚT SỬA ĐÃ ĐƯỢC FIX CỰC KỲ ỔN ĐỊNH)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -981,6 +1043,106 @@ export default function CustomersPage() {
                         <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-bold text-[10px]">✓ Đã Lưu</span>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              {/* DÒNG THỜI GIAN TƯƠNG TÁC (ACTIVITY TIMELINE) */}
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                <h4 className="font-bold text-slate-900 text-xs border-b border-slate-200 pb-2 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-blue-600" /> Dòng Thời Gian Tương Tác
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 text-[10px] font-extrabold">
+                    {selectedViewCustomer.activities?.length || 0}
+                  </span>
+                </h4>
+
+                {/* Ô THÊM TƯƠNG TÁC NHANH */}
+                <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2.5">
+                  <p className="font-bold text-slate-700 text-[11px] flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5 text-blue-600" /> Thêm Tương Tác
+                  </p>
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                    <select
+                      value={newActivityType}
+                      onChange={(e) => setNewActivityType(e.target.value as CustomerActivity['type'])}
+                      className="sm:w-40 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
+                    >
+                      <option value="CALL">📞 Cuộc gọi</option>
+                      <option value="EMAIL">✉️ Email</option>
+                      <option value="MEETING">👥 Cuộc họp</option>
+                      <option value="NOTE">📝 Ghi chú</option>
+                      <option value="CONTRACT">📄 Hợp đồng</option>
+                      <option value="STAGE">🎯 Vòng đời</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={newActivityContent}
+                      onChange={(e) => setNewActivityContent(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddActivity();
+                        }
+                      }}
+                      placeholder="Nhập nội dung tương tác với khách hàng..."
+                      className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddActivity}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" /> Lưu
+                    </button>
+                  </div>
+                </div>
+
+                {/* DANH SÁCH TIMELINE (GIẢM DẦN THEO THỜI GIAN) */}
+                {(!selectedViewCustomer.activities || selectedViewCustomer.activities.length === 0) ? (
+                  <p className="text-slate-400 italic">Chưa có tương tác nào được ghi nhận.</p>
+                ) : (
+                  <div className="relative pl-1">
+                    {/* Đường nối dọc */}
+                    <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-200" aria-hidden="true"></div>
+                    <ul className="space-y-4">
+                      {[...selectedViewCustomer.activities]
+                        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                        .map((act) => {
+                          const meta = ACTIVITY_META[act.type] || ACTIVITY_META.NOTE;
+                          const Icon = meta.Icon;
+                          return (
+                            <li key={act.id} className="relative flex items-start gap-3">
+                              {/* Icon + chấm màu theo type */}
+                              <div className="relative z-10 shrink-0">
+                                <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${meta.iconBg}`}>
+                                  <Icon className={`w-4 h-4 ${meta.iconText}`} />
+                                </div>
+                                <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ring-2 ring-slate-50 ${meta.dot}`}></span>
+                              </div>
+
+                              <div className="flex-1 min-w-0 p-3 bg-white border border-slate-200 rounded-xl">
+                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                  <p className="font-bold text-slate-900 text-xs">{act.title}</p>
+                                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${meta.iconBg} ${meta.iconText}`}>
+                                    {meta.label}
+                                  </span>
+                                </div>
+                                {act.note && <p className="text-slate-500 text-[11px] mt-1 leading-relaxed">{act.note}</p>}
+                                <div className="flex items-center gap-3 mt-1.5 text-[10.5px] text-slate-400 font-medium flex-wrap">
+                                  {act.actor && (
+                                    <span className="flex items-center gap-1">
+                                      <User className="w-3 h-3" /> {act.actor}
+                                    </span>
+                                  )}
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" /> {formatActivityTime(act.timestamp)}
+                                  </span>
+                                </div>
+                              </div>
+                            </li>
+                          );
+                        })}
+                    </ul>
                   </div>
                 )}
               </div>
