@@ -160,6 +160,36 @@ export default function LeadsPage() {
   const [stageLogs, setStageLogs] = useState<LeadStageLog[]>(INITIAL_LOGS);
   const [existingCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS_LIST);
 
+  // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Nếu lỗi/empty → giữ INITIAL_LEADS để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/leads')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.leads) && data.leads.length > 0) {
+          setLeads(data.leads as Lead[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL_LEADS */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Đồng bộ DB kiểu fire-and-forget — KHÔNG chặn optimistic update, nuốt lỗi im lặng.
+  const syncLeadToApi = (method: 'POST' | 'PATCH', payload: Record<string, unknown>) => {
+    fetch('/api/leads', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* im lặng: optimistic update phía client vẫn giữ nguyên */
+    });
+  };
+
   // VIEW MODE TOGGLE (KANBAN VS LIST VIEW)
   const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
@@ -314,6 +344,12 @@ export default function LeadsPage() {
     };
 
     setStageLogs((prev) => [newLog, ...prev]);
+    syncLeadToApi('PATCH', {
+      id: leadId,
+      stage_id: targetStage.id,
+      stage_name: targetStage.name,
+      status: targetStageId === 'stage_6' ? 'Converted' : targetStageId === 'stage_7' ? 'Lost' : 'Contacted',
+    });
     setSuccessToast(`Đã chuyển Lead [${currentLead.lead_code}] ${currentLead.full_name} sang [${toStageName}] và ghi nhận nhật ký!`);
     setTimeout(() => setSuccessToast(''), 4000);
   };
@@ -370,6 +406,7 @@ export default function LeadsPage() {
     };
 
     setLeads([newLead, ...leads]);
+    syncLeadToApi('POST', newLead as unknown as Record<string, unknown>);
 
     const createLog: LeadStageLog = {
       id: `log_${Date.now()}`,
@@ -401,6 +438,7 @@ export default function LeadsPage() {
   // HANDLE BULK IMPORT SUCCESS
   const handleBulkImportSuccess = (newImportedLeads: Lead[]) => {
     setLeads((prev) => [...newImportedLeads, ...prev]);
+    newImportedLeads.forEach((l) => syncLeadToApi('POST', l as unknown as Record<string, unknown>));
 
     // Create stage logs
     const newLogs: LeadStageLog[] = newImportedLeads.map((l) => ({
@@ -440,6 +478,7 @@ export default function LeadsPage() {
       if (data.success && data.data) {
         const newLead = data.data as Lead;
         setLeads((prev) => [newLead, ...prev]);
+        syncLeadToApi('POST', newLead as unknown as Record<string, unknown>);
         setSuccessToast(`⚡ Đã tiếp nhận Lead Webhook mới: ${newLead.full_name} (${newLead.lead_code}) từ Landing Page!`);
         setTimeout(() => setSuccessToast(''), 5000);
       }
