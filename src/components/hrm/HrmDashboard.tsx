@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Users,
   UserCheck,
@@ -126,23 +126,33 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
     return Object.entries(buckets).map(([name, value]) => ({ name, value }));
   }, [employees, today]);
 
-  // Phân bổ trạng thái theo phòng ban (stacked)
-  const deptStatusData = useMemo(() => {
+  // Phân bổ trạng thái lao động theo nhiều chiều: phòng ban / loại HĐ / BHXH / giới tính
+  const [statusDim, setStatusDim] = useState<'department' | 'contract_type' | 'bhxh_status' | 'gender'>('department');
+
+  const STATUS_DIMENSIONS = [
+    { key: 'department' as const, label: 'Phòng ban', get: (e: EmployeeProfile) => e.department || 'Khác' },
+    { key: 'contract_type' as const, label: 'Loại HĐ', get: (e: EmployeeProfile) => e.contract_type || 'Chưa xác định' },
+    { key: 'bhxh_status' as const, label: 'BHXH', get: (e: EmployeeProfile) => e.bhxh_status || 'Chưa xác định' },
+    { key: 'gender' as const, label: 'Giới tính', get: (e: EmployeeProfile) => e.gender || 'Khác' },
+  ];
+
+  const statusDistData = useMemo(() => {
     const activeStatuses = STATUS_ORDER.filter((s) => employees.some((e) => e.status === s));
-    const byDept = new Map<string, Record<string, number>>();
+    const getter = STATUS_DIMENSIONS.find((d) => d.key === statusDim)!.get;
+    const byGroup = new Map<string, Record<string, number>>();
     employees.forEach((e) => {
-      const dept = e.department || 'Khác';
-      if (!byDept.has(dept)) byDept.set(dept, {});
-      const row = byDept.get(dept)!;
+      const g = getter(e);
+      if (!byGroup.has(g)) byGroup.set(g, {});
+      const row = byGroup.get(g)!;
       row[e.status] = (row[e.status] || 0) + 1;
     });
-    const rows = Array.from(byDept.entries()).map(([department, counts]) => {
-      const row: Record<string, any> = { department };
+    const rows = Array.from(byGroup.entries()).map(([group, counts]) => {
+      const row: Record<string, any> = { group };
       activeStatuses.forEach((s) => (row[s] = counts[s] || 0));
       return row;
     });
     return { rows, statuses: activeStatuses };
-  }, [employees]);
+  }, [employees, statusDim]);
 
   const timeStats = useMemo(() => {
     const totalLeave = employees.reduce((s, e) => s + (e.annual_leave_days || 0), 0);
@@ -312,19 +322,36 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
         </div>
       </div>
 
-      {/* Phân bổ trạng thái theo phòng ban - stacked */}
+      {/* Phân bổ trạng thái lao động - chọn chiều: phòng ban / loại HĐ / BHXH / giới tính */}
       <div className={cardCls}>
-        <h3 className="font-extrabold text-slate-900 text-sm mb-1">Phân Bổ Trạng Thái Lao Động Theo Phòng Ban</h3>
-        <p className="text-[11px] text-slate-500 mb-3">Số lượng nhân sự theo trạng thái làm việc tại từng phòng ban</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-sm mb-1">Phân Bổ Trạng Thái Lao Động</h3>
+            <p className="text-[11px] text-slate-500">Số lượng nhân sự theo trạng thái làm việc, phân theo chiều đã chọn</p>
+          </div>
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold self-start">
+            {STATUS_DIMENSIONS.map((d) => (
+              <button
+                key={d.key}
+                onClick={() => setStatusDim(d.key)}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  statusDim === d.key ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'
+                }`}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={deptStatusData.rows} margin={{ bottom: 10 }}>
+          <BarChart data={statusDistData.rows} margin={{ bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-            <XAxis dataKey="department" tick={{ fontSize: 10, fill: '#64748b' }} interval={0} angle={-8} textAnchor="end" height={60} />
+            <XAxis dataKey="group" tick={{ fontSize: 10, fill: '#64748b' }} interval={0} angle={-8} textAnchor="end" height={60} />
             <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} />
             <Tooltip />
             <Legend wrapperStyle={{ fontSize: 11 }} />
-            {deptStatusData.statuses.map((s, i) => (
-              <Bar key={s} dataKey={s} stackId="status" name={STATUS_LABELS[s] || s} fill={PALETTE[i % PALETTE.length]} radius={i === deptStatusData.statuses.length - 1 ? [6, 6, 0, 0] : [0, 0, 0, 0]} />
+            {statusDistData.statuses.map((s, i) => (
+              <Bar key={s} dataKey={s} stackId="status" name={STATUS_LABELS[s] || s} fill={PALETTE[i % PALETTE.length]} radius={i === statusDistData.statuses.length - 1 ? [6, 6, 0, 0] : [0, 0, 0, 0]} />
             ))}
           </BarChart>
         </ResponsiveContainer>
