@@ -31,9 +31,9 @@ function OrgTreeNode({
       node.department.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const levelColors = [
-    'bg-slate-900 text-white border-slate-800',
-    'bg-blue-900 text-white border-blue-800',
-    'bg-indigo-50 border-indigo-200 text-slate-900',
+    'bg-blue-600 text-white border-blue-700',
+    'bg-blue-500 text-white border-blue-400',
+    'bg-blue-50 border-blue-200 text-slate-900',
     'bg-white border-slate-200 text-slate-900',
   ];
 

@@ -86,7 +86,7 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
 
       {/* RAW JSON View Toggle */}
       {showJsonCode && (
-        <div className="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto border border-slate-800">
+        <div className="bg-slate-50 text-slate-800 p-3 rounded-xl font-mono text-[11px] overflow-x-auto border border-slate-200">
           <pre>{JSON.stringify(attributes, null, 2)}</pre>
         </div>
       )}

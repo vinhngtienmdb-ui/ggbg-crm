@@ -89,23 +89,23 @@ export default function JsonbSchemaBuilderModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
         {/* Header */}
-        <div className="bg-slate-900 text-white p-5 flex items-center justify-between border-b border-slate-800">
+        <div className="bg-white text-slate-900 p-5 flex items-center justify-between border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center font-bold text-white shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-md">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold flex items-center gap-2">
+              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 Trình Cấu Hình Thuộc Tính Động Dynamic JSONB Schema Builder
               </h2>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-500">
                 Tùy biến key-value attributes cho gói dịch vụ Shopee, TikTok Shop, Lazada & Amazon
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -238,31 +238,31 @@ export default function JsonbSchemaBuilderModal({
             </div>
 
             {/* RAW JSON Schema Viewer */}
-            <div className="bg-slate-900 text-slate-200 p-5 rounded-xl border border-slate-800 shadow-sm flex flex-col justify-between">
+            <div className="bg-slate-50 text-slate-800 p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                   <div className="flex items-center gap-2">
-                    <Code className="w-4 h-4 text-cyan-400" />
-                    <h4 className="text-xs font-bold text-white">PostgreSQL JSONB Field Preview</h4>
+                    <Code className="w-4 h-4 text-blue-600" />
+                    <h4 className="text-xs font-bold text-slate-900">PostgreSQL JSONB Field Preview</h4>
                   </div>
                   <button
                     type="button"
                     onClick={handleCopyJson}
-                    className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
                   >
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Đã Copy' : 'Copy JSON'}
                   </button>
                 </div>
 
-                <div className="mt-4 bg-slate-950 p-4 rounded-xl font-mono text-xs text-emerald-400 overflow-x-auto border border-slate-800 max-h-80">
+                <div className="mt-4 bg-white p-4 rounded-xl font-mono text-xs text-slate-800 overflow-x-auto border border-slate-200 max-h-80">
                   <pre>{JSON.stringify(attributes, null, 2)}</pre>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Database column: <code className="text-cyan-400">products.attributes (JSONB)</code></span>
-                <span className="text-emerald-400 font-bold">✓ Valid JSON</span>
+              <div className="mt-4 pt-3 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+                <span>Database column: <code className="text-blue-700">products.attributes (JSONB)</code></span>
+                <span className="text-emerald-600 font-bold">✓ Valid JSON</span>
               </div>
             </div>
           </div>
