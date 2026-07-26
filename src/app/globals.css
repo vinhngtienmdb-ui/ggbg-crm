@@ -2,105 +2,244 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+/* ==========================================================================
+   GGBingo CRM — light cobalt design system.
+   One theme only: white / #F8F9FB cards on an #F3F4F6 page, cobalt accent.
+   ========================================================================== */
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f3f4f6;
+  --foreground: #16181d;
+
+  --brand: #2e5ce6;
+  --brand-hover: #2450cc;
+  --brand-ink: #1d46c4;
+  --brand-50: #eef2fe;
+  --brand-100: #dfe7fd;
+  --brand-200: #c7d5fb;
+
+  --ink-700: #3a414e;
+  --ink-500: #667085;
+  --ink-400: #98a2b3;
+
+  --line: #e4e7ec;
+  --line-soft: #f0f1f4;
+  --surface-subtle: #f8f9fb;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Handcrafted Precision Scrollbars */
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--brand-ink);
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+/* Scrollbars ------------------------------------------------------------- */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d3d7df;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Clean Cards & Subtle Handcrafted Shadows */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 8px;
-}
-
-.card-subtle {
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  border-radius: 8px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-hover {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.card-hover:hover {
-  border-color: rgba(203, 213, 225, 1);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-}
-
-.tabular-numbers {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Touch & Responsive Scroll Optimization */
-.touch-scroll {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+  background: #aeb4c0;
 }
 
 .sleek-scrollbar::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
-
 .sleek-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d3d7df;
   border-radius: 9999px;
 }
 
-/* Fluid responsive font scaling */
-@media (max-width: 640px) {
-  html {
-    font-size: 14.5px;
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Motion ----------------------------------------------------------------- */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Dark Theme Support */
-.dark-theme {
-  color-scheme: dark;
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
-.dark-theme header {
-  background-color: rgba(15, 23, 42, 0.92) !important;
-  border-color: rgba(51, 65, 85, 0.8) !important;
-  color: #f8fafc !important;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-.dark-theme header input {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-  color: #f8fafc !important;
-}
+/* ==========================================================================
+   Shared primitives. Existing pages already reference .card-subtle /
+   .glass-panel / .card-hover, so those names are kept and simply retuned to
+   the new palette rather than renamed across 17k lines of markup.
+   ========================================================================== */
+@layer components {
+  .card-subtle,
+  .glass-panel,
+  .dc-card {
+    @apply bg-white border border-line rounded-xl;
+  }
 
-.dark-theme main {
-  background-color: #090d16 !important;
-  color: #f1f5f9 !important;
+  .card-hover {
+    transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-hover:hover {
+    @apply border-line-strong shadow-card;
+  }
+
+  .tabular-numbers,
+  .dc-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Section heading inside a card */
+  .dc-card-title {
+    @apply text-[13.5px] font-extrabold text-ink-900;
+  }
+  .dc-card-sub {
+    @apply text-[11px] text-ink-500;
+  }
+
+  /* Table primitives ---------------------------------------------------- */
+  .dc-table {
+    @apply w-full border-collapse text-xs;
+  }
+  .dc-th {
+    @apply text-left px-[10px] py-[11px] text-[10px] tracking-[0.7px] uppercase text-ink-400 border-b border-line font-semibold;
+  }
+  .dc-td {
+    @apply px-[10px] py-3 border-b border-line-soft align-middle;
+  }
+  .dc-row {
+    @apply transition-colors;
+  }
+  .dc-row:hover {
+    @apply bg-surface-subtle;
+  }
+
+  /* Chips / badges ------------------------------------------------------ */
+  .dc-chip {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold;
+  }
+  .dc-tag {
+    @apply inline-flex items-center px-[7px] py-0.5 rounded-[5px] text-[9.5px] font-extrabold;
+  }
+
+  /* Buttons ------------------------------------------------------------- */
+  .dc-btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-[9px] text-[11.5px] font-bold
+           px-[13px] py-2 cursor-pointer transition-colors disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+  .dc-btn-primary {
+    @apply dc-btn bg-brand-600 text-white border-none px-[15px] py-[9px] hover:bg-brand-700;
+  }
+  .dc-btn-ghost {
+    @apply dc-btn bg-white text-ink-700 border border-line hover:border-line-strong;
+  }
+  .dc-btn-soft {
+    @apply dc-btn bg-brand-50 text-brand-600 border border-brand-100 hover:bg-brand-100;
+  }
+  .dc-btn-danger {
+    @apply dc-btn bg-danger-bg text-danger-fg border border-danger-border hover:bg-danger-hover;
+  }
+  .dc-btn-success {
+    @apply dc-btn bg-success-bg text-success-fg border border-success-border hover:bg-success-hover;
+  }
+  /* Compact row-action variant used in the Thao tác column */
+  .dc-btn-xs {
+    @apply text-[10.5px] font-extrabold px-2.5 py-[5px] rounded-[7px];
+  }
+
+  /* Form controls ------------------------------------------------------- */
+  .dc-input,
+  .dc-select {
+    @apply w-full box-border px-3 py-[9px] border border-line rounded-lg text-[12.5px]
+           bg-white outline-none transition-shadow;
+  }
+  .dc-input:focus,
+  .dc-select:focus {
+    @apply border-brand-600;
+    box-shadow: 0 0 0 3px rgba(46, 92, 230, 0.12);
+  }
+  .dc-input:disabled,
+  .dc-select:disabled {
+    @apply bg-surface-subtle text-ink-500;
+  }
+  .dc-label {
+    @apply block text-[11px] font-extrabold text-ink-500 mb-1;
+  }
+
+  /* Progress bar -------------------------------------------------------- */
+  .dc-bar {
+    @apply bg-line-soft rounded-full overflow-hidden;
+  }
+  .dc-bar > span {
+    @apply block h-full rounded-full;
+  }
+
+  /* Modal / drawer scaffolding ------------------------------------------ */
+  .dc-scrim {
+    @apply fixed inset-0 z-[90];
+    background: rgba(11, 16, 32, 0.55);
+  }
+  .dc-modal-head {
+    @apply px-[22px] py-4 border-b border-line-soft flex justify-between items-center;
+  }
+  .dc-modal-foot {
+    @apply px-[22px] py-3.5 border-t border-line-soft flex gap-2 justify-end;
+  }
+  /* Tinted head used by the 360° drawer and the employee modal */
+  .dc-modal-head-brand {
+    @apply px-5 py-[18px] bg-brand-50 border-b border-brand-100 text-ink-900;
+  }
 }

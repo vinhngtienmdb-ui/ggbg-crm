@@ -8,6 +8,8 @@ import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
+import { ToastProvider } from '@/context/ToastContext';
+import { AuditProvider } from '@/context/AuditContext';
 import { usePathname } from 'next/navigation';
 
 const VoIPCallModal = dynamic(() => import('@/components/telephony/VoIPCallModal'), { ssr: false });
@@ -29,13 +31,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   // If visiting /login page, render clean without Sidebar & Header
   if (pathname === '/login') {
-    return <main className="min-h-screen bg-slate-900">{children}</main>;
+    return <main className="min-h-screen bg-surface-page">{children}</main>;
   }
 
   const isAllowed = isRouteAllowedForRole(pathname, activeRole, toggles);
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
+    <div className="flex h-screen bg-surface-page text-ink-900 overflow-hidden font-sans">
       <Sidebar
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
@@ -45,7 +47,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           onOpenPhoneModal={() => setIsPhoneModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
-        <main className="flex-1 overflow-y-auto p-3 sm:p-6 pb-20 md:pb-6 bg-slate-50/80 touch-scroll">
+        <main className="flex-1 overflow-y-auto p-3.5 md:px-6 md:py-[22px] pb-20 md:pb-6 bg-surface-page touch-scroll">
           {isAllowed ? children : <AccessDeniedGuard />}
         </main>
       </div>
@@ -73,12 +75,16 @@ export default function RootLayout({
         <title>GGBingo CRM - Enterprise E-Commerce Platform</title>
         <meta name="description" content="Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN" />
       </head>
-      <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans">
+      <body className="bg-surface-page text-ink-900 overflow-hidden font-sans">
         <ThemeProvider>
           <AuthProvider>
-            <ModuleToggleProvider>
-              <AppLayout>{children}</AppLayout>
-            </ModuleToggleProvider>
+            <AuditProvider>
+              <ToastProvider>
+                <ModuleToggleProvider>
+                  <AppLayout>{children}</AppLayout>
+                </ModuleToggleProvider>
+              </ToastProvider>
+            </AuditProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
