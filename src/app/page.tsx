@@ -21,29 +21,32 @@ import {
 export default function DashboardPage() {
   return (
     <div className="space-y-5">
-      {/* Top Banner Header - Crisp Enterprise Style */}
-      <div className="bg-slate-900 rounded-lg p-5 text-white border border-slate-800 shadow-xs relative overflow-hidden">
+      {/* Top Banner Header - Light Enterprise Hero */}
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-medium mb-2.5">
-              <Sparkles className="w-3 h-3 text-blue-400" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
+              <Sparkles className="w-3 h-3 text-blue-600" />
               <span>GGBingo CRM System Overview</span>
             </div>
-            <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
+            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
               Tổng Quan Vận Hành & Doanh Số Kinh Doanh
             </h1>
-            <p className="text-slate-400 text-xs mt-1 max-w-2xl leading-relaxed">
+            <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
               Quản lý Dịch vụ Ủy quyền Vận hành Gian hàng TMĐT (Shopee, TikTok Shop, Lazada, Amazon) và Nền tảng GGBingoVN.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-slate-800/80 p-2.5 rounded-md border border-slate-700/80">
+          <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm">
             <div className="text-right">
-              <p className="text-[11px] text-slate-400 font-medium">Tiến độ KPI tháng này</p>
-              <p className="text-sm font-bold text-emerald-400 tabular-numbers">88.5% (Đạt chỉ tiêu)</p>
+              <p className="text-[11px] text-slate-500 font-semibold">Tiến độ KPI tháng này</p>
+              <p className="text-sm font-extrabold text-emerald-600 tabular-numbers">88.5% (Đạt chỉ tiêu)</p>
             </div>
-            <div className="w-9 h-9 rounded border border-emerald-500/40 flex items-center justify-center font-bold text-xs bg-emerald-500/10 text-emerald-300">
-              88%
+            <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'conic-gradient(#2FA84F 0 88%, #E4E7EC 88% 100%)' }}>
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center font-extrabold text-[11px] text-emerald-600">
+                88%
+              </div>
             </div>
           </div>
         </div>
@@ -241,7 +244,7 @@ export default function DashboardPage() {
 
             <div className="space-y-2.5">
               <div className="flex items-center gap-2.5 p-2.5 rounded-md bg-slate-50 border border-slate-200/80">
-                <div className="w-6 h-6 rounded bg-slate-900 text-white font-bold text-xs flex items-center justify-center">1</div>
+                <div className="w-6 h-6 rounded bg-blue-600 text-white font-bold text-xs flex items-center justify-center">1</div>
                 <div className="flex-1">
                   <p className="text-xs font-bold text-slate-900">Trần Văn Hoàng (Đội 1)</p>
                   <p className="text-[11px] text-slate-500 tabular-numbers">Doanh số: 620.000.000 ₫ (Đạt 124%)</p>

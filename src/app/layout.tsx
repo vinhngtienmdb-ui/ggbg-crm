@@ -45,7 +45,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           onOpenPhoneModal={() => setIsPhoneModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
-        <main className="flex-1 overflow-y-auto p-3 sm:p-6 pb-20 md:pb-6 bg-slate-50/80 touch-scroll">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6 pb-20 md:pb-6 bg-slate-50 touch-scroll">
           {isAllowed ? children : <AccessDeniedGuard />}
         </main>
       </div>

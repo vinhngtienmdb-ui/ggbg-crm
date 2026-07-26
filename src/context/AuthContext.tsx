@@ -130,9 +130,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white font-sans">
-        <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p className="text-xs font-semibold text-slate-300 tracking-wide">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50 flex flex-col items-center justify-center font-sans">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-extrabold text-sm shadow-lg mb-4">
+          GG
+        </div>
+        <div className="w-7 h-7 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p className="text-xs font-semibold text-slate-500 tracking-wide">
           Đang tải GGBingo CRM...
         </p>
       </div>
