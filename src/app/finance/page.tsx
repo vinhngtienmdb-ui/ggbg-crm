@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   DollarSign,
   TrendingUp,
@@ -18,18 +18,53 @@ import {
   Layers,
   Sparkles,
   ArrowUpRight,
+  BarChart3,
+  Wallet,
+  Percent,
+  Receipt,
+  Trophy,
   X
 } from 'lucide-react';
-import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RTooltip,
+  Legend,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary, getFinanceDashboardData } from '@/lib/financeStore';
 import { ContractProfitLoss, DebtInvoice } from '@/types/finance';
+
+const CHART_COLORS = ['#2E5CE6', '#1F7A33', '#D97706', '#C22F35', '#7C3AED', '#0E7490'];
+const DEBT_COLORS: Record<string, string> = {
+  ON_TIME: '#1F7A33',
+  DUE_SOON: '#D97706',
+  OVERDUE: '#C22F35',
+};
+
+const compactVnd = (n: number) => {
+  if (Math.abs(n) >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)} tỷ`;
+  if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(0)} tr`;
+  return n.toLocaleString('vi-VN');
+};
 
 export default function FinancePage() {
   const [plStatements, setPlStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
-  const [activeTab, setActiveTab] = useState<'P_L' | 'DEBT'>('P_L');
+  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'P_L' | 'DEBT'>('DASHBOARD');
   const [toastMessage, setToastMessage] = useState('');
 
   const summary = getFinancialSummary(plStatements, debtInvoices);
+  const dashboard = useMemo(
+    () => getFinanceDashboardData(plStatements, debtInvoices),
+    [plStatements, debtInvoices]
+  );
 
   // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
   // Nếu lỗi/empty (vd. không đủ quyền DIRECTOR) → giữ INITIAL để không nhấp nháy giao diện.
@@ -121,7 +156,15 @@ export default function FinancePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setActiveTab('DASHBOARD')}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                activeTab === 'DASHBOARD' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-blue-100 text-slate-600 hover:bg-blue-50'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" /> 📊 Dashboard Tài Chính
+            </button>
             <button
               onClick={() => setActiveTab('P_L')}
               className={`px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
@@ -191,6 +234,243 @@ export default function FinancePage() {
           <p className="text-xs text-slate-500 mt-1 font-medium">100% Khách hàng doanh nghiệp B2B</p>
         </div>
       </div>
+
+      {/* TAB 0: DASHBOARD TÀI CHÍNH */}
+      {activeTab === 'DASHBOARD' && (
+        <div className="space-y-5">
+          {/* KPI Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+            {[
+              {
+                label: 'Tổng Doanh Thu',
+                value: `${compactVnd(dashboard.total_revenue)} ₫`,
+                icon: <DollarSign className="w-4 h-4" />,
+                accent: 'text-slate-900',
+                iconBg: 'bg-blue-50 text-blue-600 border-blue-100',
+              },
+              {
+                label: 'Tổng Chi Phí',
+                value: `${compactVnd(dashboard.total_cost)} ₫`,
+                icon: <Wallet className="w-4 h-4" />,
+                accent: 'text-amber-600',
+                iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
+              },
+              {
+                label: 'Lợi Nhuận Gộp',
+                value: `${compactVnd(dashboard.gross_profit)} ₫`,
+                icon: <TrendingUp className="w-4 h-4" />,
+                accent: 'text-emerald-600',
+                iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+              },
+              {
+                label: 'Biên Lợi Nhuận',
+                value: `${dashboard.profit_margin}%`,
+                icon: <Percent className="w-4 h-4" />,
+                accent: 'text-emerald-600',
+                iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+              },
+              {
+                label: 'Tổng Công Nợ Phải Thu',
+                value: `${compactVnd(dashboard.total_receivable)} ₫`,
+                icon: <Receipt className="w-4 h-4" />,
+                accent: 'text-slate-900',
+                iconBg: 'bg-purple-50 text-purple-600 border-purple-100',
+              },
+              {
+                label: 'Số Hóa Đơn Quá Hạn',
+                value: `${dashboard.overdue_count} hóa đơn`,
+                icon: <AlertTriangle className="w-4 h-4" />,
+                accent: 'text-red-600',
+                iconBg: 'bg-red-50 text-red-600 border-red-100',
+              },
+            ].map((kpi) => (
+              <div key={kpi.label} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10.5px] font-semibold text-slate-500 uppercase tracking-wider leading-tight">{kpi.label}</span>
+                  <div className={`p-1.5 rounded-md border ${kpi.iconBg}`}>{kpi.icon}</div>
+                </div>
+                <p className={`text-lg font-extrabold tabular-numbers ${kpi.accent}`}>{kpi.value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts Row: Revenue/Cost/Profit + Debt Pie */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+            {/* Composed chart */}
+            <div className="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-blue-600" /> Doanh Thu · Chi Phí · Lợi Nhuận Theo Hợp Đồng
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5 mb-4">
+                So sánh theo từng mã hợp đồng vận hành TMĐT
+              </p>
+              <div className="w-full h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={dashboard.contractChart} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} />
+                    <YAxis tickFormatter={(v) => compactVnd(Number(v))} tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} width={52} />
+                    <RTooltip
+                      formatter={(v: number, name: string) => [`${Number(v).toLocaleString('vi-VN')} ₫`, name]}
+                      labelFormatter={(label: string) => {
+                        const row = dashboard.contractChart.find((r) => r.name === label);
+                        return row ? `HD-${label} · ${row.fullName}` : label;
+                      }}
+                      contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Bar dataKey="revenue" name="Doanh thu" fill={CHART_COLORS[0]} radius={[4, 4, 0, 0]} maxBarSize={34} />
+                    <Bar dataKey="cost" name="Chi phí" fill={CHART_COLORS[2]} radius={[4, 4, 0, 0]} maxBarSize={34} />
+                    <Bar dataKey="profit" name="Lợi nhuận" fill={CHART_COLORS[1]} radius={[4, 4, 0, 0]} maxBarSize={34} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Debt structure pie */}
+            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <PieChart className="w-4 h-4 text-purple-600" /> Cơ Cấu Công Nợ
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5 mb-2">
+                Theo trạng thái thanh toán
+              </p>
+              <div className="w-full h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RePieChart>
+                    <Pie
+                      data={dashboard.debtStructure}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={80}
+                      paddingAngle={2}
+                    >
+                      {dashboard.debtStructure.map((entry) => (
+                        <Cell key={entry.key} fill={DEBT_COLORS[entry.key]} />
+                      ))}
+                    </Pie>
+                    <RTooltip
+                      formatter={(v: number, _n: string, p: { payload?: { count?: number } }) => [
+                        `${Number(v).toLocaleString('vi-VN')} ₫ (${p?.payload?.count ?? 0} hóa đơn)`,
+                        'Giá trị',
+                      ]}
+                      contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                    />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-1.5 mt-2">
+                {dashboard.debtStructure.map((entry) => (
+                  <div key={entry.key} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: DEBT_COLORS[entry.key] }}></span>
+                      <span className="font-medium text-slate-600">{entry.name}</span>
+                    </div>
+                    <span className="font-bold text-slate-900 tabular-numbers">{compactVnd(entry.value)} ₫</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Top contracts + Overdue alerts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+            {/* Top contracts by profit */}
+            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-amber-600" /> Top Hợp Đồng Theo Lợi Nhuận
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5 mb-4">
+                Xếp hạng lợi nhuận thuần từng hợp đồng
+              </p>
+              <div className="space-y-3">
+                {dashboard.topContracts.map((c, idx) => {
+                  const max = dashboard.topContracts[0]?.profit || 1;
+                  const pct = Math.max(6, Math.round((c.profit / max) * 100));
+                  const color = CHART_COLORS[idx % CHART_COLORS.length];
+                  return (
+                    <div key={c.name}>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-5 h-5 shrink-0 rounded-md text-white text-[10px] font-extrabold flex items-center justify-center"
+                            style={{ backgroundColor: color }}
+                          >
+                            {idx + 1}
+                          </span>
+                          <span className="font-semibold text-slate-800 truncate">{c.fullName}</span>
+                        </div>
+                        <span className="font-extrabold text-emerald-600 tabular-numbers shrink-0 ml-2">
+                          {compactVnd(c.profit)} ₫
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                          <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }}></div>
+                        </div>
+                        <span className="text-[10.5px] font-bold text-slate-500 w-12 text-right">{c.margin}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Overdue alerts */}
+            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-600" /> Cảnh Báo Công Nợ
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5 mb-4">
+                Hóa đơn quá hạn & sắp đến hạn cần xử lý
+              </p>
+              {dashboard.overdueAlerts.length === 0 ? (
+                <div className="flex items-center gap-2 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <CheckCircle2 className="w-4 h-4" /> Không có công nợ cần cảnh báo.
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {dashboard.overdueAlerts.map((inv) => {
+                    const overdue = inv.payment_status === 'OVERDUE';
+                    return (
+                      <div
+                        key={inv.id}
+                        className={`flex items-center justify-between gap-3 p-3 rounded-lg border ${
+                          overdue ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <p className={`text-xs font-bold truncate ${overdue ? 'text-red-800' : 'text-amber-800'}`}>
+                            {inv.customer_name}
+                          </p>
+                          <p className="text-[11px] font-mono text-slate-500 truncate">
+                            {inv.invoice_code} · hạn {inv.due_date}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className={`text-xs font-extrabold tabular-numbers ${overdue ? 'text-red-600' : 'text-amber-600'}`}>
+                            {compactVnd(inv.amount_due)} ₫
+                          </p>
+                          <span
+                            className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[9.5px] font-bold ${
+                              overdue ? 'bg-red-600 text-white' : 'bg-amber-500 text-white'
+                            }`}
+                          >
+                            {overdue ? '⚠️ QUÁ HẠN' : '⏳ SẮP ĐẾN HẠN'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: P&L STATEMENTS TABLE */}
       {activeTab === 'P_L' && (
