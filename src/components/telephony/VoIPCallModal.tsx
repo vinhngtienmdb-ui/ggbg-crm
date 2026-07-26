@@ -97,7 +97,7 @@ export default function VoIPCallModal({
               />
               <button
                 onClick={handleStartCall}
-                className="w-full py-2.5 bg-success-fg hover:bg-success-fg text-white font-bold rounded-md flex items-center justify-center gap-2 transition-colors active:scale-95 text-xs"
+                className="w-full py-2.5 bg-success-fg hover:bg-success-deep text-white font-bold rounded-md flex items-center justify-center gap-2 transition-colors active:scale-95 text-xs"
               >
                 <Phone className="w-4 h-4 fill-white" />
                 Click-to-Call VoIP Ngay
@@ -110,7 +110,7 @@ export default function VoIPCallModal({
               <div className="text-brand-600 font-semibold text-xs animate-pulse mb-4">Đang kết nối cổng WebRTC...</div>
               <button
                 onClick={handleEndCall}
-                className="w-12 h-12 rounded-full bg-danger-fg hover:bg-danger-fg text-white flex items-center justify-center mx-auto shadow-md"
+                className="w-12 h-12 rounded-full bg-danger-fg hover:bg-danger-deep text-white flex items-center justify-center mx-auto shadow-md"
               >
                 <PhoneOff className="w-5 h-5" />
               </button>
@@ -145,7 +145,7 @@ export default function VoIPCallModal({
 
                 <button
                   onClick={handleEndCall}
-                  className="w-12 h-12 rounded-full bg-danger-fg hover:bg-danger-fg text-white flex items-center justify-center shadow-md active:scale-95"
+                  className="w-12 h-12 rounded-full bg-danger-fg hover:bg-danger-deep text-white flex items-center justify-center shadow-md active:scale-95"
                 >
                   <PhoneOff className="w-5 h-5" />
                 </button>

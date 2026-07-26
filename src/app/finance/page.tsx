@@ -287,7 +287,7 @@ export default function FinancePage() {
                           </button>
                           <button
                             onClick={() => handleSendReminder(inv, 'TELEGRAM_BOT')}
-                            className="px-2.5 py-1 bg-plum-bg hover:bg-plum-bg text-plum-fg border border-plum-border rounded text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                            className="px-2.5 py-1 bg-plum-bg hover:bg-plum-hover text-plum-fg border border-plum-border rounded text-[11px] font-semibold flex items-center gap-1 transition-colors"
                           >
                             <Send className="w-3 h-3 text-plum-fg" /> Telegram
                           </button>

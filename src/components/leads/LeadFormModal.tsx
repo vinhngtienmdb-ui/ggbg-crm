@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { X, Save, Building2, User, ShieldCheck } from 'lucide-react';
 import { Customer, CustomerEntityType, Lead, LeadSource } from '@/types';
 import { LEAD_SOURCES, SALES_REPS } from '@/lib/leadStore';
-import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 
 export type LeadFormMode = 'create' | 'edit' | 'view';
 
@@ -19,7 +18,6 @@ export interface LeadFormValues {
   source_name: LeadSource;
   estimated_budget: string;
   assigned_sale_name: string;
-  address: string;
 }
 
 export const EMPTY_LEAD_FORM: LeadFormValues = {
@@ -33,7 +31,6 @@ export const EMPTY_LEAD_FORM: LeadFormValues = {
   source_name: 'Facebook Lead Ads',
   estimated_budget: '150000000',
   assigned_sale_name: SALES_REPS[0],
-  address: '',
 };
 
 export function toLeadForm(lead: Lead): LeadFormValues {
@@ -48,7 +45,6 @@ export function toLeadForm(lead: Lead): LeadFormValues {
     source_name: lead.source_name,
     estimated_budget: String(lead.estimated_budget ?? 0),
     assigned_sale_name: lead.assigned_sale_name,
-    address: '',
   };
 }
 
@@ -94,15 +90,6 @@ export default function LeadFormModal({
   const readOnly = mode === 'view';
   const isEnterprise = values.entity_type === 'ENTERPRISE';
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
-  const [addressData, setAddressData] = useState<VietnamAddressValue>({
-    provinceCode: '',
-    provinceName: '',
-    wardCode: '',
-    wardName: '',
-    detailAddress: '',
-    fullAddress: values.address,
-  });
-
   const set = <K extends keyof LeadFormValues>(key: K, value: LeadFormValues[K]) =>
     onChange({ ...values, [key]: value });
 
@@ -302,18 +289,6 @@ export default function LeadFormModal({
                 </select>
               </Field>
             </div>
-
-            {!readOnly && (
-              <div className="rounded-[10px] border border-line-softer bg-surface-subtle p-3">
-                <VietnamAddressPicker
-                  value={addressData}
-                  onChange={(next) => {
-                    setAddressData(next);
-                    set('address', next.fullAddress);
-                  }}
-                />
-              </div>
-            )}
 
             {error && (
               <p className="rounded-lg border border-danger-border bg-danger-bg px-3 py-2 text-[11.5px] font-semibold text-danger-fg">

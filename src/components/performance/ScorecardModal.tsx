@@ -320,7 +320,7 @@ export default function ScorecardModal({
             <div className="text-right">
               <p className="text-[11px] text-ink-400 font-bold uppercase tracking-wider mb-1">Danh Hiệu Xếp Loại Tự Động:</p>
               <span className={`px-4 py-2 rounded-2xl text-sm font-black shadow-lg inline-block ${
-                computedRatingGrade === 'S' ? 'bg-warn-fg text-white shadow-card/20' :
+                computedRatingGrade === 'S' ? 'bg-warn-fg text-white shadow-card' :
                 computedRatingGrade === 'A' ? 'bg-brand-600 text-white' :
                 computedRatingGrade === 'B' ? 'bg-success-fg text-white' :
                 computedRatingGrade === 'C' ? 'bg-steel-bg text-steel-fg' : 'bg-danger-fg text-white'

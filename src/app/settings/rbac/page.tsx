@@ -234,7 +234,7 @@ export default function RbacPage() {
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2 bg-plum-deep hover:bg-plum-deep text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-card/20 transition-all active:scale-95"
+            className="px-4 py-2 bg-plum-deep hover:bg-plum-strong text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-card transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" />
             Tạo Chức Danh Mới
@@ -438,7 +438,7 @@ export default function RbacPage() {
                                 isSuperAdmin
                                   ? 'bg-surface-subtle border-line opacity-90 cursor-not-allowed'
                                   : isGranted
-                                  ? 'bg-success-bg/60 border-success-border hover:bg-success-bg cursor-pointer'
+                                  ? 'bg-success-bg/60 border-success-border hover:bg-success-hover cursor-pointer'
                                   : 'bg-surface-subtle border-line hover:bg-line-soft cursor-pointer'
                               }`}
                             >
@@ -606,7 +606,7 @@ export default function RbacPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-plum-deep hover:bg-plum-deep text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-card/20 transition-all active:scale-95"
+                  className="px-5 py-2 bg-plum-deep hover:bg-plum-strong text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-card transition-all active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Danh

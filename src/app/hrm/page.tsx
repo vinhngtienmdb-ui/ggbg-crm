@@ -789,7 +789,7 @@ export default function HRMPage() {
                       <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleOpenStatusModal(emp)}
-                          className="px-2.5 py-1.5 bg-plum-bg text-plum-fg font-bold rounded-xl text-[11px] hover:bg-plum-bg transition-all border border-plum-border"
+                          className="px-2.5 py-1.5 bg-plum-bg text-plum-fg font-bold rounded-xl text-[11px] hover:bg-plum-hover transition-all border border-plum-border"
                         >
                           Đổi Trạng Thái
                         </button>
@@ -809,7 +809,7 @@ export default function HRMPage() {
                             setEmployeeModalMode('edit');
                             setIsEmployeeModalOpen(true);
                           }}
-                          className="px-2.5 py-1.5 bg-warn-bg text-warn-fg font-bold rounded-xl text-[11px] hover:bg-warn-bg transition-all"
+                          className="px-2.5 py-1.5 bg-warn-bg text-warn-fg font-bold rounded-xl text-[11px] hover:bg-warn-hover transition-all"
                         >
                           Sửa
                         </button>
@@ -891,7 +891,7 @@ export default function HRMPage() {
                         {emp.approval_status === 'PENDING_DIRECT_MANAGER' && (
                           <button
                             onClick={() => handleApproveDirectManager(emp)}
-                            className="px-4 py-2 bg-warn-fg hover:bg-warn-fg text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                            className="px-4 py-2 bg-warn-fg hover:bg-warn-deep text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
                           >
                             <CheckCircle2 className="w-4 h-4" /> 1️⃣ Quản Lý Trực Tiếp Duyệt
                           </button>
@@ -908,7 +908,7 @@ export default function HRMPage() {
 
                         <button
                           onClick={() => handleRejectApproval(emp)}
-                          className="px-3.5 py-2 bg-danger-bg hover:bg-danger-bg text-danger-fg font-bold rounded-xl text-xs flex items-center gap-1 transition-all"
+                          className="px-3.5 py-2 bg-danger-bg hover:bg-danger-hover text-danger-fg font-bold rounded-xl text-xs flex items-center gap-1 transition-all"
                         >
                           <XCircle className="w-4 h-4" /> Từ Chối
                         </button>
@@ -1206,7 +1206,7 @@ export default function HRMPage() {
 
                   <button
                     onClick={() => handleSignContractAndActivate(item)}
-                    className="px-3.5 py-1.5 bg-success-fg hover:bg-success-fg text-white font-bold rounded-xl text-xs shadow-md shadow-card/20 flex items-center gap-1.5 transition-all active:scale-95 ml-2"
+                    className="px-3.5 py-1.5 bg-success-fg hover:bg-success-deep text-white font-bold rounded-xl text-xs shadow-md shadow-card flex items-center gap-1.5 transition-all active:scale-95 ml-2"
                   >
                     <FileCheck className="w-4 h-4" /> Ký HĐ & Kích Hoạt "Đang Làm Việc"
                   </button>
@@ -1258,7 +1258,7 @@ export default function HRMPage() {
             {jobSubTab === 'TITLES' && (
               <button
                 onClick={() => setIsJobTitleModalOpen(true)}
-                className="px-4 py-2.5 bg-plum-fg hover:bg-plum-fg text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-card/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-plum-fg hover:bg-plum-strong text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-card transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Chức Danh Mới
@@ -1278,7 +1278,7 @@ export default function HRMPage() {
             {jobSubTab === 'GRADES' && (
               <button
                 onClick={() => setIsGradeModalOpen(true)}
-                className="px-4 py-2.5 bg-success-fg hover:bg-success-fg text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-card/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-success-fg hover:bg-success-deep text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-card transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Cấp Bậc G-Series
@@ -1387,7 +1387,7 @@ export default function HRMPage() {
                           <td className="p-3.5 text-right">
                             <button
                               onClick={() => handleDeleteJobTitleSubmit(jt.id, jt.name)}
-                              className="px-3 py-1 bg-danger-bg hover:bg-danger-bg text-danger-fg font-bold rounded-lg transition-colors text-[11px]"
+                              className="px-3 py-1 bg-danger-bg hover:bg-danger-hover text-danger-fg font-bold rounded-lg transition-colors text-[11px]"
                             >
                               Xóa
                             </button>
@@ -1840,7 +1840,7 @@ export default function HRMPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-plum-fg hover:bg-plum-fg text-white font-extrabold rounded-xl text-xs shadow-md shadow-card/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-plum-fg hover:bg-plum-strong text-white font-extrabold rounded-xl text-xs shadow-md shadow-card transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Danh
@@ -2017,7 +2017,7 @@ export default function HRMPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-success-fg hover:bg-success-fg text-white font-extrabold rounded-xl text-xs shadow-md shadow-card/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-success-fg hover:bg-success-deep text-white font-extrabold rounded-xl text-xs shadow-md shadow-card transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Cấp Bậc G-Series

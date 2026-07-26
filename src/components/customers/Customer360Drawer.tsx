@@ -63,7 +63,10 @@ export default function Customer360Drawer({
     setRevealed((v) => !v);
   };
 
-  const UnmaskButton = () => (
+  // A plain call, not a nested component: declaring a component inside the
+  // render body gives it a fresh type on every render, which would unmount the
+  // button on each click and drop keyboard focus.
+  const unmaskButton = () => (
     <button
       onClick={toggleReveal}
       className="ml-2 inline-flex items-center gap-1 rounded-md border border-line bg-white px-2.5 py-[3px] text-[10px] font-extrabold text-brand-600 hover:border-brand-600"
@@ -163,7 +166,7 @@ export default function Customer360Drawer({
               <div className="flex flex-col gap-2.5">
                 <Row label="Số điện thoại">
                   <span className="dc-num">{hidden ? maskPhone(customer.phone) : customer.phone}</span>
-                  <UnmaskButton />
+                  {unmaskButton()}
                 </Row>
                 <Row label="Email">{customer.email || '—'}</Row>
                 <Row label="Địa chỉ">{customer.address || '—'}</Row>
@@ -188,7 +191,7 @@ export default function Customer360Drawer({
               <div className="flex flex-col gap-2.5">
                 <Row label={legalIdLabel}>
                   <span className="dc-num">{hidden ? maskLegalId(legalId) : legalId || '—'}</span>
-                  <UnmaskButton />
+                  {unmaskButton()}
                 </Row>
                 <Row label="Hợp đồng R2">
                   {customer.contract_r2_file ? (

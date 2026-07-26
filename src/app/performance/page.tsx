@@ -287,7 +287,7 @@ export default function PerformancePage() {
 
                     <td className="p-4">
                       <span className={`px-3 py-1 rounded-xl text-xs font-black  ${
-                        sc.rating_grade === 'S' ? 'bg-warn-fg text-white shadow-card/20' :
+                        sc.rating_grade === 'S' ? 'bg-warn-fg text-white shadow-card' :
                         sc.rating_grade === 'A' ? 'bg-brand-600 text-white' :
                         sc.rating_grade === 'B' ? 'bg-success-fg text-white' :
                         sc.rating_grade === 'C' ? 'bg-steel-bg text-steel-fg' : 'bg-danger-fg text-white'

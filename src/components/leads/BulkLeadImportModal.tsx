@@ -15,6 +15,7 @@ import {
   Filter
 } from 'lucide-react';
 import { Lead, BulkImportRow, CustomerEntityType, LeadSource } from '@/types';
+import { PIPELINE_STAGES } from '@/lib/uiFormat';
 
 interface BulkLeadImportModalProps {
   isOpen: boolean;
@@ -114,8 +115,8 @@ export default function BulkLeadImportModal({
         company_name: row.company_name || 'Doanh Nghiệp Import',
         source_name: 'Bulk Import Excel',
         pipeline_id: 'AGENCY',
-        stage_id: 'stage_1',
-        stage_name: '1. Tiếp Nhận Mới',
+        stage_id: PIPELINE_STAGES[0].id,
+        stage_name: PIPELINE_STAGES[0].name,
         assigned_sale_name: assignedSale,
         estimated_budget: row.estimated_budget || 150000000,
         lead_score: leadScore,

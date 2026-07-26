@@ -53,13 +53,15 @@ const config: Config = {
         },
         // Status pairs — `bg` for the chip fill, `fg` for its text.
         success: { bg: '#EEF4EE', fg: '#1F7A33', border: '#D3E4D3', hover: '#DFECDF', dot: '#2FA84F', deep: '#186329' },
-        warn: { bg: '#FDF3E7', fg: '#B25E09' },
-        danger: { bg: '#FDEEEE', fg: '#C22F35', border: '#F3C4C6', hover: '#FADCDD', dot: '#E5484D' },
+        warn: { bg: '#FDF3E7', fg: '#B25E09', hover: '#FAE8D3', deep: '#8F4A07' },
+        danger: { bg: '#FDEEEE', fg: '#C22F35', border: '#F3C4C6', hover: '#FADCDD', dot: '#E5484D', deep: '#9E2429' },
         // Named `plum`/`aqua` rather than `violet`/`cyan` so they extend the
         // Tailwind palette instead of replacing those built-in scales, which
         // the rest of the app still uses.
-        plum: { bg: '#F4F1FE', fg: '#6D3FD4', border: '#E2D9FB', deep: '#7C3AED' },
-        aqua: { bg: '#E4F6F8', fg: '#0E7490' },
+        // `deep` is the brand gradient stop from the design; `strong` is the
+        // darker press/hover state, kept separate so hovers never shift it.
+        plum: { bg: '#F4F1FE', fg: '#6D3FD4', border: '#E2D9FB', deep: '#7C3AED', strong: '#5A2FB4', hover: '#E9E2FC' },
+        aqua: { bg: '#E4F6F8', fg: '#0E7490', hover: '#D3EFF3', deep: '#0A5A70' },
         gold: { bg: '#FBF3D9', fg: '#8F6B08', border: '#EFDFA8' },
         steel: { bg: '#EEF0F4', fg: '#5B657F' },
         // Marketplace chips.

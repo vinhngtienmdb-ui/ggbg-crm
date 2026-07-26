@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Target, X, CheckCircle2, DollarSign, Building2, Phone } from 'lucide-react';
 import { Lead, ChatConversation, LeadSource } from '@/types';
+import { PIPELINE_STAGES } from '@/lib/uiFormat';
 
 interface QuickCreateLeadModalProps {
   isOpen: boolean;
@@ -45,8 +46,8 @@ export default function QuickCreateLeadModal({
       company_name: companyName.trim() || 'Khách Hàng Tư Vấn Chat',
       source_name: mapChannelToLeadSource(chat.channel_type),
       pipeline_id: 'AGENCY',
-      stage_id: 'stage_1',
-      stage_name: '1. Tiếp Nhận Mới',
+      stage_id: PIPELINE_STAGES[0].id,
+      stage_name: PIPELINE_STAGES[0].name,
       assigned_sale_name: chat.assigned_rep_name,
       estimated_budget: Number(estimatedBudget) || 180000000,
       lead_score: 88,
@@ -151,9 +152,9 @@ export default function QuickCreateLeadModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-plum-fg hover:bg-plum-fg text-white font-bold rounded-xl text-xs shadow-md shadow-card/20"
+              className="px-5 py-2 bg-plum-fg hover:bg-plum-strong text-white font-bold rounded-xl text-xs shadow-md shadow-card"
             >
-              Đẩy Lead Vào Phễu Bán Hàng (Bước 1. Tiếp Nhận Mới)
+              Đẩy Lead Vào Phễu Bán Hàng (Bước {PIPELINE_STAGES[0].name})
             </button>
           </div>
         </form>

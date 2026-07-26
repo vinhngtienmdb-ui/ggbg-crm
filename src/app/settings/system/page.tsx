@@ -463,7 +463,7 @@ export default function SystemSettingsPage() {
                   type="button"
                   onClick={() => handleTestConnection('R2')}
                   disabled={r2Test.status === 'TESTING'}
-                  className="px-4 py-2 bg-warn-bg text-warn-fg hover:bg-warn-bg border border-gold-border rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                  className="px-4 py-2 bg-warn-bg text-warn-fg hover:bg-warn-hover border border-gold-border rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
                 >
                   <Activity className={`w-4 h-4 ${r2Test.status === 'TESTING' ? 'animate-spin text-warn-fg' : 'text-warn-fg'}`} />
                   {r2Test.status === 'TESTING' ? 'Đang Kiểm Tra...' : 'Kiểm Tra Kết Nối Storage'}
@@ -551,7 +551,7 @@ export default function SystemSettingsPage() {
                   type="button"
                   onClick={() => handleTestConnection('SUPABASE')}
                   disabled={supabaseTest.status === 'TESTING'}
-                  className="px-4 py-2 bg-success-bg text-success-fg hover:bg-success-bg border border-success-border rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                  className="px-4 py-2 bg-success-bg text-success-fg hover:bg-success-hover border border-success-border rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
                 >
                   <Activity className={`w-4 h-4 ${supabaseTest.status === 'TESTING' ? 'animate-spin text-success-fg' : 'text-success-fg'}`} />
                   {supabaseTest.status === 'TESTING' ? 'Đang Kiểm Tra...' : 'Kiểm Tra Kết Nối Supabase'}
@@ -727,7 +727,7 @@ export default function SystemSettingsPage() {
                   type="button"
                   onClick={handleTestApiKeys}
                   disabled={apiKeysTest.status === 'TESTING'}
-                  className="px-4 py-2 bg-warn-bg text-warn-fg hover:bg-warn-bg border border-gold-border rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shrink-0"
+                  className="px-4 py-2 bg-warn-bg text-warn-fg hover:bg-warn-hover border border-gold-border rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shrink-0"
                 >
                   <Sparkles className={`w-4 h-4 ${apiKeysTest.status === 'TESTING' ? 'animate-spin text-warn-fg' : 'text-warn-fg'}`} />
                   {apiKeysTest.status === 'TESTING' ? 'Đang Kiểm Tra Keys...' : 'Kiểm Tra Kết Nối Sàn & AI'}

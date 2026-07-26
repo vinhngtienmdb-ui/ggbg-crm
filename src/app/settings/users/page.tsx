@@ -167,7 +167,7 @@ export default function UserAccountsPage() {
       {/* Super Admin Info Card */}
       <div className="bg-gradient-to-r from-brand-50 via-white to-white p-5 rounded-2xl text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-brand-600/40">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-warn-fg text-white font-bold text-lg flex items-center justify-center shadow-lg shadow-card/30">
+          <div className="w-11 h-11 rounded-2xl bg-warn-fg text-white font-bold text-lg flex items-center justify-center shadow-lg shadow-card">
             SA
           </div>
           <div>
@@ -321,8 +321,8 @@ export default function UserAccountsPage() {
                             onClick={() => toggleAccountStatus(user.id)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 mx-auto ${
                               isActive
-                                ? 'bg-danger-bg text-danger-fg hover:bg-danger-bg border border-danger-border'
-                                : 'bg-success-bg text-success-fg hover:bg-success-bg border border-success-border'
+                                ? 'bg-danger-bg text-danger-fg hover:bg-danger-hover border border-danger-border'
+                                : 'bg-success-bg text-success-fg hover:bg-success-hover border border-success-border'
                             }`}
                           >
                             {isActive ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
