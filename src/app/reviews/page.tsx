@@ -129,10 +129,10 @@ export default function Review360Page() {
 
       {/* OVERVIEW STAT CARDS FOR 360 PERSPECTIVES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-sm space-y-1">
-          <p className="text-xs font-bold text-slate-400 uppercase">Phiên Đánh Giá</p>
-          <p className="text-2xl font-extrabold text-blue-400">{filteredSessions.length} Nhân Sự</p>
-          <p className="text-[10px] text-slate-400 font-mono">{selectedPeriod}</p>
+        <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200 shadow-sm space-y-1">
+          <p className="text-xs font-bold text-slate-500 uppercase">Phiên Đánh Giá</p>
+          <p className="text-2xl font-extrabold text-blue-700">{filteredSessions.length} Nhân Sự</p>
+          <p className="text-[10px] text-slate-500 font-mono">{selectedPeriod}</p>
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
@@ -192,7 +192,7 @@ export default function Review360Page() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                 <th className="p-4">Họ Và Tên</th>
                 <th className="p-4">Phòng Ban & Vị Trí</th>
                 <th className="p-4">Kỳ Đánh Giá</th>
@@ -269,11 +269,11 @@ export default function Review360Page() {
       {isNewSessionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
-              <h3 className="font-bold text-base flex items-center gap-2">
-                <Plus className="w-5 h-5 text-blue-400" /> Khởi Tạo Phiên Đánh Giá 360° Mới
+            <div className="bg-blue-50 border-b border-blue-100 p-5 flex items-center justify-between">
+              <h3 className="font-bold text-base flex items-center gap-2 text-blue-700">
+                <Plus className="w-5 h-5 text-blue-600" /> Khởi Tạo Phiên Đánh Giá 360° Mới
               </h3>
-              <button onClick={() => setIsNewSessionModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsNewSessionModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 ✕
               </button>
             </div>
@@ -340,11 +340,11 @@ export default function Review360Page() {
       {isConfigModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
-              <h3 className="font-bold text-base flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-blue-400" /> Cấu Hình Khung Tiêu Chí & Trọng Số 360°
+            <div className="bg-blue-50 border-b border-blue-100 p-5 flex items-center justify-between">
+              <h3 className="font-bold text-base flex items-center gap-2 text-blue-700">
+                <Sliders className="w-5 h-5 text-blue-600" /> Cấu Hình Khung Tiêu Chí & Trọng Số 360°
               </h3>
-              <button onClick={() => setIsConfigModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsConfigModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 ✕
               </button>
             </div>

@@ -86,19 +86,22 @@ export default function ContractsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header Banner */}
-      <div className="bg-slate-900 rounded-lg p-5 text-white border border-slate-800 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-medium mb-2">
-            <FileText className="w-3.5 h-3.5 text-blue-400" />
-            <span>Official Contract PDF & Stamp Engine</span>
+      {/* Header Hero */}
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
+              <FileText className="w-3.5 h-3.5 text-blue-600" />
+              <span>Official Contract PDF & Stamp Engine</span>
+            </div>
+            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
+              Quản Lý Hợp Đồng Dịch Vụ & Xuất File PDF Bản Quyền
+            </h1>
+            <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
+              Quản lý hợp đồng ủy quyền vận hành TMĐT chính thức có con dấu đỏ điện tử & Mã QR xác thực.
+            </p>
           </div>
-          <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
-            Quản Lý Hợp Đồng Dịch Vụ & Xuất File PDF Bản Quyền
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">
-            Quản lý hợp đồng ủy quyền vận hành TMĐT chính thức có con dấu đỏ điện tử & Mã QR xác thực.
-          </p>
         </div>
       </div>
 
@@ -121,7 +124,7 @@ export default function ContractsPage() {
         <div className="overflow-x-auto touch-scroll sleek-scrollbar">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                 <th className="p-3">Mã Hợp Đồng</th>
                 <th className="p-3">Khách Hàng / Công Ty</th>
                 <th className="p-3">Gói Sàn TMĐT</th>
@@ -132,7 +135,7 @@ export default function ContractsPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredContracts.map((cnt) => (
-                <tr key={cnt.id} className="hover:bg-slate-50/80 transition-colors">
+                <tr key={cnt.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="p-3 font-mono font-bold text-blue-600">{cnt.contract_code}</td>
                   <td className="p-3">
                     <p className="font-bold text-slate-900">{cnt.company_name}</p>

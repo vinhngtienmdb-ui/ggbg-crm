@@ -80,38 +80,41 @@ export default function FinancePage() {
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="bg-slate-900 rounded-lg p-5 text-white border border-slate-800 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-medium mb-2">
-            <PieChart className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Financial & P&L Analytics Engine</span>
+      {/* Header Hero */}
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
+              <PieChart className="w-3.5 h-3.5 text-blue-600" />
+              <span>Financial & P&L Analytics Engine</span>
+            </div>
+            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
+              Báo Cáo Tài Chính, Lợi Nhuận Gộp P&L & Quản Lý Công Nợ
+            </h1>
+            <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
+              Phân tích tỷ suất lợi nhuận gộp từng hợp đồng vận hành TMĐT và theo dõi kỳ thu phí nợ dịch vụ.
+            </p>
           </div>
-          <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
-            Báo Cáo Tài Chính, Lợi Nhuận Gộp P&L & Quản Lý Công Nợ
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">
-            Phân tích tỷ suất lợi nhuận gộp từng hợp đồng vận hành TMĐT và theo dõi kỳ thu phí nợ dịch vụ.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveTab('P_L')}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              activeTab === 'P_L' ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <PieChart className="w-3.5 h-3.5" /> Báo Cáo P&L
-          </button>
-          <button
-            onClick={() => setActiveTab('DEBT')}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              activeTab === 'DEBT' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <AlertTriangle className="w-3.5 h-3.5" /> Quản Lý Công Nợ
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab('P_L')}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                activeTab === 'P_L' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-blue-100 text-slate-600 hover:bg-blue-50'
+              }`}
+            >
+              <PieChart className="w-3.5 h-3.5" /> Báo Cáo P&L
+            </button>
+            <button
+              onClick={() => setActiveTab('DEBT')}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                activeTab === 'DEBT' ? 'bg-amber-600 text-white shadow-xs' : 'bg-white border border-blue-100 text-slate-600 hover:bg-blue-50'
+              }`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5" /> Quản Lý Công Nợ
+            </button>
+          </div>
         </div>
       </div>
 
@@ -184,7 +187,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto touch-scroll sleek-scrollbar">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-3">Mã HĐ & Khách Hàng</th>
                   <th className="p-3">Sàn TMĐT</th>
                   <th className="p-3">GMV Hàng Tháng</th>
@@ -197,7 +200,7 @@ export default function FinancePage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {plStatements.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                     <td className="p-3">
                       <p className="font-bold text-slate-900">{item.company_name}</p>
                       <p className="text-[11px] text-blue-600 font-mono font-semibold">{item.contract_code} • {item.customer_name}</p>
@@ -236,7 +239,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto touch-scroll sleek-scrollbar">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-3">Mã Hóa Đơn & Khách Hàng</th>
                   <th className="p-3">Kỳ Thu Phí</th>
                   <th className="p-3">Số Tiền Phải Thu</th>
@@ -248,7 +251,7 @@ export default function FinancePage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {debtInvoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={inv.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                     <td className="p-3">
                       <p className="font-bold text-slate-900">{inv.customer_name}</p>
                       <p className="text-[11px] text-slate-500 font-mono">{inv.invoice_code} • {inv.contract_code}</p>

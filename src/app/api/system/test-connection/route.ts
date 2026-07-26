@@ -1,11 +1,28 @@
 import { NextResponse } from 'next/server';
+import { guardApi } from '@/lib/apiGuard';
+import { validateOutboundUrl } from '@/lib/ssrfGuard';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const session = await guardApi(request, { roles: ['SUPER_ADMIN'] });
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
-    const { target_service } = body;
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
+    const { target_service, endpoint_url } = body;
+    if (typeof target_service !== 'string' || target_service.length > 100) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
+    // Nếu client gửi kèm endpoint tuỳ chỉnh, chặn SSRF trước khi (giả lập) gọi ra ngoài.
+    if (endpoint_url !== undefined) {
+      const ssrfError = validateOutboundUrl(endpoint_url);
+      if (ssrfError) {
+        return NextResponse.json({ success: false, message: ssrfError }, { status: 400 });
+      }
+    }
 
     // Simulate real connection test delay (120ms - 320ms)
     const latency = Math.floor(120 + Math.random() * 200);

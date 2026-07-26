@@ -79,23 +79,23 @@ export default function ProductPackageModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
-        <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="bg-white border-b border-slate-200 text-slate-900 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center font-bold text-white shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-md">
               <Package className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold">
+              <h2 className="text-base font-extrabold text-slate-900">
                 {mode === 'create' ? 'Tạo Gói Dịch Vụ Mới' : `Chỉnh Sửa Gói: ${formData.name}`}
               </h2>
-              <p className="text-xs text-slate-300">
-                Mã SKU: <span className="font-mono text-cyan-300 font-bold">{formData.sku_code}</span> • Cấu hình thuộc tính JSONB TMĐT
+              <p className="text-xs text-slate-500">
+                Mã SKU: <span className="font-mono text-blue-600 font-bold">{formData.sku_code}</span> • Cấu hình thuộc tính JSONB TMĐT
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -192,11 +192,11 @@ export default function ProductPackageModal({
                     onClick={() => handleTogglePlatform(plat.id)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
                       isSelected
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                         : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-300" />}
                     {plat.name}
                   </button>
                 );

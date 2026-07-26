@@ -520,12 +520,18 @@ export default function LeadsPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
+            <UserCheck className="w-3 h-3 text-blue-600" />
+            <span>Phễu Bán Hàng 7 Bước</span>
+          </div>
+          <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700 flex items-center gap-2">
             Quản Lý Lead & Phễu Bán Hàng
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
             Quản lý khách hàng tiềm năng và tiến độ phễu bán hàng
           </p>
         </div>
@@ -565,6 +571,7 @@ export default function LeadsPage() {
             <Plus className="w-4 h-4" />
             Tạo Lead Mới
           </button>
+        </div>
         </div>
       </div>
 
@@ -716,7 +723,7 @@ export default function LeadsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-4">Mã Lead & Thể Nhân</th>
                   <th className="p-4">Họ và Tên Lead</th>
                   <th className="p-4">Doanh Nghiệp / MST</th>
@@ -812,19 +819,19 @@ export default function LeadsPage() {
       {isLogDrawerOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white flex items-center justify-between">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
                   <History className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base">Nhật Ký Lịch Sử Chuyển Trạng Thái</h3>
-                  <p className="text-xs text-slate-300">Lọc xem nhật ký toàn hệ thống hoặc xem chi tiết theo từng Lead</p>
+                  <h3 className="font-extrabold text-base text-slate-900">Nhật Ký Lịch Sử Chuyển Trạng Thái</h3>
+                  <p className="text-xs text-slate-500">Lọc xem nhật ký toàn hệ thống hoặc xem chi tiết theo từng Lead</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsLogDrawerOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -888,19 +895,19 @@ export default function LeadsPage() {
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white flex items-center justify-between">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base">Tạo Lead Mới Phễu 7 Bước</h3>
-                  <p className="text-xs text-slate-300">Thông tin Khách Hàng được tự động liên kết</p>
+                  <h3 className="font-extrabold text-base text-slate-900">Tạo Lead Mới Phễu 7 Bước</h3>
+                  <p className="text-xs text-slate-500">Thông tin Khách Hàng được tự động liên kết</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>

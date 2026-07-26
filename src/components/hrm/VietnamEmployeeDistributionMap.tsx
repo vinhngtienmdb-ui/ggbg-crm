@@ -3,31 +3,25 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   MapPin,
-  Users,
   Search,
   Filter,
   Building2,
   Phone,
-  Mail,
-  UserCheck,
-  Award,
-  ChevronRight,
-  ShieldCheck,
-  PieChart,
   BarChart3,
-  Layers,
-  Sparkles,
   Map as MapIcon,
-  Compass,
-  CheckCircle2,
   Flag,
   Globe,
   Loader2,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 import { EmployeeProfile } from '@/types';
-
-const GEOJSON_DATA_URL = 'https://raw.githubusercontent.com/nguyenduy1133/Free-GIS-Data/main/Vietnam%20Administrative%20Divisions%20(Pre-2025)%20-%20%C4%90%C6%A1n%20v%E1%BB%8B%20h%C3%A0nh%20ch%C3%ADnh%20Vi%E1%BB%87t%20Nam%20(Tr%C6%B0%E1%BB%9Bc%202025)/Provinces_included_Paracel_SpratlyIslands_combine.geojson';
+import {
+  VIETNAM_PROVINCES,
+  REGION_COLOR,
+  PROVINCES_GEOJSON_URL,
+  resolveProvince,
+  type Region,
+} from '@/lib/vietnamGeo';
 
 interface VietnamEmployeeDistributionMapProps {
   employees: EmployeeProfile[];
@@ -35,8 +29,7 @@ interface VietnamEmployeeDistributionMapProps {
 
 interface LocationDensityItem {
   provinceName: string;
-  wardName?: string;
-  region: 'BAC' | 'TRUNG' | 'NAM';
+  region: Region;
   count: number;
   employees: EmployeeProfile[];
   percentage: number;
@@ -47,13 +40,40 @@ interface LocationDensityItem {
 interface GeoJsonFeature {
   type: string;
   properties: {
-    Name?: string;
-    [key: string]: any;
+    name?: string;
+    region?: Region;
+    type?: string;
+    [key: string]: unknown;
   };
   geometry: {
     type: string;
-    coordinates: any[];
+    coordinates: number[][][] | number[][][][];
   };
+}
+
+// Geographic bounding box used to project lon/lat onto the SVG canvas.
+const BBOX = { minLon: 101.5, maxLon: 117.5, minLat: 7.0, maxLat: 23.8 };
+const SVG_W = 480;
+const SVG_H = 650;
+
+/** Extract a ward/district-level label from a free-text address. */
+function wardLabel(addr: string): string {
+  const segments = addr.split(',').map((s) => s.trim()).filter(Boolean);
+  const ward = segments.find((s) =>
+    /^(Phường|Xã|Thị trấn|Quận|Huyện|TT\.?|P\.|Q\.)/i.test(s)
+  );
+  return (ward || segments[0] || 'Chưa xác định').replace(/^(Q\.|P\.)/i, (m) =>
+    m.toUpperCase() === 'Q.' ? 'Quận ' : 'Phường '
+  );
+}
+
+/** Deterministic small offset so overlapping ward pins fan out slightly. */
+function jitter(key: string): { dx: number; dy: number } {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  const dx = ((h % 100) / 100 - 0.5) * 0.7;
+  const dy = (((h >> 3) % 100) / 100 - 0.5) * 0.7;
+  return { dx, dy };
 }
 
 export default function VietnamEmployeeDistributionMap({
@@ -61,43 +81,44 @@ export default function VietnamEmployeeDistributionMap({
 }: VietnamEmployeeDistributionMapProps) {
   const [groupingLevel, setGroupingLevel] = useState<'PROVINCE' | 'WARD'>('PROVINCE');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
-  const [selectedRegionFilter, setSelectedRegionFilter] = useState<'ALL' | 'BAC' | 'TRUNG' | 'NAM'>('ALL');
+  const [selectedRegionFilter, setSelectedRegionFilter] = useState<'ALL' | Region>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<LocationDensityItem | null>(null);
 
-  // GeoJSON state fetched from nguyenduy1133/Free-GIS-Data
+  // Bundled 34-province GeoJSON (offline-safe; derived from Free-GIS-Data).
   const [geoFeatures, setGeoFeatures] = useState<GeoJsonFeature[]>([]);
   const [isLoadingGeo, setIsLoadingGeo] = useState<boolean>(true);
   const [geoError, setGeoError] = useState<string | null>(null);
 
-  // Fetch real GIS GeoJSON boundaries from nguyenduy1133/Free-GIS-Data
   useEffect(() => {
     let isMounted = true;
     setIsLoadingGeo(true);
-    fetch(GEOJSON_DATA_URL)
+    fetch(PROVINCES_GEOJSON_URL)
       .then((res) => {
-        if (!res.ok) throw new Error('Không thể tải dữ liệu GeoJSON từ nguyenduy1133/Free-GIS-Data');
+        if (!res.ok) throw new Error('Không thể tải dữ liệu GeoJSON 34 tỉnh/thành');
         return res.json();
       })
       .then((data) => {
-        if (isMounted && data && data.features) {
+        if (isMounted && data && Array.isArray(data.features)) {
           setGeoFeatures(data.features);
-          setIsLoadingGeo(false);
+          setGeoError(null);
         }
       })
       .catch((err) => {
-        console.warn('GeoJSON fetch fallback:', err);
-        if (isMounted) {
-          setGeoError('Đang hiển thị chế độ xemGIS mặc định');
-          setIsLoadingGeo(false);
-        }
+        console.warn('GeoJSON load error:', err);
+        if (isMounted) setGeoError('Không tải được ranh giới GIS — hiển thị điểm phân bổ trên nền lưới.');
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingGeo(false);
       });
 
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Filter employees by department & search term
-  const filteredEmployees = useMemo(() => {
+  // Employees filtered by department + search (region filter applied separately).
+  const deptSearchEmployees = useMemo(() => {
     return employees.filter((emp) => {
       if (selectedDepartment !== 'ALL' && emp.department !== selectedDepartment) return false;
       if (searchTerm.trim()) {
@@ -114,99 +135,61 @@ export default function VietnamEmployeeDistributionMap({
     });
   }, [employees, selectedDepartment, searchTerm]);
 
-  // Real GIS Location Coordinates (GeoJSON standard)
+  // Region breakdown reflects department + search filters (NOT the region toggle),
+  // so each region button always shows its true headcount.
+  const regionBreakdown = useMemo(() => {
+    const acc = { BAC: 0, TRUNG: 0, NAM: 0 };
+    deptSearchEmployees.forEach((emp) => {
+      const { province } = resolveProvince(emp.temporary_address || emp.permanent_address);
+      acc[province.region] += 1;
+    });
+    return acc;
+  }, [deptSearchEmployees]);
+
+  // Apply the region toggle on top of department + search.
+  const filteredEmployees = useMemo(() => {
+    if (selectedRegionFilter === 'ALL') return deptSearchEmployees;
+    return deptSearchEmployees.filter((emp) => {
+      const { province } = resolveProvince(emp.temporary_address || emp.permanent_address);
+      return province.region === selectedRegionFilter;
+    });
+  }, [deptSearchEmployees, selectedRegionFilter]);
+
+  // Aggregate employees into map locations (province or ward level).
   const locationStats = useMemo(() => {
-    const map = new Map<string, { region: 'BAC' | 'TRUNG' | 'NAM'; employees: EmployeeProfile[]; lon: number; lat: number }>();
+    const map = new Map<
+      string,
+      { region: Region; employees: EmployeeProfile[]; lon: number; lat: number }
+    >();
 
     filteredEmployees.forEach((emp) => {
-      const addr = (emp.temporary_address || emp.permanent_address || 'Thành phố Hà Nội').trim();
-      let key = 'Thành phố Hà Nội';
-      let region: 'BAC' | 'TRUNG' | 'NAM' = 'BAC';
-      let lon = 105.8342;
-      let lat = 21.0278;
+      const addr = (emp.temporary_address || emp.permanent_address || '').trim();
+      const { province } = resolveProvince(addr);
+
+      let key: string;
+      let lon: number;
+      let lat: number;
 
       if (groupingLevel === 'PROVINCE') {
-        if (addr.includes('Hồ Chí Minh') || addr.includes('TP.HCM') || addr.includes('Sài Gòn')) {
-          key = 'Thành phố Hồ Chí Minh';
-          region = 'NAM';
-          lon = 106.6297;
-          lat = 10.8231;
-        } else if (addr.includes('Đà Nẵng')) {
-          key = 'Thành phố Đà Nẵng';
-          region = 'TRUNG';
-          lon = 108.2022;
-          lat = 16.0544;
-        } else if (addr.includes('Hải Phòng')) {
-          key = 'Thành phố Hải Phòng';
-          region = 'BAC';
-          lon = 106.6881;
-          lat = 20.8449;
-        } else if (addr.includes('Cần Thơ')) {
-          key = 'Thành phố Cần Thơ';
-          region = 'NAM';
-          lon = 105.7862;
-          lat = 10.0452;
-        } else if (addr.includes('Bình Dương')) {
-          key = 'Tỉnh Bình Dương';
-          region = 'NAM';
-          lon = 106.6575;
-          lat = 11.1604;
-        } else if (addr.includes('Đồng Nai')) {
-          key = 'Tỉnh Đồng Nai';
-          region = 'NAM';
-          lon = 107.0843;
-          lat = 11.0528;
-        } else if (addr.includes('Nghệ An')) {
-          key = 'Tỉnh Nghệ An';
-          region = 'TRUNG';
-          lon = 104.9200;
-          lat = 19.3800;
-        } else if (addr.includes('Thanh Hóa')) {
-          key = 'Tỉnh Thanh Hóa';
-          region = 'TRUNG';
-          lon = 105.7700;
-          lat = 19.8000;
-        } else if (addr.includes('Quảng Trị')) {
-          key = 'Tỉnh Quảng Trị';
-          region = 'TRUNG';
-          lon = 107.0000;
-          lat = 16.7500;
-        } else if (addr.includes('Khánh Hòa') || addr.includes('Nha Trang')) {
-          key = 'Tỉnh Khánh Hòa';
-          region = 'TRUNG';
-          lon = 109.1967;
-          lat = 12.2388;
-        } else {
-          key = 'Thành phố Hà Nội';
-          region = 'BAC';
-          lon = 105.8342;
-          lat = 21.0278;
-        }
+        key = `${province.type} ${province.name}`;
+        lon = province.lon;
+        lat = province.lat;
       } else {
-        // WARD grouping (Post-01/07/2025 structure)
-        if (addr.includes('Cầu Giấy')) { key = 'Phường Cầu Giấy, TP. Hà Nội'; lon = 105.7900; lat = 21.0350; }
-        else if (addr.includes('Hai Bà Trưng')) { key = 'Phường Hai Bà Trưng, TP. Hà Nội'; lon = 105.8500; lat = 21.0100; }
-        else if (addr.includes('Ba Đình')) { key = 'Phường Phúc Xá, TP. Hà Nội'; lon = 105.8400; lat = 21.0400; }
-        else if (addr.includes('Thượng Đình') || addr.includes('Thanh Xuân')) { key = 'Phường Thượng Đình, TP. Hà Nội'; lon = 105.8100; lat = 20.9950; }
-        else if (addr.includes('Quận 1') || addr.includes('Bến Nghé')) { key = 'Phường Bến Nghé, TP. Hồ Chí Minh'; lon = 106.7000; lat = 10.7750; }
-        else if (addr.includes('Thảo Điền') || addr.includes('Quận 2')) { key = 'Phường Thảo Điền, TP. Hồ Chí Minh'; lon = 106.7300; lat = 10.8000; }
-        else if (addr.includes('Hải Châu')) { key = 'Phường Hải Châu, TP. Đà Nẵng'; lon = 108.2200; lat = 16.0600; }
-        else { key = 'Phường Trung Tâm, TP. Hà Nội'; lon = 105.8342; lat = 21.0278; }
-
-        if (key.includes('TP. Hồ Chí Minh')) region = 'NAM';
-        else if (key.includes('Đà Nẵng')) region = 'TRUNG';
-        else region = 'BAC';
+        const label = wardLabel(addr);
+        key = `${label}, ${province.name}`;
+        const { dx, dy } = jitter(key);
+        lon = province.lon + dx;
+        lat = province.lat + dy;
       }
 
       if (!map.has(key)) {
-        map.set(key, { region, employees: [], lon, lat });
+        map.set(key, { region: province.region, employees: [], lon, lat });
       }
       map.get(key)!.employees.push(emp);
     });
 
     const total = filteredEmployees.length || 1;
     const result: LocationDensityItem[] = [];
-
     map.forEach((val, key) => {
       result.push({
         provinceName: key,
@@ -222,49 +205,38 @@ export default function VietnamEmployeeDistributionMap({
     return result.sort((a, b) => b.count - a.count);
   }, [filteredEmployees, groupingLevel]);
 
-  // Regional Summary Numbers
-  const regionBreakdown = useMemo(() => {
-    const bac = filteredEmployees.filter((e) => {
-      const a = e.temporary_address || e.permanent_address || '';
-      return !a.includes('Hồ Chí Minh') && !a.includes('Đà Nẵng') && !a.includes('Bình Dương') && !a.includes('Cần Thơ');
-    }).length;
-
-    const nam = filteredEmployees.filter((e) => {
-      const a = e.temporary_address || e.permanent_address || '';
-      return a.includes('Hồ Chí Minh') || a.includes('Bình Dương') || a.includes('Cần Thơ') || a.includes('Đồng Nai');
-    }).length;
-
-    const trung = filteredEmployees.length - bac - nam;
-
-    return { bac, trung: Math.max(0, trung), nam };
+  // Provinces that currently have staff (for choropleth highlighting).
+  const staffByProvince = useMemo(() => {
+    const counts = new Map<string, number>();
+    filteredEmployees.forEach((emp) => {
+      const { province } = resolveProvince(emp.temporary_address || emp.permanent_address);
+      counts.set(province.name, (counts.get(province.name) || 0) + 1);
+    });
+    return counts;
   }, [filteredEmployees]);
 
-  // Convert Lon/Lat coordinate into SVG Canvas X, Y coordinates
-  const projectCoords = (lon: number, lat: number) => {
-    // Geographic Bounding Box for Vietnam GIS Map
-    const minLon = 101.5;
-    const maxLon = 117.5;
-    const minLat = 7.0;
-    const maxLat = 23.8;
-    const svgWidth = 480;
-    const svgHeight = 650;
+  const maxProvinceCount = useMemo(
+    () => Math.max(1, ...Array.from(staffByProvince.values())),
+    [staffByProvince]
+  );
 
-    const x = ((lon - minLon) / (maxLon - minLon)) * svgWidth;
-    const y = svgHeight - ((lat - minLat) / (maxLat - minLat)) * svgHeight;
+  // Convert lon/lat to SVG x/y.
+  const projectCoords = (lon: number, lat: number) => {
+    const x = ((lon - BBOX.minLon) / (BBOX.maxLon - BBOX.minLon)) * SVG_W;
+    const y = SVG_H - ((lat - BBOX.minLat) / (BBOX.maxLat - BBOX.minLat)) * SVG_H;
     return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
   };
 
-  // Convert GeoJSON Polygon Ring into SVG SVG path string
-  const renderPolygonPath = (ring: number[][]) => {
-    return ring
+  const renderPolygonPath = (ring: number[][]) =>
+    ring
       .map((pt, idx) => {
         const { x, y } = projectCoords(pt[0], pt[1]);
         return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
       })
       .join(' ') + ' Z';
-  };
 
   const uniqueDepartments = Array.from(new Set(employees.map((e) => e.department).filter(Boolean)));
+  const totalActive = filteredEmployees.length || 1;
 
   return (
     <div className="space-y-6">
@@ -279,11 +251,13 @@ export default function VietnamEmployeeDistributionMap({
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="font-extrabold text-base text-white">Bản đồ phân bổ nhân sự</h3>
                 <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> nguyenduy1133/Free-GIS-Data
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Chuẩn 34 Tỉnh/Thành 2025
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                Tích hợp dữ liệu GIS vector chính xác từ <strong>nguyenduy1133/Free-GIS-Data</strong> (bao gồm 63 tỉnh/thành & Quần đảo <strong>Hoàng Sa, Trường Sa</strong>).
+                Bản đồ vector GIS <strong>34 đơn vị hành chính</strong> theo Nghị quyết 202/2025/QH15
+                (bao gồm Quần đảo <strong>Hoàng Sa, Trường Sa</strong>), tổng hợp từ dữ liệu nguồn mở{' '}
+                <strong>Free-GIS-Data</strong>.
               </p>
             </div>
           </div>
@@ -291,7 +265,10 @@ export default function VietnamEmployeeDistributionMap({
           {/* Group Level Toggle */}
           <div className="flex items-center gap-2 bg-slate-800/90 p-1.5 rounded-2xl border border-slate-700 text-xs font-bold shrink-0">
             <button
-              onClick={() => setGroupingLevel('PROVINCE')}
+              onClick={() => {
+                setGroupingLevel('PROVINCE');
+                setSelectedLocation(null);
+              }}
               className={`px-3.5 py-1.5 rounded-xl transition-all ${
                 groupingLevel === 'PROVINCE' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
@@ -299,7 +276,10 @@ export default function VietnamEmployeeDistributionMap({
               🏢 Theo Tỉnh / Thành Phố
             </button>
             <button
-              onClick={() => setGroupingLevel('WARD')}
+              onClick={() => {
+                setGroupingLevel('WARD');
+                setSelectedLocation(null);
+              }}
               className={`px-3.5 py-1.5 rounded-xl transition-all ${
                 groupingLevel === 'WARD' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
@@ -346,7 +326,7 @@ export default function VietnamEmployeeDistributionMap({
                   selectedRegionFilter === 'BAC' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Miền Bắc ({regionBreakdown.bac})
+                Miền Bắc ({regionBreakdown.BAC})
               </button>
               <button
                 onClick={() => setSelectedRegionFilter('TRUNG')}
@@ -354,7 +334,7 @@ export default function VietnamEmployeeDistributionMap({
                   selectedRegionFilter === 'TRUNG' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Miền Trung ({regionBreakdown.trung})
+                Miền Trung ({regionBreakdown.TRUNG})
               </button>
               <button
                 onClick={() => setSelectedRegionFilter('NAM')}
@@ -362,7 +342,7 @@ export default function VietnamEmployeeDistributionMap({
                   selectedRegionFilter === 'NAM' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Miền Nam ({regionBreakdown.nam})
+                Miền Nam ({regionBreakdown.NAM})
               </button>
             </div>
           </div>
@@ -386,54 +366,53 @@ export default function VietnamEmployeeDistributionMap({
         <div className="p-4 bg-white rounded-2xl border border-red-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-500 font-bold block">⛰️ Khối Kinh Doanh Miền Bắc</span>
-            <span className="text-2xl font-black text-red-600 mt-1 block">{regionBreakdown.bac} nhân sự</span>
-            <span className="text-[11px] text-slate-400">Trụ sở Hà Nội & các tỉnh lân cận</span>
+            <span className="text-2xl font-black text-red-600 mt-1 block">{regionBreakdown.BAC} nhân sự</span>
+            <span className="text-[11px] text-slate-400">Hà Nội, Hải Phòng, Quảng Ninh...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 font-bold flex items-center justify-center text-lg">
-            {Math.round((regionBreakdown.bac / (filteredEmployees.length || 1)) * 100)}%
+            {Math.round((regionBreakdown.BAC / (deptSearchEmployees.length || 1)) * 100)}%
           </div>
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-500 font-bold block">🏖️ Khối Kinh Doanh Miền Trung</span>
-            <span className="text-2xl font-black text-amber-600 mt-1 block">{regionBreakdown.trung} nhân sự</span>
+            <span className="text-2xl font-black text-amber-600 mt-1 block">{regionBreakdown.TRUNG} nhân sự</span>
             <span className="text-[11px] text-slate-400">Đà Nẵng, Nghệ An, Khánh Hòa...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 font-bold flex items-center justify-center text-lg">
-            {Math.round((regionBreakdown.trung / (filteredEmployees.length || 1)) * 100)}%
+            {Math.round((regionBreakdown.TRUNG / (deptSearchEmployees.length || 1)) * 100)}%
           </div>
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-emerald-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-500 font-bold block">🌴 Khối Kinh Doanh Miền Nam</span>
-            <span className="text-2xl font-black text-emerald-600 mt-1 block">{regionBreakdown.nam} nhân sự</span>
-            <span className="text-[11px] text-slate-400">TP. Hồ Chí Minh, Bình Dương, Cần Thơ...</span>
+            <span className="text-2xl font-black text-emerald-600 mt-1 block">{regionBreakdown.NAM} nhân sự</span>
+            <span className="text-[11px] text-slate-400">TP. Hồ Chí Minh, Cần Thơ, Đồng Nai...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center text-lg">
-            {Math.round((regionBreakdown.nam / (filteredEmployees.length || 1)) * 100)}%
+            {Math.round((regionBreakdown.NAM / (deptSearchEmployees.length || 1)) * 100)}%
           </div>
         </div>
       </div>
 
       {/* MAIN VISUAL MAP & LOCATION RANKING GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        {/* LEFT 7/12: REAL GEOJSON MAP FROM NGUYENDUY1133/FREE-GIS-DATA */}
+        {/* LEFT 7/12: 34-PROVINCE GEOJSON MAP */}
         <div className="lg:col-span-7 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-3xl border border-slate-800 p-6 text-white space-y-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="w-full flex items-center justify-between border-b border-slate-800 pb-3 z-10">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-indigo-400 animate-spin-slow" />
               <h4 className="font-extrabold text-sm text-white flex items-center gap-1.5">
-                Bản Đồ Vector GIS Việt Nam 
+                Bản Đồ Vector GIS Việt Nam
                 <a
                   href="https://github.com/nguyenduy1133/Free-GIS-Data"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-sky-400 hover:underline flex items-center gap-1 font-mono ml-2"
                 >
-                  nguyenduy1133/Free-GIS-Data <ExternalLink className="w-3 h-3" />
+                  Free-GIS-Data <ExternalLink className="w-3 h-3" />
                 </a>
               </h4>
             </div>
@@ -442,19 +421,23 @@ export default function VietnamEmployeeDistributionMap({
             </span>
           </div>
 
-          {/* MAP CANVAS WITH REAL GEOJSON POLYGONS */}
+          {/* MAP CANVAS */}
           <div className="relative w-full max-w-md h-[580px] flex items-center justify-center my-1">
             {isLoadingGeo && (
               <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center space-y-3">
                 <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-                <p className="text-xs font-bold text-slate-300">Đang nạp dữ liệu GeoJSON từ nguyenduy1133/Free-GIS-Data...</p>
+                <p className="text-xs font-bold text-slate-300">Đang nạp bản đồ 34 tỉnh/thành...</p>
+              </div>
+            )}
+            {geoError && !isLoadingGeo && (
+              <div className="absolute top-2 left-2 right-2 z-20 bg-amber-500/15 border border-amber-500/40 text-amber-200 text-[11px] font-bold rounded-xl px-3 py-2">
+                {geoError}
               </div>
             )}
 
             {/* Ocean Grid Background */}
             <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-30 rounded-2xl"></div>
 
-            {/* SVG RENDERING REAL GEOJSON PROVINCES */}
             <svg
               viewBox="0 0 480 650"
               className="w-full h-full drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]"
@@ -467,62 +450,67 @@ export default function VietnamEmployeeDistributionMap({
                 </filter>
               </defs>
 
-              {/* RENDER REAL GEOGRAPHIC POLYGONS FETCHED FROM NGUYENDUY1133/FREE-GIS-DATA */}
+              {/* 34-PROVINCE CHOROPLETH */}
               {geoFeatures.map((feature, featIdx) => {
-                const name = feature.properties?.Name || '';
+                const name = feature.properties?.name || '';
+                const region = feature.properties?.region as Region | undefined;
                 const geomType = feature.geometry?.type;
                 const coords = feature.geometry?.coordinates || [];
 
-                let fillColor = '#1e293b'; // Default slate
-                let strokeColor = '#475569';
+                const count = staffByProvince.get(name) || 0;
+                const dimmedByFilter =
+                  selectedRegionFilter !== 'ALL' && region !== selectedRegionFilter;
 
-                if (name.includes('Paracel') || name.includes('Hoang Sa') || name.includes('Hoàng Sa')) {
-                  fillColor = '#d97706';
-                  strokeColor = '#fbbf24';
-                } else if (name.includes('Spratly') || name.includes('Truong Sa') || name.includes('Trường Sa')) {
-                  fillColor = '#059669';
-                  strokeColor = '#34d399';
-                } else {
-                  // Standard provinces
-                  fillColor = '#0f172a';
-                  strokeColor = '#334155';
+                // Choropleth: provinces with staff glow in their region colour by intensity.
+                let fillColor = '#0f172a';
+                let strokeColor = '#334155';
+                let fillOpacity = 0.9;
+                if (region && count > 0) {
+                  fillColor = REGION_COLOR[region];
+                  strokeColor = '#ffffff';
+                  fillOpacity = 0.25 + 0.6 * (count / maxProvinceCount);
+                } else if (region) {
+                  strokeColor = '#3f4b5f';
                 }
+                if (dimmedByFilter) fillOpacity *= 0.25;
 
-                if (geomType === 'Polygon') {
-                  return (
-                    <g key={featIdx} className="hover:opacity-80 transition-opacity">
-                      {coords.map((ring, rIdx) => (
+                const rings =
+                  geomType === 'Polygon'
+                    ? (coords as number[][][]).map((ring, rIdx) => (
                         <path
                           key={rIdx}
                           d={renderPolygonPath(ring)}
                           fill={fillColor}
+                          fillOpacity={fillOpacity}
                           stroke={strokeColor}
                           strokeWidth="0.8"
                         />
-                      ))}
-                    </g>
-                  );
-                } else if (geomType === 'MultiPolygon') {
-                  return (
-                    <g key={featIdx} className="hover:opacity-80 transition-opacity">
-                      {coords.map((poly, pIdx) =>
-                        poly.map((ring: number[][], rIdx: number) => (
+                      ))
+                    : geomType === 'MultiPolygon'
+                    ? (coords as number[][][][]).flatMap((poly, pIdx) =>
+                        poly.map((ring, rIdx) => (
                           <path
                             key={`${pIdx}-${rIdx}`}
                             d={renderPolygonPath(ring)}
                             fill={fillColor}
+                            fillOpacity={fillOpacity}
                             stroke={strokeColor}
                             strokeWidth="0.8"
                           />
                         ))
-                      )}
-                    </g>
-                  );
-                }
-                return null;
+                      )
+                    : null;
+
+                if (!rings) return null;
+                return (
+                  <g key={featIdx} className="hover:opacity-90 transition-opacity">
+                    <title>{`${name}${count > 0 ? ` — ${count} nhân sự` : ''}`}</title>
+                    {rings}
+                  </g>
+                );
               })}
 
-              {/* SOVEREIGNTY ISLAND BADGES (HOÀNG SA & TRƯỜNG SA) */}
+              {/* SOVEREIGNTY ISLAND BADGES */}
               <g transform="translate(320, 270)" className="cursor-pointer group">
                 <circle r="6" fill="#f59e0b" className="animate-ping opacity-75" />
                 <circle r="7" fill="#d97706" stroke="#ffffff" strokeWidth="1.5" />
@@ -541,10 +529,10 @@ export default function VietnamEmployeeDistributionMap({
                 </text>
               </g>
 
-              {/* DYNAMIC INTERACTIVE PINS FOR EACH PROVINCE / LOCATION */}
+              {/* INTERACTIVE HEADCOUNT PINS */}
               {locationStats.map((loc) => {
                 const isSelected = selectedLocation?.provinceName === loc.provinceName;
-                const pinColor = loc.region === 'BAC' ? '#ef4444' : loc.region === 'TRUNG' ? '#f59e0b' : '#10b981';
+                const pinColor = REGION_COLOR[loc.region];
                 const { x, y } = projectCoords(loc.lon, loc.lat);
 
                 return (
@@ -554,13 +542,8 @@ export default function VietnamEmployeeDistributionMap({
                     onClick={() => setSelectedLocation(loc)}
                     className="cursor-pointer transition-all duration-300 hover:scale-125"
                   >
-                    {/* Glowing Pulse Ring */}
                     <circle r="13" fill={pinColor} opacity="0.3" className="animate-ping" />
-
-                    {/* Outer Circle Pin */}
                     <circle r="10" fill={isSelected ? '#ffffff' : pinColor} stroke="#ffffff" strokeWidth="2" filter="url(#glowGis)" />
-
-                    {/* Headcount Number Inside Pin */}
                     <text
                       y="3.5"
                       textAnchor="middle"
@@ -571,8 +554,6 @@ export default function VietnamEmployeeDistributionMap({
                     >
                       {loc.count}
                     </text>
-
-                    {/* Floating Label Badge */}
                     <g transform="translate(14, -7)">
                       <rect
                         width={loc.provinceName.length * 5.8 + 14}
@@ -636,7 +617,6 @@ export default function VietnamEmployeeDistributionMap({
                 </span>
               </div>
 
-              {/* Roster of Employees residing in selected location */}
               <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 sleek-scrollbar">
                 {selectedLocation.employees.map((emp) => (
                   <div key={emp.id} className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2 text-xs">
@@ -677,39 +657,56 @@ export default function VietnamEmployeeDistributionMap({
                 <BarChart3 className="w-4 h-4 text-indigo-600" /> Bảng Xếp Hạng Mật Độ Địa Bàn
               </h4>
 
-              <div className="space-y-3">
-                {locationStats.slice(0, 7).map((item, idx) => (
-                  <div
-                    key={item.provinceName}
-                    onClick={() => setSelectedLocation(item)}
-                    className="p-3 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200/80 rounded-2xl transition-all cursor-pointer space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-slate-200 font-mono text-[10px] font-bold flex items-center justify-center text-slate-700">
-                          #{idx + 1}
+              {locationStats.length === 0 ? (
+                <p className="text-xs text-slate-400 py-8 text-center">
+                  Không có nhân sự phù hợp với bộ lọc hiện tại.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {locationStats.slice(0, 8).map((item, idx) => (
+                    <div
+                      key={item.provinceName}
+                      onClick={() => setSelectedLocation(item)}
+                      className="p-3 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200/80 rounded-2xl transition-all cursor-pointer space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                          <span
+                            className="w-5 h-5 rounded-full font-mono text-[10px] font-bold flex items-center justify-center text-white"
+                            style={{ backgroundColor: REGION_COLOR[item.region] }}
+                          >
+                            #{idx + 1}
+                          </span>
+                          {item.provinceName}
                         </span>
-                        {item.provinceName}
-                      </span>
-                      <span className="font-mono font-extrabold text-indigo-700">
-                        {item.count} nhân sự ({item.percentage}%)
-                      </span>
-                    </div>
+                        <span className="font-mono font-extrabold text-indigo-700">
+                          {item.count} nhân sự ({item.percentage}%)
+                        </span>
+                      </div>
 
-                    {/* Progress Bar */}
-                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-indigo-600 h-full rounded-full transition-all"
-                        style={{ width: `${Math.min(100, item.percentage * 2)}%` }}
-                      />
+                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${Math.min(100, (item.count / totalActive) * 100)}%`,
+                            backgroundColor: REGION_COLOR[item.region],
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
-        </div>
 
+          {/* Coverage note */}
+          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-[11px] text-slate-500 leading-relaxed">
+            <span className="font-bold text-slate-700">Ghi chú:</span> Bản đồ áp dụng cơ cấu{' '}
+            <strong>{VIETNAM_PROVINCES.length} tỉnh/thành</strong> sau sáp nhập (01/07/2025). Địa chỉ theo
+            đơn vị hành chính cũ được tự động quy đổi về tỉnh/thành mới tương ứng.
+          </div>
+        </div>
       </div>
     </div>
   );

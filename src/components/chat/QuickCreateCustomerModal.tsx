@@ -58,17 +58,17 @@ export default function QuickCreateCustomerModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-bold">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold">
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-base">Tạo Nhanh Khách Hàng CRM</h3>
-              <p className="text-xs text-slate-300">Trích xuất trực tiếp từ cuộc hội thoại chat {chat.channel_name}</p>
+              <p className="text-xs text-slate-500">Trích xuất trực tiếp từ cuộc hội thoại chat {chat.channel_name}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
             <X className="w-5 h-5" />
           </button>
         </div>

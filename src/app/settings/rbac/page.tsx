@@ -279,7 +279,7 @@ export default function RbacPage() {
               <button
                 onClick={() => setSelectedRankFilter('ALL')}
                 className={`px-2.5 py-1 rounded-lg shrink-0 ${
-                  selectedRankFilter === 'ALL' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  selectedRankFilter === 'ALL' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 Tất Cả
@@ -321,28 +321,28 @@ export default function RbacPage() {
                     onClick={() => setSelectedRoleKey(rm.role)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-2 ${
                       isSelected
-                        ? 'bg-gradient-to-r from-slate-900 to-indigo-950 text-white border-indigo-500 shadow-md ring-2 ring-indigo-500/20'
+                        ? 'bg-blue-50 text-slate-900 border-blue-300 shadow-md ring-2 ring-blue-500/20'
                         : 'bg-slate-50/70 hover:bg-white text-slate-900 border-slate-200/80 shadow-xs'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className={`font-bold text-xs ${isSelected ? 'text-white' : 'text-slate-900'}`}>
+                        <span className={`font-bold text-xs ${isSelected ? 'text-blue-700' : 'text-slate-900'}`}>
                           {rm.role_name}
                         </span>
                       </div>
-                      <ChevronRight className={`w-4 h-4 shrink-0 ${isSelected ? 'text-indigo-400' : 'text-slate-400'}`} />
+                      <ChevronRight className={`w-4 h-4 shrink-0 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
                     </div>
 
                     <div className="flex items-center justify-between text-[10px]">
                       {renderRankBadge(rm.rank_level)}
-                      <span className={`font-mono font-bold ${isSelected ? 'text-indigo-300' : 'text-slate-500'}`}>
+                      <span className={`font-mono font-bold ${isSelected ? 'text-blue-700' : 'text-slate-500'}`}>
                         {grantedCount}/12 quyền
                       </span>
                     </div>
 
                     {rm.hrm_position_name && (
-                      <p className={`text-[10px] font-mono flex items-center gap-1 ${isSelected ? 'text-purple-300' : 'text-purple-600'}`}>
+                      <p className={`text-[10px] font-mono flex items-center gap-1 ${isSelected ? 'text-purple-700' : 'text-purple-600'}`}>
                         <Briefcase className="w-3 h-3" /> HRM: {rm.hrm_position_name}
                       </p>
                     )}
@@ -358,14 +358,14 @@ export default function RbacPage() {
           {selectedRoleObj ? (
             <>
               {/* Selected Role Banner Header */}
-              <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 rounded-2xl text-white shadow-md border border-blue-800/40 space-y-4">
+              <div className="gg-hero p-6 rounded-2xl shadow-sm space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <h2 className="text-lg font-black text-white">{selectedRoleObj.role_name}</h2>
+                      <h2 className="text-lg font-black text-slate-900">{selectedRoleObj.role_name}</h2>
                       {renderRankBadge(selectedRoleObj.rank_level)}
                     </div>
-                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                    <p className="text-xs text-slate-500 mt-1 max-w-xl">
                       {selectedRoleObj.description}
                     </p>
                   </div>
@@ -374,13 +374,13 @@ export default function RbacPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => handleToggleAllPermissionsForRole(true)}
-                        className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 rounded-lg text-[11px] font-bold transition-all"
+                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-bold transition-all"
                       >
                         Bật Tất Cả Quyền
                       </button>
                       <button
                         onClick={() => handleToggleAllPermissionsForRole(false)}
-                        className="px-2.5 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-400/30 rounded-lg text-[11px] font-bold transition-all"
+                        className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[11px] font-bold transition-all"
                       >
                         Tắt Tất Cả
                       </button>
@@ -389,21 +389,21 @@ export default function RbacPage() {
                 </div>
 
                 {/* Data Scope Config Dropdown */}
-                <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+                <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-xs font-bold text-amber-600">
                     <Database className="w-4 h-4" />
                     <span>Phạm Vi Dữ Liệu Được Phép Truy Cập (Data Scope):</span>
                   </div>
 
                   {selectedRoleObj.role === 'SUPER_ADMIN' ? (
-                    <span className="px-3 py-1 bg-red-950 text-red-300 font-mono text-xs font-bold rounded-lg border border-red-800/60">
+                    <span className="px-3 py-1 bg-red-50 text-red-700 font-mono text-xs font-bold rounded-lg border border-red-200">
                       🔴 Toàn Công Ty (Super Admin Default)
                     </span>
                   ) : (
                     <select
                       value={selectedRoleObj.data_scope}
                       onChange={(e) => handleDataScopeChange(e.target.value as DataScopeBoundary)}
-                      className="px-3.5 py-1.5 bg-slate-900 border border-slate-700 text-amber-300 font-mono text-xs font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-900 font-mono text-xs font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="ALL_COMPANY">🔴 Toàn Công Ty (ALL_COMPANY)</option>
                       <option value="DEPARTMENT">🔵 Trong Phòng Ban (DEPARTMENT)</option>

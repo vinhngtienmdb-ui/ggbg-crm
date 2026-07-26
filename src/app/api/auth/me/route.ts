@@ -1,30 +1,34 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { findUserByUsernameOrEmail } from '@/lib/userStore';
+import { findUserForAuth } from '@/lib/authRepo';
+import { verifySession, SESSION_COOKIE } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('ggbg_crm_session');
+    const token = cookieStore.get(SESSION_COOKIE)?.value;
 
-    if (!sessionCookie || !sessionCookie.value) {
+    // Xác minh CHỮ KÝ phiên (không tin JSON thuần)
+    const userData = await verifySession(token);
+    if (!userData) {
       return NextResponse.json({ authenticated: false, user: null }, { status: 401 });
     }
 
-    const userData = JSON.parse(sessionCookie.value);
-
-    // Verify current account status from userStore if present
-    const currentAccount = findUserByUsernameOrEmail(userData.username);
+    // Đối chiếu trạng thái tài khoản hiện tại
+    const currentAccount = await findUserForAuth(userData.username);
     if (currentAccount) {
       const statusUpper = (currentAccount.account_status || 'ACTIVE').toUpperCase();
       if (statusUpper === 'LOCKED' || statusUpper === 'INACTIVE' || statusUpper === 'SUSPENDED') {
-        return NextResponse.json({ authenticated: false, user: null, message: 'Tài khoản của bạn đã bị khóa hoặc ngưng hoạt động.' }, { status: 401 });
+        return NextResponse.json(
+          { authenticated: false, user: null, message: 'Tài khoản của bạn đã bị khóa hoặc ngưng hoạt động.' },
+          { status: 401 }
+        );
       }
     }
 
-    const activeStatus = currentAccount ? currentAccount.account_status : (userData.account_status || 'Active');
+    const activeStatus = currentAccount ? currentAccount.account_status : userData.account_status || 'Active';
 
     return NextResponse.json({
       authenticated: true,
@@ -38,12 +42,12 @@ export async function GET() {
         is_super_admin: userData.is_super_admin,
         employee_code: userData.employee_code,
         account_status: activeStatus,
-        roles: userData.roles || [userData.role],
+        roles: [userData.role],
         permissions: userData.permissions || (userData.is_super_admin ? ['*'] : []),
         login_at: userData.login_at,
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ authenticated: false, user: null }, { status: 401 });
   }
 }

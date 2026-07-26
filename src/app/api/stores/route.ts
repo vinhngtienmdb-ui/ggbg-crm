@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
+import { guardApi } from '@/lib/apiGuard';
 import { INITIAL_STORES } from '@/lib/storeStore';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const session = await guardApi(request);
+  if (session instanceof NextResponse) return session;
   return NextResponse.json({
     success: true,
     data: INITIAL_STORES,
@@ -11,9 +14,19 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await guardApi(request);
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
     const { store_name, platform, customer_name, monthly_gmv_target } = body;
+    for (const v of [store_name, platform, customer_name]) {
+      if (v !== undefined && (typeof v !== 'string' || v.length > 5000)) {
+        return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+      }
+    }
 
     const newStore = {
       id: `store_${Date.now()}`,

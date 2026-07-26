@@ -232,19 +232,19 @@ export default function SystemSettingsPage() {
       </div>
 
       {/* Security Notice */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white border border-slate-800 shadow-md flex items-center justify-between">
+      <div className="gg-hero p-4 rounded-2xl shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
             <Lock className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-xs text-white">Chính Sách Bảo Mật & Mã Hóa Thông Tin</h3>
-            <p className="text-[11px] text-slate-300 mt-0.5">
+            <h3 className="font-bold text-xs text-slate-900">Chính Sách Bảo Mật & Mã Hóa Thông Tin</h3>
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Toàn bộ API Keys, Mật khẩu SMTP, Bot Token và Chóa đường dẫn Storage được ẩn an toàn 100%.
             </p>
           </div>
         </div>
-        <span className="px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-[10px] font-bold shrink-0 hidden sm:inline-block">
+        <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-[10px] font-bold shrink-0 hidden sm:inline-block">
           ✓ Đã Mã Hóa An Toàn
         </span>
       </div>
@@ -254,7 +254,7 @@ export default function SystemSettingsPage() {
         <button
           onClick={() => setActiveTab('MODULE_TOGGLES')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            activeTab === 'MODULE_TOGGLES' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'MODULE_TOGGLES' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Sliders className="w-4 h-4 text-purple-400" /> 🎛️ Phân Hệ Tính Năng
@@ -263,7 +263,7 @@ export default function SystemSettingsPage() {
         <button
           onClick={() => setActiveTab('INFRASTRUCTURE')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            activeTab === 'INFRASTRUCTURE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'INFRASTRUCTURE' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Cloud className="w-4 h-4 text-orange-400" /> ☁️ Hạ Tầng Cloud & DB
@@ -272,7 +272,7 @@ export default function SystemSettingsPage() {
         <button
           onClick={() => setActiveTab('API_KEYS')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            activeTab === 'API_KEYS' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'API_KEYS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Key className="w-4 h-4 text-amber-400" /> 🔌 Sàn TMĐT & AI API Keys
@@ -281,7 +281,7 @@ export default function SystemSettingsPage() {
         <button
           onClick={() => setActiveTab('SMTP')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            activeTab === 'SMTP' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'SMTP' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Mail className="w-4 h-4 text-blue-400" /> 📧 Máy Chủ Email SMTP
@@ -290,7 +290,7 @@ export default function SystemSettingsPage() {
         <button
           onClick={() => setActiveTab('WEBHOOKS')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            activeTab === 'WEBHOOKS' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'WEBHOOKS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Bell className="w-4 h-4 text-purple-400" /> 🔔 Webhook & Telegram/Zalo
@@ -299,7 +299,7 @@ export default function SystemSettingsPage() {
         <button
           onClick={() => setActiveTab('SECURITY_AUDIT')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            activeTab === 'SECURITY_AUDIT' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'SECURITY_AUDIT' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <ShieldAlert className="w-4 h-4 text-emerald-400" /> 🛡️ Bảo Mật & Audit Logs
@@ -1247,13 +1247,13 @@ export default function SystemSettingsPage() {
               </div>
 
               {/* Maintenance Mode Toggle */}
-              <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 space-y-3">
+              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-400" />
+                    <AlertTriangle className="w-5 h-5 text-amber-600" />
                     <div>
-                      <h4 className="font-bold text-xs text-white">Chế Độ Bảo Trì Hệ Thống (Maintenance Mode)</h4>
-                      <p className="text-[11px] text-slate-400">Khi bật, hệ thống sẽ thông báo bảo trì tạm thời cho người dùng thông thường.</p>
+                      <h4 className="font-bold text-xs text-slate-900">Chế Độ Bảo Trì Hệ Thống (Maintenance Mode)</h4>
+                      <p className="text-[11px] text-slate-500">Khi bật, hệ thống sẽ thông báo bảo trì tạm thời cho người dùng thông thường.</p>
                     </div>
                   </div>
 
@@ -1264,18 +1264,18 @@ export default function SystemSettingsPage() {
                       onChange={(e) => setConfig({ ...config, security: { ...config.security, maintenance_mode: e.target.checked } })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                    <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                   </label>
                 </div>
 
                 {config.security.maintenance_mode && (
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">Thông Báo Bảo Trì Hiển Thị:</label>
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Thông Báo Bảo Trì Hiển Thị:</label>
                     <input
                       type="text"
                       value={config.security.maintenance_message}
                       onChange={(e) => setConfig({ ...config, security: { ...config.security, maintenance_message: e.target.value } })}
-                      className="w-full p-2 bg-slate-800 border border-slate-700 text-amber-300 rounded-xl text-xs font-semibold"
+                      className="w-full p-2 bg-white border border-amber-200 text-slate-900 rounded-xl text-xs font-semibold"
                     />
                   </div>
                 )}
@@ -1296,7 +1296,7 @@ export default function SystemSettingsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
+                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                       <th className="p-4">Thời Gian</th>
                       <th className="p-4">Phân Hệ Cấu Hình</th>
                       <th className="p-4">Người Thực Hiện</th>

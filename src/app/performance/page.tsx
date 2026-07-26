@@ -122,51 +122,54 @@ export default function PerformancePage() {
       )}
 
       {/* Header & Period Selector */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Chấm Điểm Hiệu Suất Cá Nhân</h1>
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">Chấm Điểm Hiệu Suất Cá Nhân</h1>
+            </div>
+            <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
+              Đánh giá hiệu suất nhân sự và xếp loại danh hiệu hàng tháng
+            </p>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Đánh giá hiệu suất nhân sự và xếp loại danh hiệu hàng tháng
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* MONTH / PERIOD SELECTOR DROP-DOWN */}
-          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-            <Calendar className="w-4 h-4 text-blue-600 ml-1" />
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="bg-transparent font-bold text-slate-900 text-xs focus:outline-none cursor-pointer pr-2"
+          <div className="flex flex-wrap items-center gap-3">
+            {/* MONTH / PERIOD SELECTOR DROP-DOWN */}
+            <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-blue-100">
+              <Calendar className="w-4 h-4 text-blue-600 ml-1" />
+              <select
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+                className="bg-transparent font-bold text-slate-900 text-xs focus:outline-none cursor-pointer pr-2"
+              >
+                <option value="Tháng 07/2026">Tháng 07/2026</option>
+                <option value="Tháng 06/2026">Tháng 06/2026</option>
+                <option value="Tháng 05/2026">Tháng 05/2026</option>
+                <option value="Tháng 08/2026">Tháng 08/2026</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => setIsFormulaModalOpen(true)}
+              className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
-              <option value="Tháng 07/2026">Tháng 07/2026</option>
-              <option value="Tháng 06/2026">Tháng 06/2026</option>
-              <option value="Tháng 05/2026">Tháng 05/2026</option>
-              <option value="Tháng 08/2026">Tháng 08/2026</option>
-            </select>
+              <Sliders className="w-4 h-4 text-blue-600" /> Cấu Hình Trọng Số
+            </button>
+            <button
+              onClick={handleRunAutoBatch}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all"
+            >
+              <Send className="w-4 h-4 text-amber-300" /> Duyệt & Gửi HR
+            </button>
           </div>
-
-          <button
-            onClick={() => setIsFormulaModalOpen(true)}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            <Sliders className="w-4 h-4 text-slate-500" /> Cấu Hình Trọng Số
-          </button>
-          <button
-            onClick={handleRunAutoBatch}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all"
-          >
-            <Send className="w-4 h-4 text-amber-300" /> Duyệt & Gửi HR
-          </button>
         </div>
       </div>
 
       {/* RATING GRADE THRESHOLDS BANNER */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 rounded-2xl text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Thang Điểm & Xếp Loại Danh Hiệu:</p>
+          <p className="text-[10.5px] font-extrabold text-slate-500 uppercase tracking-wide">Thang Điểm & Xếp Loại Danh Hiệu:</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
@@ -201,7 +204,7 @@ export default function PerformancePage() {
                   key={g}
                   onClick={() => setSelectedGrade(g)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                    selectedGrade === g ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200'
+                    selectedGrade === g ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200'
                   }`}
                 >
                   {g === 'ALL' ? 'Tất cả Danh Hiệu' : g === 'S' ? 'A+ Xuất sắc' : `Grade ${g}`}
@@ -217,7 +220,7 @@ export default function PerformancePage() {
                 setScorecardModalMode('create');
                 setIsScorecardModalOpen(true);
               }}
-              className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" /> Tạo Scorecard Mới
             </button>
@@ -231,7 +234,7 @@ export default function PerformancePage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10.5px] font-extrabold uppercase tracking-wide">
                 <th className="p-4">Nhân Sự</th>
                 <th className="p-4">Kỳ Đánh Giá</th>
                 <th className="p-4">Điểm KPI</th>

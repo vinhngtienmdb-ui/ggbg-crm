@@ -79,6 +79,8 @@ import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDist
 const EmployeeModal = dynamic(() => import('@/components/hrm/EmployeeModal'), { ssr: false });
 const ContractPdfModal = dynamic(() => import('@/components/hrm/ContractPdfModal'), { ssr: false });
 const OrgChartTree = dynamic(() => import('@/components/hrm/OrgChartTree'), { ssr: false });
+const HrmDashboard = dynamic(() => import('@/components/hrm/HrmDashboard'), { ssr: false });
+const LaborBook = dynamic(() => import('@/components/hrm/LaborBook'), { ssr: false });
 
 interface OnboardingTask {
   id: string;
@@ -172,7 +174,7 @@ export default function HRMPage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('PROFILE');
+  const [activeTab, setActiveTab] = useState<'PROFILE' | 'DASHBOARD' | 'LABOR_BOOK' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('PROFILE');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -683,10 +685,28 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('PROFILE')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'PROFILE' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           👤 Hồ Sơ Nhân Sự ({filteredEmployees.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('DASHBOARD')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'DASHBOARD' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          📊 Dashboard Nhân Sự
+        </button>
+
+        <button
+          onClick={() => setActiveTab('LABOR_BOOK')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'LABOR_BOOK' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          📒 Sổ Lao Động ({employees.length})
         </button>
 
         <button
@@ -715,7 +735,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('CONTRACTS')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'CONTRACTS' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'CONTRACTS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           📄 Quản Lý Hợp Đồng & Lương
@@ -724,7 +744,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('ONBOARDING')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ONBOARDING' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'ONBOARDING' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           📋 Checklist Onboarding ({onboardingList.length})
@@ -733,7 +753,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('ORG_CHART')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ORG_CHART' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'ORG_CHART' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           🏛️ Sơ Đồ Tổ Chức
@@ -797,7 +817,7 @@ export default function HRMPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-4">Mã NV & Họ Tên</th>
                   <th className="p-4">Phòng Ban & Vị Trí</th>
                   <th className="p-4">Trạng Thái Làm Việc</th>
@@ -808,7 +828,7 @@ export default function HRMPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={emp.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                     <td className="p-4">
                       <p className="font-bold text-slate-900 text-sm">{emp.full_name}</p>
                       <p className="font-mono text-blue-700 text-[11px]">{emp.employee_code}</p>
@@ -869,24 +889,24 @@ export default function HRMPage() {
       {/* TAB 2: QUY TRÌNH PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
       {activeTab === 'APPROVAL_PIPELINE' && (
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 rounded-2xl text-white shadow-md space-y-3">
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-amber-400" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
+          <div className="gg-hero p-6 space-y-3">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-blue-700 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-blue-600" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-amber-300">Bước 1: Quản Lý Trực Tiếp</p>
-                <p className="text-[11px] text-slate-300 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
+              <div className="p-3 bg-white rounded-xl border border-blue-100">
+                <p className="text-xs font-bold text-amber-700">Bước 1: Quản Lý Trực Tiếp</p>
+                <p className="text-[11px] text-slate-500 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
               </div>
 
-              <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-blue-300">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
-                <p className="text-[11px] text-slate-300 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
+              <div className="p-3 bg-white rounded-xl border border-blue-100">
+                <p className="text-xs font-bold text-blue-700">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
+                <p className="text-[11px] text-slate-500 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
               </div>
 
-              <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-emerald-300">Bước 3: HR Onboarding & Ký HĐ</p>
-                <p className="text-[11px] text-slate-300 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
+              <div className="p-3 bg-white rounded-xl border border-blue-100">
+                <p className="text-xs font-bold text-emerald-700">Bước 3: HR Onboarding & Ký HĐ</p>
+                <p className="text-[11px] text-slate-500 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
               </div>
             </div>
           </div>
@@ -1080,7 +1100,7 @@ export default function HRMPage() {
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                     <th className="p-4">Mã UV & Họ Tên</th>
                     <th className="p-4">Vị Trí & Phòng Ban</th>
                     <th className="p-4">SĐT & Email</th>
@@ -1156,9 +1176,9 @@ export default function HRMPage() {
       {activeTab === 'CONTRACTS' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800">
-              <p className="text-xs text-slate-400 font-bold uppercase">Hạ Tầng Lưu Trữ Hợp Đồng</p>
-              <p className="text-sm font-bold text-emerald-400 mt-1 flex items-center gap-1">
+            <div className="p-4 bg-emerald-50 text-slate-900 rounded-2xl border border-emerald-100">
+              <p className="text-xs text-emerald-700 font-bold uppercase">Hạ Tầng Lưu Trữ Hợp Đồng</p>
+              <p className="text-sm font-bold text-emerald-700 mt-1 flex items-center gap-1">
                 <Lock className="w-4 h-4" /> Đã Mã Hóa An Toàn Bảo Mật
               </p>
             </div>
@@ -1177,7 +1197,7 @@ export default function HRMPage() {
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-200 font-bold text-slate-600">
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-4">Số Hợp Đồng</th>
                   <th className="p-4">Nhân Sự</th>
                   <th className="p-4">Loại HĐ</th>
@@ -1279,19 +1299,19 @@ export default function HRMPage() {
       {activeTab === 'JOB_TITLES' && (
         <div className="space-y-6">
           {/* Header & Auto-Sync Alert */}
-          <div className="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white p-6 rounded-3xl border border-purple-800/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="gg-hero p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
-                <Briefcase className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-200 text-purple-700 flex items-center justify-center font-bold text-xl shadow-sm shrink-0">
+                <Briefcase className="w-6 h-6 text-purple-600" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-base text-white">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
-                  <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Auto Synced
+                  <h3 className="font-extrabold text-base text-slate-900">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
+                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span> Auto Synced
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
                   Phân biệt rõ <strong>Chức Vụ</strong> (Giám Đốc, Trưởng Phòng...), <strong>Chức Danh</strong> (GĐ Kinh Doanh, GĐ Thị Trường...) và <strong>Khung Cấp Bậc</strong> (G1 ➔ G6 tùy biến). Tự động đồng bộ 100% thời gian thực sang RBAC & System Users.
                 </p>
               </div>
@@ -1387,7 +1407,7 @@ export default function HRMPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
+                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                       <th className="p-3.5">Mã Chức Danh</th>
                       <th className="p-3.5">Tên Chức Danh Chuyên Môn</th>
                       <th className="p-3.5">Chức Vụ Tương Ứng</th>
@@ -1528,16 +1548,33 @@ export default function HRMPage() {
         <VietnamEmployeeDistributionMap employees={employees} />
       )}
 
+      {/* TAB: DASHBOARD NHÂN SỰ (Dựng từ sổ quản lý lao động) */}
+      {activeTab === 'DASHBOARD' && (
+        <HrmDashboard employees={employees} />
+      )}
+
+      {/* TAB: SỔ QUẢN LÝ LAO ĐỘNG (Nghị định 145/2020/NĐ-CP) */}
+      {activeTab === 'LABOR_BOOK' && (
+        <LaborBook
+          employees={employees}
+          onSelect={(emp) => {
+            setSelectedEmployee(emp);
+            setEmployeeModalMode('view');
+            setIsEmployeeModalOpen(true);
+          }}
+        />
+      )}
+
       {/* MODAL 1: THÊM ỨNG VIÊN MỚI TRONG PHỄU TUYỂN DỤNG */}
       {isNewCandModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-blue-400" />
+                <UserPlus className="w-5 h-5 text-blue-600" />
                 <h3 className="font-bold text-base">Thêm Ứng Viên Tuyển Dụng Mới</h3>
               </div>
-              <button onClick={() => setIsNewCandModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsNewCandModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1613,16 +1650,16 @@ export default function HRMPage() {
       {isCandidateModalOpen && selectedCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-base flex items-center gap-2">
-                  <History className="w-5 h-5 text-blue-400" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
+                  <History className="w-5 h-5 text-blue-600" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
                 </h3>
-                <p className="text-xs text-slate-300 font-mono mt-0.5">
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
                   {selectedCandidate.candidate_code} • {selectedCandidate.position} ({selectedCandidate.department})
                 </p>
               </div>
-              <button onClick={() => setIsCandidateModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsCandidateModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1698,19 +1735,19 @@ export default function HRMPage() {
       {isStatusModalOpen && statusTargetEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold">
+                <div className="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700 font-bold">
                   <UserCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Chuyển Trạng Thái Nhân Sự</h3>
-                  <p className="text-xs text-slate-300 font-mono">
+                  <p className="text-xs text-slate-500 font-mono">
                     {statusTargetEmp.full_name} ({statusTargetEmp.employee_code})
                   </p>
                 </div>
               </div>
-              <button onClick={() => setIsStatusModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsStatusModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1773,17 +1810,17 @@ export default function HRMPage() {
       {isJobTitleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-purple-50 text-slate-900 border-b border-purple-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-purple-500/20 border border-purple-400/30 rounded-xl text-purple-300">
+                <div className="p-2 bg-purple-100 border border-purple-200 rounded-xl text-purple-700">
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Chức Danh Chuyên Môn Mới</h3>
-                  <p className="text-[11px] text-purple-300">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
+                  <p className="text-[11px] text-purple-700">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
                 </div>
               </div>
-              <button onClick={() => setIsJobTitleModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsJobTitleModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1898,17 +1935,17 @@ export default function HRMPage() {
       {isPositionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-300">
+                <div className="p-2 bg-blue-100 border border-blue-200 rounded-xl text-blue-700">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Chức Vụ Quản Lý Mới</h3>
-                  <p className="text-[11px] text-blue-300">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
+                  <p className="text-[11px] text-blue-700">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
                 </div>
               </div>
-              <button onClick={() => setIsPositionModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsPositionModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1973,17 +2010,17 @@ export default function HRMPage() {
       {isGradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-emerald-50 text-slate-900 border-b border-emerald-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-500/20 border border-emerald-400/30 rounded-xl text-emerald-300">
+                <div className="p-2 bg-emerald-100 border border-emerald-200 rounded-xl text-emerald-700">
                   <Award className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Cấp Bậc (Grade Matrix) Mới</h3>
-                  <p className="text-[11px] text-emerald-300">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
+                  <p className="text-[11px] text-emerald-700">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
                 </div>
               </div>
-              <button onClick={() => setIsGradeModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsGradeModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>

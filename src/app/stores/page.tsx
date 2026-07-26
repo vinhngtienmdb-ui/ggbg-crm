@@ -82,30 +82,33 @@ export default function StoresPage() {
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="bg-slate-900 rounded-lg p-5 text-white border border-slate-800 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-medium mb-2">
-            <ShoppingBag className="w-3.5 h-3.5 text-blue-400" />
-            <span>Multi-Store Health & GMV Engine</span>
+      {/* Header Hero */}
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
+              <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
+              <span>Multi-Store Health & GMV Engine</span>
+            </div>
+            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
+              Quản Lý Gian Hàng Đa Sàn TMĐT & Chỉ Số Sức Khỏe Shop
+            </h1>
+            <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
+              Theo dõi chỉ số vận hành thực tế của Shopee Mall, TikTok Shop, Lazada & Amazon kéo về qua API.
+            </p>
           </div>
-          <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
-            Quản Lý Gian Hàng Đa Sàn TMĐT & Chỉ Số Sức Khỏe Shop
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">
-            Theo dõi chỉ số vận hành thực tế của Shopee Mall, TikTok Shop, Lazada & Amazon kéo về qua API.
-          </p>
-        </div>
 
-        <button
-          onClick={() => {
-            setToastMessage('🎉 Đã đồng bộ thành công dữ liệu GMV mới nhất từ API Shopee & TikTok Shop!');
-            setTimeout(() => setToastMessage(''), 4000);
-          }}
-          className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-xs flex items-center gap-1.5 transition-colors shadow-xs"
-        >
-          <RefreshCw className="w-3.5 h-3.5" /> Đồng Bộ API Sàn
-        </button>
+          <button
+            onClick={() => {
+              setToastMessage('🎉 Đã đồng bộ thành công dữ liệu GMV mới nhất từ API Shopee & TikTok Shop!');
+              setTimeout(() => setToastMessage(''), 4000);
+            }}
+            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Đồng Bộ API Sàn
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -117,8 +120,8 @@ export default function StoresPage() {
               onClick={() => setSelectedPlatform(platform)}
               className={`px-3 py-1.5 rounded-md font-semibold transition-colors shrink-0 ${
                 selectedPlatform === platform
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-blue-50 hover:text-blue-700'
               }`}
             >
               {platform === 'ALL' ? 'Tất Cả Sàn' : platform}
@@ -143,7 +146,7 @@ export default function StoresPage() {
         <div className="overflow-x-auto touch-scroll sleek-scrollbar">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                 <th className="p-3">Mã & Tên Gian Hàng</th>
                 <th className="p-3">Sàn TMĐT</th>
                 <th className="p-3">Chủ Sở Hữu / Doanh Nghiệp</th>
@@ -156,7 +159,7 @@ export default function StoresPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredStores.map((store) => (
-                <tr key={store.id} className="hover:bg-slate-50/80 transition-colors">
+                <tr key={store.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="p-3">
                     <p className="font-bold text-slate-900">{store.store_name}</p>
                     <p className="text-[11px] text-blue-600 font-mono font-semibold">{store.store_code}</p>

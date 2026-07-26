@@ -24,10 +24,10 @@ export default function OfficialContractPdfModal({
     <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-lg shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
         {/* Modal Toolbar Header */}
-        <div className="p-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="p-3.5 bg-white text-slate-900 flex items-center justify-between border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-blue-400" />
-            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-200">
+            <FileText className="w-4 h-4 text-blue-600" />
+            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700">
               Hợp Đồng Ủy Quyền Vận Hành TMĐT (File PDF Chính Thức)
             </h3>
           </div>
@@ -35,7 +35,7 @@ export default function OfficialContractPdfModal({
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded flex items-center gap-1 border border-slate-700"
+              className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded flex items-center gap-1 border border-blue-200"
             >
               <Printer className="w-3.5 h-3.5" /> In Hợp Đồng
             </button>
@@ -47,7 +47,7 @@ export default function OfficialContractPdfModal({
             >
               <Download className="w-3.5 h-3.5" /> Tải PDF
             </button>
-            <button onClick={onClose} className="p-1 rounded text-slate-400 hover:text-white">
+            <button onClick={onClose} className="p-1 rounded text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
           </div>

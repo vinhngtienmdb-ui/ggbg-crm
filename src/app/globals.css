@@ -2,65 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #F3F4F6;
+  --foreground: #16181D;
+  --line: #E4E7EC;
+  --brand: #2E5CE6;
+  --brand-dark: #1D46C4;
+  --muted: #667085;
+  --subtle: #98A2B3;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.1px;
 }
 
-/* Handcrafted Precision Scrollbars */
+a {
+  color: var(--brand);
+}
+a:hover {
+  color: var(--brand-dark);
+}
+
+/* Design scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #D3D7DF;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #AEB4C0;
 }
 
-/* Clean Cards & Subtle Handcrafted Shadows */
+/* ---- Design system component helpers ---- */
+.gg-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.gg-card-hover {
+  transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+.gg-card-hover:hover {
+  box-shadow: 0 6px 18px -8px rgba(15, 23, 42, 0.15);
+}
+.gg-hero {
+  background: linear-gradient(120deg, #EEF2FE, #FFFFFF 65%);
+  border: 1px solid #DFE7FD;
+  border-radius: 14px;
+}
+.gg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.gg-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Legacy helpers kept for compatibility with existing pages */
 .glass-panel {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
-
 .card-subtle {
   background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  border-radius: 12px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .card-hover {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .card-hover:hover {
-  border-color: rgba(203, 213, 225, 1);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border-color: #D3D7DF;
+  box-shadow: 0 6px 18px -8px rgba(15, 23, 42, 0.15);
 }
 
-.tabular-numbers {
+.tabular-numbers,
+.tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Touch & Responsive Scroll Optimization */
 .touch-scroll {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
@@ -70,10 +115,23 @@ body {
   width: 4px;
   height: 4px;
 }
-
 .sleek-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #D3D7DF;
   border-radius: 9999px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.35s ease;
 }
 
 /* Fluid responsive font scaling */
@@ -83,24 +141,21 @@ body {
   }
 }
 
-/* Dark Theme Support */
+/* Dark Theme Support (giữ nguyên tính năng chuyển nền tối của Header) */
 .dark-theme {
   color-scheme: dark;
 }
-
 .dark-theme header {
-  background-color: rgba(15, 23, 42, 0.92) !important;
-  border-color: rgba(51, 65, 85, 0.8) !important;
-  color: #f8fafc !important;
+  background-color: rgba(11, 13, 18, 0.92) !important;
+  border-color: rgba(58, 65, 78, 0.8) !important;
+  color: #F3F4F6 !important;
 }
-
 .dark-theme header input {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-  color: #f8fafc !important;
+  background-color: #16181D !important;
+  border-color: #3A414E !important;
+  color: #F3F4F6 !important;
 }
-
 .dark-theme main {
-  background-color: #090d16 !important;
-  color: #f1f5f9 !important;
+  background-color: #0B0D12 !important;
+  color: #F0F1F4 !important;
 }

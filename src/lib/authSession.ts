@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
-import { findUserByUsernameOrEmail } from '@/lib/userStore';
+import { findUserForAuth } from '@/lib/authRepo';
+import { verifySession, SESSION_COOKIE } from '@/lib/session';
 
 export interface SessionUser {
   id?: string;
@@ -16,18 +17,15 @@ export interface SessionUser {
 export async function getAuthenticatedSessionUser(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('ggbg_crm_session');
+    const token = cookieStore.get(SESSION_COOKIE)?.value;
 
-    if (!sessionCookie || !sessionCookie.value) {
-      return null;
-    }
-
-    const userData = JSON.parse(sessionCookie.value);
+    // Xác minh CHỮ KÝ phiên (không tin JSON thuần)
+    const userData = await verifySession(token);
     if (!userData || !userData.username) {
       return null;
     }
 
-    const currentAccount = findUserByUsernameOrEmail(userData.username);
+    const currentAccount = await findUserForAuth(userData.username);
     if (currentAccount) {
       const statusUpper = (currentAccount.account_status || 'ACTIVE').toUpperCase();
       if (statusUpper === 'LOCKED' || statusUpper === 'INACTIVE' || statusUpper === 'SUSPENDED') {

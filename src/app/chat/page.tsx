@@ -252,7 +252,7 @@ export default function OmnichannelChatPage() {
               <button
                 onClick={() => setSelectedChannel('ALL')}
                 className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${
-                  selectedChannel === 'ALL' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  selectedChannel === 'ALL' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 Tất Cả
@@ -308,7 +308,7 @@ export default function OmnichannelChatPage() {
                   >
                     {/* Avatar */}
                     <div className="relative shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-slate-800 text-white font-bold text-sm flex items-center justify-center border border-slate-200">
+                      <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center border border-blue-200">
                         {chat.customer_name.substring(0, 2).toUpperCase()}
                       </div>
                       {chat.unread_count > 0 && (
@@ -354,7 +354,7 @@ export default function OmnichannelChatPage() {
             {/* Active Chat Header */}
             <div className="p-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-900 text-white font-bold text-sm flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center">
                   {activeChat.customer_name.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
@@ -411,12 +411,12 @@ export default function OmnichannelChatPage() {
 
             {/* Quick Reply Macros Popup Menu */}
             {showMacrosMenu && (
-              <div className="p-3 bg-slate-900 text-white border-t border-slate-800 space-y-2 animate-in slide-in-from-bottom-2 duration-200">
-                <div className="flex items-center justify-between text-xs font-bold border-b border-slate-800 pb-2">
-                  <span className="flex items-center gap-1.5 text-purple-300">
-                    <Zap className="w-4 h-4 text-purple-400" /> Thư Viện Câu Trả Lời Mẫu (Quick Replies)
+              <div className="p-3 bg-white text-slate-900 border-t border-slate-200 space-y-2 animate-in slide-in-from-bottom-2 duration-200">
+                <div className="flex items-center justify-between text-xs font-bold border-b border-slate-200 pb-2">
+                  <span className="flex items-center gap-1.5 text-blue-700">
+                    <Zap className="w-4 h-4 text-blue-600" /> Thư Viện Câu Trả Lời Mẫu (Quick Replies)
                   </span>
-                  <button onClick={() => setShowMacrosMenu(false)} className="text-slate-400 hover:text-white">
+                  <button onClick={() => setShowMacrosMenu(false)} className="text-slate-400 hover:text-slate-700">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -427,10 +427,10 @@ export default function OmnichannelChatPage() {
                       key={macro.id}
                       type="button"
                       onClick={() => handleSelectMacro(macro.content)}
-                      className="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-left border border-slate-700 transition-colors space-y-1"
+                      className="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-xl text-left border border-slate-200 transition-colors space-y-1"
                     >
-                      <p className="font-bold text-cyan-300 text-[11px]">{macro.title}</p>
-                      <p className="text-[10px] text-slate-300 truncate">{macro.content}</p>
+                      <p className="font-bold text-blue-700 text-[11px]">{macro.title}</p>
+                      <p className="text-[10px] text-slate-500 truncate">{macro.content}</p>
                     </button>
                   ))}
                 </div>
@@ -598,9 +598,9 @@ export default function OmnichannelChatPage() {
             </div>
 
             {/* System Info */}
-            <div className="p-3 bg-slate-900 text-white rounded-2xl text-[11px] space-y-1 font-mono">
-              <p className="text-cyan-300 font-bold">💬 Cổng Tích Hợp Omnichannel Live Chat</p>
-              <p className="text-slate-400">Trạng thái: Hoạt động 100% thời gian thực</p>
+            <div className="p-3 bg-blue-50 text-slate-900 border border-blue-100 rounded-2xl text-[11px] space-y-1 font-mono">
+              <p className="text-blue-700 font-bold">💬 Cổng Tích Hợp Omnichannel Live Chat</p>
+              <p className="text-slate-500">Trạng thái: Hoạt động 100% thời gian thực</p>
             </div>
           </div>
         )}

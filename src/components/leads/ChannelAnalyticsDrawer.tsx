@@ -79,9 +79,9 @@ export default function ChannelAnalyticsDrawer({
 
         {/* Overview Metric Cards */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="p-3.5 bg-slate-900 text-white rounded-2xl border border-slate-800 space-y-1">
-            <p className="text-[10px] text-slate-400 font-bold uppercase">Tổng Lead Đa Kênh</p>
-            <p className="text-xl font-extrabold text-blue-400">{totalLeadsCount}</p>
+          <div className="p-3.5 bg-blue-50 text-slate-900 rounded-2xl border border-blue-200 space-y-1">
+            <p className="text-[10px] text-blue-700 font-bold uppercase">Tổng Lead Đa Kênh</p>
+            <p className="text-xl font-extrabold text-blue-700">{totalLeadsCount}</p>
           </div>
 
           <div className="p-3.5 bg-emerald-50 text-emerald-900 rounded-2xl border border-emerald-200 space-y-1">

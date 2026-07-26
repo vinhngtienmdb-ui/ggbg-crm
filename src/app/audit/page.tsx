@@ -65,21 +65,21 @@ export default function AuditTrailPage() {
   return (
     <div className="space-y-5">
       {/* Header Banner */}
-      <div className="bg-slate-900 rounded-lg p-5 text-white border border-slate-800 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="gg-hero p-5 md:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-medium mb-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
             <span>System Audit Trail & Security Center</span>
           </div>
-          <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
+          <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
             Nhật Ký Hệ Thống & Bảo Mật Thao Tác
           </h1>
-          <p className="text-slate-400 text-xs mt-1">
+          <p className="text-slate-500 text-xs mt-1">
             Ghi vết 100% thời gian thực mọi hành vi của tài khoản người dùng trên hệ thống CRM.
           </p>
         </div>
 
-        <button className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-md text-xs flex items-center gap-1.5 transition-colors border border-slate-700">
+        <button className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition-colors border border-blue-100">
           <Download className="w-3.5 h-3.5" /> Export Audit Log CSV
         </button>
       </div>
@@ -90,7 +90,7 @@ export default function AuditTrailPage() {
           <button
             onClick={() => setSelectedSeverity('ALL')}
             className={`px-3 py-1.5 rounded-md font-semibold transition-colors shrink-0 ${
-              selectedSeverity === 'ALL' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              selectedSeverity === 'ALL' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             Tất Cả Thao Tác
@@ -138,7 +138,7 @@ export default function AuditTrailPage() {
         <div className="overflow-x-auto touch-scroll sleek-scrollbar">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                 <th className="p-3">Thời Gian</th>
                 <th className="p-3">Tài Khoản Thực Hiện</th>
                 <th className="p-3">Loại Thao Tác & Mô Tả</th>

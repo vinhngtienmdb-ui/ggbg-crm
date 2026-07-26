@@ -135,19 +135,19 @@ export default function BulkLeadImportModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="bg-slate-50 border-b border-slate-200 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-bold">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-base">Nhập Lead Hàng Loạt Từ File Excel / CSV</h3>
-              <p className="text-xs text-slate-300">
+              <h3 className="font-extrabold text-base text-slate-900">Nhập Lead Hàng Loạt Từ File Excel / CSV</h3>
+              <p className="text-xs text-slate-500">
                 Kiểm tra trùng lặp SĐT tự động & Phân bổ Lead xoay vòng cho Sales Exec
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-white rounded-lg">
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -199,16 +199,16 @@ export default function BulkLeadImportModal({
           ) : previewRows.length > 0 ? (
             <div className="space-y-4">
               {/* Validation Summary Bar */}
-              <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div className="p-4 bg-slate-50 text-slate-900 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-4">
-                  <span className="font-bold text-blue-300">Tổng số: {previewRows.length} Dòng</span>
-                  <span className="font-bold text-emerald-400">✓ Hợp lệ: {validRowsCount}</span>
+                  <span className="font-bold text-blue-700">Tổng số: {previewRows.length} Dòng</span>
+                  <span className="font-bold text-emerald-600">✓ Hợp lệ: {validRowsCount}</span>
                   {duplicateRowsCount > 0 && (
-                    <span className="font-bold text-red-400">⚠️ Trùng SĐT: {duplicateRowsCount}</span>
+                    <span className="font-bold text-red-600">⚠️ Trùng SĐT: {duplicateRowsCount}</span>
                   )}
                 </div>
 
-                <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-500">
                   <input
                     type="checkbox"
                     checked={skipDuplicates}
@@ -223,7 +223,7 @@ export default function BulkLeadImportModal({
               <div className="border border-slate-200 rounded-2xl overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                       <th className="p-3">Họ Và Tên</th>
                       <th className="p-3">Số Điện Thoại</th>
                       <th className="p-3">Công Ty / Email</th>
