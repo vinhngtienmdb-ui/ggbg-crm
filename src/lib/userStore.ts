@@ -18,7 +18,8 @@ export interface AuditLogItem {
 }
 
 export interface UserAccountWithAuth extends UserAccount {
-  password?: string;
+  /** Mật khẩu đã băm PBKDF2 (không lưu plaintext). */
+  password_hash?: string;
   permissions?: string[];
 }
 
@@ -30,7 +31,7 @@ export const INITIAL_USER_ACCOUNTS: UserAccountWithAuth[] = [
     employee_name: 'Super Admin GGBingo',
     username: 'admin',
     email: 'admin@ggbingo.vn',
-    password: 'GGBG@2026#',
+    password_hash: 'pbkdf2$sha256$120000$c206e4dc4cd029ee97221615d0122e10$47b73358bc48badc157c0572e780b0b830066b75b4e4331efcbd123e79f1057f',
     role: 'SUPER_ADMIN',
     role_name: 'Super Admin (Toàn Quyền)',
     account_status: 'Active',
@@ -46,7 +47,7 @@ export const INITIAL_USER_ACCOUNTS: UserAccountWithAuth[] = [
     employee_name: 'Trần Văn Hoàng',
     username: 'hoang.tv',
     email: 'hoang.tv@ggbingo.vn',
-    password: 'GGBG@2026#',
+    password_hash: 'pbkdf2$sha256$120000$a34e51787fca6cee4e1a38a74e4dba89$9fdd08eee7697aebdb36895f74e5a90d79dcd83d1a31ec1b4879e027b2108d37',
     role: 'TEAM_LEADER',
     role_name: 'Trưởng Nhóm Sale',
     account_status: 'Active',
@@ -62,7 +63,7 @@ export const INITIAL_USER_ACCOUNTS: UserAccountWithAuth[] = [
     employee_name: 'Lê Thị Mai',
     username: 'mai.lt',
     email: 'mai.lt@ggbingo.vn',
-    password: 'GGBG@2026#',
+    password_hash: 'pbkdf2$sha256$120000$8fd5e5fc8400fc63ed50d719c0656343$2671da0cc6c29ba185e1c1ec7a4db35f095350764e534cf8ef2464d4c6c7f61e',
     role: 'SALE_EXEC',
     role_name: 'Nhân Viên Sale Exec',
     account_status: 'Active',
@@ -78,7 +79,7 @@ export const INITIAL_USER_ACCOUNTS: UserAccountWithAuth[] = [
     employee_name: 'Đặng Kim Anh',
     username: 'anh.dk',
     email: 'anh.dk@ggbingo.vn',
-    password: 'GGBG@2026#',
+    password_hash: 'pbkdf2$sha256$120000$61a8b40e8bad30881b3292ab1d002acb$3845a637f4e7b35ab3fc968b57673d5c53b8f15535514eeec2316b5aad7743bd',
     role: 'HR_MANAGER',
     role_name: 'Quản Lý HR',
     account_status: 'Locked',
@@ -165,7 +166,7 @@ export function toggleUserAccountStatus(id: string) {
   return userAccounts;
 }
 
-export function createUserAccount(newUser: Omit<UserAccount, 'id' | 'created_at'> & { password?: string }) {
+export function createUserAccount(newUser: Omit<UserAccount, 'id' | 'created_at'> & { password_hash?: string }) {
   const cleanUsername = newUser.username.trim().toLowerCase();
   const cleanEmail = (newUser.email || '').trim().toLowerCase();
 
@@ -184,7 +185,7 @@ export function createUserAccount(newUser: Omit<UserAccount, 'id' | 'created_at'
     id: `u_${Date.now()}`,
     created_at: new Date().toISOString().split('T')[0],
     account_status: newUser.account_status || 'Active',
-    password: newUser.password || 'GGBG@2026#',
+    password_hash: newUser.password_hash,
     permissions: ['customers.view', 'leads.view'],
   };
   userAccounts = [created, ...userAccounts];

@@ -1,44 +1,21 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifySession, SESSION_COOKIE } from '@/lib/session';
 
-export function middleware(request: NextRequest) {
-  const sessionCookie = request.cookies.get('ggbg_crm_session');
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow static files, api routes, and _next internals
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('.')
-  ) {
+  // Bỏ qua static files, api routes, _next internals (API tự bảo vệ bằng apiGuard)
+  if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.includes('.')) {
     return NextResponse.next();
   }
 
-  // Validate session cookie payload integrity
-  let isAuthenticated = false;
-  if (sessionCookie && sessionCookie.value) {
-    try {
-      const parsed = JSON.parse(sessionCookie.value);
-      if (parsed && parsed.username && parsed.role) {
-        isAuthenticated = true;
-      }
-    } catch {
-      isAuthenticated = false;
-    }
-  }
+  // Xác minh CHỮ KÝ phiên (không còn tin JSON thuần)
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  const session = await verifySession(token);
+  const isAuthenticated = !!session;
 
-  // List of protected routes requiring session authentication
-  const isProtectedRoute =
-    pathname === '/' ||
-    pathname.startsWith('/customers') ||
-    pathname.startsWith('/leads') ||
-    pathname.startsWith('/hrm') ||
-    pathname.startsWith('/products') ||
-    pathname.startsWith('/kpis') ||
-    pathname.startsWith('/performance') ||
-    pathname.startsWith('/settings');
-
-  // Redirect authenticated user away from /login page to dashboard root /
+  // Trang /login: đã đăng nhập thì đưa về dashboard
   if (pathname === '/login') {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL('/', request.url));
@@ -46,9 +23,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Redirect unauthenticated user accessing protected routes to /login
-  if (isProtectedRoute && !isAuthenticated) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Mọi route ứng dụng còn lại đều yêu cầu đăng nhập
+  if (!isAuthenticated) {
+    const url = new URL('/login', request.url);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

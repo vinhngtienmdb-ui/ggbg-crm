@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserAccounts, createUserAccount, toggleUserAccountStatus } from '@/lib/userStore';
 import { getAuthenticatedSessionUser, isAuthorizedForAdminAction } from '@/lib/authSession';
+import { hashPassword } from '@/lib/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,13 +41,14 @@ export async function POST(request: Request) {
     }
 
     try {
+      const password_hash = await hashPassword(password);
       const newUser = createUserAccount({
         profile_id: `p_${Date.now()}`,
         employee_code: employee_code || 'NV-00108',
         employee_name: employee_name || 'Nhân viên mới HRM',
         username: username,
         email: email,
-        password: password,
+        password_hash,
         role: role || 'SALE_EXEC',
         role_name: role_name || 'Nhân Viên Sale Exec',
         account_status: 'Active',
