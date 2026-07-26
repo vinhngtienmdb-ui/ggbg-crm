@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-
+import { PIPELINE_STAGES } from '@/lib/uiFormat';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
@@ -36,8 +36,8 @@ export async function POST(req: Request) {
       shop_link: shop_link || '',
       estimated_budget: budgetNum,
       lead_score: leadScore,
-      stage_id: 'stage_1',
-      stage_name: '1. Tiếp Nhận Mới',
+      stage_id: PIPELINE_STAGES[0].id,
+      stage_name: PIPELINE_STAGES[0].name,
       assigned_sale_name: 'Phân Bổ Tự Động (Round-Robin)',
       created_at: now,
     };

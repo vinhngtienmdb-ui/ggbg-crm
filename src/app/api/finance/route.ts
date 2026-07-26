@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET() {

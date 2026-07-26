@@ -1,7 +1,6 @@
 import { PerformanceScorecard, RatingGrade, FormulaWeights } from '@/types';
 import { getEmployees } from './hrmStore';
 import { getKPIs } from './kpiStore';
-
 export const DEFAULT_FORMULA_WEIGHTS: FormulaWeights = {
   kpi_weight: 50,
   compliance_weight: 20,

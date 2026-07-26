@@ -7,19 +7,12 @@ import {
   Search,
   Settings,
   Tag,
-  ShieldCheck,
-  CheckCircle,
   Edit3,
   Trash2,
   Filter,
   Sparkles,
-  Code,
   LayoutGrid,
   List,
-  DollarSign,
-  Percent,
-  Check,
-  Power
 } from 'lucide-react';
 import { ProductPackage, EcomPlatform } from '@/types';
 import { getProducts, createProduct, updateProduct, deleteProduct, ECOM_PLATFORM_OPTIONS } from '@/lib/productStore';
@@ -84,15 +77,15 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-line shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý Sản Phẩm & Gói Dịch Vụ Admin Custom</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-cyan-50 text-cyan-700 text-xs font-semibold border border-cyan-100 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-cyan-600" /> CRM SaaS, Tư Vấn & Bảo Trì Cloud
+            <h1 className="text-xl font-bold text-ink-900">Quản Lý Sản Phẩm & Gói Dịch Vụ Admin Custom</h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-aqua-bg text-aqua-fg text-xs font-semibold border border-aqua-bg flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-aqua-fg" /> CRM SaaS, Tư Vấn & Bảo Trì Cloud
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-ink-500 mt-1">
             Thiết lập Mã SP, Đơn vị tính (Tháng/Năm/Dự án), Giá niêm yết, Giá sàn duyệt tối thiểu, VAT (%) và Trạng thái Active/Inactive
           </p>
         </div>
@@ -103,9 +96,9 @@ export default function ProductsPage() {
               setTargetSchemaProductId(products[0]?.id || '');
               setIsSchemaModalOpen(true);
             }}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
           >
-            <Settings className="w-4 h-4 text-cyan-600" />
+            <Settings className="w-4 h-4 text-aqua-fg" />
             Tùy Biến Thuộc Tính JSONB
           </button>
           <button
@@ -114,7 +107,7 @@ export default function ProductsPage() {
               setPackageModalMode('create');
               setIsPackageModalOpen(true);
             }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all"
+            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shadow-brand-600/20 transition-all"
           >
             <Plus className="w-4 h-4" />
             Tạo Gói Dịch Vụ Mới
@@ -123,14 +116,14 @@ export default function ProductsPage() {
       </div>
 
       {/* Filter, View Switcher & Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-2xl border border-line shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2 w-full md:w-auto">
           {/* View Mode Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+          <div className="flex items-center gap-1 bg-line-soft p-1 rounded-2xl border border-line">
             <button
               onClick={() => setViewMode('GRID')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-                viewMode === 'GRID' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-200'
+                viewMode === 'GRID' ? 'bg-brand-600 text-white shadow-sm' : 'text-ink-700 hover:bg-line'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" /> Lưới Card
@@ -139,7 +132,7 @@ export default function ProductsPage() {
             <button
               onClick={() => setViewMode('TABLE')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-                viewMode === 'TABLE' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-200'
+                viewMode === 'TABLE' ? 'bg-brand-600 text-white shadow-sm' : 'text-ink-700 hover:bg-line'
               }`}
             >
               <List className="w-3.5 h-3.5" /> Bảng Báo Giá
@@ -147,26 +140,26 @@ export default function ProductsPage() {
           </div>
 
           <div className="relative w-full md:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm theo Mã SKU, Tên gói..."
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+              className="w-full pl-9 pr-3 py-1.5 bg-surface-subtle border border-line rounded-xl text-xs"
             />
           </div>
         </div>
 
         {/* E-commerce Platform Filter Tabs */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
+          <span className="text-xs font-bold text-ink-500 mr-1 flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" /> Sàn / Nền Tảng:
           </span>
           <button
             onClick={() => setSelectedPlatform('ALL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              selectedPlatform === 'ALL' ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              selectedPlatform === 'ALL' ? 'bg-brand-600 text-white shadow-sm' : 'bg-line-soft text-ink-500 hover:bg-line'
             }`}
           >
             Tất Cả
@@ -177,8 +170,8 @@ export default function ProductsPage() {
               onClick={() => setSelectedPlatform(plat.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
                 selectedPlatform === plat.id
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                  ? 'bg-brand-50 text-brand-800 border-line shadow-sm'
+                  : 'bg-white border-line text-ink-700 hover:bg-surface-subtle'
               }`}
             >
               {plat.name}
@@ -194,50 +187,50 @@ export default function ProductsPage() {
             <div
               key={product.id}
               className={`bg-white rounded-2xl border ${
-                product.is_active ? 'border-slate-200/80' : 'border-slate-200 opacity-60'
+                product.is_active ? 'border-line' : 'border-line opacity-60'
               } p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 px-2 py-0.5 bg-blue-50 rounded border border-blue-100">
+                  <span className="text-[10px] font-mono font-bold text-brand-600 px-2 py-0.5 bg-brand-50 rounded border border-brand-100">
                     {product.sku_code}
                   </span>
                   
                   <button
                     onClick={() => handleToggleActive(product)}
                     className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-colors ${
-                      product.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                      product.is_active ? 'bg-success-bg text-success-fg' : 'bg-line text-ink-500'
                     }`}
                   >
                     {product.is_active ? '● Active (Kinh Doanh)' : '○ Inactive (Tạm Dừng)'}
                   </button>
                 </div>
 
-                <h3 className="font-bold text-slate-900 text-base mb-1">{product.name}</h3>
-                <p className="text-xs text-slate-500 mb-3">{product.category}</p>
+                <h3 className="font-bold text-ink-900 text-base mb-1">{product.name}</h3>
+                <p className="text-xs text-ink-500 mb-3">{product.category}</p>
 
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4 space-y-1">
-                  <p className="text-xs text-slate-400 font-medium">Giá Niêm Yết & Giá Sàn Tối Thiểu</p>
-                  <p className="text-2xl font-extrabold text-blue-600">
+                <div className="bg-surface-subtle p-4 rounded-xl border border-line mb-4 space-y-1">
+                  <p className="text-xs text-ink-400 font-medium">Giá Niêm Yết & Giá Sàn Tối Thiểu</p>
+                  <p className="text-2xl font-extrabold text-brand-600">
                     {product.base_price.toLocaleString('vi-VN')} ₫{' '}
-                    <span className="text-xs font-normal text-slate-500">/ {product.unit}</span>
+                    <span className="text-xs font-normal text-ink-500">/ {product.unit}</span>
                   </p>
                   <div className="flex items-center justify-between text-[11px] pt-1">
-                    <span className="text-emerald-700 font-bold">Giá sàn duyệt: {(product.base_price * 0.85).toLocaleString('vi-VN')} ₫</span>
-                    <span className="text-slate-500 font-semibold">+ VAT {product.vat_rate}%</span>
+                    <span className="text-success-fg font-bold">Giá sàn duyệt: {(product.base_price * 0.85).toLocaleString('vi-VN')} ₫</span>
+                    <span className="text-ink-500 font-semibold">+ VAT {product.vat_rate}%</span>
                   </div>
                 </div>
 
                 {/* Dynamic JSONB Attributes */}
                 <div className="space-y-2 mb-4">
-                  <p className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                    <Tag className="w-3.5 h-3.5 text-cyan-600" /> Thuộc tính gói (JSONB):
+                  <p className="text-xs font-bold text-ink-700 flex items-center gap-1">
+                    <Tag className="w-3.5 h-3.5 text-aqua-fg" /> Thuộc tính gói (JSONB):
                   </p>
-                  <div className="space-y-1 bg-slate-50/70 p-3 rounded-xl border border-slate-100 max-h-36 overflow-y-auto">
+                  <div className="space-y-1 bg-surface-subtle p-3 rounded-xl border border-line max-h-36 overflow-y-auto">
                     {Object.entries(product.attributes || {}).map(([key, val]) => (
-                      <div key={key} className="flex justify-between text-xs py-1 border-b border-slate-100/80 last:border-none">
-                        <span className="text-slate-500 font-medium">{key}:</span>
-                        <span className="font-semibold text-slate-800 text-right ml-2">{String(val)}</span>
+                      <div key={key} className="flex justify-between text-xs py-1 border-b border-line last:border-none">
+                        <span className="text-ink-500 font-medium">{key}:</span>
+                        <span className="font-semibold text-ink-900 text-right ml-2">{String(val)}</span>
                       </div>
                     ))}
                   </div>
@@ -251,13 +244,13 @@ export default function ProductsPage() {
                     setPackageModalMode('edit');
                     setIsPackageModalOpen(true);
                   }}
-                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 py-2 bg-line-soft hover:bg-line text-ink-700 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <Edit3 className="w-3.5 h-3.5 text-slate-500" /> Sửa Cấu Hình
+                  <Edit3 className="w-3.5 h-3.5 text-ink-500" /> Sửa Cấu Hình
                 </button>
                 <button
                   onClick={() => handleDeletePackage(product.id)}
-                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  className="p-2 text-ink-400 hover:text-danger-fg hover:bg-danger-bg rounded-xl transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -269,11 +262,11 @@ export default function ProductsPage() {
 
       {/* VIEW MODE 2: QUOTATION TABLE VIEW */}
       {viewMode === 'TABLE' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-line shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase">
+                <tr className="bg-line-soft border-b border-line text-ink-500 font-bold uppercase">
                   <th className="p-4">Mã SP & Tên Gói</th>
                   <th className="p-4">Danh Mục Dịch Vụ</th>
                   <th className="p-4">Đơn Vi Tính</th>
@@ -284,27 +277,27 @@ export default function ProductsPage() {
                   <th className="p-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line-soft">
                 {filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="p-4 font-bold text-slate-900">
-                      <span className="font-mono text-blue-700 text-xs block">{p.sku_code}</span>
+                  <tr key={p.id} className="hover:bg-surface-subtle">
+                    <td className="p-4 font-bold text-ink-900">
+                      <span className="font-mono text-brand-800 text-xs block">{p.sku_code}</span>
                       {p.name}
                     </td>
-                    <td className="p-4 text-slate-700 font-semibold">{p.category}</td>
-                    <td className="p-4 font-semibold text-slate-800">{p.unit}</td>
-                    <td className="p-4 font-mono font-extrabold text-blue-600 text-sm">
+                    <td className="p-4 text-ink-700 font-semibold">{p.category}</td>
+                    <td className="p-4 font-semibold text-ink-900">{p.unit}</td>
+                    <td className="p-4 font-mono font-extrabold text-brand-600 text-sm">
                       {p.base_price.toLocaleString('vi-VN')} ₫
                     </td>
-                    <td className="p-4 font-mono font-bold text-emerald-700">
+                    <td className="p-4 font-mono font-bold text-success-fg">
                       {(p.base_price * 0.85).toLocaleString('vi-VN')} ₫
                     </td>
-                    <td className="p-4 font-mono font-semibold text-slate-700">{p.vat_rate}%</td>
+                    <td className="p-4 font-mono font-semibold text-ink-700">{p.vat_rate}%</td>
                     <td className="p-4">
                       <button
                         onClick={() => handleToggleActive(p)}
                         className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                          p.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                          p.is_active ? 'bg-success-bg text-success-fg' : 'bg-line text-ink-500'
                         }`}
                       >
                         {p.is_active ? '● Active' : '○ Inactive'}
@@ -317,7 +310,7 @@ export default function ProductsPage() {
                           setPackageModalMode('edit');
                           setIsPackageModalOpen(true);
                         }}
-                        className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                        className="px-3 py-1 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs"
                       >
                         Sửa
                       </button>

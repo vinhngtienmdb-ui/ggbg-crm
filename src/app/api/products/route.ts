@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getProducts, createProduct, updateProduct } from '@/lib/productStore';
-
 export async function GET() {
   try {
     const products = getProducts();

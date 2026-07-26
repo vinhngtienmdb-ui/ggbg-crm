@@ -1,629 +1,377 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  MessageSquare,
-  Search,
-  Filter,
-  Send,
-  Paperclip,
-  Zap,
-  UserPlus,
-  Target,
-  CheckCircle2,
-  Phone,
-  Mail,
-  Building2,
-  Crown,
-  Sparkles,
-  UserCheck,
-  Clock,
-  ChevronRight,
-  Plus,
-  ShieldCheck,
-  Tag,
-  Smile,
-  X,
-  FileText,
-  User,
-  ExternalLink,
-  Layers
-} from 'lucide-react';
-import {
-  ChatConversation,
-  ChatMessage,
-  ChatChannelType,
-  Customer,
-  Lead
-} from '@/types';
-import {
-  INITIAL_CHAT_CONVERSATIONS,
-  DEFAULT_QUICK_REPLIES
-} from '@/lib/chatStore';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-
+import { Search, Send, UserPlus, Target } from 'lucide-react';
+import { ChatChannelType, ChatConversation, ChatMessage, Customer, Lead } from '@/types';
+import { DEFAULT_QUICK_REPLIES, INITIAL_CHAT_CONVERSATIONS } from '@/lib/chatStore';
+import { avatarColor, initials } from '@/lib/uiFormat';
+import { useToast } from '@/context/ToastContext';
+import { useAudit } from '@/context/AuditContext';
 const QuickCreateCustomerModal = dynamic(() => import('@/components/chat/QuickCreateCustomerModal'), { ssr: false });
 const QuickCreateLeadModal = dynamic(() => import('@/components/chat/QuickCreateLeadModal'), { ssr: false });
 
+const CHANNEL_CHIP: Record<ChatChannelType, { bg: string; fg: string; label: string }> = {
+  ZALO_OA: { bg: '#E4F6F8', fg: '#0E7490', label: 'Zalo OA' },
+  ZALO_PERSONAL: { bg: '#E8ECFB', fg: '#1D3EA8', label: 'Zalo Cá Nhân' },
+  FACEBOOK_FANPAGE: { bg: '#E8ECFB', fg: '#2E5CE6', label: 'Messenger' },
+};
+
+const STATUS_CHIP: Record<ChatConversation['status'], { bg: string; fg: string; label: string }> = {
+  UNREAD: { bg: '#FDEEEE', fg: '#C22F35', label: 'Chưa đọc' },
+  IN_PROGRESS: { bg: '#E8ECFB', fg: '#2E5CE6', label: 'Đang xử lý' },
+  RESOLVED: { bg: '#EEF4EE', fg: '#1F7A33', label: 'Đã xong' },
+};
+
+const CHANNEL_FILTERS: ('ALL' | ChatChannelType)[] = [
+  'ALL',
+  'ZALO_OA',
+  'ZALO_PERSONAL',
+  'FACEBOOK_FANPAGE',
+];
+
 export default function OmnichannelChatPage() {
+  const { showToast } = useToast();
+  const { logAction } = useAudit();
+
   const [conversations, setConversations] = useState<ChatConversation[]>(INITIAL_CHAT_CONVERSATIONS);
-  const [activeChatId, setActiveChatId] = useState<string>('chat_001');
-
-  // Channel & Search filters
-  const [selectedChannel, setSelectedChannel] = useState<'ALL' | ChatChannelType>('ALL');
+  const [activeChatId, setActiveChatId] = useState('chat_001');
+  const [channelFilter, setChannelFilter] = useState<'ALL' | ChatChannelType>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'UNREAD' | 'IN_PROGRESS'>('ALL');
-
-  // Input message state
   const [inputMessage, setInputMessage] = useState('');
-  const [showMacrosMenu, setShowMacrosMenu] = useState(false);
-
-  // Modals & Notifications
-  const [isCreateCustOpen, setIsCreateCustOpen] = useState(false);
-  const [isCreateLeadOpen, setIsCreateLeadOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [isCreateCustOpen, setCreateCustOpen] = useState(false);
+  const [isCreateLeadOpen, setCreateLeadOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const activeChat = conversations.find((c) => c.id === activeChatId) || conversations[0];
+  const activeChat = conversations.find((c) => c.id === activeChatId) ?? conversations[0];
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat?.messages]);
 
-  // Filter conversations
-  const filteredConversations = conversations.filter((c) => {
-    if (selectedChannel !== 'ALL' && c.channel_type !== selectedChannel) return false;
-    if (statusFilter === 'UNREAD' && c.unread_count === 0) return false;
-    if (statusFilter === 'IN_PROGRESS' && c.status !== 'IN_PROGRESS') return false;
-
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
+  const filtered = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    return conversations.filter((c) => {
+      if (channelFilter !== 'ALL' && c.channel_type !== channelFilter) return false;
+      if (!term) return true;
       return (
         c.customer_name.toLowerCase().includes(term) ||
         c.last_message.toLowerCase().includes(term) ||
-        (c.customer_phone && c.customer_phone.includes(term))
+        (c.customer_phone ?? '').includes(term)
       );
-    }
-    return true;
-  });
+    });
+  }, [conversations, channelFilter, searchTerm]);
 
-  // Send message handler
-  const handleSendMessage = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!inputMessage.trim() || !activeChat) return;
+  /* -------------------------------------------------------------- handlers -- */
 
-    const messageText = inputMessage.trim();
-    setInputMessage('');
-    setShowMacrosMenu(false);
+  const selectConversation = (id: string) => {
+    setActiveChatId(id);
+    // Opening a thread clears its unread marker.
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? { ...c, unread_count: 0, status: c.status === 'UNREAD' ? 'IN_PROGRESS' : c.status }
+          : c,
+      ),
+    );
+  };
 
-    const newMsg: ChatMessage = {
+  const sendMessage = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const text = inputMessage.trim();
+    if (!text || !activeChat) return;
+
+    const stamp = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const message: ChatMessage = {
       id: `msg_${Date.now()}`,
       conversation_id: activeChat.id,
       sender_type: 'AGENT',
       sender_name: activeChat.assigned_rep_name || 'Super Admin (CSKH)',
-      content: messageText,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      content: text,
+      timestamp: stamp,
       is_read: true,
     };
 
+    setInputMessage('');
     setConversations((prev) =>
-      prev.map((c) => {
-        if (c.id === activeChat.id) {
-          return {
-            ...c,
-            last_message: messageText,
-            last_message_at: newMsg.timestamp,
-            messages: [...c.messages, newMsg],
-          };
-        }
-        return c;
-      })
+      prev.map((c) =>
+        c.id === activeChat.id
+          ? { ...c, last_message: text, last_message_at: stamp, messages: [...c.messages, message] }
+          : c,
+      ),
     );
 
-    // Call API background
     try {
       await fetch('/api/chat/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conversation_id: activeChat.id,
-          content: messageText,
+          content: text,
           sender_name: activeChat.assigned_rep_name,
         }),
       });
     } catch {
-      // ignore
+      /* optimistic UI already updated; delivery retries are out of scope here */
     }
   };
 
-  const handleSelectMacro = (macroContent: string) => {
-    setInputMessage(macroContent);
-    setShowMacrosMenu(false);
-  };
-
-  // Handle Customer Created
-  const handleCustomerCreated = (newCust: Customer) => {
+  const handleCustomerCreated = (customer: Customer) => {
     setConversations((prev) =>
-      prev.map((c) => {
-        if (c.id === activeChat.id) {
-          return {
-            ...c,
-            crm_customer_id: newCust.id,
-            customer_phone: newCust.phone,
-            tags: [...c.tags, 'Khách Hàng CRM'],
-          };
-        }
-        return c;
-      })
+      prev.map((c) =>
+        c.id === activeChat.id
+          ? {
+              ...c,
+              crm_customer_id: customer.id,
+              customer_phone: customer.phone,
+              tags: [...c.tags, 'Khách Hàng CRM'],
+            }
+          : c,
+      ),
     );
-
-    setToastMessage(`🎉 Đã tạo thành công Khách Hàng CRM [${newCust.customer_code}] ${newCust.name} và tự động liên kết với hội thoại!`);
-    setTimeout(() => setToastMessage(''), 5000);
+    showToast(`＋ Đã tạo khách hàng CRM [${customer.customer_code}] ${customer.name}`);
+    logAction({
+      action_type: 'CUSTOMER_CREATE',
+      action_description: `Tạo nhanh khách hàng từ Live Chat: ${customer.name}`,
+      resource_module: 'LIVE_CHAT',
+    });
   };
 
-  // Handle Lead Created
-  const handleLeadCreated = (newLead: Lead) => {
+  const handleLeadCreated = (lead: Lead) => {
     setConversations((prev) =>
-      prev.map((c) => {
-        if (c.id === activeChat.id) {
-          return {
-            ...c,
-            crm_lead_id: newLead.id,
-            tags: [...c.tags, 'Đã Chuyển Lead'],
-          };
-        }
-        return c;
-      })
+      prev.map((c) =>
+        c.id === activeChat.id ? { ...c, crm_lead_id: lead.id, tags: [...c.tags, 'Đã Chuyển Lead'] } : c,
+      ),
     );
-
-    setToastMessage(`🎯 Đã đẩy thành công Lead [${newLead.lead_code}] ${newLead.full_name} vào Phễu Bán Hàng!`);
-    setTimeout(() => setToastMessage(''), 5000);
+    showToast(`🎯 Đã đẩy "${lead.full_name}" vào phễu — cột 1. Lead mới`);
+    logAction({
+      action_type: 'LEAD_CREATE',
+      action_description: `Đẩy Lead ${lead.lead_code} vào phễu từ Live Chat`,
+      resource_module: 'LIVE_CHAT',
+    });
   };
 
-  const renderChannelBadge = (type: ChatChannelType) => {
-    switch (type) {
-      case 'ZALO_OA':
-        return (
-          <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-extrabold flex items-center gap-1">
-            💬 Zalo OA
-          </span>
-        );
-      case 'ZALO_PERSONAL':
-        return (
-          <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-200 text-[10px] font-extrabold flex items-center gap-1">
-            📱 Zalo Cá Nhân
-          </span>
-        );
-      case 'FACEBOOK_FANPAGE':
-        return (
-          <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-extrabold flex items-center gap-1">
-            📘 Fanpage FB
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
+  /* ---------------------------------------------------------------- render -- */
+
+  if (!activeChat) {
+    return <p className="p-6 text-[12.5px] text-ink-500">Chưa có hội thoại nào.</p>;
+  }
+
+  const activeStatus = STATUS_CHIP[activeChat.status];
 
   return (
-    <div className="h-[calc(100vh-6.5rem)] flex flex-col space-y-4">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="p-4 rounded-2xl bg-purple-600 text-white font-bold text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-purple-200" />
-            <span>{toastMessage}</span>
-          </div>
-          <button onClick={() => setToastMessage('')} className="p-1 hover:bg-purple-700 rounded-lg">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+    <div className="grid h-full min-h-0 animate-fadeUp gap-3.5 lg:[grid-template-columns:270px_1fr_270px]">
+      {/* Column 1 — inbox */}
+      <div className="dc-card flex min-h-0 flex-col overflow-hidden">
+        <div className="border-b border-line-soft px-3.5 py-3">
+          <h2 className="mb-2.5 text-[13px] font-extrabold text-ink-900">Hội thoại đa kênh</h2>
 
-      {/* Main 3-Column Chat Layout */}
-      <div className="flex-1 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col md:flex-row">
-        {/* COLUMN 1: UNIFIED OMNICHANNEL INBOX (LEFT) */}
-        <div className="w-full md:w-80 border-r border-slate-200/80 flex flex-col bg-slate-50/50 shrink-0">
-          {/* Header & Search */}
-          <div className="p-4 border-b border-slate-200/80 space-y-3 bg-white">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-blue-600" /> Live Chat CSKH Đa Kênh
-              </h2>
-              <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full border border-blue-100">
-                {filteredConversations.length} Hội Thoại
-              </span>
-            </div>
-
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm người chat, SĐT, tin nhắn..."
-                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              />
-            </div>
-
-            {/* Channel Filter Pills */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
-              <button
-                onClick={() => setSelectedChannel('ALL')}
-                className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${
-                  selectedChannel === 'ALL' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                Tất Cả
-              </button>
-              <button
-                onClick={() => setSelectedChannel('ZALO_OA')}
-                className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${
-                  selectedChannel === 'ZALO_OA' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                💬 Zalo OA
-              </button>
-              <button
-                onClick={() => setSelectedChannel('ZALO_PERSONAL')}
-                className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${
-                  selectedChannel === 'ZALO_PERSONAL' ? 'bg-cyan-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                📱 Zalo Cá Nhân
-              </button>
-              <button
-                onClick={() => setSelectedChannel('FACEBOOK_FANPAGE')}
-                className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${
-                  selectedChannel === 'FACEBOOK_FANPAGE' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                📘 Fanpage FB
-              </button>
-            </div>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-400" />
+            <input
+              className="dc-input pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm hội thoại…"
+            />
           </div>
 
-          {/* Conversations List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
-            {filteredConversations.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-xs italic">
-                Không tìm thấy cuộc hội thoại chat phù hợp.
-              </div>
-            ) : (
-              filteredConversations.map((chat) => {
-                const isActive = chat.id === activeChatId;
-                return (
-                  <button
-                    key={chat.id}
-                    onClick={() => {
-                      setActiveChatId(chat.id);
-                      setConversations((prev) =>
-                        prev.map((c) => (c.id === chat.id ? { ...c, unread_count: 0 } : c))
-                      );
-                    }}
-                    className={`w-full p-3.5 text-left flex items-start gap-3 transition-colors ${
-                      isActive ? 'bg-blue-50/80 border-l-4 border-blue-600' : 'hover:bg-slate-100/60'
-                    }`}
-                  >
-                    {/* Avatar */}
-                    <div className="relative shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-slate-800 text-white font-bold text-sm flex items-center justify-center border border-slate-200">
-                        {chat.customer_name.substring(0, 2).toUpperCase()}
-                      </div>
-                      {chat.unread_count > 0 && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border border-white">
-                          {chat.unread_count}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Meta */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <span className="font-bold text-xs text-slate-900 truncate">{chat.customer_name}</span>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0">{chat.last_message_at}</span>
-                      </div>
-
-                      <p className="text-[11px] text-slate-500 truncate mb-1">{chat.last_message}</p>
-
-                      <div className="flex items-center justify-between gap-1">
-                        {renderChannelBadge(chat.channel_type)}
-
-                        {chat.crm_customer_id ? (
-                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
-                            ✓ CRM 360
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">
-                            Mới (Chưa lưu)
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })
-            )}
+          <div className="mt-2 flex flex-wrap gap-1">
+            {CHANNEL_FILTERS.map((f) => (
+              <button
+                key={f}
+                onClick={() => setChannelFilter(f)}
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-extrabold transition-colors ${
+                  channelFilter === f
+                    ? 'border-brand-600 bg-brand-600 text-white'
+                    : 'border-line bg-white text-ink-700 hover:border-line-strong'
+                }`}
+              >
+                {f === 'ALL' ? 'Tất cả' : CHANNEL_CHIP[f].label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* COLUMN 2: LIVE CHAT STREAM (MIDDLE) */}
-        {activeChat ? (
-          <div className="flex-1 flex flex-col h-full bg-white">
-            {/* Active Chat Header */}
-            <div className="p-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-900 text-white font-bold text-sm flex items-center justify-center">
-                  {activeChat.customer_name.substring(0, 2).toUpperCase()}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.map((c) => {
+            const chip = CHANNEL_CHIP[c.channel_type];
+            const isActive = c.id === activeChatId;
+            return (
+              <button
+                key={c.id}
+                onClick={() => selectConversation(c.id)}
+                className={`w-full border-b border-line-soft border-l-[3px] px-3.5 py-3 text-left transition-colors ${
+                  isActive ? 'border-l-brand-600 bg-brand-50' : 'border-l-transparent bg-white hover:bg-surface-subtle'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-1.5">
+                  <span className="truncate text-xs font-extrabold text-ink-900">{c.customer_name}</span>
+                  <span className="shrink-0 text-[10px] text-ink-400">{c.last_message_at}</span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-sm text-slate-900">{activeChat.customer_name}</h3>
-                    {renderChannelBadge(activeChat.channel_type)}
-                  </div>
-                  <p className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                    <span>SĐT: <strong className="font-mono text-slate-800">{activeChat.customer_phone || 'Chưa cập nhật'}</strong></span>
-                    <span>• Phụ trách: <strong className="text-blue-700">{activeChat.assigned_rep_name}</strong></span>
+
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="dc-tag" style={{ background: chip.bg, color: chip.fg }}>
+                    {chip.label}
+                  </span>
+                  {c.unread_count > 0 && (
+                    <span className="min-w-[15px] rounded-full bg-danger-dot px-[5px] py-px text-center text-[9.5px] font-extrabold text-white">
+                      {c.unread_count}
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-1 truncate text-[11px] text-ink-500">{c.last_message}</p>
+              </button>
+            );
+          })}
+
+          {filtered.length === 0 && (
+            <p className="px-3.5 py-10 text-center text-[11.5px] text-ink-500">Không có hội thoại phù hợp.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Column 2 — thread */}
+      <div className="dc-card flex min-h-0 flex-col overflow-hidden">
+        <div className="flex items-center gap-2.5 border-b border-line-soft px-4 py-3">
+          <span
+            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-xs font-extrabold text-white"
+            style={{ background: avatarColor(activeChat.customer_name) }}
+          >
+            {initials(activeChat.customer_name)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-extrabold text-ink-900">{activeChat.customer_name}</p>
+            <p className="truncate text-[10.5px] text-ink-500">
+              {activeChat.channel_name} · Phụ trách: {activeChat.assigned_rep_name}
+            </p>
+          </div>
+          <span className="dc-chip shrink-0" style={{ background: activeStatus.bg, color: activeStatus.fg }}>
+            {activeStatus.label}
+          </span>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto bg-surface-subtle p-4">
+          {activeChat.messages.map((m) => {
+            const isAgent = m.sender_type === 'AGENT';
+            const isSystem = m.sender_type === 'SYSTEM';
+
+            if (isSystem) {
+              return (
+                <div key={m.id} className="flex justify-center">
+                  <span className="rounded-full bg-line-soft px-3 py-1.5 text-[11px] text-ink-500">
+                    {m.content}
+                  </span>
+                </div>
+              );
+            }
+
+            return (
+              <div key={m.id} className={`flex ${isAgent ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[78%] px-3 py-2.5 ${
+                    isAgent
+                      ? 'rounded-[12px_12px_3px_12px] bg-brand-600 text-white'
+                      : 'rounded-[12px_12px_12px_3px] border border-line bg-white text-ink-900'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap text-xs">{m.content}</p>
+                  <p className={`mt-1 text-right text-[9.5px] ${isAgent ? 'text-white/70' : 'text-ink-400'}`}>
+                    {m.timestamp}
                   </p>
                 </div>
               </div>
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </div>
 
-              {/* Tags */}
-              <div className="hidden sm:flex items-center gap-1.5">
-                {activeChat.tags.map((t, idx) => (
-                  <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md text-[10px] font-semibold border border-slate-200">
-                    #{t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Chat Messages Body */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/30">
-              {activeChat.messages.map((msg) => {
-                const isAgent = msg.sender_type === 'AGENT';
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'} max-w-[85%] ${
-                      isAgent ? 'ml-auto' : 'mr-auto'
-                    }`}
-                  >
-                    <span className="text-[10px] text-slate-400 font-semibold mb-1 px-1">
-                      {msg.sender_name} • {msg.timestamp}
-                    </span>
-
-                    <div
-                      className={`p-3 rounded-2xl text-xs leading-relaxed shadow-xs ${
-                        isAgent
-                          ? 'bg-blue-600 text-white rounded-tr-none font-medium'
-                          : 'bg-white border border-slate-200 text-slate-900 rounded-tl-none font-normal'
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
-                  </div>
-                );
-              })}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Quick Reply Macros Popup Menu */}
-            {showMacrosMenu && (
-              <div className="p-3 bg-slate-900 text-white border-t border-slate-800 space-y-2 animate-in slide-in-from-bottom-2 duration-200">
-                <div className="flex items-center justify-between text-xs font-bold border-b border-slate-800 pb-2">
-                  <span className="flex items-center gap-1.5 text-purple-300">
-                    <Zap className="w-4 h-4 text-purple-400" /> Thư Viện Câu Trả Lời Mẫu (Quick Replies)
-                  </span>
-                  <button onClick={() => setShowMacrosMenu(false)} className="text-slate-400 hover:text-white">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto text-xs">
-                  {DEFAULT_QUICK_REPLIES.map((macro) => (
-                    <button
-                      key={macro.id}
-                      type="button"
-                      onClick={() => handleSelectMacro(macro.content)}
-                      className="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-left border border-slate-700 transition-colors space-y-1"
-                    >
-                      <p className="font-bold text-cyan-300 text-[11px]">{macro.title}</p>
-                      <p className="text-[10px] text-slate-300 truncate">{macro.content}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Chat Input Bar */}
-            <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
-              <button
-                type="button"
-                onClick={async () => {
-                  const lastCustMsg = activeChat?.messages.filter(m => m.sender_type === 'CUSTOMER').pop()?.content || activeChat?.last_message;
-                  try {
-                    const res = await fetch('/api/ai/sentiment', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        message_text: lastCustMsg,
-                        customer_name: activeChat?.customer_name,
-                        channel: activeChat?.channel_name,
-                      }),
-                    });
-                    const data = await res.json();
-                    if (data.success && data.data.suggested_reply) {
-                      setInputMessage(data.data.suggested_reply);
-                    }
-                  } catch {
-                    // fallback
-                  }
-                }}
-                className="p-2 rounded-lg text-xs font-semibold flex items-center gap-1 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
-                title="AI Co-Pilot Phân Tích & Gợi Ý Phản Hồi Chốt Đơn"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span className="hidden sm:inline">AI Co-Pilot</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowMacrosMenu(!showMacrosMenu)}
-                className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-                  showMacrosMenu ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
-                }`}
-                title="Mở Thư Viện Câu Trả Lời Mẫu"
-              >
-                <Zap className="w-3.5 h-3.5 text-purple-600" />
-                <span className="hidden sm:inline">Mẫu CSKH</span>
-              </button>
-
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Nhập nội dung tin nhắn tư vấn khách hàng..."
-                className="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
-              />
-
-              <button
-                type="submit"
-                disabled={!inputMessage.trim()}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition-all active:scale-95 disabled:opacity-50"
-              >
-                <Send className="w-4 h-4" />
-                <span className="hidden sm:inline">Gửi Tin</span>
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-400 text-xs italic">
-            Chọn một cuộc hội thoại chat bên trái để bắt đầu tư vấn.
-          </div>
-        )}
-
-        {/* COLUMN 3: CRM CUSTOMER 360 & QUICK CREATION PANEL (RIGHT) */}
-        {activeChat && (
-          <div className="w-full md:w-80 border-l border-slate-200/80 p-5 bg-slate-50/40 flex flex-col justify-between overflow-y-auto space-y-6 shrink-0">
-            {/* Header */}
-            <div>
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-1.5">
-                <UserCheck className="w-4 h-4 text-blue-600" /> Thông Tin CRM 360° Khách Hàng
-              </h3>
-
-              {activeChat.crm_customer_id ? (
-                /* LINKED CRM CUSTOMER 360 PROFILE */
-                <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold rounded-full flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã Liên Kết CRM 360
-                    </span>
-                    <span className="font-mono font-bold text-xs text-slate-900">KH-1001</span>
-                  </div>
-
-                  <div>
-                    <h4 className="font-extrabold text-sm text-slate-900">{activeChat.customer_name}</h4>
-                    <p className="text-xs text-slate-500 font-medium">Công ty TNHH Vận Tải Hồng Lực</p>
-                  </div>
-
-                  <div className="p-2.5 bg-slate-50 rounded-xl space-y-1.5 text-xs">
-                    <p className="flex justify-between">
-                      <span className="text-slate-500">Phân hạng:</span>
-                      <strong className="text-purple-700 font-extrabold">Platinum Merchant</strong>
-                    </p>
-                    <p className="flex justify-between">
-                      <span className="text-slate-500">GMV Hàng tháng:</span>
-                      <strong className="text-emerald-700 font-mono font-extrabold">850.000.000 ₫</strong>
-                    </p>
-                    <p className="flex justify-between">
-                      <span className="text-slate-500">Sàn vận hành:</span>
-                      <strong className="text-blue-700 font-bold">Shopee, TikTok, GGBingoVN</strong>
-                    </p>
-                    <p className="flex justify-between">
-                      <span className="text-slate-500">Trạng thái KYC:</span>
-                      <strong className="text-emerald-600 font-bold">✓ Đã Phê Duyệt</strong>
-                    </p>
-                  </div>
-
-                  <a
-                    href="/customers"
-                    className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-slate-200"
-                  >
-                    <span>Xem Hồ Sơ CRM Chi Tiết</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-                  </a>
-                </div>
-              ) : (
-                /* NEW CUSTOMER WARNING & QUICK CREATION ACTIONS */
-                <div className="space-y-4">
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-2 text-xs">
-                    <div className="flex items-center gap-2 font-bold text-amber-900">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
-                      <span>Khách Hàng Mới (Chưa lưu trên CRM)</span>
-                    </div>
-                    <p className="text-amber-800 text-[11px] leading-relaxed">
-                      Người dùng chat chưa được tạo hồ sơ Khách hàng hoặc Lead trên CRM. Chọn thao tác bên dưới để lưu dữ liệu tức thì.
-                    </p>
-                  </div>
-
-                  {/* Action 1: Create CRM Customer */}
-                  <button
-                    type="button"
-                    onClick={() => setIsCreateCustOpen(true)}
-                    className="w-full p-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-2xl shadow-md shadow-blue-600/20 flex items-center justify-between transition-all active:scale-95"
-                  >
-                    <div className="flex items-center gap-2">
-                      <UserPlus className="w-4 h-4 text-blue-200" />
-                      <span>Tạo Nhanh Khách Hàng CRM</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-blue-200" />
-                  </button>
-
-                  {/* Action 2: Push Lead to Sales Pipeline */}
-                  <button
-                    type="button"
-                    onClick={() => setIsCreateLeadOpen(true)}
-                    className="w-full p-3.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-2xl shadow-md shadow-purple-600/20 flex items-center justify-between transition-all active:scale-95"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Target className="w-4 h-4 text-purple-200" />
-                      <span>Đẩy Lead Vào Phễu Bán Hàng</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-purple-200" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* System Info */}
-            <div className="p-3 bg-slate-900 text-white rounded-2xl text-[11px] space-y-1 font-mono">
-              <p className="text-cyan-300 font-bold">💬 Cổng Tích Hợp Omnichannel Live Chat</p>
-              <p className="text-slate-400">Trạng thái: Hoạt động 100% thời gian thực</p>
-            </div>
-          </div>
-        )}
+        <form onSubmit={sendMessage} className="flex gap-2 border-t border-line-soft p-3">
+          <input
+            className="dc-input flex-1"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Nhập tin nhắn… (Enter để gửi)"
+          />
+          <button type="submit" className="dc-btn-primary !px-4">
+            Gửi <Send className="h-3.5 w-3.5" />
+          </button>
+        </form>
       </div>
 
-      {/* MODALS */}
-      {activeChat && (
-        <>
-          <QuickCreateCustomerModal
-            isOpen={isCreateCustOpen}
-            onClose={() => setIsCreateCustOpen(false)}
-            chat={activeChat}
-            onCustomerCreated={handleCustomerCreated}
-          />
+      {/* Column 3 — CRM context (desktop only, matching the design) */}
+      <div className="hidden min-h-0 flex-col gap-3 overflow-y-auto lg:flex">
+        <div className="dc-card px-[15px] py-3.5">
+          <p className="mb-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.7px] text-ink-500">
+            Ngữ cảnh CRM
+          </p>
+          <p className="text-xs font-bold text-ink-900">{activeChat.customer_name}</p>
+          <p className="dc-num text-[11px] text-ink-500">
+            {activeChat.customer_phone ?? '—'} · {activeChat.customer_email ?? '—'}
+          </p>
 
-          <QuickCreateLeadModal
-            isOpen={isCreateLeadOpen}
-            onClose={() => setIsCreateLeadOpen(false)}
-            chat={activeChat}
-            onLeadCreated={handleLeadCreated}
-          />
-        </>
-      )}
+          <div className="mt-2 flex flex-wrap gap-1">
+            {activeChat.tags.map((t) => (
+              <span key={t} className="rounded-full bg-line-soft px-2 py-0.5 text-[9.5px] font-bold text-ink-700">
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-3 flex flex-col gap-[7px]">
+            <button
+              onClick={() => setCreateCustOpen(true)}
+              disabled={Boolean(activeChat.crm_customer_id)}
+              className="dc-btn-success w-full"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              {activeChat.crm_customer_id ? 'Đã liên kết Khách hàng' : 'Tạo nhanh Khách hàng CRM'}
+            </button>
+            <button
+              onClick={() => setCreateLeadOpen(true)}
+              disabled={Boolean(activeChat.crm_lead_id)}
+              className="dc-btn-soft w-full"
+            >
+              <Target className="h-3.5 w-3.5" />
+              {activeChat.crm_lead_id ? 'Đã đẩy vào phễu' : 'Đẩy Lead vào phễu'}
+            </button>
+          </div>
+        </div>
+
+        <div className="dc-card flex-1 px-[15px] py-3.5">
+          <p className="mb-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.7px] text-ink-500">
+            Câu trả lời mẫu (1-click)
+          </p>
+
+          <div className="flex flex-col gap-[7px]">
+            {DEFAULT_QUICK_REPLIES.map((macro) => (
+              <button
+                key={macro.id}
+                onClick={() => setInputMessage(macro.content)}
+                className="rounded-lg border border-line bg-surface-subtle px-[11px] py-2 text-left transition-colors hover:border-brand-600 hover:bg-brand-50"
+              >
+                <p className="text-[11.5px] font-bold text-ink-900">{macro.title}</p>
+                <p className="mt-px text-[9.5px] font-bold text-plum-fg">{macro.category}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <QuickCreateCustomerModal
+        isOpen={isCreateCustOpen}
+        onClose={() => setCreateCustOpen(false)}
+        chat={activeChat}
+        onCustomerCreated={handleCustomerCreated}
+      />
+
+      <QuickCreateLeadModal
+        isOpen={isCreateLeadOpen}
+        onClose={() => setCreateLeadOpen(false)}
+        chat={activeChat}
+        onLeadCreated={handleLeadCreated}
+      />
     </div>
   );
 }

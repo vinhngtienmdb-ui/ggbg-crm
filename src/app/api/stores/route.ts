@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { INITIAL_STORES } from '@/lib/storeStore';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET() {

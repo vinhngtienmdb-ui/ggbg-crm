@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Target, X, CheckCircle2, DollarSign, Building2, Phone } from 'lucide-react';
+import { Target, X } from 'lucide-react';
 import { Lead, ChatConversation, LeadSource } from '@/types';
-
+import { PIPELINE_STAGES } from '@/lib/uiFormat';
 interface QuickCreateLeadModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -45,8 +45,8 @@ export default function QuickCreateLeadModal({
       company_name: companyName.trim() || 'Khách Hàng Tư Vấn Chat',
       source_name: mapChannelToLeadSource(chat.channel_type),
       pipeline_id: 'AGENCY',
-      stage_id: 'stage_1',
-      stage_name: '1. Tiếp Nhận Mới',
+      stage_id: PIPELINE_STAGES[0].id,
+      stage_name: PIPELINE_STAGES[0].name,
       assigned_sale_name: chat.assigned_rep_name,
       estimated_budget: Number(estimatedBudget) || 180000000,
       lead_score: 88,
@@ -60,100 +60,100 @@ export default function QuickCreateLeadModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold">
+            <div className="w-10 h-10 rounded-xl bg-plum-fg/20 border border-plum-border/30 flex items-center justify-center text-plum-deep font-bold">
               <Target className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-base">Đẩy Lead Trực Tiếp Vào Phễu Bán Hàng</h3>
-              <p className="text-xs text-slate-300">Chuyển cuộc trò chuyện {chat.channel_name} thành Lead tiềm năng</p>
+              <p className="text-xs text-ink-400">Chuyển cuộc trò chuyện {chat.channel_name} thành Lead tiềm năng</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-ink-400 hover:text-brand-800">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-xs flex items-center justify-between">
-            <span className="font-bold text-purple-900">Kênh Nguồn Đẩy Lead:</span>
-            <span className="font-mono font-bold text-purple-700 bg-white px-2 py-0.5 rounded border border-purple-200">
+          <div className="p-3 bg-plum-bg/70 border border-plum-border rounded-xl text-xs flex items-center justify-between">
+            <span className="font-bold text-plum-fg">Kênh Nguồn Đẩy Lead:</span>
+            <span className="font-mono font-bold text-plum-fg bg-white px-2 py-0.5 rounded border border-plum-border">
               {mapChannelToLeadSource(chat.channel_type)}
             </span>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Họ Và Tên Lead *</label>
+            <label className="block text-xs font-bold text-ink-700 mb-1">Họ Và Tên Lead *</label>
             <input
               type="text"
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+              className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-bold text-ink-900"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại *</label>
+              <label className="block text-xs font-bold text-ink-700 mb-1">Số Điện Thoại *</label>
               <input
                 type="text"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-mono font-bold text-ink-900"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+              <label className="block text-xs font-bold text-ink-700 mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-mono text-ink-900"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Tên Công Ty / Gian Hàng Dự Kiến</label>
+            <label className="block text-xs font-bold text-ink-700 mb-1">Tên Công Ty / Gian Hàng Dự Kiến</label>
             <input
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="Nhập tên doanh nghiệp hoặc shop"
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+              className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-medium text-ink-900"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Ngân Sách Dự Kiến (VNĐ) *</label>
+            <label className="block text-xs font-bold text-ink-700 mb-1">Ngân Sách Dự Kiến (VNĐ) *</label>
             <input
               type="number"
               required
               value={estimatedBudget}
               onChange={(e) => setEstimatedBudget(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-extrabold text-emerald-700"
+              className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-mono font-extrabold text-success-fg"
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-line flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+              className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20"
+              className="px-5 py-2 bg-plum-fg hover:bg-plum-strong text-white font-bold rounded-xl text-xs shadow-md shadow-card"
             >
-              Đẩy Lead Vào Phễu Bán Hàng (Bước 1. Tiếp Nhận Mới)
+              Đẩy Lead Vào Phễu Bán Hàng (Bước {PIPELINE_STAGES[0].name})
             </button>
           </div>
         </form>

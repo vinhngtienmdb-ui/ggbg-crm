@@ -1,259 +1,334 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  Users,
-  UserCheck,
-  TrendingUp,
   DollarSign,
   PhoneCall,
   ArrowUpRight,
   ShoppingBag,
-  Award,
+  UserCheck,
+  Play,
   Sparkles,
   ChevronRight,
-  Play,
-  Layers,
-  CheckCircle2,
-  Clock
 } from 'lucide-react';
+import { INITIAL_LEADS } from '@/lib/leadStore';
+import { INITIAL_CUSTOMERS } from '@/lib/customerStore';
+
+import {
+  PIPELINE_STAGES,
+  PLATFORM_CHIP,
+  TIER_CHIP,
+  fmtCompact,
+  fmtVnd,
+} from '@/lib/uiFormat';
+import { useToast } from '@/context/ToastContext';
+/** Widest funnel bar corresponds to this much pipeline value. */
+const FUNNEL_SCALE = 500_000_000;
+
+const METRICS = [
+  {
+    label: 'Doanh số dịch vụ',
+    value: '3,48 tỷ ₫',
+    sub: 'Tăng 18,4% so với tháng trước',
+    subTone: 'text-success-fg',
+    Icon: DollarSign,
+    iconBg: 'bg-brand-300 text-brand-600',
+    trend: true,
+  },
+  {
+    label: 'Gian hàng active',
+    value: '1.240',
+    sub: 'Shopee 520 · TikTok 480 · Lazada 240',
+    subTone: 'text-ink-500',
+    Icon: ShoppingBag,
+    iconBg: 'bg-plum-bg text-plum-fg',
+    trend: false,
+  },
+  {
+    label: 'Lead mới tiếp nhận',
+    value: '458',
+    sub: 'Tự động phân bổ nhân sự',
+    subTone: 'text-success-fg',
+    Icon: UserCheck,
+    iconBg: 'bg-warn-bg text-warn-fg',
+    trend: false,
+    live: true,
+  },
+  {
+    label: 'Phút gọi VoIP',
+    value: '12.450',
+    sub: 'Tỷ lệ nghe máy 84,2% · Ghi âm tự động',
+    subTone: 'text-ink-500',
+    Icon: PhoneCall,
+    iconBg: 'bg-success-bg text-success-fg',
+    trend: false,
+  },
+] as const;
+
+const RECENT_CALLS = [
+  { who: 'Phạm Minh Đức → 0912 *** 889', meta: 'Tư vấn gói Shopee · 3 phút 12 giây' },
+  { who: 'Lê Thị Mai → 0977 *** 555', meta: 'Báo giá LazMall Enterprise · 6 phút 40 giây' },
+  { who: '0936 *** 333 → Tổng đài (Inbound)', meta: 'Hỏi quy trình KYC gian hàng · 2 phút 05 giây' },
+];
+
+const LEADERBOARD = [
+  { name: 'Trần Văn Hoàng (Đội 1)', revenue: 620_000_000, pct: 124 },
+  { name: 'Lê Thị Mai (Đội 3)', revenue: 264_000_000, pct: 88 },
+  { name: 'Nguyễn Quốc Tuấn (Đội 2)', revenue: 198_000_000, pct: 75 },
+];
+
+const KPI_PROGRESS = 87;
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { showToast } = useToast();
+
+  const funnel = useMemo(
+    () =>
+      PIPELINE_STAGES.map((stage) => {
+        const stageLeads = INITIAL_LEADS.filter((l) => l.stage_id === stage.id);
+        const sum = stageLeads.reduce((acc, l) => acc + l.estimated_budget, 0);
+        return {
+          ...stage,
+          count: stageLeads.length,
+          sum,
+          pct: Math.max(4, Math.min(100, Math.round((sum / FUNNEL_SCALE) * 100))),
+        };
+      }),
+    [],
+  );
+
+  const topCustomers = useMemo(
+    () => [...INITIAL_CUSTOMERS].sort((a, b) => b.ltv_total_spent - a.ltv_total_spent).slice(0, 4),
+    [],
+  );
+
   return (
-    <div className="space-y-5">
-      {/* Top Banner Header - Crisp Enterprise Style */}
-      <div className="bg-slate-900 rounded-lg p-5 text-white border border-slate-800 shadow-xs relative overflow-hidden">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-medium mb-2.5">
-              <Sparkles className="w-3 h-3 text-blue-400" />
-              <span>GGBingo CRM System Overview</span>
-            </div>
-            <h1 className="text-lg md:text-xl font-bold tracking-tight text-white">
-              Tổng Quan Vận Hành & Doanh Số Kinh Doanh
-            </h1>
-            <p className="text-slate-400 text-xs mt-1 max-w-2xl leading-relaxed">
-              Quản lý Dịch vụ Ủy quyền Vận hành Gian hàng TMĐT (Shopee, TikTok Shop, Lazada, Amazon) và Nền tảng GGBingoVN.
+    <div className="flex flex-col gap-4 animate-fadeUp">
+      {/* Hero banner ---------------------------------------------------- */}
+      <section className="relative overflow-hidden rounded-[14px] border border-brand-100 bg-gradient-to-br from-brand-50 to-white px-6 py-[22px]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-16 -top-20 h-[280px] w-[280px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(46,92,230,.12), transparent 70%)' }}
+        />
+
+        {/* The copy block and the KPI tile are separate flex children so long
+            descriptions wrap instead of running underneath the tile. */}
+        <div className="relative flex flex-wrap items-center gap-[18px]">
+          <div className="min-w-[240px] flex-1">
+            <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-100 px-2.5 py-[3px] text-[10.5px] font-bold text-brand-800">
+              <Sparkles className="h-3 w-3" />
+              GGBINGO SYSTEM OVERVIEW
+            </span>
+            <h1 className="text-xl font-extrabold tracking-[-0.4px] text-brand-800">Tổng quan hệ thống</h1>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-ink-500">
+              Dịch vụ ủy quyền vận hành gian hàng TMĐT (Shopee, TikTok Shop, Lazada, Amazon) và nền tảng
+              GGBingoVN.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-slate-800/80 p-2.5 rounded-md border border-slate-700/80">
-            <div className="text-right">
-              <p className="text-[11px] text-slate-400 font-medium">Tiến độ KPI tháng này</p>
-              <p className="text-sm font-bold text-emerald-400 tabular-numbers">88.5% (Đạt chỉ tiêu)</p>
+          <div className="flex shrink-0 items-center gap-3.5 rounded-xl border border-brand-100 bg-white px-4 py-3">
+            <div>
+              <p className="text-[10.5px] font-semibold text-ink-500">TIẾN ĐỘ KPI THÁNG 07</p>
+              <p className="dc-num text-[19px] font-extrabold text-success-fg">{KPI_PROGRESS.toFixed(1)}%</p>
+              <p className="text-[10.5px] text-ink-500">3,48 tỷ / 4,0 tỷ ₫</p>
             </div>
-            <div className="w-9 h-9 rounded border border-emerald-500/40 flex items-center justify-center font-bold text-xs bg-emerald-500/10 text-emerald-300">
-              88%
+            <div
+              className="flex h-[52px] w-[52px] items-center justify-center rounded-full"
+              style={{
+                background: `conic-gradient(#2FA84F 0 ${KPI_PROGRESS}%, #E4E7EC ${KPI_PROGRESS}% 100%)`,
+              }}
+            >
+              <span className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-white text-[11px] font-extrabold text-success-fg">
+                {KPI_PROGRESS}%
+              </span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {/* Card 1: Agency GMV */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Doanh Số Dịch Vụ</span>
-            <div className="p-1.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100">
-              <DollarSign className="w-4 h-4" />
+      {/* Metric cards --------------------------------------------------- */}
+      <section className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(215px,1fr))]">
+        {METRICS.map((m) => (
+          <div key={m.label} className="dc-card card-hover p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[10.5px] font-extrabold uppercase tracking-[0.7px] text-ink-500">
+                {m.label}
+              </span>
+              <span className={`flex h-[30px] w-[30px] items-center justify-center rounded-lg ${m.iconBg}`}>
+                <m.Icon className="h-4 w-4" />
+              </span>
             </div>
+            <p className="dc-num text-[19px] font-extrabold tracking-[-0.3px] text-ink-900">{m.value}</p>
+            <p className={`mt-1 flex items-center gap-1.5 text-[11.5px] font-semibold ${m.subTone}`}>
+              {m.trend && <ArrowUpRight className="h-3.5 w-3.5" />}
+              {'live' in m && m.live && (
+                <span className="h-1.5 w-1.5 rounded-full bg-success-dot animate-softPulse" />
+              )}
+              {m.sub}
+            </p>
           </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">3.480.000.000 ₫</p>
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium mt-1.5">
-            <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>Tăng 18.4% so với tháng trước</span>
-          </div>
-        </div>
+        ))}
+      </section>
 
-        {/* Card 2: Total Active Customers */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Khách Hàng (Gian Hàng)</span>
-            <div className="p-1.5 rounded-md bg-purple-50 text-purple-600 border border-purple-100">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">1.240 Gian Hàng</p>
-          <p className="text-xs text-slate-500 mt-1.5 font-medium">Shopee: 520 • TikTok: 480 • Lazada: 240</p>
-        </div>
-
-        {/* Card 3: Total Leads Ingested */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Lead Mới Tiếp Nhận</span>
-            <div className="p-1.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100">
-              <UserCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">458 Lead</p>
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium mt-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>Tự động phân bổ nhân sự</span>
-          </div>
-        </div>
-
-        {/* Card 4: VoIP Activity */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Cuộc Gọi Tổng Đài</span>
-            <div className="p-1.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
-              <PhoneCall className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">12.450 Phút Gọi</p>
-          <p className="text-xs text-slate-500 mt-1.5 font-medium">Tỷ lệ nghe máy: 84.2% (Ghi âm tự động)</p>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Left Column: Pipeline Summary */}
-        <div className="lg:col-span-2 space-y-5">
-          <div className="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs">
-            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+      {/* Two-column body ------------------------------------------------ */}
+      <section className="grid items-start gap-4 lg:[grid-template-columns:1.9fr_1fr]">
+        <div className="flex flex-col gap-4">
+          {/* Sales funnel */}
+          <div className="dc-card px-5 py-[18px]">
+            <div className="mb-3.5 flex items-center justify-between border-b border-line-soft pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-blue-600" /> Phễu Bán Hàng Dịch Vụ TMĐT
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">Phân tích giá trị cơ hội kinh doanh ở từng giai đoạn</p>
+                <h2 className="dc-card-title">Phễu bán hàng</h2>
+                <p className="dc-card-sub">Giá trị cơ hội kinh doanh theo từng giai đoạn</p>
               </div>
-              <a href="/leads" className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                Xem chi tiết phễu <ChevronRight className="w-3.5 h-3.5" />
-              </a>
+              <button
+                onClick={() => router.push('/leads')}
+                className="flex items-center gap-1 rounded-lg bg-brand-50 px-3 py-1.5 text-[11.5px] font-bold text-brand-600 transition-colors hover:bg-brand-100"
+              >
+                Mở phễu <ChevronRight className="h-3.5 w-3.5" />
+              </button>
             </div>
 
-            <div className="space-y-3.5">
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-700">1. Lead Mới Tiếp Nhận • 142 Lead</span>
-                  <span className="text-slate-900 font-bold tabular-numbers">850.000.000 ₫</span>
+            <div className="flex flex-col gap-[11px]">
+              {funnel.map((f) => (
+                <div key={f.id}>
+                  <div className="mb-1 flex justify-between text-[11.5px] font-semibold">
+                    <span className="text-ink-700">
+                      {f.name} · {f.count} lead
+                    </span>
+                    <span className="dc-num font-extrabold text-ink-900">{fmtCompact(f.sum)}</span>
+                  </div>
+                  <div className="dc-bar h-[7px]">
+                    <span style={{ width: `${f.pct}%`, background: f.color }} />
+                  </div>
                 </div>
-                <div className="w-full h-2 bg-slate-100 rounded overflow-hidden">
-                  <div className="h-full bg-blue-600 rounded" style={{ width: '70%' }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-700">2. Khảo Sát Gian Hàng & Đánh Giá • 86 Gian hàng</span>
-                  <span className="text-slate-900 font-bold tabular-numbers">1.420.000.000 ₫</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded overflow-hidden">
-                  <div className="h-full bg-amber-500 rounded" style={{ width: '55%' }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-700">3. Báo Giá & Kế Hoạch Vận Hành • 45 Gian hàng</span>
-                  <span className="text-slate-900 font-bold tabular-numbers">980.000.000 ₫</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded overflow-hidden">
-                  <div className="h-full bg-purple-600 rounded" style={{ width: '40%' }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-700">4. Chốt Hợp Đồng & Vận Hành • 32 Gian hàng</span>
-                  <span className="text-slate-900 font-bold tabular-numbers">1.150.000.000 ₫</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded overflow-hidden">
-                  <div className="h-full bg-emerald-600 rounded" style={{ width: '85%' }}></div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Recent Customers Table */}
-          <div className="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs">
-            <h3 className="font-bold text-slate-900 text-sm mb-3">Khách Hàng Ký Hợp Đồng Mới Đây</h3>
+          {/* High-value customers */}
+          <div className="dc-card px-5 py-[18px]">
+            <h2 className="dc-card-title mb-3">Khách Hàng Giá Trị Cao</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
+              <table className="dc-table">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-                    <th className="pb-2.5">Khách Hàng / Công Ty</th>
-                    <th className="pb-2.5">Sàn TMĐT</th>
-                    <th className="pb-2.5">Gói Dịch Vụ</th>
-                    <th className="pb-2.5">Sale Phụ Trách</th>
-                    <th className="pb-2.5">Trạng Thái</th>
+                  <tr>
+                    <th className="dc-th pl-0">Khách hàng</th>
+                    <th className="dc-th">Sàn</th>
+                    <th className="dc-th">Hạng</th>
+                    <th className="dc-th pr-0 text-right">LTV</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <tr>
-                    <td className="py-2.5 font-semibold text-slate-900">Cửa hàng Thời Trang An An</td>
-                    <td className="py-2.5 text-slate-600">Shopee Mall</td>
-                    <td className="py-2.5 text-slate-600">Vận hành Trọn Gói</td>
-                    <td className="py-2.5 text-slate-600">Trần Văn Hoàng (Đội 1)</td>
-                    <td className="py-2.5">
-                      <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
-                        Đang Vận Hành
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 font-semibold text-slate-900">Mỹ Phẩm Beauty Glow</td>
-                    <td className="py-2.5 text-slate-600">TikTok Shop</td>
-                    <td className="py-2.5 text-slate-600">Livestream & Booking KOC</td>
-                    <td className="py-2.5 text-slate-600">Lê Thị Mai (Đội 3)</td>
-                    <td className="py-2.5">
-                      <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[10px]">
-                        Khởi Tạo
-                      </span>
-                    </td>
-                  </tr>
+                <tbody>
+                  {topCustomers.map((c) => {
+                    const tier = TIER_CHIP[c.tier];
+                    return (
+                      <tr
+                        key={c.id}
+                        onClick={() => router.push('/customers')}
+                        className="dc-row cursor-pointer"
+                      >
+                        <td className="dc-td pl-0">
+                          <p className="font-bold text-ink-900">{c.company_name}</p>
+                          <p className="text-[10.5px] text-ink-500">{c.owner_name}</p>
+                        </td>
+                        <td className="dc-td text-ink-700">
+                          {c.ecom_platforms.map((p) => PLATFORM_CHIP[p].label).join(' · ')}
+                        </td>
+                        <td className="dc-td">
+                          <span
+                            className="dc-chip"
+                            style={{ background: tier.bg, color: tier.fg }}
+                          >
+                            {c.tier}
+                          </span>
+                        </td>
+                        <td className="dc-td dc-num pr-0 text-right font-extrabold text-ink-900">
+                          {fmtCompact(c.ltv_total_spent)}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-5">
-          <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs">
-            <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <PhoneCall className="w-4 h-4 text-emerald-600" />
-                Lịch Sử Cuộc Gọi Mới
-              </h3>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+        <div className="flex flex-col gap-4">
+          {/* Call centre */}
+          <div className="dc-card px-[18px] py-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-[13px] font-extrabold text-ink-900">
+                <PhoneCall className="h-4 w-4 text-success-fg" />
+                Cuộc Gọi Tổng Đài
+              </h2>
+              <span className="h-[7px] w-[7px] rounded-full bg-success-dot animate-softPulse" />
             </div>
 
-            <div className="space-y-2.5">
-              <div className="p-2.5 rounded-md bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-bold text-slate-900">Phạm Minh Đức → 0912 **** 889</p>
-                  <p className="text-slate-500 text-[11px] mt-0.5">Tư vấn gói Shopee • 3 phút 12 giây</p>
+            <div className="flex flex-col gap-2">
+              {RECENT_CALLS.map((call) => (
+                <div
+                  key={call.who}
+                  className="flex items-center justify-between gap-2 rounded-[9px] border border-line-softer bg-surface-subtle px-[11px] py-[9px]"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-[11.5px] font-bold text-ink-900">{call.who}</p>
+                    <p className="text-[10.5px] text-ink-500">{call.meta}</p>
+                  </div>
+                  <button
+                    onClick={() => showToast('▶ Đang phát ghi âm cuộc gọi (Cloudflare R2)…')}
+                    className="dc-btn-success dc-btn-xs shrink-0"
+                  >
+                    <Play className="h-3 w-3" /> Ghi âm
+                  </button>
                 </div>
-                <button className="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold flex items-center gap-1 text-[10px] transition-colors">
-                  <Play className="w-3 h-3 fill-emerald-700" /> Ghi Âm
-                </button>
-              </div>
+              ))}
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs">
-            <h3 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2 border-b border-slate-100 pb-2.5">
-              <Award className="w-4 h-4 text-amber-500" />
-              Thành Tích Doanh Số Tháng
-            </h3>
+          {/* Sales leaderboard */}
+          <div className="dc-card px-[18px] py-4">
+            <h2 className="mb-3 text-[13px] font-extrabold text-ink-900">🏆 Bảng Vàng Doanh Số Tháng</h2>
 
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2.5 p-2.5 rounded-md bg-slate-50 border border-slate-200/80">
-                <div className="w-6 h-6 rounded bg-slate-900 text-white font-bold text-xs flex items-center justify-center">1</div>
-                <div className="flex-1">
-                  <p className="text-xs font-bold text-slate-900">Trần Văn Hoàng (Đội 1)</p>
-                  <p className="text-[11px] text-slate-500 tabular-numbers">Doanh số: 620.000.000 ₫ (Đạt 124%)</p>
-                </div>
-                <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 rounded text-[10px] font-bold">
-                  Top 1
-                </span>
-              </div>
+            <div className="flex flex-col gap-2">
+              {LEADERBOARD.map((row, i) => {
+                const isTop = i === 0;
+                const onTarget = row.pct >= 100;
+                return (
+                  <div
+                    key={row.name}
+                    className={`flex items-center gap-2.5 rounded-[9px] border px-[11px] py-[9px] ${
+                      isTop ? 'border-gold-border bg-gold-bg' : 'border-line-softer bg-surface-subtle'
+                    }`}
+                  >
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center rounded-[7px] text-[11px] font-extrabold ${
+                        isTop ? 'bg-brand-600 text-white' : 'bg-line text-ink-700'
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[11.5px] font-bold text-ink-900">{row.name}</p>
+                      <p className="dc-num text-[10.5px] text-ink-500">Doanh số: {fmtVnd(row.revenue)}</p>
+                    </div>
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-extrabold ${
+                        onTarget ? 'bg-success-bg text-success-fg' : 'bg-brand-300 text-brand-600'
+                      }`}
+                    >
+                      Đạt {row.pct}%
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getKPIs, createKPI, updateKPI } from '@/lib/kpiStore';
-
 export async function GET() {
   try {
     const kpis = getKPIs();

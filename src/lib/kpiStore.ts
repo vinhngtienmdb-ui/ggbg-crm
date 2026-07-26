@@ -1,5 +1,4 @@
 import { KPIAssignment } from '@/types';
-
 export const INITIAL_KPIS: KPIAssignment[] = [
   {
     id: 'k1',

@@ -1,5 +1,4 @@
-import { Review360Session, EvaluationCriterion, FeedbackSubmission, ReviewCyclePeriodType } from '@/types';
-import { getEmployees } from './hrmStore';
+import { Review360Session, EvaluationCriterion, FeedbackSubmission } from '@/types';
 
 export const DEFAULT_360_CRITERIA: EvaluationCriterion[] = [
   {

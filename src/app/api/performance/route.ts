@@ -7,7 +7,6 @@ import {
   updateFormulaWeights,
   runAutomatedBatchEvaluation,
 } from '@/lib/performanceStore';
-
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

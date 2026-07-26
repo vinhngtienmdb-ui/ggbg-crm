@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { UserRole } from '@/types';
-
 export interface UserSession {
   id?: string;
   username: string;
@@ -130,9 +129,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white font-sans">
-        <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p className="text-xs font-semibold text-slate-300 tracking-wide">
+      <div className="min-h-screen bg-surface-page flex flex-col items-center justify-center text-ink-900 font-sans">
+        <div className="w-8 h-8 border-[3px] border-brand-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p className="text-xs font-semibold text-ink-500 tracking-wide">
           Đang tải GGBingo CRM...
         </p>
       </div>

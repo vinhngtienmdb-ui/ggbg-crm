@@ -3,9 +3,8 @@ import {
   SmtpConfig,
   WebhookConfig,
   SecuritySystemConfig,
-  ConfigAuditLog
+  ConfigAuditLog,
 } from '@/types';
-
 export interface SystemConfig {
   r2: {
     account_id: string;

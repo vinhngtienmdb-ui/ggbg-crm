@@ -1,5 +1,4 @@
 import { UserAccount, UserRole } from '@/types';
-
 export interface RolePermissionItem {
   role: UserRole;
   module: string;

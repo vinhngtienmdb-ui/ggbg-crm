@@ -1,5 +1,4 @@
 import { GranularPermission, DataScopeBoundary, RoleMatrixDefinition, UserRole } from '@/types';
-
 export const CORE_12_PERMISSIONS: { key: GranularPermission; name: string; category: string; description: string }[] = [
   { key: 'leads:read', name: 'Xem Danh Sách Leads', category: 'Phân Hệ Lead', description: 'Cho phép xem và tìm kiếm thông tin Lead trong hệ thống' },
   { key: 'leads:create', name: 'Tạo Lead Mới', category: 'Phân Hệ Lead', description: 'Khởi tạo Lead thủ công hoặc import hàng loạt' },
@@ -119,7 +118,6 @@ export const INITIAL_ROLE_MATRIX: RoleMatrixDefinition[] = [
 ];
 
 import { getJobTitles, INITIAL_EMPLOYEES } from './hrmStore';
-
 let roleMatrix = [...INITIAL_ROLE_MATRIX];
 
 export function getRoleMatrix(): RoleMatrixDefinition[] {

@@ -1,5 +1,4 @@
 import { ContractProfitLoss, DebtInvoice, FinancialSummary } from '@/types/finance';
-
 export const INITIAL_PL_DATA: ContractProfitLoss[] = [
   {
     id: 'pl_001',
