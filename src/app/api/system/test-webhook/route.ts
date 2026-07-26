@@ -1,11 +1,26 @@
 import { NextResponse } from 'next/server';
+import { guardApi } from '@/lib/apiGuard';
+import { validateOutboundUrl } from '@/lib/ssrfGuard';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  const session = await guardApi(req, { roles: ['SUPER_ADMIN'] });
+  if (session instanceof NextResponse) return session;
   try {
     const body = await req.json();
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
     const { target_type, telegram_chat_id, zalo_webhook_url } = body || {};
+
+    // Nếu có webhook URL tuỳ chỉnh, chặn SSRF trước khi (giả lập) bắn tín hiệu ra ngoài.
+    if (zalo_webhook_url !== undefined) {
+      const ssrfError = validateOutboundUrl(zalo_webhook_url);
+      if (ssrfError) {
+        return NextResponse.json({ success: false, message: ssrfError }, { status: 400 });
+      }
+    }
 
     const startTime = Date.now();
     await new Promise((resolve) => setTimeout(resolve, 600));

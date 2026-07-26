@@ -3,8 +3,19 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  // Webhook nhận lead từ kênh ngoài: xác thực bằng secret token thay vì session.
+  const expectedToken = process.env.LEAD_INGEST_TOKEN;
+  if (!expectedToken || req.headers.get('x-ingest-token') !== expectedToken) {
+    return NextResponse.json(
+      { success: false, message: 'Token webhook không hợp lệ hoặc thiếu cấu hình.' },
+      { status: 401 }
+    );
+  }
   try {
     const body = await req.json();
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
     const { full_name, phone, email, company_name, source_name, estimated_budget, shop_link } = body || {};
 
     if (!full_name || !phone) {
@@ -12,6 +23,10 @@ export async function POST(req: Request) {
         { success: false, message: 'Thiếu trường bắt buộc: full_name và phone' },
         { status: 400 }
       );
+    }
+
+    if (String(full_name).length > 500 || String(phone).length > 50) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
     }
 
     const cleanPhone = String(phone).replace(/\D/g, '');

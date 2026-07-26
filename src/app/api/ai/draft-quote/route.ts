@@ -1,11 +1,28 @@
 import { NextResponse } from 'next/server';
+import { guardApi } from '@/lib/apiGuard';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const session = await guardApi(request);
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
     const { customer_name, company_name, platforms, target_gmv } = body;
+    for (const v of [customer_name, company_name]) {
+      if (v !== undefined && v !== null && (typeof v !== 'string' || v.length > 5000)) {
+        return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+      }
+    }
+    if (target_gmv !== undefined && target_gmv !== null && typeof target_gmv !== 'number') {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
+    if (platforms !== undefined && platforms !== null && !Array.isArray(platforms)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
 
     const quoteCode = `BG-AI-${Math.floor(1000 + Math.random() * 9000)}`;
     const estimatedCommissionRate = 4.5;

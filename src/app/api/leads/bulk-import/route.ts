@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
+import { guardApi } from '@/lib/apiGuard';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  const session = await guardApi(req);
+  if (session instanceof NextResponse) return session;
   try {
     const body = await req.json();
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
+    }
     const { rows, existing_phones } = body || {};
 
     if (!Array.isArray(rows)) {

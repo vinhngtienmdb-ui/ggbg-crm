@@ -3,6 +3,17 @@ import { EmployeeProfile, OrgNode, ApprovalAuditStep } from '@/types';
 export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
   {
     id: 'e1',
+    gender: 'Nam', date_of_birth: '1992-04-12', nationality: 'Việt Nam',
+    education_level: 'Đại học', skill_level: 'Bậc 4/5',
+    bhxh_status: 'Đang tham gia', base_salary: 25000000, salary_grade: 'G4',
+    salary_history: [
+      { effective_date: '2025-09-01', type: 'Nâng lương', from_salary: 22000000, to_salary: 25000000, note: 'Đạt KPI quý' },
+    ],
+    annual_leave_days: 12, leave_taken_days: 5, overtime_hours: 24,
+    training_records: [
+      { name: 'Kỹ năng quản lý đội nhóm Sale', type: 'Bồi dưỡng', institution: 'GGBingo Academy', start_date: '2025-05-10', end_date: '2025-05-14', result: 'Đạt' },
+    ],
+    disciplinary_records: [], occupational_incidents: [],
     employee_code: 'NV-00101',
     full_name: 'Trần Văn Hoàng',
     email: 'hoang.tv@ggbingo.vn',
@@ -41,6 +52,13 @@ export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
   },
   {
     id: 'e2',
+    gender: 'Nữ', date_of_birth: '1996-09-20', nationality: 'Việt Nam',
+    education_level: 'Cao đẳng', skill_level: 'Bậc 3/5',
+    bhxh_status: 'Đang tham gia', base_salary: 15000000, salary_grade: 'G3',
+    annual_leave_days: 12, leave_taken_days: 3, overtime_hours: 10,
+    training_records: [
+      { name: 'Nghiệp vụ tư vấn khách hàng TMĐT', type: 'Đào tạo', institution: 'GGBingo Academy', start_date: '2025-06-05', end_date: '2025-06-07', result: 'Đạt' },
+    ],
     employee_code: 'NV-00102',
     full_name: 'Lê Thị Mai',
     email: 'mai.lt@ggbingo.vn',
@@ -74,6 +92,14 @@ export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
   },
   {
     id: 'e3',
+    gender: 'Nữ', date_of_birth: '1990-02-05', nationality: 'Việt Nam',
+    education_level: 'Đại học', skill_level: 'Bậc 5/5',
+    bhxh_status: 'Đang tham gia', base_salary: 30000000, salary_grade: 'G5',
+    salary_history: [
+      { effective_date: '2025-01-01', type: 'Nâng bậc', from_salary: 26000000, to_salary: 28000000, note: 'Nâng ngạch G4→G5' },
+      { effective_date: '2025-11-01', type: 'Nâng lương', from_salary: 28000000, to_salary: 30000000, note: 'Thâm niên' },
+    ],
+    annual_leave_days: 14, leave_taken_days: 8, overtime_hours: 6,
     employee_code: 'NV-00103',
     full_name: 'Đặng Kim Anh',
     email: 'anh.dk@ggbingo.vn',
@@ -107,6 +133,13 @@ export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
   },
   {
     id: 'e4',
+    gender: 'Nam', date_of_birth: '1999-11-30', nationality: 'Việt Nam',
+    education_level: 'Cao đẳng', skill_level: 'Bậc 2/5',
+    bhxh_status: 'Chưa tham gia', base_salary: 12000000, salary_grade: 'G2',
+    annual_leave_days: 6, leave_taken_days: 1, overtime_hours: 12,
+    training_records: [
+      { name: 'Vận hành & tối ưu gian hàng Shopee/TikTok', type: 'Học nghề', institution: 'GGBingo Academy', start_date: '2026-01-16', end_date: '2026-01-20', result: 'Đang học' },
+    ],
     employee_code: 'NV-00104',
     full_name: 'Nguyễn Quốc Tuấn',
     email: 'tuan.nq@ggbingo.vn',
@@ -144,6 +177,10 @@ export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
   },
   {
     id: 'e5',
+    gender: 'Nữ', date_of_birth: '2001-07-14', nationality: 'Việt Nam',
+    education_level: 'Trung cấp', skill_level: 'Bậc 1/5',
+    bhxh_status: 'Chưa tham gia', base_salary: 9000000, salary_grade: 'G1',
+    annual_leave_days: 0, leave_taken_days: 0, overtime_hours: 0,
     employee_code: 'NV-00105',
     full_name: 'Phạm Thanh Hương',
     email: 'huong.pt@ggbingo.vn',

@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { canViewPII } from '@/lib/pii';
 import {
   Users,
   Plus,
@@ -187,6 +189,13 @@ export default function CustomersPage() {
   const [selectedEntityFilter, setSelectedEntityFilter] = useState<string>('ALL');
   const [showMaskedData, setShowMaskedData] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Chỉ vai trò được phép mới có thể gỡ mask PII (CCCD/MST/SĐT/tài khoản NH)
+  const { user, simulatedRole } = useAuth();
+  const canReveal = canViewPII(simulatedRole || user?.role, user?.is_super_admin);
+  const revealPII = canReveal && !showMaskedData;
+  const maskPhoneVal = (p?: string) =>
+    p ? `${p.substring(0, 4)} **** ${p.substring(p.length - 2)}` : '—';
 
   // SELECTION CHECKBOX STATE
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -666,13 +675,19 @@ export default function CustomersPage() {
             Tạo Khách Hàng Mới
           </button>
 
-          <button
-            onClick={() => setShowMaskedData(!showMaskedData)}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
-          >
-            {showMaskedData ? <Eye className="w-4 h-4 text-blue-600" /> : <EyeOff className="w-4 h-4 text-slate-500" />}
-            <span>{showMaskedData ? 'Gỡ Mask SĐT / MST / CCCD' : 'Ẩn Bảo Mật Thông Tin'}</span>
-          </button>
+          {canReveal ? (
+            <button
+              onClick={() => setShowMaskedData(!showMaskedData)}
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
+            >
+              {showMaskedData ? <Eye className="w-4 h-4 text-blue-600" /> : <EyeOff className="w-4 h-4 text-slate-500" />}
+              <span>{showMaskedData ? 'Gỡ Mask SĐT / MST / CCCD' : 'Ẩn Bảo Mật Thông Tin'}</span>
+            </button>
+          ) : (
+            <span className="px-3.5 py-2 bg-slate-50 text-slate-400 rounded-xl text-xs font-semibold flex items-center gap-2 border border-slate-200" title="Vai trò của bạn không được phép xem đầy đủ dữ liệu nhạy cảm">
+              <EyeOff className="w-4 h-4" /> Dữ liệu nhạy cảm đã ẩn
+            </span>
+          )}
 
           <button
             onClick={handleExportData}
@@ -834,14 +849,14 @@ export default function CustomersPage() {
 
                       <td className="p-4 font-mono font-bold">
                         {cust.entity_type === 'ENTERPRISE' ? (
-                          <span className="text-blue-700">MST: {maskIdentification(cust.tax_code, !showMaskedData)}</span>
+                          <span className="text-blue-700">MST: {maskIdentification(cust.tax_code, revealPII)}</span>
                         ) : (
-                          <span className="text-purple-700">CCCD: {maskIdentification(cust.id_card_number, !showMaskedData)}</span>
+                          <span className="text-purple-700">CCCD: {maskIdentification(cust.id_card_number, revealPII)}</span>
                         )}
                       </td>
 
                       <td className="p-4 font-mono font-semibold text-slate-800">
-                        {showMaskedData ? `${cust.phone.substring(0, 4)} **** ${cust.phone.substring(cust.phone.length - 2)}` : cust.phone}
+                        {revealPII ? cust.phone : maskPhoneVal(cust.phone)}
                       </td>
 
                       <td className="p-4 font-mono font-extrabold text-emerald-700 text-sm">
@@ -979,14 +994,14 @@ export default function CustomersPage() {
                     <p className="text-slate-500">Mã Số Thuế / CCCD Định Danh:</p>
                     <p className="font-bold font-mono text-blue-700">
                       {selectedViewCustomer.entity_type === 'ENTERPRISE'
-                        ? `MST: ${maskIdentification(selectedViewCustomer.tax_code, !showMaskedData)}`
-                        : `CCCD: ${maskIdentification(selectedViewCustomer.id_card_number, !showMaskedData)}`}
+                        ? `MST: ${maskIdentification(selectedViewCustomer.tax_code, revealPII)}`
+                        : `CCCD: ${maskIdentification(selectedViewCustomer.id_card_number, revealPII)}`}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-slate-500">Số Điện Thoại:</p>
-                    <p className="font-bold font-mono text-slate-900">{selectedViewCustomer.phone}</p>
+                    <p className="font-bold font-mono text-slate-900">{revealPII ? selectedViewCustomer.phone : maskPhoneVal(selectedViewCustomer.phone)}</p>
                   </div>
 
                   <div>
@@ -1008,7 +1023,7 @@ export default function CustomersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-slate-500">Số Tài Khoản Ngân Hàng:</p>
-                    <p className="font-bold font-mono text-slate-900">{selectedViewCustomer.bank_account || 'Chưa cập nhật'}</p>
+                    <p className="font-bold font-mono text-slate-900">{revealPII ? (selectedViewCustomer.bank_account || 'Chưa cập nhật') : (selectedViewCustomer.bank_account ? '•••• ' + selectedViewCustomer.bank_account.slice(-4) : 'Chưa cập nhật')}</p>
                   </div>
 
                   <div>

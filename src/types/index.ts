@@ -262,6 +262,69 @@ export interface EmployeeProfile {
   approval_history?: ApprovalAuditStep[];
   kyc_documents?: KycDocument[];
   created_at?: string;
+
+  // ===== SỔ QUẢN LÝ LAO ĐỘNG (Nghị định 145/2020/NĐ-CP) =====
+  // Thông tin nhân thân
+  gender?: 'Nam' | 'Nữ' | 'Khác';
+  date_of_birth?: string;
+  nationality?: string; // Quốc tịch (mặc định Việt Nam)
+  // Chuyên môn & công việc
+  education_level?: string; // Trình độ chuyên môn kỹ thuật
+  skill_level?: string;     // Bậc kỹ năng nghề
+  // Tiền lương & bảo hiểm
+  bhxh_status?: 'Đang tham gia' | 'Chưa tham gia' | 'Tạm dừng' | 'Đã chốt sổ';
+  base_salary?: number;     // Tiền lương (VND/tháng)
+  salary_grade?: string;    // Bậc/ngạch lương (VD: G1-G6)
+  salary_history?: SalaryChange[]; // Nâng bậc, nâng lương
+  // Thời giờ làm việc & nghỉ ngơi
+  annual_leave_days?: number; // Tổng phép năm
+  leave_taken_days?: number;  // Số ngày đã nghỉ
+  overtime_hours?: number;    // Số giờ làm thêm (lũy kế)
+  // Đào tạo & phát triển
+  training_records?: TrainingRecord[];
+  // Quản lý trong quá trình làm việc
+  disciplinary_records?: DisciplinaryRecord[]; // Kỷ luật lao động
+  material_liability?: string; // Trách nhiệm vật chất
+  occupational_incidents?: OccupationalIncident[]; // TNLĐ & bệnh nghề nghiệp
+  // Chấm dứt quan hệ lao động
+  termination_date?: string;
+  termination_reason?: string;
+}
+
+export interface SalaryChange {
+  id?: string;
+  effective_date: string;
+  type: 'Nâng lương' | 'Nâng bậc' | 'Điều chỉnh';
+  from_salary?: number;
+  to_salary: number;
+  note?: string;
+}
+
+export interface TrainingRecord {
+  id?: string;
+  name: string;
+  type: 'Học nghề' | 'Đào tạo' | 'Bồi dưỡng' | 'Nâng cao kỹ năng nghề';
+  institution?: string;
+  start_date?: string;
+  end_date?: string;
+  result?: string;
+}
+
+export interface DisciplinaryRecord {
+  id?: string;
+  date: string;
+  violation: string;
+  form: 'Khiển trách' | 'Kéo dài thời hạn nâng lương' | 'Cách chức' | 'Sa thải';
+  note?: string;
+}
+
+export interface OccupationalIncident {
+  id?: string;
+  date: string;
+  type: 'Tai nạn lao động' | 'Bệnh nghề nghiệp';
+  description: string;
+  severity?: 'Nhẹ' | 'Nặng' | 'Nghiêm trọng';
+  days_off?: number;
 }
 
 export type RecruitmentStage = 'APPLIED' | 'INTERVIEW' | 'OFFER' | 'HIRED' | 'REJECTED';
