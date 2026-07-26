@@ -1613,16 +1613,16 @@ export default function HRMPage() {
       {isCandidateModalOpen && selectedCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-base flex items-center gap-2">
-                  <History className="w-5 h-5 text-blue-400" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
+                  <History className="w-5 h-5 text-blue-600" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
                 </h3>
-                <p className="text-xs text-slate-300 font-mono mt-0.5">
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
                   {selectedCandidate.candidate_code} • {selectedCandidate.position} ({selectedCandidate.department})
                 </p>
               </div>
-              <button onClick={() => setIsCandidateModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsCandidateModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1698,19 +1698,19 @@ export default function HRMPage() {
       {isStatusModalOpen && statusTargetEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold">
+                <div className="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700 font-bold">
                   <UserCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Chuyển Trạng Thái Nhân Sự</h3>
-                  <p className="text-xs text-slate-300 font-mono">
+                  <p className="text-xs text-slate-500 font-mono">
                     {statusTargetEmp.full_name} ({statusTargetEmp.employee_code})
                   </p>
                 </div>
               </div>
-              <button onClick={() => setIsStatusModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsStatusModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1773,17 +1773,17 @@ export default function HRMPage() {
       {isJobTitleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-purple-50 text-slate-900 border-b border-purple-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-purple-500/20 border border-purple-400/30 rounded-xl text-purple-300">
+                <div className="p-2 bg-purple-100 border border-purple-200 rounded-xl text-purple-700">
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Chức Danh Chuyên Môn Mới</h3>
-                  <p className="text-[11px] text-purple-300">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
+                  <p className="text-[11px] text-purple-700">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
                 </div>
               </div>
-              <button onClick={() => setIsJobTitleModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsJobTitleModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1898,17 +1898,17 @@ export default function HRMPage() {
       {isPositionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-300">
+                <div className="p-2 bg-blue-100 border border-blue-200 rounded-xl text-blue-700">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Chức Vụ Quản Lý Mới</h3>
-                  <p className="text-[11px] text-blue-300">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
+                  <p className="text-[11px] text-blue-700">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
                 </div>
               </div>
-              <button onClick={() => setIsPositionModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsPositionModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1973,17 +1973,17 @@ export default function HRMPage() {
       {isGradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-emerald-50 text-slate-900 border-b border-emerald-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-500/20 border border-emerald-400/30 rounded-xl text-emerald-300">
+                <div className="p-2 bg-emerald-100 border border-emerald-200 rounded-xl text-emerald-700">
                   <Award className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Cấp Bậc (Grade Matrix) Mới</h3>
-                  <p className="text-[11px] text-emerald-300">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
+                  <p className="text-[11px] text-emerald-700">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
                 </div>
               </div>
-              <button onClick={() => setIsGradeModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsGradeModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>

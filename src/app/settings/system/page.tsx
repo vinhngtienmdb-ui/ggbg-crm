@@ -1296,7 +1296,7 @@ export default function SystemSettingsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
+                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                       <th className="p-4">Thời Gian</th>
                       <th className="p-4">Phân Hệ Cấu Hình</th>
                       <th className="p-4">Người Thực Hiện</th>
