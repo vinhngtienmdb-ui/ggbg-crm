@@ -3,13 +3,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Search, Send, UserPlus, Target } from 'lucide-react';
-
 import { ChatChannelType, ChatConversation, ChatMessage, Customer, Lead } from '@/types';
 import { DEFAULT_QUICK_REPLIES, INITIAL_CHAT_CONVERSATIONS } from '@/lib/chatStore';
 import { avatarColor, initials } from '@/lib/uiFormat';
 import { useToast } from '@/context/ToastContext';
 import { useAudit } from '@/context/AuditContext';
-
 const QuickCreateCustomerModal = dynamic(() => import('@/components/chat/QuickCreateCustomerModal'), { ssr: false });
 const QuickCreateLeadModal = dynamic(() => import('@/components/chat/QuickCreateLeadModal'), { ssr: false });
 
@@ -159,7 +157,6 @@ export default function OmnichannelChatPage() {
     return <p className="p-6 text-[12.5px] text-ink-500">Chưa có hội thoại nào.</p>;
   }
 
-  const activeChannel = CHANNEL_CHIP[activeChat.channel_type];
   const activeStatus = STATUS_CHIP[activeChat.status];
 
   return (

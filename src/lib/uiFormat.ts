@@ -13,7 +13,6 @@ import {
   EmployeeProfile,
   UserRole,
 } from '@/types';
-
 export type ChipColors = { bg: string; fg: string };
 
 const chip = (bg: string, fg: string): ChipColors => ({ bg, fg });
@@ -86,8 +85,8 @@ export function maskLegalId(value?: string): string {
 /* -------------------------------------------------------------------------- */
 
 export const TIER_CHIP: Record<CustomerTier, ChipColors> = {
-  VIP: chip('#FDF3E7', '#B25E09'),
-  Gold: chip('#FBF3D9', '#8F6B08'),
+  VIP: chip('#FDF3E7', '#A05408'),
+  Gold: chip('#FBF3D9', '#856206'),
   Silver: chip('#EEF0F4', '#5B657F'),
   Standard: chip('#F0F1F4', '#3A414E'),
 };
@@ -96,7 +95,7 @@ export const PLATFORM_CHIP: Record<EcomPlatform, ChipColors & { label: string }>
   Shopee: { ...chip('#FDEBE5', '#D14415'), label: 'Shopee' },
   TikTokShop: { ...chip('#F0F1F4', '#16181D'), label: 'TikTok' },
   Lazada: { ...chip('#E8ECFB', '#1D3EA8'), label: 'Lazada' },
-  Amazon: { ...chip('#FDF3E7', '#B25E09'), label: 'Amazon' },
+  Amazon: { ...chip('#FDF3E7', '#A05408'), label: 'Amazon' },
   GGBingoVN: { ...chip('#E4F6F8', '#0E7490'), label: 'GGBingoVN' },
 };
 
@@ -104,21 +103,21 @@ export const GRADE_CHIP: Record<RatingGrade, ChipColors> = {
   S: chip('#F4F1FE', '#6D3FD4'),
   A: chip('#EEF4EE', '#1F7A33'),
   B: chip('#E8ECFB', '#2E5CE6'),
-  C: chip('#FDF3E7', '#B25E09'),
+  C: chip('#FDF3E7', '#A05408'),
   D: chip('#FDEEEE', '#C22F35'),
 };
 
 export const KYC_CHIP: Record<KycStatus, ChipColors & { label: string }> = {
   VERIFIED: { ...chip('#EEF4EE', '#1F7A33'), label: 'Đã xác minh' },
-  PENDING: { ...chip('#FDF3E7', '#B25E09'), label: 'Chờ duyệt' },
+  PENDING: { ...chip('#FDF3E7', '#A05408'), label: 'Chờ duyệt' },
   REJECTED: { ...chip('#FDEEEE', '#C22F35'), label: 'Từ chối' },
 };
 
 export const EMPLOYEE_STATUS_CHIP: Record<EmployeeProfile['status'], ChipColors & { label: string }> = {
   Active: { ...chip('#EEF4EE', '#1F7A33'), label: 'Đang làm việc' },
   Probation: { ...chip('#E8ECFB', '#2E5CE6'), label: 'Thử việc' },
-  Applicant: { ...chip('#FDF3E7', '#B25E09'), label: 'Ứng viên' },
-  Pending_Resign: { ...chip('#FDF3E7', '#B25E09'), label: 'Chờ nghỉ việc' },
+  Applicant: { ...chip('#FDF3E7', '#A05408'), label: 'Ứng viên' },
+  Pending_Resign: { ...chip('#FDF3E7', '#A05408'), label: 'Chờ nghỉ việc' },
   Resigned: { ...chip('#F0F1F4', '#5B657F'), label: 'Nghỉ việc' },
   Suspended: { ...chip('#FDEEEE', '#C22F35'), label: 'Đình chỉ' },
 };
@@ -132,7 +131,7 @@ export const ROLE_CHIP: Record<string, ChipColors> = {
   SALES_REP: chip('#EEF4EE', '#1F7A33'),
   CSKH: chip('#E4F6F8', '#0E7490'),
   AUDITOR: chip('#F4F1FE', '#6D3FD4'),
-  HR_MANAGER: chip('#FDF3E7', '#B25E09'),
+  HR_MANAGER: chip('#FDF3E7', '#A05408'),
 };
 
 export function roleChip(role: UserRole | string): ChipColors {
@@ -162,7 +161,7 @@ export const LIFECYCLE_LABEL: Record<string, string> = {
 /** Green ≥ 75, amber ≥ 50, red below — used for customer health bars. */
 export function healthColor(score: number): string {
   if (score >= 75) return '#1F7A33';
-  if (score >= 50) return '#B25E09';
+  if (score >= 50) return '#A05408';
   return '#C22F35';
 }
 
@@ -170,14 +169,14 @@ export function healthColor(score: number): string {
 export function leadScoreChip(score: number): ChipColors {
   if (score >= 85) return chip('#EEF4EE', '#1F7A33');
   if (score >= 70) return chip('#E8ECFB', '#2E5CE6');
-  return chip('#FDF3E7', '#B25E09');
+  return chip('#FDF3E7', '#A05408');
 }
 
 /** KPI progress colour: green at target, cobalt when close, amber when behind. */
 export function progressColor(pct: number): string {
   if (pct >= 100) return '#1F7A33';
   if (pct >= 85) return '#2E5CE6';
-  return '#B25E09';
+  return '#A05408';
 }
 
 /* -------------------------------------------------------------------------- */

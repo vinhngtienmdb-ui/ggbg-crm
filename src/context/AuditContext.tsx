@@ -4,7 +4,6 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import { AuditLogEntry, AuditSeverity } from '@/types/audit';
 import { INITIAL_AUDIT_LOGS } from '@/lib/auditStore';
 import { useAuth } from '@/context/AuthContext';
-
 export interface LogActionInput {
   action_type: string;
   action_description: string;

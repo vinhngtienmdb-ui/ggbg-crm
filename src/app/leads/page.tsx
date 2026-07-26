@@ -16,7 +16,6 @@ import {
   BarChart3,
   Zap,
 } from 'lucide-react';
-
 import { Customer, Lead } from '@/types';
 import { INITIAL_CUSTOMERS } from '@/lib/customerStore';
 import {

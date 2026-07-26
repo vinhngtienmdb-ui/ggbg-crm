@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { PIPELINE_STAGES } from '@/lib/uiFormat';
-
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {

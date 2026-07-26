@@ -2,28 +2,14 @@
 
 import React, { useState } from 'react';
 import {
-  Users,
-  Award,
   Calendar,
   Plus,
   Sliders,
-  CheckCircle2,
-  Clock,
   Search,
   MessageSquare,
-  Sparkles,
-  Send,
-  Eye,
-  ShieldCheck,
-  TrendingUp,
-  UserCheck,
-  Building2,
-  RefreshCw,
-  HeartHandshake
 } from 'lucide-react';
 import { Review360Session, ReviewCyclePeriodType, EvaluationCriterion } from '@/types';
 import {
-  get360Sessions,
   get360SessionsByPeriod,
   create360Session,
   get360Criteria,

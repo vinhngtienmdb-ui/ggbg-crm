@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import { findUserByUsernameOrEmail } from '@/lib/userStore';
-
 export interface SessionUser {
   id?: string;
   username: string;

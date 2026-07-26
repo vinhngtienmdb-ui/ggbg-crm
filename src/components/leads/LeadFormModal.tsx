@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { X, Save, Building2, User, ShieldCheck } from 'lucide-react';
 import { Customer, CustomerEntityType, Lead, LeadSource } from '@/types';
 import { LEAD_SOURCES, SALES_REPS } from '@/lib/leadStore';
-
 export type LeadFormMode = 'create' | 'edit' | 'view';
 
 export interface LeadFormValues {

@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Target, X, CheckCircle2, DollarSign, Building2, Phone } from 'lucide-react';
+import { Target, X } from 'lucide-react';
 import { Lead, ChatConversation, LeadSource } from '@/types';
 import { PIPELINE_STAGES } from '@/lib/uiFormat';
-
 interface QuickCreateLeadModalProps {
   isOpen: boolean;
   onClose: () => void;

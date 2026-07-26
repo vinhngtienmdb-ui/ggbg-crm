@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Download, Printer, CheckCircle2, ShieldCheck, QrCode, FileText, Building2 } from 'lucide-react';
-
+import { X, Download, Printer, QrCode, FileText } from 'lucide-react';
 interface OfficialContractPdfModalProps {
   isOpen: boolean;
   onClose: () => void;

@@ -3,15 +3,8 @@
 import React, { useState } from 'react';
 import {
   FileText,
-  Download,
-  Printer,
-  CheckCircle2,
   Eye,
   Search,
-  Building2,
-  ShieldCheck,
-  Calendar,
-  Sparkles
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 

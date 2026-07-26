@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-
 interface ToastContextType {
   /** Show a transient confirmation at the bottom of the screen. */
   showToast: (message: string) => void;

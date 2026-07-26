@@ -2,22 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  UserCheck,
-  ShieldCheck,
-  Plus,
   Search,
   Lock,
   Unlock,
-  KeyRound,
   UserPlus,
   Briefcase,
-  Sparkles,
   CheckCircle2,
-  AlertTriangle,
-  X
+  X,
 } from 'lucide-react';
 import { UserAccount, UserRole } from '@/types';
-
 export default function UserAccountsPage() {
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);

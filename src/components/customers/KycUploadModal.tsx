@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { X, Plus, Trash2, Upload } from 'lucide-react';
 import { KycDocument } from '@/types';
 import { ExtendedCustomer } from '@/lib/customerStore';
-
 export interface UploadRow {
   id: string;
   category: KycDocument['doc_type'];

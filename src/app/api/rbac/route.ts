@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getRolePermissionsMatrix, updateRolePermission, getAuditLogs } from '@/lib/userStore';
 import { getAuthenticatedSessionUser, isAuthorizedForAdminAction } from '@/lib/authSession';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET() {

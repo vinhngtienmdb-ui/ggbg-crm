@@ -1,5 +1,4 @@
 import { ChatConversation, QuickReplyMacro } from '@/types';
-
 export const DEFAULT_QUICK_REPLIES: QuickReplyMacro[] = [
   {
     id: 'macro_1',

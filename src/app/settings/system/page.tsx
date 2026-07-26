@@ -15,23 +15,19 @@ import {
   Mail,
   Send,
   Bell,
-  MessageSquare,
   ShieldAlert,
   Eye,
   EyeOff,
   History,
-  Check,
   Server,
   Sliders,
   Sparkles,
-  RefreshCw,
   ShoppingBag,
-  Bot
+  Bot,
 } from 'lucide-react';
 import { SystemConfig, getSystemConfig, saveSystemConfig } from '@/lib/systemConfigStore';
 import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { useAuth } from '@/context/AuthContext';
-
 interface TestResult {
   service: string;
   status: 'IDLE' | 'TESTING' | 'SUCCESS' | 'FAILED';

@@ -7,7 +7,6 @@ import { LayoutDashboard, Users, UserCheck, MessageSquare, Menu } from 'lucide-r
 import { useAuth } from '@/context/AuthContext';
 import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { isRouteAllowedForRole } from '@/lib/permissions';
-
 interface MobileBottomNavProps {
   onToggleMobileSidebar: () => void;
 }

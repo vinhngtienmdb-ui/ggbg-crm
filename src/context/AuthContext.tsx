@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { UserRole } from '@/types';
-
 export interface UserSession {
   id?: string;
   username: string;

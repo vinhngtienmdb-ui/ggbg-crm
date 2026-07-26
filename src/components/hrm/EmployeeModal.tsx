@@ -4,27 +4,16 @@ import React, { useState, useEffect } from 'react';
 import {
   X,
   UserCheck,
-  ShieldCheck,
-  FileText,
-  Building2,
-  Briefcase,
-  Calendar,
-  CreditCard,
-  Mail,
-  Phone,
   Upload,
   FileCheck,
   Plus,
   Trash2,
-  Camera,
   MapPin,
   HeartPulse,
   BadgeCheck,
-  Paperclip,
-  FolderPlus
+  FolderPlus,
 } from 'lucide-react';
 import { EmployeeProfile, KycDocument } from '@/types';
-
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -180,7 +169,7 @@ export default function EmployeeModal({
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-200/30 flex items-center justify-center text-brand-400 font-bold shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-200/30 flex items-center justify-center text-brand-600 font-bold shadow-md">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>

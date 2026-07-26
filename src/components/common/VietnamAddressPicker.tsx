@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MapPin, Building2, ShieldCheck, Check, Search, RefreshCw } from 'lucide-react';
+import { MapPin, ShieldCheck } from 'lucide-react';
 import {
   getNewProvinces,
   getNewWards,
@@ -9,7 +9,6 @@ import {
   NewWard,
   formatFullAddressPost2025,
 } from '@/lib/locationService';
-
 export interface VietnamAddressValue {
   provinceCode: string;
   provinceName: string;

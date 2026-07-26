@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Award, Users, ShieldCheck, Sliders, ThumbsUp, Send, HeartHandshake, UserCheck, MessageSquare, Sparkles } from 'lucide-react';
-import { Review360Session, ReviewerPerspective, EvaluationCriterion } from '@/types';
+import { X, Users, Sliders, Send, UserCheck, MessageSquare } from 'lucide-react';
+import { Review360Session, ReviewerPerspective } from '@/types';
 import { submit360Feedback } from '@/lib/review360Store';
-
 interface Review360ModalProps {
   isOpen: boolean;
   onClose: () => void;

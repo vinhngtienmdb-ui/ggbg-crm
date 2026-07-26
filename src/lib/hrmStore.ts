@@ -1,5 +1,4 @@
 import { EmployeeProfile, OrgNode, ApprovalAuditStep } from '@/types';
-
 export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
   {
     id: 'e1',

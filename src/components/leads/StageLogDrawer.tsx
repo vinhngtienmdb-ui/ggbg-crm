@@ -4,7 +4,6 @@ import React from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { Lead } from '@/types';
 import { LeadStageLog } from '@/lib/leadStore';
-
 interface StageLogDrawerProps {
   logs: LeadStageLog[];
   leads: Lead[];

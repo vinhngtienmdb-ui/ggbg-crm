@@ -16,7 +16,6 @@ import {
   Headphones,
   Sliders,
 } from 'lucide-react';
-
 import { KycDocument, LifecycleStage } from '@/types';
 import {
   ExtendedCustomer,

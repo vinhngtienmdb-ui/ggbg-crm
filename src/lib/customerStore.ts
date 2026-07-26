@@ -1,5 +1,4 @@
 import { Customer } from '@/types';
-
 /**
  * Customer record plus the finance fields the 360° drawer shows.
  *

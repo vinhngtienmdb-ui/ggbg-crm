@@ -13,7 +13,6 @@ import {
   maskLegalId,
   maskPhone,
 } from '@/lib/uiFormat';
-
 type DrawerTab = 'info' | 'kyc' | 'fin';
 
 const TABS: { id: DrawerTab; label: string }[] = [

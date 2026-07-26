@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Building2, Users, ChevronDown, ChevronRight, UserCheck, Search, ShieldCheck, Mail, Phone } from 'lucide-react';
+import { Building2, Users, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { OrgNode } from '@/types';
-
 interface OrgChartTreeProps {
   rootData: OrgNode;
   onSelectMember?: (name: string) => void;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Package, Tag, Settings, Plus, Check } from 'lucide-react';
+import { X, Package, Check } from 'lucide-react';
 import { ProductPackage, EcomPlatform } from '@/types';
 import { ECOM_PLATFORM_OPTIONS } from '@/lib/productStore';
 import JsonbAttributeEditor from './JsonbAttributeEditor';

@@ -12,7 +12,6 @@ import {
 import { ExtendedCustomer, SALE_OWNERS } from '@/lib/customerStore';
 import { PLATFORM_CHIP, LIFECYCLE_LABEL } from '@/lib/uiFormat';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
-
 /** Everything the create/edit form collects, as strings ready for inputs. */
 export interface CustomerFormValues {
   customer_code: string;

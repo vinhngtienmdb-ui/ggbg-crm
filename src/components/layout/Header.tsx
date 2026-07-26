@@ -20,7 +20,6 @@ import {
 import { UserRole } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 import { getPageMeta, CURRENT_PERIOD } from '@/lib/pageMeta';
-
 interface HeaderProps {
   onOpenPhoneModal?: () => void;
   onToggleMobileSidebar?: () => void;

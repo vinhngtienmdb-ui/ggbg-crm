@@ -24,12 +24,10 @@ import {
   X,
   Lock,
 } from 'lucide-react';
-
 import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { useAuth } from '@/context/AuthContext';
 import { getFilteredMenuClusters, MenuItemDefinition } from '@/lib/permissions';
 import { INITIAL_CHAT_CONVERSATIONS } from '@/lib/chatStore';
-
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
@@ -106,7 +104,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <Building2 className="w-4 h-4 text-brand-600 shrink-0" />
           <div className="min-w-0">
             <p className="text-[11px] font-bold text-brand-800 truncate">Vận hành TMĐT &amp; GGBingoVN</p>
-            <p className="text-[10px] text-brand-400 truncate">Shopee · TikTok · Lazada · Amazon</p>
+            <p className="text-[10px] text-brand-600 truncate">Shopee · TikTok · Lazada · Amazon</p>
           </div>
         </div>
 

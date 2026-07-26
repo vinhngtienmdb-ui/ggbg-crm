@@ -7,19 +7,12 @@ import {
   Search,
   Settings,
   Tag,
-  ShieldCheck,
-  CheckCircle,
   Edit3,
   Trash2,
   Filter,
   Sparkles,
-  Code,
   LayoutGrid,
   List,
-  DollarSign,
-  Percent,
-  Check,
-  Power
 } from 'lucide-react';
 import { ProductPackage, EcomPlatform } from '@/types';
 import { getProducts, createProduct, updateProduct, deleteProduct, ECOM_PLATFORM_OPTIONS } from '@/lib/productStore';

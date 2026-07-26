@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2, Tag, Sparkles, Code, Check } from 'lucide-react';
+import { Plus, Trash2, Tag, Sparkles, Code } from 'lucide-react';
 import { DYNAMIC_ATTRIBUTE_PRESETS } from '@/lib/productStore';
-
 interface JsonbAttributeEditorProps {
   attributes: Record<string, any>;
   onChange: (updatedAttrs: Record<string, any>) => void;

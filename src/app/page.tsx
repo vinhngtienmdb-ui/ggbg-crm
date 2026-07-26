@@ -12,9 +12,9 @@ import {
   Sparkles,
   ChevronRight,
 } from 'lucide-react';
-
 import { INITIAL_LEADS } from '@/lib/leadStore';
 import { INITIAL_CUSTOMERS } from '@/lib/customerStore';
+
 import {
   PIPELINE_STAGES,
   PLATFORM_CHIP,
@@ -23,7 +23,6 @@ import {
   fmtVnd,
 } from '@/lib/uiFormat';
 import { useToast } from '@/context/ToastContext';
-
 /** Widest funnel bar corresponds to this much pipeline value. */
 const FUNNEL_SCALE = 500_000_000;
 

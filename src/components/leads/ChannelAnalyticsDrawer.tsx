@@ -4,18 +4,11 @@ import React from 'react';
 import {
   BarChart3,
   X,
-  TrendingUp,
-  Share2,
   PieChart,
   Zap,
-  Target,
   Send,
-  Sparkles,
-  CheckCircle2,
-  DollarSign
 } from 'lucide-react';
 import { Lead, LeadChannelStats } from '@/types';
-
 interface ChannelAnalyticsDrawerProps {
   isOpen: boolean;
   onClose: () => void;

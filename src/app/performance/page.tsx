@@ -2,27 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Award,
   Plus,
   Sliders,
   CheckCircle2,
-  AlertCircle,
-  FileSpreadsheet,
-  Sparkles,
-  RefreshCw,
   Edit3,
   Trash2,
   Filter,
   Search,
   Calendar,
-  Clock,
   Send,
   AlertTriangle,
-  History
 } from 'lucide-react';
 import { PerformanceScorecard, FormulaWeights, RatingGrade } from '@/types';
 import {
-  getScorecards,
   getScorecardsByPeriod,
   createScorecard,
   updateScorecard,

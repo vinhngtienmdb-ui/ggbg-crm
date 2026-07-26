@@ -4,19 +4,14 @@ import React, { useState } from 'react';
 import {
   ShoppingBag,
   CheckCircle2,
-  AlertTriangle,
   ExternalLink,
-  Plus,
   Search,
   Filter,
-  TrendingUp,
-  Award,
   RefreshCw,
-  X
+  X,
 } from 'lucide-react';
 import { INITIAL_STORES } from '@/lib/storeStore';
 import { EcomStore } from '@/types/store';
-
 export default function StoresPage() {
   const [stores, setStores] = useState<EcomStore[]>(INITIAL_STORES);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('ALL');

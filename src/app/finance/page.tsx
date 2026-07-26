@@ -9,20 +9,12 @@ import {
   Send,
   CheckCircle2,
   PieChart,
-  Calendar,
-  Building2,
-  Clock,
-  ChevronRight,
   Download,
-  Filter,
-  Layers,
-  Sparkles,
   ArrowUpRight,
-  X
+  X,
 } from 'lucide-react';
 import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
 import { ContractProfitLoss, DebtInvoice } from '@/types/finance';
-
 export default function FinancePage() {
   const [plStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);

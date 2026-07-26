@@ -14,13 +14,10 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  Building2,
-  TrendingUp,
   ShoppingBag,
   PhoneCall,
-  Globe
+  Globe,
 } from 'lucide-react';
-
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
@@ -78,7 +75,7 @@ export default function LoginPage() {
             <div>
               <h2 className="text-xl font-bold text-brand-800 tracking-tight flex items-center gap-2">
                 GGBingo Enterprise
-                <span className="px-2 py-0.5 rounded-full bg-brand-500/20 border border-brand-200/30 text-brand-400 text-[10px] font-semibold">
+                <span className="px-2 py-0.5 rounded-full bg-brand-500/20 border border-brand-200/30 text-brand-600 text-[10px] font-semibold">
                   v2.0
                 </span>
               </h2>
@@ -107,7 +104,7 @@ export default function LoginPage() {
             {/* Feature Highlights Grid */}
             <div className="grid grid-cols-2 gap-4 max-w-xl">
               <div className="p-4 rounded-2xl bg-white border border-line flex items-start gap-3">
-                <div className="p-2.5 rounded-xl bg-brand-500/10 text-brand-400 border border-brand-600/20 shrink-0">
+                <div className="p-2.5 rounded-xl bg-brand-500/10 text-brand-600 border border-brand-600/20 shrink-0">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>

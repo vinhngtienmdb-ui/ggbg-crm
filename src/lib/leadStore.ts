@@ -1,6 +1,5 @@
 import { Lead, LeadSource } from '@/types';
 import { PIPELINE_STAGES } from '@/lib/uiFormat';
-
 export interface LeadStageLog {
   id: string;
   lead_code: string;

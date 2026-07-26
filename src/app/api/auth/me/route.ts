@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { findUserByUsernameOrEmail } from '@/lib/userStore';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET() {

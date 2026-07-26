@@ -3,30 +3,18 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   MapPin,
-  Users,
   Search,
   Filter,
   Building2,
   Phone,
-  Mail,
-  UserCheck,
-  Award,
-  ChevronRight,
-  ShieldCheck,
-  PieChart,
   BarChart3,
-  Layers,
-  Sparkles,
   Map as MapIcon,
-  Compass,
-  CheckCircle2,
   Flag,
   Globe,
   Loader2,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 import { EmployeeProfile } from '@/types';
-
 const GEOJSON_DATA_URL = 'https://raw.githubusercontent.com/nguyenduy1133/Free-GIS-Data/main/Vietnam%20Administrative%20Divisions%20(Pre-2025)%20-%20%C4%90%C6%A1n%20v%E1%BB%8B%20h%C3%A0nh%20ch%C3%ADnh%20Vi%E1%BB%87t%20Nam%20(Tr%C6%B0%E1%BB%9Bc%202025)/Provinces_included_Paracel_SpratlyIslands_combine.geojson';
 
 interface VietnamEmployeeDistributionMapProps {

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, X, Play, Download, Building2, FileText, CheckCircle2 } from 'lucide-react';
-
+import { Phone, PhoneOff, Mic, MicOff, X, Building2, FileText, CheckCircle2 } from 'lucide-react';
 interface VoIPCallModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -129,7 +128,7 @@ export default function VoIPCallModal({
                 <p className="font-bold text-ink-700 flex items-center gap-1">
                   <FileText className="w-3.5 h-3.5 text-brand-600" /> Bóc tách lời thoại (Speech-to-Text):
                 </p>
-                <p className="text-ink-500 italic leading-relaxed">"{speechTranscript}"</p>
+                <p className="text-ink-500 italic leading-relaxed">&ldquo;{speechTranscript}&rdquo;</p>
               </div>
 
               <div className="flex items-center justify-center gap-3">

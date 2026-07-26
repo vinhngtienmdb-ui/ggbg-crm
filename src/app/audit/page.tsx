@@ -9,14 +9,9 @@ import {
   AlertTriangle,
   Info,
   ShieldAlert,
-  Clock,
-  User,
-  Monitor,
-  Key
 } from 'lucide-react';
 import { useAudit } from '@/context/AuditContext';
 import { AuditLogEntry } from '@/types/audit';
-
 export default function AuditTrailPage() {
   // Live trail: entries appended by other modules this session show up here.
   const { logs } = useAudit();

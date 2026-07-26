@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Award, Sparkles, CheckCircle2, Calculator, Sliders, ThumbsUp, ShieldCheck, HeartHandshake, Smile } from 'lucide-react';
-import { PerformanceScorecard, FormulaWeights, RatingGrade } from '@/types';
+import { X, Award, Calculator, Sliders, ShieldCheck, HeartHandshake, Smile } from 'lucide-react';
+import { PerformanceScorecard, RatingGrade } from '@/types';
 import { calculateFinalScore, classifyRatingGrade, getFormulaWeights } from '@/lib/performanceStore';
-
 interface ScorecardModalProps {
   isOpen: boolean;
   onClose: () => void;

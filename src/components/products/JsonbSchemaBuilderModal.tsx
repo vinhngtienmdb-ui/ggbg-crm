@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Tag, Code, Copy, Check, Save, Plus, Trash2, Sliders } from 'lucide-react';
+import { X, Sparkles, Tag, Code, Copy, Check, Save, Plus, Trash2 } from 'lucide-react';
 import { ProductPackage } from '@/types';
 import { DYNAMIC_ATTRIBUTE_PRESETS, ECOM_PLATFORM_OPTIONS } from '@/lib/productStore';
-
 interface JsonbSchemaBuilderModalProps {
   isOpen: boolean;
   onClose: () => void;

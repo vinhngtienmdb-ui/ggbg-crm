@@ -5,18 +5,11 @@ import {
   Upload,
   FileSpreadsheet,
   Download,
-  CheckCircle2,
-  AlertTriangle,
   X,
   FileCheck,
-  Users,
-  ShieldAlert,
-  ArrowRight,
-  Filter
 } from 'lucide-react';
-import { Lead, BulkImportRow, CustomerEntityType, LeadSource } from '@/types';
+import { Lead, BulkImportRow } from '@/types';
 import { PIPELINE_STAGES } from '@/lib/uiFormat';
-
 interface BulkLeadImportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -138,7 +131,7 @@ export default function BulkLeadImportModal({
         {/* Header */}
         <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-200/30 flex items-center justify-center text-brand-400 font-bold">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-200/30 flex items-center justify-center text-brand-600 font-bold">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>

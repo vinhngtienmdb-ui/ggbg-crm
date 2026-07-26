@@ -1,6 +1,5 @@
 import { UserRole } from '@/types';
 import { ModuleToggles } from '@/context/ModuleToggleContext';
-
 export interface MenuItemDefinition {
   name: string;
   href: string;

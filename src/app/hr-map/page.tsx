@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MapPin, Users, Filter, Compass } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { getEmployees } from '@/lib/hrmStore';
 import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDistributionMap';
 

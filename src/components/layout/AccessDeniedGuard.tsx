@@ -2,9 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldAlert, ArrowLeft, LayoutDashboard, Lock } from 'lucide-react';
+import { ShieldAlert, LayoutDashboard, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-
 interface AccessDeniedGuardProps {
   moduleName?: string;
 }

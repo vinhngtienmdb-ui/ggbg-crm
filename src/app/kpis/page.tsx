@@ -2,25 +2,8 @@
 
 import React, { useState } from 'react';
 import {
-  TrendingUp,
-  Target,
-  Users,
-  Building2,
-  Award,
-  Plus,
-  CheckCircle2,
-  AlertCircle,
-  BarChart3,
-  Crown,
-  Medal,
-  Trophy,
-  Flame,
-  ChevronRight,
-  Calendar,
   Layers,
-  Check
 } from 'lucide-react';
-
 export type KPILevel = 'COMPANY' | 'DEPARTMENT' | 'TEAM' | 'INDIVIDUAL';
 export type KPICategory = 'REVENUE' | 'NEW_LEADS' | 'CONVERSION_RATE' | 'CSAT' | 'RECRUITMENT';
 export type ReportPeriod = 'MONTH_07_2026' | 'Q3_2026' | 'YEAR_2026';
@@ -247,7 +230,7 @@ export default function KPIsPage() {
                 ? '#1F7A33'
                 : item.achievement_rate >= 85
                   ? '#2E5CE6'
-                  : '#B25E09';
+                  : '#A05408';
             const fmt = (v: number) =>
               item.unit === 'VNĐ'
                 ? `${(v / 1000000).toLocaleString('vi-VN')} Tr ₫`

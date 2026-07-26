@@ -8,47 +8,24 @@ import {
   Building2,
   Plus,
   Search,
-  Download,
-  Calendar,
   ShieldCheck,
   CheckCircle2,
-  ExternalLink,
-  Upload,
-  Filter,
-  Eye,
-  Edit3,
   Cloud,
   UserCheck,
   Lock,
   UserPlus,
-  CheckSquare,
-  Square,
   Laptop,
   Key,
   GraduationCap,
-  Sparkles,
-  ArrowRight,
-  DollarSign,
-  MapPin,
-  HeartPulse,
-  Camera,
-  BadgeCheck,
-  Paperclip,
   Clock,
   CheckCircle,
   XCircle,
-  AlertTriangle,
-  Send,
-  UserCheck2,
-  ShieldAlert,
   History,
   LayoutGrid,
   List,
-  ChevronRight,
   FileCheck,
   X,
-  MessageSquare,
-  Award
+  Award,
 } from 'lucide-react';
 import { EmployeeProfile, EmployeeApprovalStatus, Candidate, CandidateAuditLog, RecruitmentStage } from '@/types';
 import {
@@ -71,7 +48,7 @@ import {
   getGradeLevels,
   createGradeLevel,
   deleteGradeLevel,
-  GradeLevelDefinition
+  GradeLevelDefinition,
 } from '@/lib/hrmStore';
 import dynamic from 'next/dynamic';
 import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDistributionMap';
@@ -1208,7 +1185,7 @@ export default function HRMPage() {
                     onClick={() => handleSignContractAndActivate(item)}
                     className="px-3.5 py-1.5 bg-success-fg hover:bg-success-deep text-white font-bold rounded-xl text-xs shadow-md shadow-card flex items-center gap-1.5 transition-all active:scale-95 ml-2"
                   >
-                    <FileCheck className="w-4 h-4" /> Ký HĐ & Kích Hoạt "Đang Làm Việc"
+                    <FileCheck className="w-4 h-4" /> Ký HĐ &amp; Kích Hoạt &ldquo;Đang Làm Việc&rdquo;
                   </button>
                 </div>
               </div>
@@ -1857,7 +1834,7 @@ export default function HRMPage() {
           <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-brand-500/20 border border-brand-200/30 rounded-xl text-brand-400">
+                <div className="p-2 bg-brand-500/20 border border-brand-200/30 rounded-xl text-brand-600">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>

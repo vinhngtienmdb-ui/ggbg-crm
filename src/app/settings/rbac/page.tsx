@@ -1,41 +1,31 @@
 'use client';
 
+import { INITIAL_EMPLOYEES, getJobTitles } from '@/lib/hrmStore';
+
 import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
-  Lock,
-  UserCheck,
-  Check,
   X,
   Save,
-  Sliders,
   Database,
   Building2,
   Users,
-  User,
   Sparkles,
-  Key,
   Plus,
-  RefreshCw,
   Search,
-  Award,
-  CheckCircle2,
   Briefcase,
   ChevronRight,
   Shield,
   Layers,
-  Settings
 } from 'lucide-react';
-import { GranularPermission, DataScopeBoundary, UserRole, RoleMatrixDefinition } from '@/types';
+import { GranularPermission, DataScopeBoundary, RoleMatrixDefinition } from '@/types';
 import {
   CORE_12_PERMISSIONS,
   getRoleMatrix,
   updateRolePermissionToggle,
   updateRoleDataScope,
-  syncRolesFromHrmPositions,
-  addCustomRoleMatrix
+  addCustomRoleMatrix,
 } from '@/lib/rbacStore';
-import { INITIAL_EMPLOYEES, getJobTitles } from '@/lib/hrmStore';
 
 export default function RbacPage() {
   const [roleMatrix, setRoleMatrix] = useState<RoleMatrixDefinition[]>(() => getRoleMatrix());

@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Sliders, Sparkles, Check, RefreshCw } from 'lucide-react';
+import { X, Sliders } from 'lucide-react';
 import { FormulaWeights } from '@/types';
-
 interface FormulaConfigModalProps {
   isOpen: boolean;
   onClose: () => void;

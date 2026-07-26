@@ -1,5 +1,4 @@
 import { ProductPackage, EcomPlatform } from '@/types';
-
 export const ECOM_PLATFORM_OPTIONS: { id: EcomPlatform; name: string; color: string }[] = [
   { id: 'Shopee', name: 'Shopee Mall', color: 'bg-orange-100 text-orange-800 border-orange-200' },
   { id: 'TikTokShop', name: 'TikTok Shop', color: 'bg-slate-900 text-white border-slate-700' },

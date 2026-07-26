@@ -11,7 +11,6 @@ import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { AuditProvider } from '@/context/AuditContext';
 import { usePathname } from 'next/navigation';
-
 const VoIPCallModal = dynamic(() => import('@/components/telephony/VoIPCallModal'), { ssr: false });
 
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
@@ -19,7 +18,6 @@ import AccessDeniedGuard from '@/components/layout/AccessDeniedGuard';
 import { useAuth } from '@/context/AuthContext';
 import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { isRouteAllowedForRole } from '@/lib/permissions';
-
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
