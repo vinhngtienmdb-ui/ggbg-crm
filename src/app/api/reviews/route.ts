@@ -1,23 +1,19 @@
 import { NextResponse } from 'next/server';
 import { guardApi } from '@/lib/apiGuard';
-import { listKpis, createKpi, updateKpi } from '@/lib/kpisRepo';
-import { KPIItem } from '@/lib/kpiStore';
+import { create360Session } from '@/lib/review360Store';
+import { listReviews, createReview, updateReview } from '@/lib/reviewsRepo';
 
 export const dynamic = 'force-dynamic';
 
-/** GET — danh sách KPI (dual-mode: Supabase hoặc in-memory). */
+/** GET — danh sách phiên đánh giá 360° (dual-mode: Supabase hoặc in-memory). */
 export async function GET(request: Request) {
   const session = await guardApi(request);
   if (session instanceof NextResponse) return session;
-  try {
-    const kpis = await listKpis();
-    return NextResponse.json({ success: true, data: kpis });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+  const reviews = await listReviews();
+  return NextResponse.json({ success: true, data: reviews });
 }
 
-/** POST — tạo mới KPI. Body cần có name (string ≤ 500). */
+/** POST — tạo mới phiên đánh giá 360°. */
 export async function POST(request: Request) {
   const session = await guardApi(request);
   if (session instanceof NextResponse) return session;
@@ -26,24 +22,16 @@ export async function POST(request: Request) {
     if (typeof body !== 'object' || body === null || Array.isArray(body)) {
       return NextResponse.json({ success: false, message: 'Dữ liệu không hợp lệ' }, { status: 400 });
     }
-    if (typeof body.name !== 'string' || body.name.trim().length === 0 || body.name.length > 500) {
-      return NextResponse.json(
-        { success: false, message: 'Thiếu hoặc sai định dạng Tên chỉ tiêu (name).' },
-        { status: 400 }
-      );
-    }
-    const obj: KPIItem = {
-      ...body,
-      id: typeof body.id === 'string' && body.id.trim() ? body.id : `kpi_${Date.now()}`,
-    };
-    const created = await createKpi(obj);
+    // Store dựng shape đầy đủ (mã phiên, khung tiêu chí...) → persist qua repo.
+    const created = create360Session(body);
+    await createReview(created);
     return NextResponse.json({ success: true, data: created });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }
 
-/** PATCH — cập nhật KPI theo id. Body cần có id. */
+/** PATCH — cập nhật một phần phiên đánh giá theo id (đồng bộ DB). */
 export async function PATCH(request: Request) {
   const session = await guardApi(request);
   if (session instanceof NextResponse) return session;
@@ -54,11 +42,11 @@ export async function PATCH(request: Request) {
     }
     const { id, ...patch } = body;
     if (typeof id !== 'string' || !id.trim()) {
-      return NextResponse.json({ success: false, error: 'KPI ID is required' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Thiếu id phiên đánh giá.' }, { status: 400 });
     }
-    const updated = await updateKpi(id, patch);
+    const updated = await updateReview(id, patch);
     if (!updated) {
-      return NextResponse.json({ success: false, message: 'Không tìm thấy KPI.' }, { status: 404 });
+      return NextResponse.json({ success: false, message: 'Không tìm thấy phiên đánh giá.' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: updated });
   } catch (error: any) {

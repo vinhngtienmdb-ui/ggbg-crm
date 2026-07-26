@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DollarSign,
   TrendingUp,
@@ -24,12 +24,36 @@ import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/l
 import { ContractProfitLoss, DebtInvoice } from '@/types/finance';
 
 export default function FinancePage() {
-  const [plStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
+  const [plStatements, setPlStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
   const [activeTab, setActiveTab] = useState<'P_L' | 'DEBT'>('P_L');
   const [toastMessage, setToastMessage] = useState('');
 
-  const summary = getFinancialSummary();
+  const summary = getFinancialSummary(plStatements, debtInvoices);
+
+  // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Nếu lỗi/empty (vd. không đủ quyền DIRECTOR) → giữ INITIAL để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/finance')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && data.data) {
+          if (Array.isArray(data.data.pl_statements) && data.data.pl_statements.length > 0) {
+            setPlStatements(data.data.pl_statements as ContractProfitLoss[]);
+          }
+          if (Array.isArray(data.data.debt_invoices) && data.data.debt_invoices.length > 0) {
+            setDebtInvoices(data.data.debt_invoices as DebtInvoice[]);
+          }
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleSendReminder = async (inv: DebtInvoice, channel: string) => {
     try {

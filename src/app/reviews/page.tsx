@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Users,
   Award,
@@ -38,6 +38,43 @@ export default function Review360Page() {
   const [sessions, setSessions] = useState<Review360Session[]>(() => get360SessionsByPeriod('Quý 3/2026'));
   const [criteriaList, setCriteriaList] = useState<EvaluationCriterion[]>(() => get360Criteria());
   const [searchTerm, setSearchTerm] = useState('');
+  // Dữ liệu từ API (dual-mode: Supabase hoặc in-memory phía server); null = chưa tải.
+  const [remoteSessions, setRemoteSessions] = useState<Review360Session[] | null>(null);
+
+  const scopeByPeriod = (list: Review360Session[], period: string) =>
+    period === 'ALL' ? list : list.filter((s) => s.period_name === period);
+
+  // Đồng bộ từ API khi mount; lỗi/empty → giữ store fallback.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/reviews')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          const remote = data.data as Review360Session[];
+          setRemoteSessions(remote);
+          setSessions(scopeByPeriod(remote, selectedPeriod));
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ store in-memory */
+      });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Đồng bộ DB kiểu fire-and-forget — nuốt lỗi im lặng.
+  const syncReviewToApi = (method: 'POST' | 'PATCH', payload: Record<string, unknown>) => {
+    fetch('/api/reviews', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* im lặng: optimistic update phía client vẫn giữ nguyên */
+    });
+  };
 
   // Modals state
   const [selectedSession, setSelectedSession] = useState<Review360Session | null>(null);
@@ -57,7 +94,7 @@ export default function Review360Page() {
 
   const handlePeriodChange = (period: string) => {
     setSelectedPeriod(period);
-    setSessions(get360SessionsByPeriod(period));
+    setSessions(remoteSessions ? scopeByPeriod(remoteSessions, period) : get360SessionsByPeriod(period));
   };
 
   const filteredSessions = sessions.filter(
@@ -69,11 +106,14 @@ export default function Review360Page() {
 
   const handleCreateSession = (e: React.FormEvent) => {
     e.preventDefault();
-    create360Session({
+    const created = create360Session({
       ...newSessionData,
       status: 'IN_PROGRESS',
     });
-    setSessions(get360SessionsByPeriod(selectedPeriod));
+    const nextRemote = remoteSessions ? [created, ...remoteSessions] : null;
+    if (nextRemote) setRemoteSessions(nextRemote);
+    setSessions(nextRemote ? scopeByPeriod(nextRemote, selectedPeriod) : get360SessionsByPeriod(selectedPeriod));
+    syncReviewToApi('POST', { ...newSessionData, status: 'IN_PROGRESS' });
     setIsNewSessionModalOpen(false);
   };
 

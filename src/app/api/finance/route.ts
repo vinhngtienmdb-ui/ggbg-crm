@@ -1,22 +1,27 @@
 import { NextResponse } from 'next/server';
 import { guardApi } from '@/lib/apiGuard';
-import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
+import { listFinance, updateFinance } from '@/lib/financeRepo';
+import { getFinancialSummary } from '@/lib/financeStore';
+import { DebtInvoice } from '@/types/finance';
 
 export const dynamic = 'force-dynamic';
 
+/** GET — báo cáo tài chính (dual-mode: Supabase hoặc in-memory). Chỉ DIRECTOR. */
 export async function GET(request: Request) {
   const session = await guardApi(request, { roles: ['DIRECTOR'] });
   if (session instanceof NextResponse) return session;
+  const { plStatements, debtInvoices } = await listFinance();
   return NextResponse.json({
     success: true,
     data: {
-      summary: getFinancialSummary(),
-      pl_statements: INITIAL_PL_DATA,
-      debt_invoices: INITIAL_DEBT_INVOICES,
+      summary: getFinancialSummary(plStatements, debtInvoices),
+      pl_statements: plStatements,
+      debt_invoices: debtInvoices,
     },
   });
 }
 
+/** POST — hành động nghiệp vụ (nhắc nợ). Chỉ DIRECTOR. */
 export async function POST(request: Request) {
   const session = await guardApi(request, { roles: ['DIRECTOR'] });
   if (session instanceof NextResponse) return session;
@@ -34,16 +39,21 @@ export async function POST(request: Request) {
     }
 
     if (action === 'SEND_DEBT_REMINDER') {
-      const inv = INITIAL_DEBT_INVOICES.find((i) => i.id === invoice_id);
+      const { debtInvoices } = await listFinance();
+      const inv = debtInvoices.find((i) => i.id === invoice_id);
+      let updatedInv: DebtInvoice | null = inv ?? null;
       if (inv) {
-        inv.reminder_sent_count += 1;
-        inv.last_reminder_at = new Date().toLocaleString('vi-VN');
+        updatedInv =
+          ((await updateFinance(inv.id, {
+            reminder_sent_count: inv.reminder_sent_count + 1,
+            last_reminder_at: new Date().toLocaleString('vi-VN'),
+          })) as DebtInvoice | null) ?? inv;
       }
 
       return NextResponse.json({
         success: true,
-        message: `Đã tự động gửi thông báo nhắc nợ thành công qua kênh [${channel || 'EMAIL_SMTP'}] cho hợp đồng ${inv?.contract_code || ''}!`,
-        data: inv,
+        message: `Đã tự động gửi thông báo nhắc nợ thành công qua kênh [${channel || 'EMAIL_SMTP'}] cho hợp đồng ${updatedInv?.contract_code || ''}!`,
+        data: updatedInv,
       });
     }
 

@@ -138,3 +138,106 @@ export function updateKPI(id: string, updates: Partial<KPIAssignment>): KPIAssig
 export function deleteKPI(id: string): void {
   kpis = kpis.filter(k => k.id !== id);
 }
+
+// ---------------------------------------------------------------------------
+// KPI Items — dữ liệu hiển thị đa cấp độ cho trang /kpis (tách từ inline page).
+// Đây là NGUỒN cho bảng Supabase `kpis` (id, name, owner_name, period,
+// target, actual, level, data). Xem src/lib/kpisRepo.ts.
+// ---------------------------------------------------------------------------
+export type KPILevel = 'COMPANY' | 'DEPARTMENT' | 'TEAM' | 'INDIVIDUAL';
+export type KPICategory = 'REVENUE' | 'NEW_LEADS' | 'CONVERSION_RATE' | 'CSAT' | 'RECRUITMENT';
+export type ReportPeriod = 'MONTH_07_2026' | 'Q3_2026' | 'YEAR_2026';
+
+export interface KPIItem {
+  id: string;
+  name: string;
+  level: KPILevel;
+  level_name: string;
+  target_owner: string;
+  period: ReportPeriod;
+  period_label: string;
+  category: KPICategory;
+  category_label: string;
+  target_value: number;
+  current_value: number;
+  unit: string;
+  achievement_rate: number;
+}
+
+export const INITIAL_KPI_ITEMS: KPIItem[] = [
+  {
+    id: 'kpi_1',
+    name: 'Tổng Doanh Thu Toàn Công Ty Q3/2026',
+    level: 'COMPANY',
+    level_name: '🌐 Toàn Công Ty',
+    target_owner: 'GGBingo Việt Nam JSC',
+    period: 'Q3_2026',
+    period_label: 'Q3/2026',
+    category: 'REVENUE',
+    category_label: '💰 Doanh thu',
+    target_value: 15000000000,
+    current_value: 16500000000,
+    unit: 'VNĐ',
+    achievement_rate: 110,
+  },
+  {
+    id: 'kpi_2',
+    name: 'Chỉ Tiêu Doanh Số Phòng Kinh Doanh Tháng 07/2026',
+    level: 'DEPARTMENT',
+    level_name: '🏢 Phòng Ban',
+    target_owner: 'Phòng Kinh Doanh (Sales Dept)',
+    period: 'MONTH_07_2026',
+    period_label: 'Tháng 07/2026',
+    category: 'REVENUE',
+    category_label: '💰 Doanh thu',
+    target_value: 5000000000,
+    current_value: 4800000000,
+    unit: 'VNĐ',
+    achievement_rate: 96,
+  },
+  {
+    id: 'kpi_3',
+    name: 'Số Lượng Lead Mới Tiếp Nhận Đội TikTok Shop',
+    level: 'TEAM',
+    level_name: '👥 Đội Nhóm',
+    target_owner: 'Đội 3 (TikTok Shop Team)',
+    period: 'MONTH_07_2026',
+    period_label: 'Tháng 07/2026',
+    category: 'NEW_LEADS',
+    category_label: '🎯 Leads mới',
+    target_value: 200,
+    current_value: 140,
+    unit: 'Leads',
+    achievement_rate: 70,
+  },
+  {
+    id: 'kpi_4',
+    name: 'Doanh Số Cá Nhân Trần Văn Hoàng',
+    level: 'INDIVIDUAL',
+    level_name: '👤 Cá Nhân',
+    target_owner: 'Trần Văn Hoàng (Sale Exec)',
+    period: 'MONTH_07_2026',
+    period_label: 'Tháng 07/2026',
+    category: 'REVENUE',
+    category_label: '💰 Doanh thu',
+    target_value: 500000000,
+    current_value: 620000000,
+    unit: 'VNĐ',
+    achievement_rate: 124,
+  },
+  {
+    id: 'kpi_5',
+    name: 'Tỷ Lệ Hài Lòng Khách Hàng CSAT Phòng CSKH',
+    level: 'DEPARTMENT',
+    level_name: '🏢 Phòng Ban',
+    target_owner: 'Phòng CSKH',
+    period: 'MONTH_07_2026',
+    period_label: 'Tháng 07/2026',
+    category: 'CSAT',
+    category_label: '⭐ Điểm CSAT',
+    target_value: 95,
+    current_value: 96,
+    unit: '%',
+    achievement_rate: 101,
+  },
+];
