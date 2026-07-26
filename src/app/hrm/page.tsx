@@ -79,6 +79,8 @@ import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDist
 const EmployeeModal = dynamic(() => import('@/components/hrm/EmployeeModal'), { ssr: false });
 const ContractPdfModal = dynamic(() => import('@/components/hrm/ContractPdfModal'), { ssr: false });
 const OrgChartTree = dynamic(() => import('@/components/hrm/OrgChartTree'), { ssr: false });
+const HrmDashboard = dynamic(() => import('@/components/hrm/HrmDashboard'), { ssr: false });
+const LaborBook = dynamic(() => import('@/components/hrm/LaborBook'), { ssr: false });
 
 interface OnboardingTask {
   id: string;
@@ -172,7 +174,7 @@ export default function HRMPage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('PROFILE');
+  const [activeTab, setActiveTab] = useState<'PROFILE' | 'DASHBOARD' | 'LABOR_BOOK' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('PROFILE');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -687,6 +689,24 @@ export default function HRMPage() {
           }`}
         >
           👤 Hồ Sơ Nhân Sự ({filteredEmployees.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('DASHBOARD')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'DASHBOARD' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          📊 Dashboard Nhân Sự
+        </button>
+
+        <button
+          onClick={() => setActiveTab('LABOR_BOOK')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'LABOR_BOOK' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          📒 Sổ Lao Động ({employees.length})
         </button>
 
         <button
@@ -1526,6 +1546,23 @@ export default function HRMPage() {
       {/* TAB 8: BẢN ĐỒ PHÂN BỔ NHÂN SỰ KINH DOANH VIỆT NAM (GIS HEATMAP) */}
       {activeTab === 'MAP' && (
         <VietnamEmployeeDistributionMap employees={employees} />
+      )}
+
+      {/* TAB: DASHBOARD NHÂN SỰ (Dựng từ sổ quản lý lao động) */}
+      {activeTab === 'DASHBOARD' && (
+        <HrmDashboard employees={employees} />
+      )}
+
+      {/* TAB: SỔ QUẢN LÝ LAO ĐỘNG (Nghị định 145/2020/NĐ-CP) */}
+      {activeTab === 'LABOR_BOOK' && (
+        <LaborBook
+          employees={employees}
+          onSelect={(emp) => {
+            setSelectedEmployee(emp);
+            setEmployeeModalMode('view');
+            setIsEmployeeModalOpen(true);
+          }}
+        />
       )}
 
       {/* MODAL 1: THÊM ỨNG VIÊN MỚI TRONG PHỄU TUYỂN DỤNG */}
