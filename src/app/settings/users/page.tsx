@@ -135,8 +135,8 @@ export default function UserAccountsPage() {
     <div className="space-y-6">
       {/* Toast Notification */}
       {notification && (
-        <div className="fixed top-20 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2 text-xs font-semibold animate-bounce">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="fixed top-20 right-6 z-50 bg-white text-slate-900 px-4 py-3 rounded-xl shadow-xl border border-slate-200 flex items-center gap-2 text-xs font-semibold animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{notification}</span>
         </div>
       )}
@@ -165,22 +165,22 @@ export default function UserAccountsPage() {
       </div>
 
       {/* Super Admin Info Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 rounded-2xl text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-blue-800/40">
+      <div className="gg-hero p-5 rounded-2xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white font-bold text-lg flex items-center justify-center shadow-lg shadow-amber-500/30">
             SA
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-base text-white">Tài Khoản Super Admin Mặc Định</h3>
-              <span className="px-2 py-0.5 bg-amber-500 text-slate-900 rounded text-[10px] font-black uppercase">Active</span>
+              <h3 className="font-bold text-base text-slate-900">Tài Khoản Super Admin Mặc Định</h3>
+              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 rounded text-[10px] font-black uppercase">Active</span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Tài khoản quản trị tối cao của hệ thống • Đã bảo mật thông tin xác thực
             </p>
           </div>
         </div>
-        <div className="text-xs text-slate-400 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+        <div className="text-xs text-blue-700 font-semibold bg-white px-3 py-1.5 rounded-xl border border-blue-100">
           Quyền Hạn: Super Admin (Toàn Quyền Hệ Thống)
         </div>
       </div>
@@ -205,7 +205,7 @@ export default function UserAccountsPage() {
               onClick={() => setStatusFilter(status)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 statusFilter.toUpperCase() === status.toUpperCase()
-                  ? 'bg-slate-900 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -230,7 +230,7 @@ export default function UserAccountsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                 <th className="p-4">Username & Email Access</th>
                 <th className="p-4">Nhân Sự HRM Liên Kết</th>
                 <th className="p-4">Vai Trò System (Role)</th>

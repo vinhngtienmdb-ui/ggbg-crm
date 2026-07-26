@@ -32,7 +32,7 @@ export default function MobileBottomNav({ onToggleMobileSidebar }: MobileBottomN
   });
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#090d16]/95 backdrop-blur-md border-t border-slate-800 px-2 py-1 flex items-center justify-around shadow-2xl">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1 flex items-center justify-around shadow-lg">
       {visibleNavItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;

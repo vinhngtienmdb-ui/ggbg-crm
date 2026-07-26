@@ -683,7 +683,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('PROFILE')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'PROFILE' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           👤 Hồ Sơ Nhân Sự ({filteredEmployees.length})
@@ -715,7 +715,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('CONTRACTS')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'CONTRACTS' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'CONTRACTS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           📄 Quản Lý Hợp Đồng & Lương
@@ -724,7 +724,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('ONBOARDING')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ONBOARDING' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'ONBOARDING' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           📋 Checklist Onboarding ({onboardingList.length})
@@ -733,7 +733,7 @@ export default function HRMPage() {
         <button
           onClick={() => setActiveTab('ORG_CHART')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ORG_CHART' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'ORG_CHART' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           🏛️ Sơ Đồ Tổ Chức
@@ -797,7 +797,7 @@ export default function HRMPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
                   <th className="p-4">Mã NV & Họ Tên</th>
                   <th className="p-4">Phòng Ban & Vị Trí</th>
                   <th className="p-4">Trạng Thái Làm Việc</th>
@@ -808,7 +808,7 @@ export default function HRMPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={emp.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                     <td className="p-4">
                       <p className="font-bold text-slate-900 text-sm">{emp.full_name}</p>
                       <p className="font-mono text-blue-700 text-[11px]">{emp.employee_code}</p>
@@ -869,24 +869,24 @@ export default function HRMPage() {
       {/* TAB 2: QUY TRÌNH PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
       {activeTab === 'APPROVAL_PIPELINE' && (
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 rounded-2xl text-white shadow-md space-y-3">
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-amber-400" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
+          <div className="gg-hero p-6 space-y-3">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-blue-700 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-blue-600" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-amber-300">Bước 1: Quản Lý Trực Tiếp</p>
-                <p className="text-[11px] text-slate-300 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
+              <div className="p-3 bg-white rounded-xl border border-blue-100">
+                <p className="text-xs font-bold text-amber-700">Bước 1: Quản Lý Trực Tiếp</p>
+                <p className="text-[11px] text-slate-500 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
               </div>
 
-              <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-blue-300">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
-                <p className="text-[11px] text-slate-300 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
+              <div className="p-3 bg-white rounded-xl border border-blue-100">
+                <p className="text-xs font-bold text-blue-700">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
+                <p className="text-[11px] text-slate-500 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
               </div>
 
-              <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-emerald-300">Bước 3: HR Onboarding & Ký HĐ</p>
-                <p className="text-[11px] text-slate-300 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
+              <div className="p-3 bg-white rounded-xl border border-blue-100">
+                <p className="text-xs font-bold text-emerald-700">Bước 3: HR Onboarding & Ký HĐ</p>
+                <p className="text-[11px] text-slate-500 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
               </div>
             </div>
           </div>

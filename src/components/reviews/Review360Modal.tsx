@@ -67,21 +67,21 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="bg-blue-50 border-b border-blue-100 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-md">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold">
+              <h2 className="text-base font-bold text-blue-700">
                 Thực Hiện Đánh Giá 360°: {session.employee_name}
               </h2>
-              <p className="text-xs text-slate-300">
-                {session.review_code} • Kỳ đánh giá: <strong className="text-amber-400">{session.period_name}</strong>
+              <p className="text-xs text-slate-500">
+                {session.review_code} • Kỳ đánh giá: <strong className="text-amber-600">{session.period_name}</strong>
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <button onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-blue-100 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -210,10 +210,10 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
           </div>
 
           {/* Live Score Summary Banner */}
-          <div className="bg-slate-900 text-white p-4 rounded-2xl flex items-center justify-between">
+          <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-center justify-between">
             <div>
-              <p className="text-[11px] text-slate-400 font-bold uppercase">Điểm 360° Quy Đổi Thời Gian Thực:</p>
-              <p className="text-2xl font-extrabold text-amber-400">{computeTotalWeightedScore()} / 100 Điểm</p>
+              <p className="text-[11px] text-slate-500 font-bold uppercase">Điểm 360° Quy Đổi Thời Gian Thực:</p>
+              <p className="text-2xl font-extrabold text-blue-700">{computeTotalWeightedScore()} / 100 Điểm</p>
             </div>
 
             <button

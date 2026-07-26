@@ -62,12 +62,12 @@ export default function VoIPCallModal({
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="p-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="p-3.5 bg-white text-slate-900 flex items-center justify-between border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-200">Tổng Đài VoIP WebRTC GGBingo</h3>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700">Tổng Đài VoIP WebRTC GGBingo</h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded text-slate-400 hover:text-white">
+          <button onClick={onClose} className="p-1 rounded text-slate-400 hover:text-slate-600">
             <X className="w-4 h-4" />
           </button>
         </div>
