@@ -1,18 +1,22 @@
 import { NextResponse } from 'next/server';
 import { guardApi } from '@/lib/apiGuard';
-import { INITIAL_STORES } from '@/lib/storeStore';
+import { listStores, createStore } from '@/lib/storesRepo';
+import { EcomStore } from '@/types/store';
 
 export const dynamic = 'force-dynamic';
 
+/** GET — danh sách gian hàng (dual-mode: Supabase hoặc in-memory). */
 export async function GET(request: Request) {
   const session = await guardApi(request);
   if (session instanceof NextResponse) return session;
+  const stores = await listStores();
   return NextResponse.json({
     success: true,
-    data: INITIAL_STORES,
+    data: stores,
   });
 }
 
+/** POST — kết nối gian hàng mới. */
 export async function POST(request: Request) {
   const session = await guardApi(request);
   if (session instanceof NextResponse) return session;
@@ -28,7 +32,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const newStore = {
+    const newStore: EcomStore = {
       id: `store_${Date.now()}`,
       store_code: `SHOP-NEW-${Math.floor(1000 + Math.random() * 9000)}`,
       store_name: store_name || 'Gian Hàng Mới',
@@ -38,7 +42,7 @@ export async function POST(request: Request) {
       store_url: `https://shopee.vn/store_${Date.now()}`,
       monthly_gmv_actual: 0,
       monthly_gmv_target: Number(monthly_gmv_target) || 300000000,
-      health_rating: 'GOOD' as const,
+      health_rating: 'GOOD',
       cancellation_rate_percent: 0,
       late_shipment_rate_percent: 0,
       rating_score: 5.0,
@@ -46,12 +50,12 @@ export async function POST(request: Request) {
       connected_at: new Date().toISOString().substring(0, 10),
     };
 
-    INITIAL_STORES.unshift(newStore);
+    const created = await createStore(newStore);
 
     return NextResponse.json({
       success: true,
-      message: `Đã kết nối thành công Gian hàng ${newStore.store_name}!`,
-      data: newStore,
+      message: `Đã kết nối thành công Gian hàng ${created.store_name}!`,
+      data: created,
     });
   } catch {
     return NextResponse.json({ success: false, message: 'Lỗi API Gian Hàng' }, { status: 500 });

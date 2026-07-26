@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   Search,
@@ -18,9 +18,28 @@ import { INITIAL_AUDIT_LOGS } from '@/lib/auditStore';
 import { AuditLogEntry } from '@/types/audit';
 
 export default function AuditTrailPage() {
-  const [logs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOGS);
+  const [logs, setLogs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOGS);
   const [selectedSeverity, setSelectedSeverity] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Đồng bộ từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Lỗi/empty → giữ INITIAL_AUDIT_LOGS để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/audit')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          setLogs(data.data as AuditLogEntry[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL_AUDIT_LOGS */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredLogs = logs.filter((log) => {
     if (selectedSeverity !== 'ALL' && log.severity !== selectedSeverity) return false;

@@ -50,10 +50,47 @@ export default function PerformancePage() {
   const [selectedScorecard, setSelectedScorecard] = useState<PerformanceScorecard | null>(null);
   const [isFormulaModalOpen, setIsFormulaModalOpen] = useState(false);
   const [autoRunToast, setAutoRunToast] = useState<string | null>(null);
+  // Dữ liệu từ API (dual-mode: Supabase hoặc in-memory phía server); null = chưa tải.
+  const [remoteCards, setRemoteCards] = useState<PerformanceScorecard[] | null>(null);
 
+  // Đồng bộ từ API khi mount; lỗi/empty → giữ store fallback.
   useEffect(() => {
-    setScorecards(getScorecardsByPeriod(selectedPeriod));
-  }, [selectedPeriod]);
+    let active = true;
+    fetch('/api/performance')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          setRemoteCards(data.data as PerformanceScorecard[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ store in-memory */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Lọc theo kỳ: ưu tiên dữ liệu API, fallback về store (kèm sinh bảng tạm tính).
+  useEffect(() => {
+    if (remoteCards) {
+      const scoped = selectedPeriod === 'ALL' ? remoteCards : remoteCards.filter((s) => s.period === selectedPeriod);
+      setScorecards(scoped.length > 0 ? scoped : getScorecardsByPeriod(selectedPeriod));
+    } else {
+      setScorecards(getScorecardsByPeriod(selectedPeriod));
+    }
+  }, [selectedPeriod, remoteCards]);
+
+  // Đồng bộ DB kiểu fire-and-forget — nuốt lỗi im lặng.
+  const syncPerformanceToApi = (method: 'POST' | 'PUT', payload: Record<string, unknown>, query = '') => {
+    fetch(`/api/performance${query}`, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* im lặng: optimistic update phía client vẫn giữ nguyên */
+    });
+  };
 
   const filteredScorecards = scorecards.filter((sc) => {
     const matchesGrade = selectedGrade === 'ALL' || sc.rating_grade === selectedGrade;
@@ -68,11 +105,15 @@ export default function PerformancePage() {
 
   const handleSaveScorecard = (scData: Partial<PerformanceScorecard>) => {
     if (scorecardModalMode === 'create') {
-      createScorecard({ ...scData, period: selectedPeriod } as any);
+      const created = createScorecard({ ...scData, period: selectedPeriod } as any);
       setScorecards(getScorecardsByPeriod(selectedPeriod));
+      syncPerformanceToApi('POST', { ...scData, period: selectedPeriod } as Record<string, unknown>);
+      setRemoteCards((prev) => (prev ? [created, ...prev] : prev));
     } else if (selectedScorecard) {
-      updateScorecard(selectedScorecard.id, scData);
+      const updated = updateScorecard(selectedScorecard.id, scData);
       setScorecards(getScorecardsByPeriod(selectedPeriod));
+      syncPerformanceToApi('PUT', { id: selectedScorecard.id, ...scData });
+      setRemoteCards((prev) => (prev ? prev.map((s) => (s.id === selectedScorecard.id ? updated : s)) : prev));
     }
   };
 
@@ -84,7 +125,10 @@ export default function PerformancePage() {
 
   const handleRunAutoBatch = () => {
     const updated = runAutomatedBatchEvaluation(selectedPeriod);
-    setScorecards([...updated.filter(s => s.period === selectedPeriod)]);
+    const scoped = updated.filter((s) => s.period === selectedPeriod);
+    setScorecards([...scoped]);
+    setRemoteCards(updated);
+    syncPerformanceToApi('POST', { period: selectedPeriod }, '?action=batch_auto_score');
     setAutoRunToast(`Đã tự động chấm điểm & khóa bảng điểm ${selectedPeriod} gửi HR!`);
     setTimeout(() => setAutoRunToast(null), 4000);
   };

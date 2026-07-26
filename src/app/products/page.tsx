@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Package,
   Plus,
@@ -42,6 +42,36 @@ export default function ProductsPage() {
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   const [targetSchemaProductId, setTargetSchemaProductId] = useState<string>('');
 
+  // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Nếu lỗi/empty → giữ INITIAL_PRODUCTS để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/products')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          setProducts(data.data as ProductPackage[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL_PRODUCTS */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Đồng bộ DB kiểu fire-and-forget — KHÔNG chặn optimistic update, nuốt lỗi im lặng.
+  const syncProductToApi = (method: 'POST' | 'PATCH', payload: Record<string, unknown>) => {
+    fetch('/api/products', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* im lặng: optimistic update phía client vẫn giữ nguyên */
+    });
+  };
+
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,22 +86,26 @@ export default function ProductsPage() {
 
   const handleSavePackage = (pkgData: Partial<ProductPackage>) => {
     if (packageModalMode === 'create') {
-      createProduct(pkgData as any);
+      const created = createProduct(pkgData as any);
       setProducts(getProducts());
+      syncProductToApi('POST', created as unknown as Record<string, unknown>);
     } else if (selectedPackage) {
       updateProduct(selectedPackage.id, pkgData);
       setProducts(getProducts());
+      syncProductToApi('PATCH', { id: selectedPackage.id, ...pkgData });
     }
   };
 
   const handleSaveAttributesFromSchemaBuilder = (productId: string, updatedAttributes: Record<string, any>) => {
     updateProduct(productId, { attributes: updatedAttributes });
     setProducts(getProducts());
+    syncProductToApi('PATCH', { id: productId, attributes: updatedAttributes });
   };
 
   const handleToggleActive = (pkg: ProductPackage) => {
     updateProduct(pkg.id, { is_active: !pkg.is_active });
     setProducts(getProducts());
+    syncProductToApi('PATCH', { id: pkg.id, is_active: !pkg.is_active });
   };
 
   const handleDeletePackage = (id: string) => {

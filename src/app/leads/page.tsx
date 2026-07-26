@@ -42,6 +42,8 @@ import {
 } from 'lucide-react';
 import { Lead, VoIPCallLog, LeadSource, Customer, CustomerEntityType } from '@/types';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
+import { INITIAL_LEADS, autoAssignLeads } from '@/lib/leadStore';
+import { computeLeadScore, scoreColor, isLeadAssigned, LeadTier } from '@/lib/leadScoring';
 import dynamic from 'next/dynamic';
 
 const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
@@ -121,48 +123,7 @@ const INITIAL_CUSTOMERS_LIST: Customer[] = [
   },
 ];
 
-const initialLeads: Lead[] = [
-  {
-    id: 'l1',
-    lead_code: 'LD-1029',
-    full_name: 'Phạm Hồng Thái',
-    entity_type: 'ENTERPRISE',
-    phone: '0977 123 888',
-    email: 'thai.pham@sneakerx.vn',
-    company_name: 'Shop Giày Sneaker X',
-    tax_code: '0109283711',
-    shop_link: 'shopee.vn/sneakerx',
-    source_name: 'Facebook Ads',
-    pipeline_id: 'AGENCY',
-    stage_id: 'stage_1',
-    stage_name: '1. Tiếp Nhận Mới',
-    assigned_sale_name: 'Trần Văn Hoàng (Đội 1)',
-    estimated_budget: 150000000,
-    lead_score: 88,
-    status: 'New',
-    created_at: '2026-07-23 08:30',
-  },
-  {
-    id: 'l2',
-    lead_code: 'LD-1030',
-    full_name: 'Vũ Thị Minh',
-    entity_type: 'INDIVIDUAL',
-    phone: '0912 345 678',
-    email: 'minh.vu@miumiusale.com',
-    company_name: 'Thời Trang Nữ Miu Miu',
-    id_card_number: '001198002345',
-    shop_link: 'tiktok.com/@miumiusale',
-    source_name: 'Google Ads',
-    pipeline_id: 'AGENCY',
-    stage_id: 'stage_2',
-    stage_name: '2. Liên Hệ Ban Đầu',
-    assigned_sale_name: 'Lê Thị Mai (Đội 3)',
-    estimated_budget: 200000000,
-    lead_score: 92,
-    status: 'Contacted',
-    created_at: '2026-07-23 09:00',
-  },
-];
+const initialLeads: Lead[] = INITIAL_LEADS;
 
 const INITIAL_LOGS: LeadStageLog[] = [
   {
@@ -200,6 +161,36 @@ export default function LeadsPage() {
   const [stageLogs, setStageLogs] = useState<LeadStageLog[]>(INITIAL_LOGS);
   const [existingCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS_LIST);
 
+  // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Nếu lỗi/empty → giữ INITIAL_LEADS để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/leads')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.leads) && data.leads.length > 0) {
+          setLeads(data.leads as Lead[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL_LEADS */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Đồng bộ DB kiểu fire-and-forget — KHÔNG chặn optimistic update, nuốt lỗi im lặng.
+  const syncLeadToApi = (method: 'POST' | 'PATCH', payload: Record<string, unknown>) => {
+    fetch('/api/leads', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* im lặng: optimistic update phía client vẫn giữ nguyên */
+    });
+  };
+
   // VIEW MODE TOGGLE (KANBAN VS LIST VIEW)
   const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
@@ -212,6 +203,10 @@ export default function LeadsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState<string>('ALL');
   const [selectedRepFilter, setSelectedRepFilter] = useState<string>('ALL');
+
+  // LEAD SCORING: bộ lọc phân hạng (tier) + sắp xếp theo điểm
+  const [selectedTierFilter, setSelectedTierFilter] = useState<'ALL' | LeadTier>('ALL');
+  const [sortByScore, setSortByScore] = useState(false);
 
   // Modals & Toasts
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -279,6 +274,7 @@ export default function LeadsPage() {
   const filteredLeads = leads.filter((l) => {
     if (selectedSourceFilter !== 'ALL' && l.source_name !== selectedSourceFilter) return false;
     if (selectedRepFilter !== 'ALL' && l.assigned_sale_name !== selectedRepFilter) return false;
+    if (selectedTierFilter !== 'ALL' && computeLeadScore(l).tier !== selectedTierFilter) return false;
 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
@@ -291,6 +287,46 @@ export default function LeadsPage() {
     }
     return true;
   });
+
+  // Sắp xếp theo điểm (giảm dần) khi bật — dùng bản sao để không đổi thứ tự gốc.
+  const displayedLeads = sortByScore
+    ? [...filteredLeads].sort((a, b) => computeLeadScore(b).score - computeLeadScore(a).score)
+    : filteredLeads;
+
+  // Số Lead chưa có người phụ trách (dùng cho nút phân bổ)
+  const unassignedCount = leads.filter((l) => !isLeadAssigned(l)).length;
+
+  // TỰ ĐỘNG PHÂN BỔ: gán mọi Lead chưa có owner cho danh sách sale (round-robin)
+  const handleAutoAssignLeads = () => {
+    const { leads: nextLeads, assignedCount, assignments } = autoAssignLeads(leads, SALES_REPS);
+    if (assignedCount === 0) {
+      setSuccessToast('✅ Tất cả Lead đều đã có người phụ trách — không có Lead nào cần phân bổ.');
+      setTimeout(() => setSuccessToast(''), 4000);
+      return;
+    }
+    setLeads(nextLeads);
+    // Sync từng Lead đã được gán về API (nếu server hỗ trợ)
+    assignments.forEach((a) => syncLeadToApi('PATCH', { id: a.id, assigned_sale_name: a.assignee }));
+
+    // Ghi nhật ký cho các Lead vừa phân bổ
+    const assignedIds = new Set(assignments.map((a) => a.id));
+    const newLogs: LeadStageLog[] = nextLeads
+      .filter((l) => assignedIds.has(l.id))
+      .map((l) => ({
+        id: `log_assign_${l.id}_${Date.now()}`,
+        lead_code: l.lead_code,
+        lead_name: l.full_name,
+        from_stage: 'Chưa phân bổ',
+        to_stage: l.stage_name,
+        actor_name: 'Super Admin (Tự động phân bổ)',
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        note: `Tự động phân bổ (round-robin) cho ${l.assigned_sale_name}`,
+      }));
+    setStageLogs((prev) => [...newLogs, ...prev]);
+
+    setSuccessToast(`⚡ Đã tự động phân bổ ${assignedCount} Lead chưa gán cho ${SALES_REPS.length} sale theo round-robin!`);
+    setTimeout(() => setSuccessToast(''), 5000);
+  };
 
   // Filter logs for specific lead or all
   const filteredStageLogs = stageLogs.filter((log) => {
@@ -354,6 +390,12 @@ export default function LeadsPage() {
     };
 
     setStageLogs((prev) => [newLog, ...prev]);
+    syncLeadToApi('PATCH', {
+      id: leadId,
+      stage_id: targetStage.id,
+      stage_name: targetStage.name,
+      status: targetStageId === 'stage_6' ? 'Converted' : targetStageId === 'stage_7' ? 'Lost' : 'Contacted',
+    });
     setSuccessToast(`Đã chuyển Lead [${currentLead.lead_code}] ${currentLead.full_name} sang [${toStageName}] và ghi nhận nhật ký!`);
     setTimeout(() => setSuccessToast(''), 4000);
   };
@@ -410,6 +452,7 @@ export default function LeadsPage() {
     };
 
     setLeads([newLead, ...leads]);
+    syncLeadToApi('POST', newLead as unknown as Record<string, unknown>);
 
     const createLog: LeadStageLog = {
       id: `log_${Date.now()}`,
@@ -441,6 +484,7 @@ export default function LeadsPage() {
   // HANDLE BULK IMPORT SUCCESS
   const handleBulkImportSuccess = (newImportedLeads: Lead[]) => {
     setLeads((prev) => [...newImportedLeads, ...prev]);
+    newImportedLeads.forEach((l) => syncLeadToApi('POST', l as unknown as Record<string, unknown>));
 
     // Create stage logs
     const newLogs: LeadStageLog[] = newImportedLeads.map((l) => ({
@@ -480,6 +524,7 @@ export default function LeadsPage() {
       if (data.success && data.data) {
         const newLead = data.data as Lead;
         setLeads((prev) => [newLead, ...prev]);
+        syncLeadToApi('POST', newLead as unknown as Record<string, unknown>);
         setSuccessToast(`⚡ Đã tiếp nhận Lead Webhook mới: ${newLead.full_name} (${newLead.lead_code}) từ Landing Page!`);
         setTimeout(() => setSuccessToast(''), 5000);
       }
@@ -565,6 +610,15 @@ export default function LeadsPage() {
           </button>
 
           <button
+            onClick={handleAutoAssignLeads}
+            title="Gán tất cả Lead chưa có người phụ trách cho danh sách sale theo round-robin"
+            className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-xl text-xs font-bold flex items-center gap-2 border border-indigo-200 transition-colors"
+          >
+            <Zap className="w-4 h-4 text-indigo-600" />
+            <span>Tự Động Phân Bổ Lead Chưa Gán{unassignedCount > 0 ? ` (${unassignedCount})` : ''}</span>
+          </button>
+
+          <button
             onClick={() => setIsAddModalOpen(true)}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all active:scale-95"
           >
@@ -629,6 +683,30 @@ export default function LeadsPage() {
             <option value="Bulk Import Excel">Bulk Import Excel</option>
             <option value="Universal Webhook">Universal Webhook API</option>
           </select>
+
+          <select
+            value={selectedTierFilter}
+            onChange={(e) => setSelectedTierFilter(e.target.value as 'ALL' | LeadTier)}
+            className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700"
+          >
+            <option value="ALL">Tất cả Phân Hạng</option>
+            <option value="HOT">🔥 HOT (≥70)</option>
+            <option value="WARM">🌤️ WARM (40-69)</option>
+            <option value="COLD">❄️ COLD (&lt;40)</option>
+          </select>
+
+          <button
+            onClick={() => setSortByScore((v) => !v)}
+            title="Sắp xếp Lead theo điểm số giảm dần"
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 border transition-colors ${
+              sortByScore
+                ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+            }`}
+          >
+            <Flame className={`w-4 h-4 ${sortByScore ? 'text-white' : 'text-orange-500'}`} />
+            <span>Sắp Xếp Theo Điểm</span>
+          </button>
         </div>
       </div>
 
@@ -636,7 +714,7 @@ export default function LeadsPage() {
       {viewMode === 'KANBAN' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 overflow-x-auto pb-4 touch-scroll sleek-scrollbar">
           {SEVEN_STAGES.map((col) => {
-            const stageLeads = filteredLeads.filter((l) => l.stage_id === col.id);
+            const stageLeads = displayedLeads.filter((l) => l.stage_id === col.id);
 
             return (
               <div
@@ -661,7 +739,10 @@ export default function LeadsPage() {
                       Kéo Lead vào đây
                     </div>
                   ) : (
-                    stageLeads.map((lead) => (
+                    stageLeads.map((lead) => {
+                      const sc = computeLeadScore(lead);
+                      const tc = scoreColor(sc.tier);
+                      return (
                       <div
                         key={lead.id}
                         draggable
@@ -672,11 +753,20 @@ export default function LeadsPage() {
                           <span className="text-[10px] font-mono font-bold text-blue-600 px-1.5 py-0.5 bg-blue-50 rounded">
                             {lead.lead_code}
                           </span>
-                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                            lead.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
-                          }`}>
-                            {lead.entity_type === 'ENTERPRISE' ? '🏢 DN' : '👤 CN'}
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <span
+                              className={`text-[9px] font-black px-1.5 py-0.5 rounded border inline-flex items-center gap-0.5 ${tc.badge}`}
+                              title={sc.reasons.join('\n')}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${tc.dot}`}></span>
+                              {tc.label}
+                            </span>
+                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                              lead.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                            }`}>
+                              {lead.entity_type === 'ENTERPRISE' ? '🏢 DN' : '👤 CN'}
+                            </span>
+                          </div>
                         </div>
 
                         <div>
@@ -684,12 +774,21 @@ export default function LeadsPage() {
                           <p className="text-[11px] text-slate-500 truncate">{lead.company_name}</p>
                         </div>
 
-                        <div className="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-[10px]">
+                        <div
+                          className="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-[10px] cursor-help"
+                          title={sc.reasons.join('\n')}
+                        >
                           <span className="text-slate-500 font-semibold flex items-center gap-1">
-                            <Flame className="w-3 h-3 text-orange-500 fill-orange-500" /> Score:
+                            <Flame className={`w-3 h-3 ${tc.text} fill-current`} /> Điểm:
                           </span>
-                          <span className="font-black font-mono text-emerald-600">{lead.lead_score}/100</span>
+                          <span className={`font-black font-mono ${tc.text}`}>{sc.score}/100</span>
                         </div>
+
+                        {!isLeadAssigned(lead) && (
+                          <div className="text-[9px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 inline-flex items-center gap-1">
+                            <AlertTriangle className="w-2.5 h-2.5" /> Chưa gán
+                          </div>
+                        )}
 
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
                           <button
@@ -708,7 +807,8 @@ export default function LeadsPage() {
                           </button>
                         </div>
                       </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -729,20 +829,24 @@ export default function LeadsPage() {
                   <th className="p-4">Doanh Nghiệp / MST</th>
                   <th className="p-4">Số Điện Thoại</th>
                   <th className="p-4">Nguồn Lead</th>
+                  <th className="p-4">Điểm & Phân Hạng</th>
                   <th className="p-4">Giai Đoạn Phễu</th>
                   <th className="p-4 text-center">Nhật Ký Log Lead</th>
                   <th className="p-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredLeads.length === 0 ? (
+                {displayedLeads.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-slate-400 italic">
+                    <td colSpan={9} className="p-8 text-center text-slate-400 italic">
                       Không tìm thấy lead phù hợp.
                     </td>
                   </tr>
                 ) : (
-                  filteredLeads.map((lead) => (
+                  displayedLeads.map((lead) => {
+                    const sc = computeLeadScore(lead);
+                    const tc = scoreColor(sc.tier);
+                    return (
                     <tr key={lead.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="p-4">
                         <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
@@ -807,7 +911,8 @@ export default function LeadsPage() {
                         </button>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { canViewPII } from '@/lib/pii';
@@ -42,9 +42,13 @@ import {
   ShoppingBag,
   Coins,
   Calendar,
-  Tag
+  Tag,
+  Clock,
+  MessageSquare,
+  Users2
 } from 'lucide-react';
-import { Customer, CustomerEntityType, CustomerType, CustomerTier, KycDocument, LifecycleStage } from '@/types';
+import { CustomerEntityType, CustomerType, CustomerTier, KycDocument, LifecycleStage } from '@/types';
+import { ExtendedCustomer, INITIAL_CUSTOMERS, CustomerActivity } from '@/lib/customerStore';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 
 function maskIdentification(val?: string, showFull: boolean = false): string {
@@ -58,128 +62,11 @@ function maskIdentification(val?: string, showFull: boolean = false): string {
   return `${start}${stars}${end}`;
 }
 
-interface ExtendedCustomer extends Customer {
-  bank_account?: string;
-  bank_name?: string;
-  credit_limit?: number;
-  notes?: string;
-}
-
 export interface UploadRow {
   id: string;
   category: string;
   fileName: string;
 }
-
-const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
-  {
-    id: 'c1',
-    customer_code: 'KH-8801',
-    name: 'Phạm Văn Nam',
-    entity_type: 'ENTERPRISE',
-    company_name: 'Công ty TNHH Mỹ Phẩm SunBeauty',
-    tax_code: '0108928374',
-    representative_name: 'Phạm Văn Nam',
-    phone: '0988 123 456',
-    email: 'nam.pham@sunbeauty.vn',
-    address: 'Số 18 Nguyễn Chánh, Quận Cầu Giấy, Hà Nội',
-    customer_type: 'B2B_Agency_Service',
-    tier: 'VIP',
-    lifecycle_stage: 'VIP',
-    health_score: 95,
-    ltv_total_spent: 3850000000,
-    ecom_platforms: ['Shopee', 'TikTokShop', 'Lazada'],
-    avg_monthly_gmv: 1200000000,
-    owner_name: 'Trần Văn Hoàng (Sale Exec)',
-    ops_manager_name: 'Đỗ Thị Quyên (Ops Leader)',
-    contract_r2_file: 'HDLD_KH8801.pdf',
-    kyc_status: 'VERIFIED',
-    kyc_documents: [
-      {
-        doc_id: 'doc_1',
-        doc_type: 'GPKD',
-        doc_name: 'Giay_Phep_Kinh_Doanh_SunBeauty.pdf',
-        file_r2_path: 'storage.ggbingo.vn/kyc/gpkd_8801.pdf',
-        uploaded_at: '2026-01-16 10:00',
-        status: 'VALID',
-      },
-    ],
-    bank_account: '1903888999001',
-    bank_name: 'Techcombank - CN Cầu Giấy',
-    credit_limit: 500000000,
-    notes: 'Khách hàng VIP agency ưu tiên hỗ trợ 24/7',
-    tags: ['Doanh số cao', 'Hợp đồng 2 năm'],
-    created_at: '2026-01-15',
-  },
-  {
-    id: 'c2',
-    customer_code: 'KH-8802',
-    name: 'Nguyễn Thị Hoa',
-    entity_type: 'INDIVIDUAL',
-    company_name: 'Hộ Kinh Doanh Thời Trang MiuStore',
-    id_card_number: '001198002345',
-    id_card_issue_date: '2021-05-10',
-    id_card_issue_place: 'Cục Cảnh Sát QLHC về Trật Tự Xã Hội',
-    phone: '0912 345 678',
-    email: 'hoa.miustore@gmail.com',
-    address: 'Đường Lê Lai, Quận 1, TP. Hồ Chí Minh',
-    customer_type: 'GGBingoVN_Merchant',
-    tier: 'Gold',
-    lifecycle_stage: 'Regular',
-    health_score: 82,
-    ltv_total_spent: 1250000000,
-    ecom_platforms: ['TikTokShop', 'GGBingoVN'],
-    avg_monthly_gmv: 450000000,
-    owner_name: 'Nguyễn Quốc Tuấn (Sale Senior)',
-    ops_manager_name: 'Phạm Minh Đức (Ops Specialist)',
-    contract_r2_file: 'HDLD_KH8802.pdf',
-    kyc_status: 'VERIFIED',
-    kyc_documents: [
-      {
-        doc_id: 'doc_2',
-        doc_type: 'CCCD_FRONT',
-        doc_name: 'CCCD_Mat_Truoc_NguyenThiHoa.jpg',
-        file_r2_path: 'storage.ggbingo.vn/kyc/cccd_front_8802.jpg',
-        uploaded_at: '2026-02-11 14:20',
-        status: 'VALID',
-      },
-    ],
-    bank_account: '0071000988776',
-    bank_name: 'Vietcombank - CN Sài Gòn',
-    credit_limit: 200000000,
-    notes: 'Gian hàng hot trên GGBingoVN Platform',
-    tags: ['GGBingoVN Merchant'],
-    created_at: '2026-02-10',
-  },
-  {
-    id: 'c3',
-    customer_code: 'KH-8803',
-    name: 'Lê Hoàng Anh',
-    entity_type: 'ENTERPRISE',
-    company_name: 'Công ty CP Gia Dụng SmartHome',
-    tax_code: '0314928172',
-    representative_name: 'Lê Hoàng Anh',
-    phone: '0977 888 999',
-    email: 'hoanganh@smarthome.vn',
-    address: 'Quận Hai Bà Trưng, Hà Nội',
-    customer_type: 'B2B_Agency_Service',
-    tier: 'Silver',
-    lifecycle_stage: 'At-Risk',
-    health_score: 38,
-    ltv_total_spent: 680000000,
-    ecom_platforms: ['Shopee', 'Amazon'],
-    avg_monthly_gmv: 280000000,
-    owner_name: 'Lê Thị Mai (Sale Exec)',
-    ops_manager_name: 'Nguyễn Văn Bình (Ops Specialist)',
-    contract_r2_file: 'HDLD_KH8803.pdf',
-    kyc_status: 'PENDING',
-    bank_account: '112000888999',
-    bank_name: 'VietinBank - CN Hai Bà Trưng',
-    credit_limit: 150000000,
-    tags: ['Nguy cơ rời bỏ', 'Giảm GMV tháng trước'],
-    created_at: '2026-03-01',
-  },
-];
 
 export default function CustomersPage() {
   const router = useRouter();
@@ -189,6 +76,36 @@ export default function CustomersPage() {
   const [selectedEntityFilter, setSelectedEntityFilter] = useState<string>('ALL');
   const [showMaskedData, setShowMaskedData] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Nếu lỗi/empty → giữ INITIAL_CUSTOMERS để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/customers')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.customers) && data.customers.length > 0) {
+          setCustomers(data.customers as ExtendedCustomer[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL_CUSTOMERS */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Đồng bộ DB kiểu fire-and-forget — KHÔNG chặn optimistic update, nuốt lỗi im lặng.
+  const syncCustomerToApi = (method: 'POST' | 'PATCH', payload: Record<string, unknown>) => {
+    fetch('/api/customers', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* im lặng: optimistic update phía client vẫn giữ nguyên */
+    });
+  };
 
   // Chỉ vai trò được phép mới có thể gỡ mask PII (CCCD/MST/SĐT/tài khoản NH)
   const { user, simulatedRole } = useAuth();
@@ -205,6 +122,65 @@ export default function CustomersPage() {
   // VIEW DETAIL MODAL STATE (NÚT XEM CHI TIẾT)
   const [isViewDetailModalOpen, setIsViewDetailModalOpen] = useState(false);
   const [selectedViewCustomer, setSelectedViewCustomer] = useState<ExtendedCustomer | null>(null);
+
+  // ACTIVITY TIMELINE — Ô THÊM TƯƠNG TÁC NHANH TRONG VIEW CHI TIẾT
+  const [newActivityType, setNewActivityType] = useState<CustomerActivity['type']>('NOTE');
+  const [newActivityContent, setNewActivityContent] = useState('');
+
+  const handleAddActivity = () => {
+    if (!selectedViewCustomer) return;
+    const content = newActivityContent.trim();
+    if (!content) {
+      setToastMessage('⚠️ Vui lòng nhập nội dung tương tác trước khi lưu!');
+      setTimeout(() => setToastMessage(''), 4000);
+      return;
+    }
+
+    const newActivity: CustomerActivity = {
+      id: `act_${Date.now()}`,
+      type: newActivityType,
+      title: content,
+      actor: user?.name || user?.email || 'Người dùng CRM',
+      timestamp: new Date().toISOString(),
+    };
+
+    const updatedActivities = [...(selectedViewCustomer.activities || []), newActivity];
+    const updatedCustomer: ExtendedCustomer = { ...selectedViewCustomer, activities: updatedActivities };
+
+    setCustomers((prev) => prev.map((c) => (c.id === updatedCustomer.id ? updatedCustomer : c)));
+    setSelectedViewCustomer(updatedCustomer);
+    syncCustomerToApi('PATCH', { id: updatedCustomer.id, activities: updatedActivities });
+
+    setNewActivityContent('');
+    setNewActivityType('NOTE');
+    setToastMessage('✅ Đã ghi nhận tương tác mới vào dòng thời gian khách hàng!');
+    setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  // Cấu hình icon + màu sắc theo loại tương tác (dùng cho chấm & nhãn timeline)
+  const ACTIVITY_META: Record<
+    CustomerActivity['type'],
+    { label: string; Icon: React.ComponentType<{ className?: string }>; dot: string; iconBg: string; iconText: string }
+  > = {
+    CALL: { label: 'Cuộc gọi', Icon: PhoneCall, dot: 'bg-emerald-500', iconBg: 'bg-emerald-50 border-emerald-200', iconText: 'text-emerald-600' },
+    EMAIL: { label: 'Email', Icon: Mail, dot: 'bg-blue-500', iconBg: 'bg-blue-50 border-blue-200', iconText: 'text-blue-600' },
+    MEETING: { label: 'Cuộc họp', Icon: Users2, dot: 'bg-violet-500', iconBg: 'bg-violet-50 border-violet-200', iconText: 'text-violet-600' },
+    NOTE: { label: 'Ghi chú', Icon: MessageSquare, dot: 'bg-slate-400', iconBg: 'bg-slate-100 border-slate-200', iconText: 'text-slate-600' },
+    CONTRACT: { label: 'Hợp đồng', Icon: FileCheck, dot: 'bg-amber-500', iconBg: 'bg-amber-50 border-amber-200', iconText: 'text-amber-600' },
+    STAGE: { label: 'Vòng đời', Icon: Target, dot: 'bg-cyan-500', iconBg: 'bg-cyan-50 border-cyan-200', iconText: 'text-cyan-600' },
+  };
+
+  const formatActivityTime = (ts: string) => {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts;
+    return d.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   // EDIT CUSTOMER MODAL STATE (NÚT SỬA ĐÃ ĐƯỢC FIX CỰC KỲ ỔN ĐỊNH)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -380,6 +356,7 @@ export default function CustomersPage() {
     };
 
     setCustomers((prev) => [newCust, ...prev]);
+    syncCustomerToApi('POST', newCust as unknown as Record<string, unknown>);
     setIsCreateModalOpen(false);
     setToastMessage(`🎉 Đã tạo thành công khách hàng mới [${newCust.customer_code}] ${newCust.name}!`);
     setTimeout(() => setToastMessage(''), 4000);
@@ -463,29 +440,31 @@ export default function CustomersPage() {
     e.preventDefault();
     if (!editForm.id) return;
 
+    const editPatch = {
+      entity_type: editForm.entity_type,
+      name: editForm.name.trim(),
+      company_name: editForm.company_name.trim(),
+      tax_code: editForm.tax_code.trim(),
+      id_card_number: editForm.id_card_number.trim(),
+      id_card_issue_date: editForm.id_card_issue_date.trim(),
+      phone: editForm.phone.trim(),
+      email: editForm.email.trim(),
+      address: editForm.address.trim(),
+      bank_account: editForm.bank_account.trim(),
+      bank_name: editForm.bank_name.trim(),
+      credit_limit: Number(editForm.credit_limit) || 0,
+      notes: editForm.notes.trim(),
+    };
+
     setCustomers((prev) =>
       prev.map((c) => {
         if (c.id === editForm.id) {
-          return {
-            ...c,
-            entity_type: editForm.entity_type,
-            name: editForm.name.trim(),
-            company_name: editForm.company_name.trim(),
-            tax_code: editForm.tax_code.trim(),
-            id_card_number: editForm.id_card_number.trim(),
-            id_card_issue_date: editForm.id_card_issue_date.trim(),
-            phone: editForm.phone.trim(),
-            email: editForm.email.trim(),
-            address: editForm.address.trim(),
-            bank_account: editForm.bank_account.trim(),
-            bank_name: editForm.bank_name.trim(),
-            credit_limit: Number(editForm.credit_limit) || 0,
-            notes: editForm.notes.trim(),
-          };
+          return { ...c, ...editPatch };
         }
         return c;
       })
     );
+    syncCustomerToApi('PATCH', { id: editForm.id, ...editPatch });
 
     setIsEditModalOpen(false);
     setToastMessage(`Đã cập nhật thành công hồ sơ khách hàng [${editForm.customer_code}] ${editForm.name}!`);
@@ -542,6 +521,11 @@ export default function CustomersPage() {
     };
 
     setCustomers((prev) => prev.map((c) => (c.id === selectedCustomer.id ? updatedCustomer : c)));
+    syncCustomerToApi('PATCH', {
+      id: updatedCustomer.id,
+      kyc_status: updatedCustomer.kyc_status,
+      kyc_documents: updatedCustomer.kyc_documents,
+    });
     setSelectedCustomer(updatedCustomer);
     setUploadRows([{ id: `row_${Date.now()}`, category: 'GPKD', fileName: '' }]);
     setToastMessage(`Đã tải lên thành công ${validRows.length} tệp chứng từ cho khách hàng ${selectedCustomer.name}!`);
@@ -568,17 +552,19 @@ export default function CustomersPage() {
   const handleBulkAssignCskh = () => {
     if (selectedIds.length === 0) return;
 
+    const cskhLabel = `Giao Task CSKH Tái Chăm Sóc Hàng Loạt — ${new Date().toLocaleDateString('vi-VN')}`;
     setCustomers((prev) =>
       prev.map((c) => {
         if (selectedIds.includes(c.id)) {
           return {
             ...c,
-            cskh_task_assigned: `Giao Task CSKH Tái Chăm Sóc Hàng Loạt — ${new Date().toLocaleDateString('vi-VN')}`,
+            cskh_task_assigned: cskhLabel,
           };
         }
         return c;
       })
     );
+    selectedIds.forEach((id) => syncCustomerToApi('PATCH', { id, cskh_task_assigned: cskhLabel }));
 
     setToastMessage(`Đã giao thành công Task CSKH tái chăm sóc cho ${selectedIds.length} khách hàng được chọn!`);
     setSelectedIds([]);
@@ -599,6 +585,7 @@ export default function CustomersPage() {
         return c;
       })
     );
+    selectedIds.forEach((id) => syncCustomerToApi('PATCH', { id, lifecycle_stage: targetLifecycle }));
 
     setToastMessage(`Đã cập nhật trạng thái vòng đời [${targetLifecycle}] cho ${selectedIds.length} khách hàng!`);
     setBulkLifecycleModalOpen(false);
@@ -1056,6 +1043,106 @@ export default function CustomersPage() {
                         <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-bold text-[10px]">✓ Đã Lưu</span>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              {/* DÒNG THỜI GIAN TƯƠNG TÁC (ACTIVITY TIMELINE) */}
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                <h4 className="font-bold text-slate-900 text-xs border-b border-slate-200 pb-2 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-blue-600" /> Dòng Thời Gian Tương Tác
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 text-[10px] font-extrabold">
+                    {selectedViewCustomer.activities?.length || 0}
+                  </span>
+                </h4>
+
+                {/* Ô THÊM TƯƠNG TÁC NHANH */}
+                <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2.5">
+                  <p className="font-bold text-slate-700 text-[11px] flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5 text-blue-600" /> Thêm Tương Tác
+                  </p>
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                    <select
+                      value={newActivityType}
+                      onChange={(e) => setNewActivityType(e.target.value as CustomerActivity['type'])}
+                      className="sm:w-40 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
+                    >
+                      <option value="CALL">📞 Cuộc gọi</option>
+                      <option value="EMAIL">✉️ Email</option>
+                      <option value="MEETING">👥 Cuộc họp</option>
+                      <option value="NOTE">📝 Ghi chú</option>
+                      <option value="CONTRACT">📄 Hợp đồng</option>
+                      <option value="STAGE">🎯 Vòng đời</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={newActivityContent}
+                      onChange={(e) => setNewActivityContent(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddActivity();
+                        }
+                      }}
+                      placeholder="Nhập nội dung tương tác với khách hàng..."
+                      className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddActivity}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" /> Lưu
+                    </button>
+                  </div>
+                </div>
+
+                {/* DANH SÁCH TIMELINE (GIẢM DẦN THEO THỜI GIAN) */}
+                {(!selectedViewCustomer.activities || selectedViewCustomer.activities.length === 0) ? (
+                  <p className="text-slate-400 italic">Chưa có tương tác nào được ghi nhận.</p>
+                ) : (
+                  <div className="relative pl-1">
+                    {/* Đường nối dọc */}
+                    <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-200" aria-hidden="true"></div>
+                    <ul className="space-y-4">
+                      {[...selectedViewCustomer.activities]
+                        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                        .map((act) => {
+                          const meta = ACTIVITY_META[act.type] || ACTIVITY_META.NOTE;
+                          const Icon = meta.Icon;
+                          return (
+                            <li key={act.id} className="relative flex items-start gap-3">
+                              {/* Icon + chấm màu theo type */}
+                              <div className="relative z-10 shrink-0">
+                                <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${meta.iconBg}`}>
+                                  <Icon className={`w-4 h-4 ${meta.iconText}`} />
+                                </div>
+                                <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ring-2 ring-slate-50 ${meta.dot}`}></span>
+                              </div>
+
+                              <div className="flex-1 min-w-0 p-3 bg-white border border-slate-200 rounded-xl">
+                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                  <p className="font-bold text-slate-900 text-xs">{act.title}</p>
+                                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${meta.iconBg} ${meta.iconText}`}>
+                                    {meta.label}
+                                  </span>
+                                </div>
+                                {act.note && <p className="text-slate-500 text-[11px] mt-1 leading-relaxed">{act.note}</p>}
+                                <div className="flex items-center gap-3 mt-1.5 text-[10.5px] text-slate-400 font-medium flex-wrap">
+                                  {act.actor && (
+                                    <span className="flex items-center gap-1">
+                                      <User className="w-3 h-3" /> {act.actor}
+                                    </span>
+                                  )}
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" /> {formatActivityTime(act.timestamp)}
+                                  </span>
+                                </div>
+                              </div>
+                            </li>
+                          );
+                        })}
+                    </ul>
                   </div>
                 )}
               </div>

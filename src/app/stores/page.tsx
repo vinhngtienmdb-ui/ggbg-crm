@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShoppingBag,
   CheckCircle2,
@@ -22,6 +22,25 @@ export default function StoresPage() {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMessage, setToastMessage] = useState('');
+
+  // Đồng bộ dữ liệu từ API khi mount (dual-mode: Supabase hoặc in-memory phía server).
+  // Nếu lỗi/empty → giữ INITIAL_STORES để không nhấp nháy giao diện.
+  useEffect(() => {
+    let active = true;
+    fetch('/api/stores')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          setStores(data.data as EcomStore[]);
+        }
+      })
+      .catch(() => {
+        /* fallback: giữ INITIAL_STORES */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredStores = stores.filter((s) => {
     if (selectedPlatform !== 'ALL' && s.platform !== selectedPlatform) return false;
