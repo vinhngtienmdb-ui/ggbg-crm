@@ -31,10 +31,10 @@ function OrgTreeNode({
       node.department.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const levelColors = [
-    'bg-slate-900 text-white border-slate-800',
-    'bg-blue-900 text-white border-blue-800',
-    'bg-indigo-50 border-indigo-200 text-slate-900',
-    'bg-white border-slate-200 text-slate-900',
+    'bg-brand-50 text-brand-800 border-line',
+    'bg-brand-800 text-white border-brand-600',
+    'bg-plum-bg border-plum-border text-ink-900',
+    'bg-white border-line text-ink-900',
   ];
 
   return (
@@ -46,18 +46,18 @@ function OrgTreeNode({
             if (hasChildren) setIsExpanded(!isExpanded);
             if (onSelectMember) onSelectMember(node.name);
           }}
-          className={`p-4 rounded-2xl border shadow-md transition-all cursor-pointer min-w-[240px] max-w-[280px] hover:shadow-xl hover:scale-105 ${
+          className={`p-4 rounded-2xl border shadow-md transition-all cursor-pointer min-w-[240px] max-w-[280px] hover:shadow-cardLg hover:scale-105 ${
             matchesSearch
-              ? 'ring-4 ring-amber-400 border-amber-500 scale-105 bg-amber-50 text-slate-900'
+              ? 'ring-4 ring-warn-fg border-gold-border scale-105 bg-warn-bg text-ink-900'
               : levelColors[Math.min(level, levelColors.length - 1)]
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-2">
             <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-              matchesSearch ? 'bg-amber-500 text-white' :
-              level === 0 ? 'bg-orange-500 text-white' :
-              level === 1 ? 'bg-blue-500 text-white' :
-              level === 2 ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-700'
+              matchesSearch ? 'bg-warn-fg text-white' :
+              level === 0 ? 'bg-warn-fg text-white' :
+              level === 1 ? 'bg-brand-500 text-white' :
+              level === 2 ? 'bg-plum-bg text-plum-fg' : 'bg-line-soft text-ink-700'
             }`}>
               {level === 0 ? 'TỔNG CÔNG TY' : level === 1 ? 'PHÒNG BAN' : level === 2 ? 'ĐỘI NHÓM' : 'CÁ NHÂN'}
             </span>
@@ -71,8 +71,8 @@ function OrgTreeNode({
 
           <div className="flex items-start gap-3">
             <div className={`w-10 h-10 rounded-full font-bold flex items-center justify-center text-sm shrink-0 border ${
-              matchesSearch ? 'bg-amber-200 text-amber-900 border-amber-400' :
-              level <= 1 ? 'bg-white/20 text-white border-white/30' : 'bg-blue-50 text-blue-700 border-blue-200'
+              matchesSearch ? 'bg-warn-bg text-warn-fg border-gold-border' :
+              level <= 1 ? 'bg-brand-50 text-brand-800 border-brand-100' : 'bg-brand-50 text-brand-800 border-brand-100'
             }`}>
               {node.name.charAt(0)}
             </div>
@@ -97,14 +97,14 @@ function OrgTreeNode({
       {hasChildren && isExpanded && (
         <div className="flex flex-col items-center mt-3 w-full">
           {/* Vertical Connecting Line Down */}
-          <div className="w-0.5 h-6 bg-slate-300"></div>
+          <div className="w-0.5 h-6 bg-line-muted"></div>
 
           {/* Children Horizontal Row */}
-          <div className="flex flex-wrap justify-center gap-8 relative pt-2 border-t-2 border-slate-300">
+          <div className="flex flex-wrap justify-center gap-8 relative pt-2 border-t-2 border-line-strong">
             {node.children?.map((childNode) => (
               <div key={childNode.id} className="relative flex flex-col items-center">
                 {/* Small vertical connector from top bar to node */}
-                <div className="w-0.5 h-4 bg-slate-300 -mt-2 mb-2"></div>
+                <div className="w-0.5 h-4 bg-line-muted -mt-2 mb-2"></div>
                 <OrgTreeNode node={childNode} level={level + 1} onSelectMember={onSelectMember} searchTerm={searchTerm} />
               </div>
             ))}
@@ -121,26 +121,26 @@ export default function OrgChartTree({ rootData, onSelectMember }: OrgChartTreeP
   return (
     <div className="space-y-6">
       {/* Controls & Search */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-2xl border border-line shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Building2 className="w-5 h-5 text-blue-600" />
-          <h2 className="text-sm font-bold text-slate-900">Sơ Đồ Cấu Trúc Tổ Chức (Visual Department Tree)</h2>
+          <Building2 className="w-5 h-5 text-brand-600" />
+          <h2 className="text-sm font-bold text-ink-900">Sơ Đồ Cấu Trúc Tổ Chức (Visual Department Tree)</h2>
         </div>
 
         <div className="relative w-72">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
           <input
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Tìm vị trí, phòng ban, nhân sự..."
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+            className="w-full pl-9 pr-3 py-1.5 bg-surface-subtle border border-line rounded-xl text-xs"
           />
         </div>
       </div>
 
       {/* Visual Tree Display Container */}
-      <div className="bg-slate-50/70 rounded-2xl border border-slate-200/80 p-8 shadow-sm overflow-x-auto min-h-[600px] flex justify-center">
+      <div className="bg-surface-subtle rounded-2xl border border-line p-8 shadow-sm overflow-x-auto min-h-[600px] flex justify-center">
         <OrgTreeNode node={rootData} level={0} onSelectMember={onSelectMember} searchTerm={searchTerm} />
       </div>
     </div>

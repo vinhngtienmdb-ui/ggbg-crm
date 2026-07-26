@@ -56,38 +56,38 @@ export default function QuickCreateCustomerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-bold">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-200/30 flex items-center justify-center text-brand-400 font-bold">
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-base">Tạo Nhanh Khách Hàng CRM</h3>
-              <p className="text-xs text-slate-300">Trích xuất trực tiếp từ cuộc hội thoại chat {chat.channel_name}</p>
+              <p className="text-xs text-ink-400">Trích xuất trực tiếp từ cuộc hội thoại chat {chat.channel_name}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-ink-400 hover:text-brand-800">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs flex items-center justify-between">
-            <span className="font-bold text-blue-900">Kênh Nguồn Chat:</span>
-            <span className="font-mono font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200">
+          <div className="p-3 bg-brand-50/70 border border-brand-100 rounded-xl text-xs flex items-center justify-between">
+            <span className="font-bold text-brand-900">Kênh Nguồn Chat:</span>
+            <span className="font-mono font-bold text-brand-800 bg-white px-2 py-0.5 rounded border border-brand-100">
               {chat.channel_name}
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Loại Hình Khách Hàng</label>
+              <label className="block text-xs font-bold text-ink-700 mb-1">Loại Hình Khách Hàng</label>
               <select
                 value={entityType}
                 onChange={(e) => setEntityType(e.target.value as any)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
+                className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-bold text-ink-900"
               >
                 <option value="ENTERPRISE">🏢 Doanh Nghiệp (B2B)</option>
                 <option value="INDIVIDUAL">👤 Cá Nhân / HKD (B2C)</option>
@@ -95,11 +95,11 @@ export default function QuickCreateCustomerModal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Phân Hạng Dự Kiến</label>
+              <label className="block text-xs font-bold text-ink-700 mb-1">Phân Hạng Dự Kiến</label>
               <select
                 value={tier}
                 onChange={(e) => setTier(e.target.value as any)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
+                className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-bold text-ink-900"
               >
                 <option value="Standard">Standard</option>
                 <option value="Silver">Silver</option>
@@ -110,61 +110,61 @@ export default function QuickCreateCustomerModal({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Họ Và Tên Khách Hàng *</label>
+            <label className="block text-xs font-bold text-ink-700 mb-1">Họ Và Tên Khách Hàng *</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+              className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-bold text-ink-900"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại *</label>
+              <label className="block text-xs font-bold text-ink-700 mb-1">Số Điện Thoại *</label>
               <input
                 type="text"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-mono font-bold text-ink-900"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+              <label className="block text-xs font-bold text-ink-700 mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-mono text-ink-900"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Tên Công Ty / Gian Hàng Shop</label>
+            <label className="block text-xs font-bold text-ink-700 mb-1">Tên Công Ty / Gian Hàng Shop</label>
             <input
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="Ví dụ: Công ty Mỹ Phẩm Bảo An / Shop MiuStore"
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+              className="w-full p-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-medium text-ink-900"
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-line flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+              className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-600/20"
+              className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs shadow-md shadow-brand-600/20"
             >
               Tạo Hồ Sơ Khách Hàng CRM & Tự Động Liên Kết
             </button>

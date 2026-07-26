@@ -56,103 +56,103 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 flex font-sans text-slate-100 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-surface-page flex font-sans text-ink-700 relative overflow-hidden">
       {/* Dynamic Background Mesh Gradients */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-500/15 rounded-full blur-[140px] pointer-events-none"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[180px] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-brand-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-aqua-fg/15 rounded-full blur-[140px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-plum-deep/10 rounded-full blur-[180px] pointer-events-none"></div>
 
       {/* Main Container - Split Screen */}
       <div className="w-full flex flex-col lg:flex-row min-h-screen z-10">
 
         {/* LEFT COLUMN: Premium Brand & Enterprise Feature Showcase */}
-        <div className="hidden lg:flex lg:w-7/12 flex-col justify-between p-12 xl:p-16 border-r border-slate-800/80 bg-slate-900/40 backdrop-blur-md relative">
+        <div className="hidden lg:flex lg:w-7/12 flex-col justify-between p-12 xl:p-16 border-r border-line bg-white relative">
 
           {/* Top Brand Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-cyan-400 p-0.5 shadow-xl shadow-blue-500/25">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-black text-xl text-white">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-600 to-plum-deep p-0.5 shadow-cardLg shadow-brand-600/25">
+              <div className="w-full h-full bg-brand-600 rounded-[14px] flex items-center justify-center font-black text-xl text-white">
                 GG
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-xl font-bold text-brand-800 tracking-tight flex items-center gap-2">
                 GGBingo Enterprise
-                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-semibold">
+                <span className="px-2 py-0.5 rounded-full bg-brand-500/20 border border-brand-200/30 text-brand-400 text-[10px] font-semibold">
                   v2.0
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">E-Commerce Agency & Platform Admin</p>
+              <p className="text-xs text-ink-500">E-Commerce Agency & Platform Admin</p>
             </div>
           </div>
 
           {/* Middle Value Proposition Hero Section */}
           <div className="my-auto space-y-8 py-8">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-cyan-400 text-xs font-semibold">
-                <Sparkles className="w-4 h-4 text-cyan-400 fill-cyan-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-subtle border border-line text-aqua-fg text-xs font-semibold">
+                <Sparkles className="w-4 h-4 text-aqua-fg fill-cyan-400 animate-pulse" />
                 Hệ Thống Quản Trị Chuyên Sâu TMĐT (Shopee • TikTok • Lazada • Amazon)
               </div>
-              <h1 className="text-4xl xl:text-5xl font-black text-white tracking-tight leading-tight">
+              <h1 className="text-4xl xl:text-5xl font-black text-brand-800 tracking-tight leading-tight">
                 Nâng Tầm Vận Hành <br />
-                <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-brand-600 via-cyan-300 to-success-dot bg-clip-text text-transparent">
                   Đột Phá Doanh Số TMĐT
                 </span>
               </h1>
-              <p className="text-slate-300 text-sm xl:text-base max-w-xl leading-relaxed">
+              <p className="text-ink-500 text-sm xl:text-base max-w-xl leading-relaxed">
                 Nền tảng CRM tích hợp phân quyền hạt mịn cho 500+ nhân sự, tự động tiếp nhận Lead đa kênh, VoIP Call Center & Hệ thống chấm điểm KPI tự động.
               </p>
             </div>
 
             {/* Feature Highlights Grid */}
             <div className="grid grid-cols-2 gap-4 max-w-xl">
-              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-start gap-3 backdrop-blur-sm">
-                <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+              <div className="p-4 rounded-2xl bg-white border border-line flex items-start gap-3">
+                <div className="p-2.5 rounded-xl bg-brand-500/10 text-brand-400 border border-brand-600/20 shrink-0">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-sm">Ủy Quyền Vận Hành</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Shopee Mall, TikTok Shop, Lazada</p>
+                  <h4 className="font-bold text-ink-900 text-sm">Ủy Quyền Vận Hành</h4>
+                  <p className="text-xs text-ink-500 mt-0.5">Shopee Mall, TikTok Shop, Lazada</p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-start gap-3 backdrop-blur-sm">
-                <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+              <div className="p-4 rounded-2xl bg-white border border-line flex items-start gap-3">
+                <div className="p-2.5 rounded-xl bg-plum-fg/10 text-plum-deep border border-plum-border/20 shrink-0">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-sm">Sàn GGBingoVN</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Tuyển mộ & quản lý merchant</p>
+                  <h4 className="font-bold text-ink-900 text-sm">Sàn GGBingoVN</h4>
+                  <p className="text-xs text-ink-500 mt-0.5">Tuyển mộ & quản lý merchant</p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-start gap-3 backdrop-blur-sm">
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+              <div className="p-4 rounded-2xl bg-white border border-line flex items-start gap-3">
+                <div className="p-2.5 rounded-xl bg-success-dot/10 text-success-dot border border-success-border/20 shrink-0">
                   <PhoneCall className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-sm">VoIP Telephony</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Ghi âm cuộc gọi R2 Storage</p>
+                  <h4 className="font-bold text-ink-900 text-sm">VoIP Telephony</h4>
+                  <p className="text-xs text-ink-500 mt-0.5">Ghi âm cuộc gọi R2 Storage</p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-start gap-3 backdrop-blur-sm">
-                <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+              <div className="p-4 rounded-2xl bg-white border border-line flex items-start gap-3">
+                <div className="p-2.5 rounded-xl bg-warn-fg/10 text-warn-fg border border-gold-border/20 shrink-0">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-sm">Phân Quyền RLS</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Chống rò rỉ SĐT 500+ users</p>
+                  <h4 className="font-bold text-ink-900 text-sm">Phân Quyền RLS</h4>
+                  <p className="text-xs text-ink-500 mt-0.5">Chống rò rỉ SĐT 500+ users</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Bottom Live System Status Footer */}
-          <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-6">
+          <div className="flex items-center justify-between text-xs text-ink-400 border-t border-line pt-6">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span className="text-slate-300 font-medium">Supabase Enterprise Auth Online</span>
+              <span className="w-2 h-2 rounded-full bg-success-dot animate-ping"></span>
+              <span className="text-ink-500 font-medium">Supabase Enterprise Auth Online</span>
             </div>
             <span>© 2026 GGBingo Corporation</span>
           </div>
@@ -161,15 +161,15 @@ export default function LoginPage() {
         {/* RIGHT COLUMN: Ultra-Clean & Professional Login Portal */}
         <div className="w-full lg:w-5/12 flex items-center justify-center p-6 sm:p-12 relative">
 
-          <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-2xl border border-slate-200 text-slate-900 relative z-10">
+          <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-cardLg border border-line text-ink-900 relative z-10">
 
             {/* Top Greeting */}
             <div className="text-center mb-8">
-              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-600/30">
+              <div className="w-12 h-12 rounded-2xl bg-brand-600 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-lg shadow-brand-600/30">
                 <Lock className="w-6 h-6" />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Đăng Nhập CRM</h2>
-              <p className="text-xs text-slate-500 mt-1 font-medium">
+              <h2 className="text-2xl font-black text-ink-900 tracking-tight">Đăng Nhập CRM</h2>
+              <p className="text-xs text-ink-500 mt-1 font-medium">
                 Vui lòng nhập tài khoản được cấp để truy cập hệ thống
               </p>
             </div>
@@ -177,55 +177,55 @@ export default function LoginPage() {
             {/* Real Submission Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {errorMsg && (
-                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold text-center animate-in fade-in duration-150">
+                <div className="p-3.5 rounded-xl bg-danger-bg border border-danger-border text-danger-fg text-xs font-bold text-center animate-in fade-in duration-150">
                   {errorMsg}
                 </div>
               )}
 
               {isSuccess && (
-                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center flex items-center justify-center gap-2 animate-in fade-in duration-150">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <div className="p-3.5 rounded-xl bg-success-bg border border-success-border text-success-fg text-xs font-bold text-center flex items-center justify-center gap-2 animate-in fade-in duration-150">
+                  <CheckCircle2 className="w-4 h-4 text-success-fg" />
                   Xác thực tài khoản thành công! Đang vào Dashboard...
                 </div>
               )}
 
               {/* Username Input Field */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-ink-700 mb-1.5 uppercase tracking-wider">
                   Tên Đăng Nhập / Email
                 </label>
                 <div className="relative">
-                  <User className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <User className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Nhập tên đăng nhập hoặc email..."
                     disabled={isSubmitting}
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all disabled:opacity-50"
+                    className="w-full pl-11 pr-4 py-3 bg-surface-subtle border border-line rounded-xl text-xs font-semibold text-ink-900 placeholder-ink-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/30 focus:border-brand-600 transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
 
               {/* Password Input Field */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-ink-700 mb-1.5 uppercase tracking-wider">
                   Mật Khẩu Access
                 </label>
                 <div className="relative">
-                  <KeyRound className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <KeyRound className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Nhập mật khẩu..."
                     disabled={isSubmitting}
-                    className="w-full pl-11 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono transition-all disabled:opacity-50"
+                    className="w-full pl-11 pr-11 py-3 bg-surface-subtle border border-line rounded-xl text-xs font-semibold text-ink-900 placeholder-ink-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/30 focus:border-brand-600 font-mono transition-all disabled:opacity-50"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-500 p-1"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -236,7 +236,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-extrabold rounded-xl text-xs tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95 mt-6 disabled:opacity-70"
+                className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl text-xs tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-brand-600/30 transition-all active:scale-95 mt-6 disabled:opacity-70"
               >
                 {isSubmitting ? (
                   <>
@@ -253,9 +253,9 @@ export default function LoginPage() {
             </form>
 
             {/* Footer Trust Badges */}
-            <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1 font-medium text-slate-500">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="mt-8 pt-4 border-t border-line flex items-center justify-between text-[11px] text-ink-400">
+              <span className="flex items-center gap-1 font-medium text-ink-500">
+                <ShieldCheck className="w-3.5 h-3.5 text-success-fg" />
                 256-bit SSL Encrypted
               </span>
               <span>Postgres RLS Security</span>

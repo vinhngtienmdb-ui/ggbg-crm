@@ -43,14 +43,14 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
   };
 
   return (
-    <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+    <div className="space-y-4 bg-surface-subtle p-4 rounded-xl border border-line">
       {/* Header & Presets */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-line">
         <div>
-          <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-            <Tag className="w-4 h-4 text-blue-600" /> Tùy Biến Thuộc Tính Động (Dynamic JSONB Attributes)
+          <h4 className="text-xs font-bold text-ink-900 flex items-center gap-1.5">
+            <Tag className="w-4 h-4 text-brand-600" /> Tùy Biến Thuộc Tính Động (Dynamic JSONB Attributes)
           </h4>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-[11px] text-ink-500 mt-0.5">
             Thêm bớt trường dữ liệu JSONB tùy biến cho các gói TMĐT Shopee, TikTok, Lazada, Amazon
           </p>
         </div>
@@ -59,7 +59,7 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
           <button
             type="button"
             onClick={() => setShowJsonCode(!showJsonCode)}
-            className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+            className="px-2.5 py-1 bg-white border border-line hover:bg-line-soft text-ink-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
           >
             <Code className="w-3.5 h-3.5" />
             {showJsonCode ? 'Thu gọn JSON' : 'Xem RAW JSON'}
@@ -69,15 +69,15 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
 
       {/* Preset Selector */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        <span className="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Mẫu Preset TMĐT:
+        <span className="text-[11px] font-bold text-ink-500 whitespace-nowrap flex items-center gap-1">
+          <Sparkles className="w-3.5 h-3.5 text-warn-fg" /> Mẫu Preset TMĐT:
         </span>
         {Object.keys(DYNAMIC_ATTRIBUTE_PRESETS).map((presetName) => (
           <button
             key={presetName}
             type="button"
             onClick={() => handleApplyPreset(presetName)}
-            className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-slate-200 text-slate-700 hover:text-blue-700 hover:border-blue-300 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all shadow-2xs"
+            className="px-2.5 py-1 bg-white hover:bg-brand-50 border border-line text-ink-700 hover:text-brand-800 hover:border-brand-200 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all"
           >
             + {presetName}
           </button>
@@ -86,7 +86,7 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
 
       {/* RAW JSON View Toggle */}
       {showJsonCode && (
-        <div className="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto border border-slate-800">
+        <div className="bg-white text-success-dot p-3 rounded-xl font-mono text-[11px] overflow-x-auto border border-line">
           <pre>{JSON.stringify(attributes, null, 2)}</pre>
         </div>
       )}
@@ -94,27 +94,27 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
       {/* Key-Value Pair Editor List */}
       <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
         {Object.keys(attributes).length === 0 ? (
-          <p className="text-xs text-slate-400 italic text-center py-3">Chưa có thuộc tính động nào. Vui lòng thêm thuộc tính bên dưới.</p>
+          <p className="text-xs text-ink-400 italic text-center py-3">Chưa có thuộc tính động nào. Vui lòng thêm thuộc tính bên dưới.</p>
         ) : (
           Object.entries(attributes).map(([key, val]) => (
-            <div key={key} className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
+            <div key={key} className="flex items-center gap-2 bg-white p-2 rounded-xl border border-line">
               <input
                 type="text"
                 value={key}
                 disabled
-                className="w-1/3 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-semibold text-slate-700 truncate"
+                className="w-1/3 px-2 py-1 bg-line-soft border border-line rounded text-xs font-semibold text-ink-700 truncate"
               />
-              <span className="text-slate-400 font-bold">:</span>
+              <span className="text-ink-400 font-bold">:</span>
               <input
                 type="text"
                 value={val}
                 onChange={e => handleUpdateValue(key, e.target.value)}
-                className="w-full px-2 py-1 border border-slate-200 rounded text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-2 py-1 border border-line rounded text-xs text-ink-900 focus:outline-none focus:ring-1 focus:ring-brand-600"
               />
               <button
                 type="button"
                 onClick={() => handleRemoveAttribute(key)}
-                className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                className="p-1 text-ink-400 hover:text-danger-fg hover:bg-danger-bg rounded transition-colors"
                 title="Xóa thuộc tính"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -125,25 +125,25 @@ export default function JsonbAttributeEditor({ attributes, onChange }: JsonbAttr
       </div>
 
       {/* Add New Key-Value Pair Controls */}
-      <div className="pt-2 border-t border-slate-200 flex items-center gap-2">
+      <div className="pt-2 border-t border-line flex items-center gap-2">
         <input
           type="text"
           value={newKey}
           onChange={e => setNewKey(e.target.value)}
           placeholder="Tên thuộc tính (VD: Cam kết ROAS)"
-          className="w-1/3 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-1/3 px-3 py-1.5 bg-white border border-line rounded-xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
         />
         <input
           type="text"
           value={newValue}
           onChange={e => setNewValue(e.target.value)}
           placeholder="Giá trị (VD: >= 4.5)"
-          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-1.5 bg-white border border-line rounded-xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
         />
         <button
           type="button"
           onClick={handleAddAttribute}
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1 transition-all shadow-xs"
+          className="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1 transition-all"
         >
           <Plus className="w-3.5 h-3.5" /> Thêm Trường
         </button>

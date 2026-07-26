@@ -347,37 +347,37 @@ export default function HRMPage() {
     switch (status) {
       case 'Active':
         return (
-          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+          <span className="px-2.5 py-1 bg-success-bg text-success-fg border border-success-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
             🟢 Đang Làm Việc
           </span>
         );
       case 'Probation':
         return (
-          <span className="px-2.5 py-1 bg-blue-100 text-blue-800 border border-blue-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+          <span className="px-2.5 py-1 bg-brand-300 text-brand-800 border border-brand-100 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
             🔵 Thử Việc
           </span>
         );
       case 'Pending_Resign':
         return (
-          <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit animate-pulse">
+          <span className="px-2.5 py-1 bg-warn-bg text-warn-fg border border-gold-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit animate-pulse">
             🟠 Chờ Nghỉ Việc
           </span>
         );
       case 'Resigned':
         return (
-          <span className="px-2.5 py-1 bg-red-100 text-red-800 border border-red-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+          <span className="px-2.5 py-1 bg-danger-bg text-danger-fg border border-danger-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
             🔴 Đã Nghỉ Việc
           </span>
         );
       case 'Suspended':
         return (
-          <span className="px-2.5 py-1 bg-purple-100 text-purple-800 border border-purple-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+          <span className="px-2.5 py-1 bg-plum-bg text-plum-fg border border-plum-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
             🟣 Tạm Hoãn HĐ
           </span>
         );
       default:
         return (
-          <span className="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+          <span className="px-2.5 py-1 bg-line-soft text-ink-700 border border-line font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
             ⚪ Ứng Viên Mới
           </span>
         );
@@ -583,31 +583,31 @@ export default function HRMPage() {
     switch (status) {
       case 'PENDING_DIRECT_MANAGER':
         return (
-          <span className="px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
-            <Clock className="w-3.5 h-3.5 text-amber-600" /> 1️⃣ Chờ Quản Lý Trực Tiếp Duyệt
+          <span className="px-2.5 py-1 bg-warn-bg text-warn-fg border border-gold-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+            <Clock className="w-3.5 h-3.5 text-warn-fg" /> 1️⃣ Chờ Quản Lý Trực Tiếp Duyệt
           </span>
         );
       case 'PENDING_SALES_DIRECTOR':
         return (
-          <span className="px-2.5 py-1 bg-blue-100 text-blue-800 border border-blue-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
-            <Clock className="w-3.5 h-3.5 text-blue-600" /> 2️⃣ Chờ GĐ Kinh Doanh Duyệt (Duyệt Cuối)
+          <span className="px-2.5 py-1 bg-brand-300 text-brand-800 border border-brand-100 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+            <Clock className="w-3.5 h-3.5 text-brand-600" /> 2️⃣ Chờ GĐ Kinh Doanh Duyệt (Duyệt Cuối)
           </span>
         );
       case 'APPROVED_FOR_ONBOARDING':
         return (
-          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
-            <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> 3️⃣ Đã Duyệt ➔ Chuyển HR Onboard / Ký HĐ
+          <span className="px-2.5 py-1 bg-success-bg text-success-fg border border-success-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+            <CheckCircle className="w-3.5 h-3.5 text-success-fg" /> 3️⃣ Đã Duyệt ➔ Chuyển HR Onboard / Ký HĐ
           </span>
         );
       case 'REJECTED':
         return (
-          <span className="px-2.5 py-1 bg-red-100 text-red-800 border border-red-200 font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
-            <XCircle className="w-3.5 h-3.5 text-red-600" /> ❌ Từ Chối Phê Duyệt
+          <span className="px-2.5 py-1 bg-danger-bg text-danger-fg border border-danger-border font-bold rounded-xl text-[11px] flex items-center gap-1 w-fit">
+            <XCircle className="w-3.5 h-3.5 text-danger-fg" /> ❌ Từ Chối Phê Duyệt
           </span>
         );
       default:
         return (
-          <span className="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded-xl text-[11px]">
+          <span className="px-2.5 py-1 bg-line-soft text-ink-700 font-bold rounded-xl text-[11px]">
             Đã Duyệt
           </span>
         );
@@ -617,14 +617,14 @@ export default function HRMPage() {
   const renderRankBadge = (rank?: number) => {
     switch (rank) {
       case 1:
-        return <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded text-[10px] font-black uppercase">Cấp 1: Ban Giám Đốc</span>;
+        return <span className="px-2 py-0.5 bg-danger-bg text-danger-fg border border-danger-border rounded text-[10px] font-black uppercase">Cấp 1: Ban Giám Đốc</span>;
       case 2:
-        return <span className="px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-200 rounded text-[10px] font-bold uppercase">Cấp 2: Quản Lý & Lead</span>;
+        return <span className="px-2 py-0.5 bg-brand-300 text-brand-800 border border-brand-100 rounded text-[10px] font-bold uppercase">Cấp 2: Quản Lý & Lead</span>;
       case 3:
-        return <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[10px] font-bold uppercase">Cấp 3: Chuyên Viên</span>;
+        return <span className="px-2 py-0.5 bg-success-bg text-success-fg border border-success-border rounded text-[10px] font-bold uppercase">Cấp 3: Chuyên Viên</span>;
       case 4:
       default:
-        return <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-200 rounded text-[10px] font-bold uppercase">Cấp 4: Thử Việc / Mới</span>;
+        return <span className="px-2 py-0.5 bg-warn-bg text-warn-fg border border-gold-border rounded text-[10px] font-bold uppercase">Cấp 4: Thử Việc / Mới</span>;
     }
   };
 
@@ -632,24 +632,24 @@ export default function HRMPage() {
     <div className="space-y-6">
       {/* Toast Notification */}
       {statusToast && (
-        <div className="p-4 rounded-2xl bg-purple-600 text-white font-bold text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
+        <div className="p-4 rounded-2xl bg-plum-fg text-white font-bold text-xs shadow-cardLg flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
           <div className="flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-purple-200" />
+            <UserCheck className="w-5 h-5 text-plum-deep" />
             <span>{statusToast}</span>
           </div>
-          <button onClick={() => setStatusToast('')} className="p-1 hover:bg-purple-700 rounded-lg">
+          <button onClick={() => setStatusToast('')} className="p-1 hover:bg-plum-fg rounded-lg">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-line shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý Nhân Sự</h1>
+            <h1 className="text-xl font-bold text-ink-900">Quản Lý Nhân Sự</h1>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-ink-500 mt-1">
             Quản lý hồ sơ nhân viên, quy trình phê duyệt và phễu tuyển dụng
           </p>
         </div>
@@ -659,9 +659,9 @@ export default function HRMPage() {
             onClick={() => {
               if (employees.length > 0) handleOpenContractModal(employees[0]);
             }}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
           >
-            <FileText className="w-4 h-4 text-blue-600" />
+            <FileText className="w-4 h-4 text-brand-600" />
             Xem Hợp Đồng PDF
           </button>
           <button
@@ -670,7 +670,7 @@ export default function HRMPage() {
               setEmployeeModalMode('create');
               setIsEmployeeModalOpen(true);
             }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all"
+            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shadow-brand-600/20 transition-all"
           >
             <Plus className="w-4 h-4" />
             Tạo Nhân Sự Mới
@@ -678,106 +678,63 @@ export default function HRMPage() {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 w-fit">
-        <button
-          onClick={() => setActiveTab('PROFILE')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          👤 Hồ Sơ Nhân Sự ({filteredEmployees.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('APPROVAL_PIPELINE')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-            activeTab === 'APPROVAL_PIPELINE' ? 'bg-amber-600 text-white shadow-sm' : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
-          }`}
-        >
-          ⏳ Phê Duyệt Nhân Sự Mới
-          {pendingApprovalCount > 0 && (
-            <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full animate-pulse">
-              {pendingApprovalCount}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('RECRUITMENT')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'RECRUITMENT' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          💼 Phễu Tuyển Dụng Dual-View ({candidates.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('CONTRACTS')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'CONTRACTS' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          📄 Quản Lý Hợp Đồng & Lương
-        </button>
-
-        <button
-          onClick={() => setActiveTab('ONBOARDING')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ONBOARDING' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          📋 Checklist Onboarding ({onboardingList.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('ORG_CHART')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ORG_CHART' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          🏛️ Sơ Đồ Tổ Chức
-        </button>
-
-        <button
-          onClick={() => setActiveTab('JOB_TITLES')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'JOB_TITLES' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
-          }`}
-        >
-          🏅 Chức Danh & Chức Vụ ({jobTitlesList.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('MAP')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'MAP' ? 'bg-indigo-600 text-white shadow-sm' : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100'
-          }`}
-        >
-          🗺️ Bản Đồ Phân Bổ Nhân Sự
-        </button>
+      {/* Navigation tabs — one chip style for all eight, per the redesign. */}
+      <div className="flex flex-wrap items-center gap-2">
+        {(
+          [
+            { id: 'PROFILE', label: `👤 Hồ Sơ Nhân Sự (${filteredEmployees.length})` },
+            { id: 'APPROVAL_PIPELINE', label: '⏳ Phê Duyệt Nhân Sự Mới', badge: pendingApprovalCount },
+            { id: 'RECRUITMENT', label: `💼 Phễu Tuyển Dụng (${candidates.length})` },
+            { id: 'CONTRACTS', label: '📄 Hợp Đồng & Lương' },
+            { id: 'ONBOARDING', label: `📋 Checklist Onboarding (${onboardingList.length})` },
+            { id: 'ORG_CHART', label: '🏛️ Sơ Đồ Tổ Chức' },
+            { id: 'JOB_TITLES', label: `🏅 Chức Danh & Chức Vụ (${jobTitlesList.length})` },
+            { id: 'MAP', label: '🗺️ Bản Đồ Phân Bổ Nhân Sự' },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-1.5 rounded-[9px] border px-4 py-2 text-xs font-bold transition-colors ${
+              activeTab === tab.id
+                ? 'border-brand-600 bg-brand-600 text-white'
+                : 'border-line bg-white text-ink-700 hover:border-line-strong'
+            }`}
+          >
+            {tab.label}
+            {'badge' in tab && tab.badge > 0 && (
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-black ${
+                  activeTab === tab.id ? 'bg-white text-brand-600' : 'bg-danger-fg text-white'
+                }`}
+              >
+                {tab.badge}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* TAB 1: HỒ SƠ NHÂN SỰ ĐỊNH DANH CHI TIẾT */}
       {activeTab === 'PROFILE' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+        <div className="bg-white rounded-2xl border border-line shadow-sm overflow-hidden p-6 space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
               <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm tên, Mã NV, CCCD, Phòng ban..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+                  className="w-full pl-9 pr-3 py-2 bg-surface-subtle border border-line rounded-xl text-xs"
                 />
               </div>
 
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none"
+                className="w-full sm:w-auto px-3 py-2 bg-surface-subtle border border-line rounded-xl text-xs font-bold text-ink-900 focus:outline-none"
               >
                 <option value="ALL">Tất Cả Trạng Thái</option>
                 <option value="Active">🟢 Đang Làm Việc</option>
@@ -789,15 +746,15 @@ export default function HRMPage() {
               </select>
             </div>
 
-            <span className="text-xs font-bold text-slate-500">
-              Đang hiển thị <strong className="text-slate-900">{filteredEmployees.length} Nhân Sự</strong>
+            <span className="text-xs font-bold text-ink-500">
+              Đang hiển thị <strong className="text-ink-900">{filteredEmployees.length} Nhân Sự</strong>
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                <tr className="bg-line-soft border-b border-line text-ink-500 font-bold uppercase tracking-wider">
                   <th className="p-4">Mã NV & Họ Tên</th>
                   <th className="p-4">Phòng Ban & Vị Trí</th>
                   <th className="p-4">Trạng Thái Làm Việc</th>
@@ -806,17 +763,17 @@ export default function HRMPage() {
                   <th className="p-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line-soft">
                 {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={emp.id} className="hover:bg-surface-subtle transition-colors">
                     <td className="p-4">
-                      <p className="font-bold text-slate-900 text-sm">{emp.full_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{emp.employee_code}</p>
+                      <p className="font-bold text-ink-900 text-sm">{emp.full_name}</p>
+                      <p className="font-mono text-brand-800 text-[11px]">{emp.employee_code}</p>
                     </td>
 
                     <td className="p-4">
-                      <p className="font-bold text-slate-800">{emp.department}</p>
-                      <p className="text-slate-500">{emp.position}</p>
+                      <p className="font-bold text-ink-900">{emp.department}</p>
+                      <p className="text-ink-500">{emp.position}</p>
                     </td>
 
                     <td className="p-4">{renderEmployeeStatusBadge(emp.status)}</td>
@@ -824,15 +781,15 @@ export default function HRMPage() {
                     <td className="p-4">{renderApprovalBadge(emp.approval_status)}</td>
 
                     <td className="p-4 font-mono">
-                      <p className="text-emerald-700 font-bold text-[11px]">BHXH: {emp.social_insurance_code || '7910928374'}</p>
-                      <p className="text-purple-700 text-[10px]">BHYT: {emp.health_insurance_code || 'DN4010928'}</p>
+                      <p className="text-success-fg font-bold text-[11px]">BHXH: {emp.social_insurance_code || '7910928374'}</p>
+                      <p className="text-plum-fg text-[10px]">BHYT: {emp.health_insurance_code || 'DN4010928'}</p>
                     </td>
 
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleOpenStatusModal(emp)}
-                          className="px-2.5 py-1.5 bg-purple-50 text-purple-700 font-bold rounded-xl text-[11px] hover:bg-purple-100 transition-all border border-purple-200"
+                          className="px-2.5 py-1.5 bg-plum-bg text-plum-fg font-bold rounded-xl text-[11px] hover:bg-plum-bg transition-all border border-plum-border"
                         >
                           Đổi Trạng Thái
                         </button>
@@ -842,7 +799,7 @@ export default function HRMPage() {
                             setEmployeeModalMode('view');
                             setIsEmployeeModalOpen(true);
                           }}
-                          className="px-2.5 py-1.5 bg-blue-50 text-blue-700 font-bold rounded-xl text-[11px] hover:bg-blue-100 transition-all"
+                          className="px-2.5 py-1.5 bg-brand-50 text-brand-800 font-bold rounded-xl text-[11px] hover:bg-brand-300 transition-all"
                         >
                           Chi Tiết
                         </button>
@@ -852,7 +809,7 @@ export default function HRMPage() {
                             setEmployeeModalMode('edit');
                             setIsEmployeeModalOpen(true);
                           }}
-                          className="px-2.5 py-1.5 bg-amber-50 text-amber-700 font-bold rounded-xl text-[11px] hover:bg-amber-100 transition-all"
+                          className="px-2.5 py-1.5 bg-warn-bg text-warn-fg font-bold rounded-xl text-[11px] hover:bg-warn-bg transition-all"
                         >
                           Sửa
                         </button>
@@ -869,45 +826,45 @@ export default function HRMPage() {
       {/* TAB 2: QUY TRÌNH PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
       {activeTab === 'APPROVAL_PIPELINE' && (
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 rounded-2xl text-white shadow-md space-y-3">
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-amber-400" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
+          <div className="bg-gradient-to-r from-brand-50 via-white to-white p-6 rounded-2xl text-white shadow-md space-y-3">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-warn-fg flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-warn-fg" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-amber-300">Bước 1: Quản Lý Trực Tiếp</p>
-                <p className="text-[11px] text-slate-300 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
+                <p className="text-xs font-bold text-warn-fg">Bước 1: Quản Lý Trực Tiếp</p>
+                <p className="text-[11px] text-ink-400 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
               </div>
 
               <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-blue-300">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
-                <p className="text-[11px] text-slate-300 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
+                <p className="text-xs font-bold text-brand-400">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
+                <p className="text-[11px] text-ink-400 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
               </div>
 
               <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-                <p className="text-xs font-bold text-emerald-300">Bước 3: HR Onboarding & Ký HĐ</p>
-                <p className="text-[11px] text-slate-300 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
+                <p className="text-xs font-bold text-success-dot">Bước 3: HR Onboarding & Ký HĐ</p>
+                <p className="text-[11px] text-ink-400 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" /> Danh Sách Hồ Sơ Đang Chờ Phê Duyệt ({pendingApprovalCount})
+          <div className="bg-white rounded-2xl border border-line p-6 shadow-sm space-y-4">
+            <h3 className="font-bold text-sm text-ink-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-warn-fg" /> Danh Sách Hồ Sơ Đang Chờ Phê Duyệt ({pendingApprovalCount})
             </h3>
 
             <div className="space-y-4">
               {employees
                 .filter((e) => e.approval_status === 'PENDING_DIRECT_MANAGER' || e.approval_status === 'PENDING_SALES_DIRECTOR')
                 .map((emp) => (
-                  <div key={emp.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 hover:border-blue-300 transition-all">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                  <div key={emp.id} className="p-5 bg-surface-subtle border border-line rounded-2xl space-y-3 hover:border-brand-200 transition-all">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-line pb-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-extrabold text-base text-slate-900">{emp.full_name}</h4>
-                          <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">{emp.employee_code}</span>
+                          <h4 className="font-extrabold text-base text-ink-900">{emp.full_name}</h4>
+                          <span className="font-mono text-xs font-bold text-brand-800 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">{emp.employee_code}</span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs text-ink-500 mt-0.5">
                           {emp.position} • {emp.department} • Quản lý trực tiếp: <strong>{emp.direct_manager_name || 'Chưa chỉ định'}</strong>
                         </p>
                       </div>
@@ -915,9 +872,9 @@ export default function HRMPage() {
                       {renderApprovalBadge(emp.approval_status)}
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-line flex flex-col md:flex-row items-center justify-between gap-4">
                       <div className="w-full md:w-1/2">
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Ghi Chú Phê Duyệt / Lý Do:</label>
+                        <label className="block text-[11px] font-semibold text-ink-500 mb-1">Ghi Chú Phê Duyệt / Lý Do:</label>
                         <input
                           type="text"
                           value={selectedApprovalEmp?.id === emp.id ? approvalNote : ''}
@@ -926,7 +883,7 @@ export default function HRMPage() {
                             setApprovalNote(e.target.value);
                           }}
                           placeholder="Nhập ý kiến phê duyệt hoặc lý do từ chối..."
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs"
+                          className="w-full px-3 py-1.5 border border-line rounded-xl text-xs"
                         />
                       </div>
 
@@ -934,7 +891,7 @@ export default function HRMPage() {
                         {emp.approval_status === 'PENDING_DIRECT_MANAGER' && (
                           <button
                             onClick={() => handleApproveDirectManager(emp)}
-                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                            className="px-4 py-2 bg-warn-fg hover:bg-warn-fg text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
                           >
                             <CheckCircle2 className="w-4 h-4" /> 1️⃣ Quản Lý Trực Tiếp Duyệt
                           </button>
@@ -943,7 +900,7 @@ export default function HRMPage() {
                         {emp.approval_status === 'PENDING_SALES_DIRECTOR' && (
                           <button
                             onClick={() => handleApproveSalesDirector(emp)}
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
                           >
                             <ShieldCheck className="w-4 h-4" /> 2️⃣ Giám Đốc Kinh Doanh Duyệt (Duyệt Cuối)
                           </button>
@@ -951,7 +908,7 @@ export default function HRMPage() {
 
                         <button
                           onClick={() => handleRejectApproval(emp)}
-                          className="px-3.5 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl text-xs flex items-center gap-1 transition-all"
+                          className="px-3.5 py-2 bg-danger-bg hover:bg-danger-bg text-danger-fg font-bold rounded-xl text-xs flex items-center gap-1 transition-all"
                         >
                           <XCircle className="w-4 h-4" /> Từ Chối
                         </button>
@@ -968,14 +925,14 @@ export default function HRMPage() {
       {activeTab === 'RECRUITMENT' && (
         <div className="space-y-4">
           {/* Controls & View Switcher */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-line shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Chế Độ Xem Phễu:</span>
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+              <span className="text-xs font-bold text-ink-700 uppercase tracking-wider">Chế Độ Xem Phễu:</span>
+              <div className="flex items-center gap-1 bg-line-soft p-1 rounded-xl">
                 <button
                   onClick={() => setRecruitmentViewMode('KANBAN')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                    recruitmentViewMode === 'KANBAN' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200'
+                    recruitmentViewMode === 'KANBAN' ? 'bg-brand-600 text-white ' : 'text-ink-500 hover:bg-line'
                   }`}
                 >
                   <LayoutGrid className="w-3.5 h-3.5" /> Dạng Thẻ Kanban (5 Bước)
@@ -983,7 +940,7 @@ export default function HRMPage() {
                 <button
                   onClick={() => setRecruitmentViewMode('LIST')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                    recruitmentViewMode === 'LIST' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200'
+                    recruitmentViewMode === 'LIST' ? 'bg-brand-600 text-white ' : 'text-ink-500 hover:bg-line'
                   }`}
                 >
                   <List className="w-3.5 h-3.5" /> Dạng Bảng Danh Sách
@@ -994,13 +951,13 @@ export default function HRMPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsAuditDrawerOpen(true)}
-                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                className="px-3.5 py-2 bg-line-soft hover:bg-line text-ink-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
               >
-                <History className="w-4 h-4 text-blue-600" /> Nhật Ký Ghi Log Tuyển Dụng
+                <History className="w-4 h-4 text-brand-600" /> Nhật Ký Ghi Log Tuyển Dụng
               </button>
               <button
                 onClick={() => setIsNewCandModalOpen(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition-all"
+                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-brand-600/20 transition-all"
               >
                 <Plus className="w-4 h-4" /> Thêm Ứng Viên Mới
               </button>
@@ -1019,44 +976,44 @@ export default function HRMPage() {
               ].map((col) => {
                 const stageCands = candidates.filter((c) => c.stage === col.stageId);
                 return (
-                  <div key={col.stageId} className="bg-slate-100/80 p-3 rounded-2xl border border-slate-200/90 min-h-[550px] flex flex-col justify-between">
+                  <div key={col.stageId} className="bg-line-soft p-3 rounded-2xl border border-line min-h-[550px] flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
-                        <span className="font-bold text-slate-800 text-[11px]" style={{ color: col.color }}>{col.name}</span>
-                        <span className="px-2 py-0.5 bg-slate-200 rounded-full font-black text-[10px] text-slate-700">{stageCands.length}</span>
+                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-line">
+                        <span className="font-bold text-ink-900 text-[11px]" style={{ color: col.color }}>{col.name}</span>
+                        <span className="px-2 py-0.5 bg-line rounded-full font-black text-[10px] text-ink-700">{stageCands.length}</span>
                       </div>
 
                       <div className="space-y-3">
                         {stageCands.map((cand) => (
-                          <div key={cand.id} className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:shadow-md transition-all">
+                          <div key={cand.id} className="bg-white p-3.5 rounded-2xl border border-line shadow-sm space-y-2 hover:shadow-md transition-all">
                             <div className="flex items-start justify-between">
                               <div>
-                                <p className="font-extrabold text-slate-900 text-xs">{cand.name}</p>
-                                <p className="text-[10px] font-mono text-blue-600">{cand.candidate_code || 'UV-2026'}</p>
+                                <p className="font-extrabold text-ink-900 text-xs">{cand.name}</p>
+                                <p className="text-[10px] font-mono text-brand-600">{cand.candidate_code || 'UV-2026'}</p>
                               </div>
                               <button
                                 onClick={() => {
                                   setSelectedCandidate(cand);
                                   setIsCandidateModalOpen(true);
                                 }}
-                                className="p-1 text-slate-400 hover:text-blue-600 rounded"
+                                className="p-1 text-ink-400 hover:text-brand-600 rounded"
                                 title="Xem Chi Tiết & Log"
                               >
                                 <History className="w-3.5 h-3.5" />
                               </button>
                             </div>
 
-                            <p className="text-[11px] text-slate-600 font-semibold">{cand.position}</p>
-                            <p className="text-[10px] text-slate-500">{cand.department}</p>
-                            <p className="text-[10px] font-mono text-slate-400">{cand.phone} • {cand.email}</p>
+                            <p className="text-[11px] text-ink-500 font-semibold">{cand.position}</p>
+                            <p className="text-[10px] text-ink-500">{cand.department}</p>
+                            <p className="text-[10px] font-mono text-ink-400">{cand.phone} • {cand.email}</p>
 
                             {/* Quick Stage Transition Dropdown */}
-                            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-400">Đổi Bước:</span>
+                            <div className="pt-2 border-t border-line flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-ink-400">Đổi Bước:</span>
                               <select
                                 value={cand.stage}
                                 onChange={(e) => handleUpdateCandidateStage(cand.id, e.target.value as RecruitmentStage)}
-                                className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-800 focus:outline-none"
+                                className="px-2 py-1 bg-surface-subtle border border-line rounded-lg text-[10px] font-bold text-ink-900 focus:outline-none"
                               >
                                 <option value="APPLIED">1. Ứng Tuyển</option>
                                 <option value="INTERVIEW">2. Phỏng Vấn</option>
@@ -1077,10 +1034,10 @@ export default function HRMPage() {
 
           {/* DẠNG 2: BẢNG DANH SÁCH CHI TIẾT */}
           {recruitmentViewMode === 'LIST' && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-line shadow-sm overflow-hidden">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                  <tr className="bg-line-soft border-b border-line text-ink-500 font-bold uppercase tracking-wider">
                     <th className="p-4">Mã UV & Họ Tên</th>
                     <th className="p-4">Vị Trí & Phòng Ban</th>
                     <th className="p-4">SĐT & Email</th>
@@ -1090,25 +1047,25 @@ export default function HRMPage() {
                     <th className="p-4 text-center">Thao Tác</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-line-soft">
                   {candidates.map((cand) => (
-                    <tr key={cand.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={cand.id} className="hover:bg-surface-subtle transition-colors">
                       <td className="p-4">
-                        <p className="font-bold text-slate-900 text-sm">{cand.name}</p>
-                        <p className="font-mono text-blue-700 text-[11px]">{cand.candidate_code || 'UV-2026'}</p>
+                        <p className="font-bold text-ink-900 text-sm">{cand.name}</p>
+                        <p className="font-mono text-brand-800 text-[11px]">{cand.candidate_code || 'UV-2026'}</p>
                       </td>
 
                       <td className="p-4">
-                        <p className="font-bold text-slate-800">{cand.position}</p>
-                        <p className="text-slate-500 text-[11px]">{cand.department}</p>
+                        <p className="font-bold text-ink-900">{cand.position}</p>
+                        <p className="text-ink-500 text-[11px]">{cand.department}</p>
                       </td>
 
-                      <td className="p-4 font-mono text-slate-700">
+                      <td className="p-4 font-mono text-ink-700">
                         <p className="font-bold">{cand.phone}</p>
-                        <p className="text-slate-400 text-[10px] font-sans">{cand.email}</p>
+                        <p className="text-ink-400 text-[10px] font-sans">{cand.email}</p>
                       </td>
 
-                      <td className="p-4 font-mono font-extrabold text-emerald-700">
+                      <td className="p-4 font-mono font-extrabold text-success-fg">
                         {(cand.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫
                       </td>
 
@@ -1116,7 +1073,7 @@ export default function HRMPage() {
                         <select
                           value={cand.stage}
                           onChange={(e) => handleUpdateCandidateStage(cand.id, e.target.value as RecruitmentStage)}
-                          className="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+                          className="px-2.5 py-1 bg-line-soft border border-line rounded-xl text-xs font-bold text-ink-900"
                         >
                           <option value="APPLIED">1. Ứng Tuyển Mới</option>
                           <option value="INTERVIEW">2. Phỏng Vấn</option>
@@ -1127,7 +1084,7 @@ export default function HRMPage() {
                       </td>
 
                       <td className="p-4">
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 font-mono text-[10px] font-bold rounded">
+                        <span className="px-2 py-0.5 bg-brand-50 text-brand-800 border border-brand-100 font-mono text-[10px] font-bold rounded">
                           {cand.audit_logs?.length || 0} Lần Ghi Log
                         </span>
                       </td>
@@ -1138,7 +1095,7 @@ export default function HRMPage() {
                             setSelectedCandidate(cand);
                             setIsCandidateModalOpen(true);
                           }}
-                          className="px-3 py-1.5 bg-blue-50 text-blue-700 font-bold rounded-xl text-xs hover:bg-blue-100 transition-all flex items-center gap-1 mx-auto"
+                          className="px-3 py-1.5 bg-brand-50 text-brand-800 font-bold rounded-xl text-xs hover:bg-brand-300 transition-all flex items-center gap-1 mx-auto"
                         >
                           <History className="w-3.5 h-3.5" /> Xem Log & Lịch Sử
                         </button>
@@ -1156,28 +1113,28 @@ export default function HRMPage() {
       {activeTab === 'CONTRACTS' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800">
-              <p className="text-xs text-slate-400 font-bold uppercase">Hạ Tầng Lưu Trữ Hợp Đồng</p>
-              <p className="text-sm font-bold text-emerald-400 mt-1 flex items-center gap-1">
+            <div className="p-4 bg-brand-50 text-brand-800 rounded-2xl border border-line">
+              <p className="text-xs text-ink-400 font-bold uppercase">Hạ Tầng Lưu Trữ Hợp Đồng</p>
+              <p className="text-sm font-bold text-success-dot mt-1 flex items-center gap-1">
                 <Lock className="w-4 h-4" /> Đã Mã Hóa An Toàn Bảo Mật
               </p>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl border border-slate-200">
-              <p className="text-xs text-slate-500 font-semibold">Tổng Hợp Đồng Đã Lưu</p>
-              <p className="text-xl font-extrabold text-slate-900">{filteredEmployees.length} File PDF</p>
+            <div className="p-4 bg-white rounded-2xl border border-line">
+              <p className="text-xs text-ink-500 font-semibold">Tổng Hợp Đồng Đã Lưu</p>
+              <p className="text-xl font-extrabold text-ink-900">{filteredEmployees.length} File PDF</p>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl border border-slate-200">
-              <p className="text-xs text-slate-500 font-semibold">Tổng Quỹ Lương Cơ Bản</p>
-              <p className="text-xl font-extrabold text-emerald-700">185.000.000 ₫/tháng</p>
+            <div className="p-4 bg-white rounded-2xl border border-line">
+              <p className="text-xs text-ink-500 font-semibold">Tổng Quỹ Lương Cơ Bản</p>
+              <p className="text-xl font-extrabold text-success-fg">185.000.000 ₫/tháng</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-line overflow-hidden">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-200 font-bold text-slate-600">
+                <tr className="bg-line-soft border-b border-line font-bold text-ink-500">
                   <th className="p-4">Số Hợp Đồng</th>
                   <th className="p-4">Nhân Sự</th>
                   <th className="p-4">Loại HĐ</th>
@@ -1186,16 +1143,16 @@ export default function HRMPage() {
                   <th className="p-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line-soft">
                 {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-slate-50">
-                    <td className="p-4 font-mono font-bold text-blue-700">{emp.contract_number}</td>
-                    <td className="p-4 font-bold text-slate-900">{emp.full_name}</td>
-                    <td className="p-4 font-semibold text-slate-700">{emp.contract_type || 'Chính thức'}</td>
-                    <td className="p-4 font-mono font-extrabold text-emerald-700">15.000.000 ₫</td>
-                    <td className="p-4"><span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-bold text-[10px]">🔒 Đã Lưu</span></td>
+                  <tr key={emp.id} className="hover:bg-surface-subtle">
+                    <td className="p-4 font-mono font-bold text-brand-800">{emp.contract_number}</td>
+                    <td className="p-4 font-bold text-ink-900">{emp.full_name}</td>
+                    <td className="p-4 font-semibold text-ink-700">{emp.contract_type || 'Chính thức'}</td>
+                    <td className="p-4 font-mono font-extrabold text-success-fg">15.000.000 ₫</td>
+                    <td className="p-4"><span className="px-2 py-0.5 bg-success-bg text-success-fg rounded font-bold text-[10px]">🔒 Đã Lưu</span></td>
                     <td className="p-4 text-center">
-                      <button onClick={() => handleOpenContractModal(emp)} className="px-3 py-1 bg-blue-600 text-white font-bold rounded-xl text-xs">
+                      <button onClick={() => handleOpenContractModal(emp)} className="px-3 py-1 bg-brand-600 text-white font-bold rounded-xl text-xs">
                         Xem PDF Hợp Đồng
                       </button>
                     </td>
@@ -1209,21 +1166,21 @@ export default function HRMPage() {
 
       {/* TAB 5: CHECKLIST ONBOARDING NHÂN SỰ MỚI */}
       {activeTab === 'ONBOARDING' && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
-          <h3 className="font-bold text-sm text-slate-900">Checklist Bàn Giao & Đào Tạo Nhân Sự Mới</h3>
+        <div className="bg-white rounded-2xl border border-line p-6 space-y-4">
+          <h3 className="font-bold text-sm text-ink-900">Checklist Bàn Giao & Đào Tạo Nhân Sự Mới</h3>
           <div className="space-y-3">
             {onboardingList.map((item) => (
-              <div key={item.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs">
+              <div key={item.id} className="p-4 bg-surface-subtle border border-line rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs">
                 <div>
-                  <p className="font-bold text-slate-900 text-sm">{item.employee_name}</p>
-                  <p className="text-slate-500">{item.position} • {item.department} (Ngày vào: {item.joined_date})</p>
+                  <p className="font-bold text-ink-900 text-sm">{item.employee_name}</p>
+                  <p className="text-ink-500">{item.position} • {item.department} (Ngày vào: {item.joined_date})</p>
                 </div>
 
                 <div className="flex items-center gap-4 flex-wrap">
                   <button
                     onClick={() => toggleOnboardingTask(item.id, 'equipment_delivered')}
                     className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
-                      item.equipment_delivered ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-200 text-slate-600'
+                      item.equipment_delivered ? 'bg-success-bg text-success-fg border border-success-border' : 'bg-line text-ink-500'
                     }`}
                   >
                     <Laptop className="w-4 h-4" /> {item.equipment_delivered ? '✓ Bàn Giao Thiết Bị' : 'Chưa Giao Thiết Bị'}
@@ -1232,7 +1189,7 @@ export default function HRMPage() {
                   <button
                     onClick={() => toggleOnboardingTask(item.id, 'crm_account_created')}
                     className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
-                      item.crm_account_created ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-slate-200 text-slate-600'
+                      item.crm_account_created ? 'bg-brand-300 text-brand-800 border border-brand-100' : 'bg-line text-ink-500'
                     }`}
                   >
                     <Key className="w-4 h-4" /> {item.crm_account_created ? '✓ Cấp TK CRM' : 'Chưa Cấp TK CRM'}
@@ -1241,7 +1198,7 @@ export default function HRMPage() {
                   <button
                     onClick={() => toggleOnboardingTask(item.id, 'training_completed')}
                     className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
-                      item.training_completed ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-200 text-slate-600'
+                      item.training_completed ? 'bg-plum-bg text-plum-fg border border-plum-border' : 'bg-line text-ink-500'
                     }`}
                   >
                     <GraduationCap className="w-4 h-4" /> {item.training_completed ? '✓ Hoàn Thành Đào Tạo' : 'Đang Đào Tạo'}
@@ -1249,7 +1206,7 @@ export default function HRMPage() {
 
                   <button
                     onClick={() => handleSignContractAndActivate(item)}
-                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all active:scale-95 ml-2"
+                    className="px-3.5 py-1.5 bg-success-fg hover:bg-success-fg text-white font-bold rounded-xl text-xs shadow-md shadow-card/20 flex items-center gap-1.5 transition-all active:scale-95 ml-2"
                   >
                     <FileCheck className="w-4 h-4" /> Ký HĐ & Kích Hoạt "Đang Làm Việc"
                   </button>
@@ -1279,19 +1236,19 @@ export default function HRMPage() {
       {activeTab === 'JOB_TITLES' && (
         <div className="space-y-6">
           {/* Header & Auto-Sync Alert */}
-          <div className="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white p-6 rounded-3xl border border-purple-800/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-6 rounded-3xl border border-plum-border/40 shadow-cardLg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
-                <Briefcase className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 rounded-2xl bg-plum-fg/20 border border-plum-border/30 text-plum-deep flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
+                <Briefcase className="w-6 h-6 text-plum-deep" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-base text-white">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
-                  <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Auto Synced
+                  <span className="px-2.5 py-0.5 bg-success-dot text-ink-900 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-surface-subtle animate-ping"></span> Auto Synced
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                <p className="text-xs text-ink-400 mt-1 max-w-2xl leading-relaxed">
                   Phân biệt rõ <strong>Chức Vụ</strong> (Giám Đốc, Trưởng Phòng...), <strong>Chức Danh</strong> (GĐ Kinh Doanh, GĐ Thị Trường...) và <strong>Khung Cấp Bậc</strong> (G1 ➔ G6 tùy biến). Tự động đồng bộ 100% thời gian thực sang RBAC & System Users.
                 </p>
               </div>
@@ -1301,7 +1258,7 @@ export default function HRMPage() {
             {jobSubTab === 'TITLES' && (
               <button
                 onClick={() => setIsJobTitleModalOpen(true)}
-                className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-plum-fg hover:bg-plum-fg text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-card/30 transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Chức Danh Mới
@@ -1311,7 +1268,7 @@ export default function HRMPage() {
             {jobSubTab === 'POSITIONS' && (
               <button
                 onClick={() => setIsPositionModalOpen(true)}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-brand-600/30 transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Chức Vụ Mới
@@ -1321,7 +1278,7 @@ export default function HRMPage() {
             {jobSubTab === 'GRADES' && (
               <button
                 onClick={() => setIsGradeModalOpen(true)}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-success-fg hover:bg-success-fg text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-card/30 transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Cấp Bậc G-Series
@@ -1330,11 +1287,11 @@ export default function HRMPage() {
           </div>
 
           {/* Sub-Tab Navigation Bar */}
-          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 w-fit text-xs font-extrabold">
+          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-line w-fit text-xs font-extrabold">
             <button
               onClick={() => setJobSubTab('TITLES')}
               className={`px-4 py-2 rounded-xl transition-all ${
-                jobSubTab === 'TITLES' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                jobSubTab === 'TITLES' ? 'bg-plum-fg text-white shadow-sm' : 'text-ink-500 hover:bg-line-soft'
               }`}
             >
               🏅 1. Quản Lý Chức Danh ({jobTitlesList.length})
@@ -1343,7 +1300,7 @@ export default function HRMPage() {
             <button
               onClick={() => setJobSubTab('POSITIONS')}
               className={`px-4 py-2 rounded-xl transition-all ${
-                jobSubTab === 'POSITIONS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                jobSubTab === 'POSITIONS' ? 'bg-brand-600 text-white shadow-sm' : 'text-ink-500 hover:bg-line-soft'
               }`}
             >
               🏢 2. Quản Lý Chức Vụ ({positionsList.length})
@@ -1352,7 +1309,7 @@ export default function HRMPage() {
             <button
               onClick={() => setJobSubTab('GRADES')}
               className={`px-4 py-2 rounded-xl transition-all ${
-                jobSubTab === 'GRADES' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                jobSubTab === 'GRADES' ? 'bg-success-fg text-white shadow-sm' : 'text-ink-500 hover:bg-line-soft'
               }`}
             >
               📊 3. Khung Cấp Bậc (G1 - G6) ({gradeLevelsList.length})
@@ -1361,25 +1318,25 @@ export default function HRMPage() {
 
           {/* SUB-TAB 1: CHỨC DANH CHUYÊN MÔN (JOB TITLES) */}
           {jobSubTab === 'TITLES' && (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="bg-white rounded-3xl border border-line shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line pb-4">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-purple-600" /> Danh Mục Chức Danh Chuyên Môn
+                  <h4 className="font-extrabold text-sm text-ink-900 flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-plum-fg" /> Danh Mục Chức Danh Chuyên Môn
                   </h4>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-ink-500 mt-0.5">
                     Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường, Trưởng Phòng Kinh Doanh...
                   </p>
                 </div>
 
                 <div className="relative w-full sm:w-72">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
                   <input
                     type="text"
                     value={jobTitleSearchTerm}
                     onChange={(e) => setJobTitleSearchTerm(e.target.value)}
                     placeholder="Tìm theo mã, tên chức danh..."
-                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                    className="w-full pl-10 pr-4 py-2 bg-surface-subtle border border-line rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-plum-fg/20"
                   />
                 </div>
               </div>
@@ -1387,7 +1344,7 @@ export default function HRMPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase tracking-wider">
+                    <tr className="bg-line-soft border-b border-line text-ink-700 font-extrabold uppercase tracking-wider">
                       <th className="p-3.5">Mã Chức Danh</th>
                       <th className="p-3.5">Tên Chức Danh Chuyên Môn</th>
                       <th className="p-3.5">Chức Vụ Tương Ứng</th>
@@ -1397,7 +1354,7 @@ export default function HRMPage() {
                       <th className="p-3.5 text-right">Thao Tác</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line-soft">
                     {jobTitlesList
                       .filter((jt) => {
                         if (!jobTitleSearchTerm.trim()) return true;
@@ -1409,28 +1366,28 @@ export default function HRMPage() {
                         );
                       })
                       .map((jt) => (
-                        <tr key={jt.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="p-3.5 font-mono font-bold text-purple-700">{jt.code}</td>
+                        <tr key={jt.id} className="hover:bg-surface-subtle transition-colors">
+                          <td className="p-3.5 font-mono font-bold text-plum-fg">{jt.code}</td>
                           <td className="p-3.5">
-                            <p className="font-bold text-slate-900">{jt.name}</p>
-                            <p className="text-[11px] text-slate-500">{jt.description}</p>
+                            <p className="font-bold text-ink-900">{jt.name}</p>
+                            <p className="text-[11px] text-ink-500">{jt.description}</p>
                           </td>
-                          <td className="p-3.5 font-bold text-blue-700">{jt.position_name || 'N/A'}</td>
+                          <td className="p-3.5 font-bold text-brand-800">{jt.position_name || 'N/A'}</td>
                           <td className="p-3.5">
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-mono font-bold rounded border border-emerald-200">
+                            <span className="px-2 py-0.5 bg-success-bg text-success-fg font-mono font-bold rounded border border-success-border">
                               {jt.grade_code || 'G4'}
                             </span>
                           </td>
-                          <td className="p-3.5 text-slate-700 font-medium">{jt.department}</td>
+                          <td className="p-3.5 text-ink-700 font-medium">{jt.department}</td>
                           <td className="p-3.5 text-center">
-                            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Auto-Synced RBAC
+                            <span className="px-2.5 py-1 bg-success-bg text-success-fg border border-success-border rounded-full font-bold text-[10px] inline-flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-success-fg" /> Auto-Synced RBAC
                             </span>
                           </td>
                           <td className="p-3.5 text-right">
                             <button
                               onClick={() => handleDeleteJobTitleSubmit(jt.id, jt.name)}
-                              className="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition-colors text-[11px]"
+                              className="px-3 py-1 bg-danger-bg hover:bg-danger-bg text-danger-fg font-bold rounded-lg transition-colors text-[11px]"
                             >
                               Xóa
                             </button>
@@ -1445,13 +1402,13 @@ export default function HRMPage() {
 
           {/* SUB-TAB 2: CHỨC VỤ QUẢN LÝ (POSITIONS) */}
           {jobSubTab === 'POSITIONS' && (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="bg-white rounded-3xl border border-line shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-line pb-4">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-blue-600" /> Danh Mục Chức Vụ Hành Chính / Quản Lý
+                  <h4 className="font-extrabold text-sm text-ink-900 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-brand-600" /> Danh Mục Chức Vụ Hành Chính / Quản Lý
                   </h4>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-ink-500 mt-0.5">
                     Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Chuyên Viên / Nhân Viên, Thử Việc...
                   </p>
                 </div>
@@ -1459,20 +1416,20 @@ export default function HRMPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {positionsList.map((pos) => (
-                  <div key={pos.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div key={pos.id} className="p-4 rounded-2xl bg-surface-subtle border border-line space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono text-[11px] font-bold rounded border border-blue-200">
+                      <span className="px-2 py-0.5 bg-brand-300 text-brand-800 font-mono text-[11px] font-bold rounded border border-brand-100">
                         {pos.code}
                       </span>
                       <button
                         onClick={() => handleDeletePositionSubmit(pos.id, pos.name)}
-                        className="text-red-600 hover:text-red-800 text-[11px] font-bold"
+                        className="text-danger-fg hover:text-danger-fg text-[11px] font-bold"
                       >
                         Xóa
                       </button>
                     </div>
-                    <h5 className="font-extrabold text-sm text-slate-900">{pos.name}</h5>
-                    <p className="text-xs text-slate-500 leading-relaxed">{pos.description}</p>
+                    <h5 className="font-extrabold text-sm text-ink-900">{pos.name}</h5>
+                    <p className="text-xs text-ink-500 leading-relaxed">{pos.description}</p>
                   </div>
                 ))}
               </div>
@@ -1481,13 +1438,13 @@ export default function HRMPage() {
 
           {/* SUB-TAB 3: KHUNG CẤP BẬC G-SERIES (GRADE LEVELS) */}
           {jobSubTab === 'GRADES' && (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="bg-white rounded-3xl border border-line shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-line pb-4">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-emerald-600" /> Thang Cấp Bậc & Khung Băng Ngạch Năng Lực (G-Series)
+                  <h4 className="font-extrabold text-sm text-ink-900 flex items-center gap-2">
+                    <Award className="w-4 h-4 text-success-fg" /> Thang Cấp Bậc & Khung Băng Ngạch Năng Lực (G-Series)
                   </h4>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-ink-500 mt-0.5">
                     Tùy biến cấp bậc G1, G2, G3, G4, G5, G6... tương ứng với dải lương trần / sàn doanh nghiệp
                   </p>
                 </div>
@@ -1495,26 +1452,26 @@ export default function HRMPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {gradeLevelsList.map((gr) => (
-                  <div key={gr.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div key={gr.id} className="p-4 rounded-2xl bg-surface-subtle border border-line space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 bg-emerald-600 text-white font-mono text-xs font-black rounded">
+                      <span className="px-2.5 py-0.5 bg-success-fg text-white font-mono text-xs font-black rounded">
                         {gr.code}
                       </span>
                       <button
                         onClick={() => handleDeleteGradeSubmit(gr.id, gr.code)}
-                        className="text-red-600 hover:text-red-800 text-[11px] font-bold"
+                        className="text-danger-fg hover:text-danger-fg text-[11px] font-bold"
                       >
                         Xóa
                       </button>
                     </div>
-                    <h5 className="font-extrabold text-xs text-slate-900">{gr.name}</h5>
-                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800">
+                    <h5 className="font-extrabold text-xs text-ink-900">{gr.name}</h5>
+                    <div className="p-2.5 bg-white rounded-xl border border-line text-xs font-mono font-bold text-ink-900">
                       <span>Dải Lương: </span>
-                      <span className="text-emerald-700">{gr.min_salary.toLocaleString('vi-VN')} ₫</span>
+                      <span className="text-success-fg">{gr.min_salary.toLocaleString('vi-VN')} ₫</span>
                       <span> - </span>
-                      <span className="text-emerald-700">{gr.max_salary.toLocaleString('vi-VN')} ₫</span>
+                      <span className="text-success-fg">{gr.max_salary.toLocaleString('vi-VN')} ₫</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">{gr.description}</p>
+                    <p className="text-[11px] text-ink-500 leading-relaxed">{gr.description}</p>
                   </div>
                 ))}
               </div>
@@ -1530,60 +1487,60 @@ export default function HRMPage() {
 
       {/* MODAL 1: THÊM ỨNG VIÊN MỚI TRONG PHỄU TUYỂN DỤNG */}
       {isNewCandModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4">
+          <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-brand-50 text-brand-800 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-blue-400" />
+                <UserPlus className="w-5 h-5 text-brand-400" />
                 <h3 className="font-bold text-base">Thêm Ứng Viên Tuyển Dụng Mới</h3>
               </div>
-              <button onClick={() => setIsNewCandModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsNewCandModalOpen(false)} className="text-ink-400 hover:text-brand-800">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreateNewCandidate} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Họ Và Tên Ứng Viên *</label>
+                <label className="block text-xs font-semibold text-ink-700 mb-1">Họ Và Tên Ứng Viên *</label>
                 <input
                   type="text"
                   value={newCandData.name || ''}
                   onChange={(e) => setNewCandData({ ...newCandData, name: e.target.value })}
                   placeholder="Ví dụ: Đỗ Hoàng Long"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs"
+                  className="w-full px-3 py-2 border border-line rounded-xl text-xs"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Số Điện Thoại *</label>
+                <label className="block text-xs font-semibold text-ink-700 mb-1">Số Điện Thoại *</label>
                 <input
                   type="text"
                   value={newCandData.phone || ''}
                   onChange={(e) => setNewCandData({ ...newCandData, phone: e.target.value })}
                   placeholder="0988 999 888"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-mono"
+                  className="w-full px-3 py-2 border border-line rounded-xl text-xs font-mono"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Vị Trí Ứng Tuyển</label>
+                <label className="block text-xs font-semibold text-ink-700 mb-1">Vị Trí Ứng Tuyển</label>
                 <input
                   type="text"
                   value={newCandData.position || ''}
                   onChange={(e) => setNewCandData({ ...newCandData, position: e.target.value })}
                   placeholder="Chuyên Viên Sale Exec / Marketing"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs"
+                  className="w-full px-3 py-2 border border-line rounded-xl text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Phòng Ban</label>
+                <label className="block text-xs font-semibold text-ink-700 mb-1">Phòng Ban</label>
                 <select
                   value={newCandData.department || 'Phòng Kinh Doanh 1'}
                   onChange={(e) => setNewCandData({ ...newCandData, department: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs"
+                  className="w-full px-3 py-2 border border-line rounded-xl text-xs"
                 >
                   <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
                   <option value="Phòng Kinh Doanh 2">Phòng Kinh Doanh 2</option>
@@ -1596,11 +1553,11 @@ export default function HRMPage() {
                 <button
                   type="button"
                   onClick={() => setIsNewCandModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                  className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs"
                 >
                   Hủy
                 </button>
-                <button type="submit" className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md">
+                <button type="submit" className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs shadow-md">
                   Tạo Ứng Viên & Ghi Log
                 </button>
               </div>
@@ -1611,48 +1568,48 @@ export default function HRMPage() {
 
       {/* MODAL 2: XEM AUDIT LOGS CHI TIẾT THEO ỨNG VIÊN */}
       {isCandidateModalOpen && selectedCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
+            <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-base flex items-center gap-2">
-                  <History className="w-5 h-5 text-blue-400" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
+                  <History className="w-5 h-5 text-brand-400" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
                 </h3>
-                <p className="text-xs text-slate-300 font-mono mt-0.5">
+                <p className="text-xs text-ink-400 font-mono mt-0.5">
                   {selectedCandidate.candidate_code} • {selectedCandidate.position} ({selectedCandidate.department})
                 </p>
               </div>
-              <button onClick={() => setIsCandidateModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsCandidateModalOpen(false)} className="text-ink-400 hover:text-brand-800">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 text-xs">
+              <div className="p-4 bg-surface-subtle rounded-2xl border border-line space-y-2 text-xs">
                 <div className="grid grid-cols-2 gap-2">
-                  <p>SĐT: <strong className="font-mono text-slate-900">{selectedCandidate.phone}</strong></p>
-                  <p>Email: <strong className="text-slate-900">{selectedCandidate.email}</strong></p>
-                  <p>Trạng thái phễu: <strong className="text-blue-700 font-bold">{selectedCandidate.stage}</strong></p>
-                  <p>Lương kỳ vọng: <strong className="text-emerald-700 font-bold font-mono">{(selectedCandidate.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫</strong></p>
+                  <p>SĐT: <strong className="font-mono text-ink-900">{selectedCandidate.phone}</strong></p>
+                  <p>Email: <strong className="text-ink-900">{selectedCandidate.email}</strong></p>
+                  <p>Trạng thái phễu: <strong className="text-brand-800 font-bold">{selectedCandidate.stage}</strong></p>
+                  <p>Lương kỳ vọng: <strong className="text-success-fg font-bold font-mono">{(selectedCandidate.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫</strong></p>
                 </div>
               </div>
 
               {/* Timeline Logs */}
               <div>
-                <h4 className="font-bold text-xs uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-blue-600" /> Lịch Sử Ghi Log Thao Tác (Audit History):
+                <h4 className="font-bold text-xs uppercase tracking-wider text-ink-700 mb-3 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-brand-600" /> Lịch Sử Ghi Log Thao Tác (Audit History):
                 </h4>
 
-                <div className="space-y-3 pl-4 border-l-2 border-blue-500">
+                <div className="space-y-3 pl-4 border-l-2 border-brand-600">
                   {selectedCandidate.audit_logs?.map((log) => (
-                    <div key={log.id} className="p-3 bg-blue-50/60 border border-blue-100 rounded-xl space-y-1 text-xs">
+                    <div key={log.id} className="p-3 bg-brand-50/60 border border-brand-100 rounded-xl space-y-1 text-xs">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-bold text-blue-900">{log.actor_name}</span>
-                        <span className="font-mono text-slate-400">{log.timestamp}</span>
+                        <span className="font-bold text-brand-900">{log.actor_name}</span>
+                        <span className="font-mono text-ink-400">{log.timestamp}</span>
                       </div>
-                      <p className="text-slate-800 font-semibold">{log.note}</p>
+                      <p className="text-ink-900 font-semibold">{log.note}</p>
                       {log.stage_from && log.stage_to && (
-                        <p className="text-[10px] text-blue-700 font-mono">
+                        <p className="text-[10px] text-brand-800 font-mono">
                           Chuyển phễu: <span>{log.stage_from}</span> ➔ <strong>{log.stage_to}</strong>
                         </p>
                       )}
@@ -1667,26 +1624,26 @@ export default function HRMPage() {
 
       {/* DRAWER: KHAI THÁC NHẬT KÝ LOG TOÀN BỘ PHỄU TUYỂN DỤNG */}
       {isAuditDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto space-y-4 animate-in slide-in-from-right duration-300">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-                <History className="w-5 h-5 text-blue-600" /> Toàn Bộ Log Phễu Tuyển Dụng
+        <div className="fixed inset-0 z-50 flex justify-end bg-white">
+          <div className="bg-white w-full max-w-md h-full shadow-cardLg p-6 overflow-y-auto space-y-4 animate-in slide-in-from-right duration-300">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <h3 className="font-bold text-base text-ink-900 flex items-center gap-2">
+                <History className="w-5 h-5 text-brand-600" /> Toàn Bộ Log Phễu Tuyển Dụng
               </h3>
-              <button onClick={() => setIsAuditDrawerOpen(false)} className="text-slate-400 hover:text-slate-700">
+              <button onClick={() => setIsAuditDrawerOpen(false)} className="text-ink-400 hover:text-ink-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3">
               {candidates.flatMap((c) => c.audit_logs || []).map((log) => (
-                <div key={log.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
+                <div key={log.id} className="p-3 bg-surface-subtle border border-line rounded-xl text-xs space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-slate-900">{log.candidate_name}</span>
-                    <span className="font-mono text-slate-400 text-[10px]">{log.timestamp}</span>
+                    <span className="font-bold text-ink-900">{log.candidate_name}</span>
+                    <span className="font-mono text-ink-400 text-[10px]">{log.timestamp}</span>
                   </div>
-                  <p className="text-slate-700">{log.note}</p>
-                  <p className="text-[10px] text-blue-600 font-mono">Người thực hiện: {log.actor_name}</p>
+                  <p className="text-ink-700">{log.note}</p>
+                  <p className="text-[10px] text-brand-600 font-mono">Người thực hiện: {log.actor_name}</p>
                 </div>
               ))}
             </div>
@@ -1696,37 +1653,37 @@ export default function HRMPage() {
 
       {/* MODAL: CHUYỂN TRẠNG THÁI NHÂN SỰ */}
       {isStatusModalOpen && statusTargetEmp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold">
+                <div className="w-10 h-10 rounded-xl bg-plum-fg/20 border border-plum-border/30 flex items-center justify-center text-plum-deep font-bold">
                   <UserCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Chuyển Trạng Thái Nhân Sự</h3>
-                  <p className="text-xs text-slate-300 font-mono">
+                  <p className="text-xs text-ink-400 font-mono">
                     {statusTargetEmp.full_name} ({statusTargetEmp.employee_code})
                   </p>
                 </div>
               </div>
-              <button onClick={() => setIsStatusModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsStatusModalOpen(false)} className="text-ink-400 hover:text-brand-800">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSaveStatusChange} className="p-6 space-y-4">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex items-center justify-between">
-                <span className="font-bold text-slate-600">Trạng Thái Hiện Tại:</span>
+              <div className="p-3 bg-surface-subtle border border-line rounded-xl text-xs flex items-center justify-between">
+                <span className="font-bold text-ink-500">Trạng Thái Hiện Tại:</span>
                 {renderEmployeeStatusBadge(statusTargetEmp.status)}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Chọn Trạng Thái Mới *</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1.5">Chọn Trạng Thái Mới *</label>
                 <select
                   value={statusNewValue}
                   onChange={(e) => setStatusNewValue(e.target.value as any)}
-                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 bg-surface-subtle border border-line rounded-xl text-xs font-bold text-ink-900 focus:ring-2 focus:ring-brand-600"
                   required
                 >
                   <option value="Active">🟢 Đang Làm Việc (Active)</option>
@@ -1739,27 +1696,27 @@ export default function HRMPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Ghi Chú / Lý Do Chuyển Trạng Thái</label>
+                <label className="block text-xs font-semibold text-ink-700 mb-1">Ghi Chú / Lý Do Chuyển Trạng Thái</label>
                 <textarea
                   rows={3}
                   value={statusReasonNote}
                   onChange={(e) => setStatusReasonNote(e.target.value)}
                   placeholder="Nhập lý do (ví dụ: Đã nộp đơn xin nghỉ việc, Đạt thử việc ký HĐ chính thức, Hoàn tất ký HĐLĐ...)"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs"
+                  className="w-full px-3 py-2 border border-line rounded-xl text-xs"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-line flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsStatusModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                  className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs transition-colors"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-600/20 transition-all"
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs shadow-md shadow-brand-600/20 transition-all"
                 >
                   Lưu Cập Nhật Trạng Thái
                 </button>
@@ -1771,43 +1728,43 @@ export default function HRMPage() {
 
       {/* MODAL 1: THÊM CHỨC DANH MỚI (JOB TITLE) */}
       {isJobTitleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-purple-500/20 border border-purple-400/30 rounded-xl text-purple-300">
+                <div className="p-2 bg-plum-fg/20 border border-plum-border/30 rounded-xl text-plum-deep">
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Chức Danh Chuyên Môn Mới</h3>
-                  <p className="text-[11px] text-purple-300">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
+                  <p className="text-[11px] text-plum-deep">Ví dụ: Giám Đốc Kinh Doanh, Giám Đốc Thị Trường...</p>
                 </div>
               </div>
-              <button onClick={() => setIsJobTitleModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsJobTitleModalOpen(false)} className="text-ink-400 hover:text-brand-800">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreateJobTitleSubmit} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Tên Chức Danh Chuyên Môn *:</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Tên Chức Danh Chuyên Môn *:</label>
                 <input
                   type="text"
                   required
                   value={newJtName}
                   onChange={(e) => setNewJtName(e.target.value)}
                   placeholder="VD: Giám Đốc Kinh Doanh, Trưởng Phòng HR..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-semibold text-ink-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum-fg/20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Chức Vụ Hành Chính:</label>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">Chức Vụ Hành Chính:</label>
                   <select
                     value={newJtPosName}
                     onChange={(e) => setNewJtPosName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-blue-700 focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-bold text-brand-800 focus:outline-none"
                   >
                     {positionsList.map((p) => (
                       <option key={p.id} value={p.name}>
@@ -1818,11 +1775,11 @@ export default function HRMPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Khung Cấp Bậc (Grade):</label>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">Khung Cấp Bậc (Grade):</label>
                   <select
                     value={newJtGradeCode}
                     onChange={(e) => setNewJtGradeCode(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-emerald-700 focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-mono font-bold text-success-fg focus:outline-none"
                   >
                     {gradeLevelsList.map((g) => (
                       <option key={g.id} value={g.code}>
@@ -1834,22 +1791,22 @@ export default function HRMPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mã Chức Danh (Code):</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Mã Chức Danh (Code):</label>
                 <input
                   type="text"
                   value={newJtCode}
                   onChange={(e) => setNewJtCode(e.target.value)}
                   placeholder="VD: DIR_SALES, MGR_HR... (Tự tạo nếu trống)"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-mono text-ink-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum-fg/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Thuộc Phòng Ban:</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Thuộc Phòng Ban:</label>
                 <select
                   value={newJtDept}
                   onChange={(e) => setNewJtDept(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-medium text-ink-900 focus:outline-none focus:ring-2 focus:ring-plum-fg/20"
                 >
                   <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
                   <option value="Phòng Kinh Doanh 2">Phòng Kinh Doanh 2</option>
@@ -1863,27 +1820,27 @@ export default function HRMPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mô Tả Trách Nhiệm:</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Mô Tả Trách Nhiệm:</label>
                 <textarea
                   rows={2}
                   value={newJtDesc}
                   onChange={(e) => setNewJtDesc(e.target.value)}
                   placeholder="Mô tả phạm vi chiến lược / công việc chuyên môn..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl text-ink-900 focus:outline-none focus:ring-2 focus:ring-plum-fg/20"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-line flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsJobTitleModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                  className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs transition-colors"
                 >
                   Hủy Bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-purple-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-plum-fg hover:bg-plum-fg text-white font-extrabold rounded-xl text-xs shadow-md shadow-card/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Danh
@@ -1896,69 +1853,69 @@ export default function HRMPage() {
 
       {/* MODAL 2: THÊM CHỨC VỤ MỚI (POSITION) */}
       {isPositionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-300">
+                <div className="p-2 bg-brand-500/20 border border-brand-200/30 rounded-xl text-brand-400">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Chức Vụ Quản Lý Mới</h3>
-                  <p className="text-[11px] text-blue-300">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
+                  <p className="text-[11px] text-brand-400">Ví dụ: Giám Đốc, Trưởng Phòng, Trưởng Nhóm, Nhân Viên...</p>
                 </div>
               </div>
-              <button onClick={() => setIsPositionModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsPositionModalOpen(false)} className="text-ink-400 hover:text-brand-800">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreatePositionSubmit} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Tên Chức Vụ Hành Chính *:</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Tên Chức Vụ Hành Chính *:</label>
                 <input
                   type="text"
                   required
                   value={newPosName}
                   onChange={(e) => setNewPosName(e.target.value)}
                   placeholder="VD: Phó Giám Đốc, Trưởng Bộ Phận, Trợ Lý Executive..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-semibold text-ink-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mã Chức Vụ (Code):</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Mã Chức Vụ (Code):</label>
                 <input
                   type="text"
                   value={newPosCode}
                   onChange={(e) => setNewPosCode(e.target.value)}
                   placeholder="VD: POS_VP, POS_HEAD... (Tự tạo nếu trống)"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-mono text-ink-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mô Tả Vai Trò:</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Mô Tả Vai Trò:</label>
                 <textarea
                   rows={2}
                   value={newPosDesc}
                   onChange={(e) => setNewPosDesc(e.target.value)}
                   placeholder="Mô tả quyền hạn quản lý hành chính..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl text-ink-900 focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-line flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsPositionModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                  className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs transition-colors"
                 >
                   Hủy Bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-brand-600/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Vụ
@@ -1971,19 +1928,19 @@ export default function HRMPage() {
 
       {/* MODAL 3: THÊM CẤP BẬC G-SERIES MỚI (GRADE LEVEL) */}
       {isGradeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-line shadow-cardLg w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-gradient-to-r from-brand-50 via-white to-white text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-500/20 border border-emerald-400/30 rounded-xl text-emerald-300">
+                <div className="p-2 bg-success-dot/20 border border-success-border/30 rounded-xl text-success-dot">
                   <Award className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Khai Báo Cấp Bậc (Grade Matrix) Mới</h3>
-                  <p className="text-[11px] text-emerald-300">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
+                  <p className="text-[11px] text-success-dot">Thang ngạch bậc G1, G2, G3, G4, G5, G6...</p>
                 </div>
               </div>
-              <button onClick={() => setIsGradeModalOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsGradeModalOpen(false)} className="text-ink-400 hover:text-brand-800">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1991,76 +1948,76 @@ export default function HRMPage() {
             <form onSubmit={handleCreateGradeSubmit} className="p-6 space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Mã Cấp Bậc (Grade Code) *:</label>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">Mã Cấp Bậc (Grade Code) *:</label>
                   <input
                     type="text"
                     required
                     value={newGrCode}
                     onChange={(e) => setNewGrCode(e.target.value)}
                     placeholder="VD: G1, G2, G3, G7..."
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-emerald-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-mono font-bold text-success-fg focus:bg-white focus:outline-none focus:ring-2 focus:ring-success-fg/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Tên Gọi Ngạch Bậc *:</label>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">Tên Gọi Ngạch Bậc *:</label>
                   <input
                     type="text"
                     required
                     value={newGrName}
                     onChange={(e) => setNewGrName(e.target.value)}
                     placeholder="VD: G7 - Chuyên Gia Cao Cấp..."
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-semibold text-ink-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-success-fg/20"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Mức Lương Sàn (Sàn VNĐ):</label>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">Mức Lương Sàn (Sàn VNĐ):</label>
                   <input
                     type="number"
                     value={newGrMinSal}
                     onChange={(e) => setNewGrMinSal(Number(e.target.value))}
                     step={500000}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-mono text-ink-900 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Mức Lương Trần (Trần VNĐ):</label>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">Mức Lương Trần (Trần VNĐ):</label>
                   <input
                     type="number"
                     value={newGrMaxSal}
                     onChange={(e) => setNewGrMaxSal(Number(e.target.value))}
                     step={500000}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl font-mono text-ink-900 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mô Tả Năng Lực Năng Định:</label>
+                <label className="block text-xs font-bold text-ink-700 mb-1">Mô Tả Năng Lực Năng Định:</label>
                 <textarea
                   rows={2}
                   value={newGrDesc}
                   onChange={(e) => setNewGrDesc(e.target.value)}
                   placeholder="Mô tả yêu cầu tiêu chuẩn kinh nghiệm & năng lực..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full px-3 py-2 bg-surface-subtle border border-line rounded-xl text-ink-900 focus:outline-none focus:ring-2 focus:ring-success-fg/20"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-line flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsGradeModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                  className="px-4 py-2 bg-line-soft hover:bg-line text-ink-700 font-bold rounded-xl text-xs transition-colors"
                 >
                   Hủy Bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-success-fg hover:bg-success-fg text-white font-extrabold rounded-xl text-xs shadow-md shadow-card/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Cấp Bậc G-Series
