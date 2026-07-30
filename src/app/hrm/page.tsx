@@ -697,16 +697,7 @@ export default function HRMPage() {
             activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          👤 2. Hồ Sơ Nhân Sự ({filteredEmployees.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('LABOR_BOOK')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'LABOR_BOOK' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          📒 Sổ Lao Động ({employees.length})
+          👤 2. Hồ Sơ Nhân Sự & Sổ Lao Động NĐ 145/2020 ({employees.length})
         </button>
 
         <button
@@ -778,112 +769,16 @@ export default function HRMPage() {
         </button>
       </div>
 
-      {/* TAB 1: HỒ SƠ NHÂN SỰ ĐỊNH DANH CHI TIẾT */}
+      {/* TAB 1: HỒ SƠ NHÂN SỰ & SỔ QUẢN LÝ LAO ĐỘNG (NĐ 145/2020/NĐ-CP) */}
       {activeTab === 'PROFILE' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-              <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Tìm tên, Mã NV, CCCD, Phòng ban..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs"
-                />
-              </div>
-
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none"
-              >
-                <option value="ALL">Tất Cả Trạng Thái</option>
-                <option value="Active">🟢 Đang Làm Việc</option>
-                <option value="Probation">🔵 Thử Việc</option>
-                <option value="Pending_Resign">🟠 Chờ Nghỉ Việc</option>
-                <option value="Resigned">🔴 Đã Nghỉ Việc</option>
-                <option value="Suspended">🟣 Tạm Hoãn HĐ</option>
-                <option value="Applicant">⚪ Ứng Viên Mới</option>
-              </select>
-            </div>
-
-            <span className="text-xs font-bold text-slate-500">
-              Đang hiển thị <strong className="text-slate-900">{filteredEmployees.length} Nhân Sự</strong>
-            </span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
-                  <th className="p-4">Mã NV & Họ Tên</th>
-                  <th className="p-4">Phòng Ban & Vị Trí</th>
-                  <th className="p-4">Trạng Thái Làm Việc</th>
-                  <th className="p-4">Trạng Thái Phê Duyệt</th>
-                  <th className="p-4">BHXH / BHYT</th>
-                  <th className="p-4 text-center">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <td className="p-4">
-                      <p className="font-bold text-slate-900 text-sm">{emp.full_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{emp.employee_code}</p>
-                    </td>
-
-                    <td className="p-4">
-                      <p className="font-bold text-slate-800">{emp.department}</p>
-                      <p className="text-slate-500">{emp.position}</p>
-                    </td>
-
-                    <td className="p-4">{renderEmployeeStatusBadge(emp.status)}</td>
-
-                    <td className="p-4">{renderApprovalBadge(emp.approval_status)}</td>
-
-                    <td className="p-4 font-mono">
-                      <p className="text-emerald-700 font-bold text-[11px]">BHXH: {emp.social_insurance_code || '7910928374'}</p>
-                      <p className="text-purple-700 text-[10px]">BHYT: {emp.health_insurance_code || 'DN4010928'}</p>
-                    </td>
-
-                    <td className="p-4 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() => handleOpenStatusModal(emp)}
-                          className="px-2.5 py-1.5 bg-purple-50 text-purple-700 font-bold rounded-xl text-[11px] hover:bg-purple-100 transition-all border border-purple-200"
-                        >
-                          Đổi Trạng Thái
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedEmployee(emp);
-                            setEmployeeModalMode('view');
-                            setIsEmployeeModalOpen(true);
-                          }}
-                          className="px-2.5 py-1.5 bg-blue-50 text-blue-700 font-bold rounded-xl text-[11px] hover:bg-blue-100 transition-all"
-                        >
-                          Chi Tiết
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedEmployee(emp);
-                            setEmployeeModalMode('edit');
-                            setIsEmployeeModalOpen(true);
-                          }}
-                          className="px-2.5 py-1.5 bg-amber-50 text-amber-700 font-bold rounded-xl text-[11px] hover:bg-amber-100 transition-all"
-                        >
-                          Sửa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <LaborBook
+          employees={employees}
+          onSelect={(emp) => {
+            setSelectedEmployee(emp);
+            setEmployeeModalMode('view');
+            setIsEmployeeModalOpen(true);
+          }}
+        />
       )}
 
       {/* TAB 2: QUY TRÌNH PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
@@ -1553,17 +1448,7 @@ export default function HRMPage() {
         <HrmDashboard employees={employees} />
       )}
 
-      {/* TAB: SỔ QUẢN LÝ LAO ĐỘNG (Nghị định 145/2020/NĐ-CP) */}
-      {activeTab === 'LABOR_BOOK' && (
-        <LaborBook
-          employees={employees}
-          onSelect={(emp) => {
-            setSelectedEmployee(emp);
-            setEmployeeModalMode('view');
-            setIsEmployeeModalOpen(true);
-          }}
-        />
-      )}
+
 
       {/* MODAL 1: THÊM ỨNG VIÊN MỚI TRONG PHỄU TUYỂN DỤNG */}
       {isNewCandModalOpen && (
