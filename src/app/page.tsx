@@ -15,36 +15,48 @@ import {
   Play,
   Layers,
   CheckCircle2,
-  Clock
+  Clock,
+  Briefcase,
+  MapPin,
+  FileText,
+  BarChart3,
+  Calendar,
+  PieChart,
+  ShieldCheck,
+  Building2,
+  FileSpreadsheet
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Top Banner Header - Light Enterprise Hero */}
-      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
-        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
+      <div className="gg-hero p-5 md:p-6 relative overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-3xl shadow-xl">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
-              <Sparkles className="w-3 h-3 text-blue-600" />
-              <span>GGBingo CRM System Overview</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold mb-2.5">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              <span>Trung Tâm Điều Hành Dashboard Doanh Nghiệp GGBingo CRM</span>
             </div>
-            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
-              Tổng Quan Vận Hành & Doanh Số Kinh Doanh
+            <h1 className="text-xl md:text-2xl font-black tracking-tight text-white">
+              Tổng Quan Vận Hành, Doanh Số & Nhân Sự Toàn Hệ Thống
             </h1>
-            <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
-              Quản lý Dịch vụ Ủy quyền Vận hành Gian hàng TMĐT (Shopee, TikTok Shop, Lazada, Amazon) và Nền tảng GGBingoVN.
+            <p className="text-slate-300 text-xs mt-1 max-w-2xl leading-relaxed">
+              Quản lý Dịch vụ Ủy quyền Vận hành Gian hàng TMĐT (Shopee, TikTok Shop, Lazada, Amazon), Nhân sự 3P, KPIs & Bảng Lương.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm">
+          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/20 shadow-sm">
             <div className="text-right">
-              <p className="text-[11px] text-slate-500 font-semibold">Tiến độ KPI tháng này</p>
-              <p className="text-sm font-extrabold text-emerald-600 tabular-numbers">88.5% (Đạt chỉ tiêu)</p>
+              <p className="text-[11px] text-slate-300 font-semibold">Tỷ lệ hoàn thành KPI tháng</p>
+              <p className="text-sm font-black text-emerald-400 tabular-numbers">88.5% (Đạt Mục Tiêu)</p>
             </div>
-            <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'conic-gradient(#2FA84F 0 88%, #E4E7EC 88% 100%)' }}>
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center font-extrabold text-[11px] text-emerald-600">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center shadow-md"
+              style={{ background: 'conic-gradient(#10B981 0 88.5%, #374151 88.5% 100%)' }}
+            >
+              <div className="w-9 h-9 rounded-full bg-slate-900 flex items-center justify-center font-extrabold text-[11px] text-emerald-400">
                 88%
               </div>
             </div>
@@ -52,78 +64,191 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {/* Card 1: Agency GMV */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Doanh Số Dịch Vụ</span>
-            <div className="p-1.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100">
+      {/* QUICK DASHBOARD NAVIGATION METRICS CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Revenue & CRM */}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 transition-all space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Doanh Số Dịch Vụ</span>
+            <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">3.480.000.000 ₫</p>
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium mt-1.5">
-            <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>Tăng 18.4% so với tháng trước</span>
+          <p className="text-2xl font-black text-slate-900 tracking-tight">3.480.000.000 ₫</p>
+          <div className="flex items-center justify-between text-xs text-emerald-600 font-bold pt-1 border-t border-slate-100">
+            <span className="flex items-center gap-1">
+              <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% so tháng trước
+            </span>
+            <Link href="/leads" className="text-blue-600 hover:underline">Phễu CRM →</Link>
           </div>
         </div>
 
-        {/* Card 2: Total Active Customers */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Khách Hàng (Gian Hàng)</span>
-            <div className="p-1.5 rounded-md bg-purple-50 text-purple-600 border border-purple-100">
-              <ShoppingBag className="w-4 h-4" />
+        {/* Card 2: HRM & Headcount */}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:border-purple-300 transition-all space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Nhân Sự & Quy Mô</span>
+            <div className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+              <Briefcase className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">1.240 Gian Hàng</p>
-          <p className="text-xs text-slate-500 mt-1.5 font-medium">Shopee: 520 • TikTok: 480 • Lazada: 240</p>
-        </div>
-
-        {/* Card 3: Total Leads Ingested */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Lead Mới Tiếp Nhận</span>
-            <div className="p-1.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100">
-              <UserCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">458 Lead</p>
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium mt-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>Tự động phân bổ nhân sự</span>
+          <p className="text-2xl font-black text-slate-900 tracking-tight">48 Nhân Sự</p>
+          <div className="flex items-center justify-between text-xs text-slate-500 font-bold pt-1 border-t border-slate-100">
+            <span>Active: 94% • Thử việc: 6%</span>
+            <Link href="/hrm" className="text-purple-600 hover:underline">HRM →</Link>
           </div>
         </div>
 
-        {/* Card 4: VoIP Activity */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs card-hover">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Cuộc Gọi Tổng Đài</span>
-            <div className="p-1.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
-              <PhoneCall className="w-4 h-4" />
+        {/* Card 3: KPIs Target Completion */}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:border-indigo-300 transition-all space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Chỉ Tiêu KPIs</span>
+            <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-xl font-bold text-slate-900 tabular-numbers tracking-tight">12.450 Phút Gọi</p>
-          <p className="text-xs text-slate-500 mt-1.5 font-medium">Tỷ lệ nghe máy: 84.2% (Ghi âm tự động)</p>
+          <p className="text-2xl font-black text-slate-900 tracking-tight">7 Chỉ Tiêu KPIs</p>
+          <div className="flex items-center justify-between text-xs text-indigo-600 font-bold pt-1 border-t border-slate-100">
+            <span>🔥 3 KPI Vượt Chỉ Tiêu</span>
+            <Link href="/kpis" className="text-indigo-600 hover:underline">KPIs →</Link>
+          </div>
+        </div>
+
+        {/* Card 4: Total Payroll */}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:border-emerald-300 transition-all space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Bảng Lương P3 Tháng</span>
+            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <PieChart className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-black text-emerald-700 tracking-tight">485.000.000 ₫</p>
+          <div className="flex items-center justify-between text-xs text-emerald-600 font-bold pt-1 border-t border-slate-100">
+            <span>Đã khóa & gửi Paystub</span>
+            <Link href="/payroll" className="text-emerald-600 hover:underline">Bảng Lương →</Link>
+          </div>
         </div>
       </div>
 
-      {/* Main Content Grid */}
+      {/* DASHBOARDS QUICK ACCESS GRID FOR ALL MODULES */}
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+          <BarChart3 className="w-4 h-4 text-blue-600" /> Danh Sách Dashboard Các Phân Hệ Chuyên Sâu
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          {/* Dashboard 1: HRM */}
+          <Link
+            href="/hrm"
+            className="p-4 bg-slate-50 hover:bg-blue-50/60 border border-slate-200/80 hover:border-blue-300 rounded-2xl transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-slate-900 group-hover:text-blue-700 flex items-center gap-1.5">
+                <Briefcase className="w-4 h-4 text-blue-600" /> Dashboard Quản Lý Nhân Sự (HRM)
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+            </div>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              Sơ đồ tổ chức cây phòng ban, Sổ quản lý lao động (NĐ 145/2020), hợp đồng lao động & tuyển dụng
+            </p>
+          </Link>
+
+          {/* Dashboard 2: KPIs */}
+          <Link
+            href="/kpis"
+            className="p-4 bg-slate-50 hover:bg-indigo-50/60 border border-slate-200/80 hover:border-indigo-300 rounded-2xl transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-slate-900 group-hover:text-indigo-700 flex items-center gap-1.5">
+                <TrendingUp className="w-4 h-4 text-indigo-600" /> Dashboard Quản Lý KPIs
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600" />
+            </div>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              Phân bổ chỉ tiêu chi tiết theo Công Ty / Phòng Ban / Cá Nhân theo đa dạng loại chỉ số Doanh số, Lead, Call
+            </p>
+          </Link>
+
+          {/* Dashboard 3: Performance */}
+          <Link
+            href="/performance"
+            className="p-4 bg-slate-50 hover:bg-purple-50/60 border border-slate-200/80 hover:border-purple-300 rounded-2xl transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-slate-900 group-hover:text-purple-700 flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-purple-600" /> Dashboard Chấm Điểm Hiệu Suất
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600" />
+            </div>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              Quy trình ngày 01 tự động, tự đánh giá công việc, rà soát tiêu chí HR, xếp loại A-D & tính Lương P3
+            </p>
+          </Link>
+
+          {/* Dashboard 4: Attendance */}
+          <Link
+            href="/attendance"
+            className="p-4 bg-slate-50 hover:bg-blue-50/60 border border-slate-200/80 hover:border-blue-300 rounded-2xl transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-slate-900 group-hover:text-blue-700 flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-blue-600" /> Dashboard Chấm Công & Nghỉ Phép
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+            </div>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              Check-in GPS, phê duyệt đơn xin nghỉ phép 2 cấp, tổng hợp công chuẩn & cài đặt giờ ca làm việc
+            </p>
+          </Link>
+
+          {/* Dashboard 5: Payroll */}
+          <Link
+            href="/payroll"
+            className="p-4 bg-slate-50 hover:bg-emerald-50/60 border border-slate-200/80 hover:border-emerald-300 rounded-2xl transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-slate-900 group-hover:text-emerald-700 flex items-center gap-1.5">
+                <PieChart className="w-4 h-4 text-emerald-600" /> Dashboard Quản Lý Bảng Lương
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
+            </div>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              Động cơ tính lương 3P tự động (P1+P2+P3), trích nộp BHXH/Thuế TNCN & gửi Phiếu Lương Zalo ZNS/Email
+            </p>
+          </Link>
+
+          {/* Dashboard 6: Vietnam GIS Map */}
+          <Link
+            href="/hr-map"
+            className="p-4 bg-slate-50 hover:bg-amber-50/60 border border-slate-200/80 hover:border-amber-300 rounded-2xl transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-slate-900 group-hover:text-amber-700 flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-amber-600" /> Bản Đồ Phân Bổ Nhân Sự Vietnam GIS
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600" />
+            </div>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              Bản đồ vector GIS 63 tỉnh thành & Hoàng Sa/Trường Sa theo chuẩn 34 đơn vị hành chính mới
+            </p>
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Content Grid: Pipeline Summary & Operational Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left Column: Pipeline Summary */}
         <div className="lg:col-span-2 space-y-5">
-          <div className="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
             <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-blue-600" /> Phễu Bán Hàng Dịch Vụ TMĐT
+                  <Layers className="w-4 h-4 text-blue-600" /> Phễu Chuyển Đổi CRM & Khách Hàng Gian Hàng TMĐT
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">Phân tích giá trị cơ hội kinh doanh ở từng giai đoạn</p>
               </div>
-              <a href="/leads" className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                Xem chi tiết phễu <ChevronRight className="w-3.5 h-3.5" />
-              </a>
+              <Link href="/leads" className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                Xem phễu chi tiết <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
             <div className="space-y-3.5">
@@ -170,7 +295,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Customers Table */}
-          <div className="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
             <h3 className="font-bold text-slate-900 text-sm mb-3">Khách Hàng Ký Hợp Đồng Mới Đây</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
@@ -214,42 +339,42 @@ export default function DashboardPage() {
 
         {/* Right Column */}
         <div className="space-y-5">
-          <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
             <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
               <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                 <PhoneCall className="w-4 h-4 text-emerald-600" />
-                Lịch Sử Cuộc Gọi Mới
+                Lịch Sử Cuộc Gọi VoIP Mới
               </h3>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
             </div>
 
             <div className="space-y-2.5">
-              <div className="p-2.5 rounded-md bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
                 <div>
                   <p className="font-bold text-slate-900">Phạm Minh Đức → 0912 **** 889</p>
                   <p className="text-slate-500 text-[11px] mt-0.5">Tư vấn gói Shopee • 3 phút 12 giây</p>
                 </div>
-                <button className="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold flex items-center gap-1 text-[10px] transition-colors">
+                <button className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold flex items-center gap-1 text-[10px] transition-colors">
                   <Play className="w-3 h-3 fill-emerald-700" /> Ghi Âm
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-2xs">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
             <h3 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2 border-b border-slate-100 pb-2.5">
               <Award className="w-4 h-4 text-amber-500" />
               Thành Tích Doanh Số Tháng
             </h3>
 
             <div className="space-y-2.5">
-              <div className="flex items-center gap-2.5 p-2.5 rounded-md bg-slate-50 border border-slate-200/80">
-                <div className="w-6 h-6 rounded bg-blue-600 text-white font-bold text-xs flex items-center justify-center">1</div>
+              <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div className="w-6 h-6 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">1</div>
                 <div className="flex-1">
                   <p className="text-xs font-bold text-slate-900">Trần Văn Hoàng (Đội 1)</p>
                   <p className="text-[11px] text-slate-500 tabular-numbers">Doanh số: 620.000.000 ₫ (Đạt 124%)</p>
                 </div>
-                <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 rounded text-[10px] font-bold">
+                <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 rounded-md text-[10px] font-bold">
                   Top 1
                 </span>
               </div>
