@@ -365,7 +365,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'ONBOARDING' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <UserCheck className="w-4 h-4 text-purple-400" /> 🚀 3. Quy Trình Onboarding (Hội Nhập 60 Ngày)
+          <UserCheck className="w-4 h-4 text-purple-400" /> 🚀 3. Onboarding
         </button>
 
         <button
