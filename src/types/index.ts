@@ -138,15 +138,21 @@ export interface VoIPCallLog {
 }
 
 export type KpiAssigneeType = 'Company' | 'Department' | 'Team' | 'Individual';
+export type KpiCategory = 'REVENUE' | 'LEADS' | 'CALLS' | 'CONTRACTS' | 'CONVERSION' | 'CSAT' | 'OTHER';
+export type KpiMetricType = 'Currency' | 'Count' | 'Percentage' | 'Score';
 
 export interface KPIAssignment {
   id: string;
   kpi_code?: string;
   kpi_name: string;
+  category?: KpiCategory;
+  category_label?: string;
+  metric_type?: KpiMetricType;
   unit: string;
   assignee_type: KpiAssigneeType;
   assignee_id?: string;
   assignee_name: string;
+  department?: string;
   region?: 'Sale Miền Bắc' | 'Sale Miền Nam' | 'Khối Enterprise';
   period: string;
   target_value: number;
