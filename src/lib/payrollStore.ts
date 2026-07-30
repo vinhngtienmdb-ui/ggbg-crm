@@ -6,14 +6,42 @@ import {
   AttendanceStatus,
   LeaveType,
   LeaveStatus,
-  PayrollStatus
+  PayrollStatus,
+  AttendanceSettings,
+  PayrollSettings
 } from '@/types';
 import { getEmployees } from './hrmStore';
 import { getScorecardsByPeriod } from './performanceStore';
 
 export const PAYROLL_UPDATED_EVENT = 'ggbg_payroll_updated_event';
 
-// Initial Seed Data: Attendance Records for July 2026
+export const DEFAULT_ATTENDANCE_SETTINGS: AttendanceSettings = {
+  standard_workdays: 26,
+  work_start_time: '08:00',
+  work_end_time: '17:30',
+  late_grace_minutes: 15,
+  ot_min_hours: 1.0,
+  annual_leave_quota: 12,
+  gps_radius_meters: 200,
+  allowed_ip_range: '192.168.1.0/24',
+};
+
+export const DEFAULT_PAYROLL_SETTINGS: PayrollSettings = {
+  p2_lunch_allowance: 730000,
+  p2_phone_allowance: 300000,
+  p2_transport_allowance: 500000,
+  bhxh_percent: 8.0,
+  bhyt_percent: 1.5,
+  bhtn_percent: 1.0,
+  late_penalty_per_instance: 50000,
+  ot_multiplier_standard: 1.5,
+  ot_multiplier_weekend: 2.0,
+  ot_multiplier_holiday: 3.0,
+  personal_tax_deduction_self: 11000000,
+  personal_tax_deduction_dependent: 4400000,
+};
+
+// Initial Seed Data: Attendance Records
 export const INITIAL_ATTENDANCE: AttendanceRecord[] = [
   {
     id: 'att_1',
@@ -116,6 +144,43 @@ export const INITIAL_LEAVE_REQUESTS: LeaveRequest[] = [
 const ATTENDANCE_KEY = 'ggbg_attendance_records_v1';
 const LEAVE_KEY = 'ggbg_leave_requests_v1';
 const PAYROLL_KEY = 'ggbg_payroll_sheets_v1';
+const ATTENDANCE_SETTING_KEY = 'ggbg_attendance_settings_v1';
+const PAYROLL_SETTING_KEY = 'ggbg_payroll_settings_v1';
+
+// ===== GETTERS / SETTERS SETTINGS =====
+export function getAttendanceSettings(): AttendanceSettings {
+  if (typeof window === 'undefined') return DEFAULT_ATTENDANCE_SETTINGS;
+  try {
+    const raw = localStorage.getItem(ATTENDANCE_SETTING_KEY);
+    if (!raw) return DEFAULT_ATTENDANCE_SETTINGS;
+    return { ...DEFAULT_ATTENDANCE_SETTINGS, ...JSON.parse(raw) };
+  } catch (e) {
+    return DEFAULT_ATTENDANCE_SETTINGS;
+  }
+}
+
+export function saveAttendanceSettings(settings: AttendanceSettings) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(ATTENDANCE_SETTING_KEY, JSON.stringify(settings));
+  window.dispatchEvent(new Event(PAYROLL_UPDATED_EVENT));
+}
+
+export function getPayrollSettings(): PayrollSettings {
+  if (typeof window === 'undefined') return DEFAULT_PAYROLL_SETTINGS;
+  try {
+    const raw = localStorage.getItem(PAYROLL_SETTING_KEY);
+    if (!raw) return DEFAULT_PAYROLL_SETTINGS;
+    return { ...DEFAULT_PAYROLL_SETTINGS, ...JSON.parse(raw) };
+  } catch (e) {
+    return DEFAULT_PAYROLL_SETTINGS;
+  }
+}
+
+export function savePayrollSettings(settings: PayrollSettings) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(PAYROLL_SETTING_KEY, JSON.stringify(settings));
+  window.dispatchEvent(new Event(PAYROLL_UPDATED_EVENT));
+}
 
 function loadAttendance(): AttendanceRecord[] {
   if (typeof window === 'undefined') return INITIAL_ATTENDANCE;
@@ -182,11 +247,12 @@ export function getAttendance(): AttendanceRecord[] {
 export function recordCheckIn(employeeId: string, checkInTime: string = '08:20'): AttendanceRecord {
   const currentList = loadAttendance();
   const employees = getEmployees();
+  const settings = getAttendanceSettings();
   const emp = employees.find((e) => e.id === employeeId);
   if (!emp) throw new Error('Employee not found');
 
   const today = new Date().toISOString().split('T')[0];
-  const lateMinutes = checkInTime > '08:30' ? 15 : 0;
+  const lateMinutes = checkInTime > settings.work_start_time ? 15 : 0;
   const status: AttendanceStatus = lateMinutes > 0 ? 'LATE' : 'ON_TIME';
 
   const newRecord: AttendanceRecord = {
@@ -276,9 +342,9 @@ export function updateLeaveStatus(id: string, status: LeaveStatus, approverNote?
 export function generateTimekeepingSummary(period: string = 'Tháng 07/2026'): TimekeepingSummary[] {
   const employees = getEmployees();
   const leaveList = loadLeaves();
+  const attSettings = getAttendanceSettings();
 
   return employees.map((emp) => {
-    // Approved paid leaves for employee
     const approvedLeaves = leaveList.filter(
       (l) => l.employee_id === emp.id && (l.status === 'HR_APPROVED' || l.status === 'MANAGER_APPROVED')
     );
@@ -290,7 +356,7 @@ export function generateTimekeepingSummary(period: string = 'Tháng 07/2026'): T
       .filter((l) => l.leave_type === 'UNPAID')
       .reduce((acc, curr) => acc + curr.total_days, 0);
 
-    const standardWorkdays = 26;
+    const standardWorkdays = attSettings.standard_workdays || 26;
     const actualWorkdays = Math.max(20, standardWorkdays - paidLeaveDays - unpaidLeaveDays);
     const billableWorkdays = actualWorkdays + paidLeaveDays;
     const otHours = emp.employee_code === 'NV-00101' ? 8.5 : emp.employee_code === 'NV-00104' ? 12.0 : 4.0;
@@ -321,6 +387,7 @@ export function generateMonthlyPayroll(period: string = 'Tháng 07/2026'): Payro
   const employees = getEmployees();
   const summaries = generateTimekeepingSummary(period);
   const scorecards = getScorecardsByPeriod(period);
+  const paySettings = getPayrollSettings();
   const existingPayroll = loadPayroll();
 
   const generatedSheets: PayrollSheet[] = employees.map((emp) => {
@@ -341,37 +408,35 @@ export function generateMonthlyPayroll(period: string = 'Tháng 07/2026'): Payro
     // Tính P1 theo số công billable thực tế
     const p1Calculated = Math.round(baseSalary * (summary.billable_workdays / summary.standard_workdays));
 
-    // Phụ cấp P2 (Ăn trưa 730k + Điện thoại 300k + Xăng xe 500k = 1,530,000 ₫)
-    const p2Allowances = 1530000;
+    // Phụ cấp P2 từ Cài đặt Payroll
+    const p2Allowances = paySettings.p2_lunch_allowance + paySettings.p2_phone_allowance + paySettings.p2_transport_allowance;
 
     // Lương Hiệu Suất P3 (Tự động lấy từ Module Performance)
     const p3PerformanceSalary = scorecard?.calculated_p3_salary || (scorecard?.rating_grade === 'S' ? 7200000 : 4000000);
 
-    // Tiền OT Tăng Ca (x1.5 lương theo giờ)
-    const hourlyRate = baseSalary / (26 * 8);
-    const otSalary = Math.round(summary.total_ot_hours * hourlyRate * 1.5);
+    // Tiền OT Tăng Ca
+    const hourlyRate = baseSalary / (summary.standard_workdays * 8);
+    const otSalary = Math.round(summary.total_ot_hours * hourlyRate * paySettings.ot_multiplier_standard);
 
     const bonusAmount = scorecard?.bonus_score ? scorecard.bonus_score * 200000 : 0;
     const totalGross = p1Calculated + p2Allowances + p3PerformanceSalary + otSalary + bonusAmount;
 
-    // Khấu trừ Bảo hiểm theo quy định pháp luật Lao động Vietnam:
-    // BHXH 8%, BHYT 1.5%, BHTN 1% = Tổng 10.5% lương BHXH
-    const insuranceBase = Math.min(baseSalary, 36000000); // Trần BHXH 36tr
-    const bhxhDeduction = Math.round(insuranceBase * 0.08);
-    const bhytDeduction = Math.round(insuranceBase * 0.015);
-    const bhtnDeduction = Math.round(insuranceBase * 0.01);
+    // Khấu trừ Bảo hiểm theo cài đặt %
+    const insuranceBase = Math.min(baseSalary, 36000000);
+    const bhxhDeduction = Math.round(insuranceBase * (paySettings.bhxh_percent / 100));
+    const bhytDeduction = Math.round(insuranceBase * (paySettings.bhyt_percent / 100));
+    const bhtnDeduction = Math.round(insuranceBase * (paySettings.bhtn_percent / 100));
 
-    // Phạt đi muộn (50,000 ₫ / lần đi muộn)
-    const latePenalty = (summary.late_count || 0) * 50000;
+    // Phạt đi muộn
+    const latePenalty = (summary.late_count || 0) * paySettings.late_penalty_per_instance;
 
-    // Thuế TNCN tạm tính (Biểu thuế lũy tiến từng phần đơn giản hóa)
-    const taxableIncome = Math.max(0, totalGross - (11000000 + bhxhDeduction + bhytDeduction + bhtnDeduction));
+    // Thuế TNCN tạm tính
+    const taxableIncome = Math.max(0, totalGross - (paySettings.personal_tax_deduction_self + bhxhDeduction + bhytDeduction + bhtnDeduction));
     const personalIncomeTax = Math.round(taxableIncome * 0.05);
 
     const totalDeductions = bhxhDeduction + bhytDeduction + bhtnDeduction + latePenalty + personalIncomeTax;
     const netSalary = Math.max(0, totalGross - totalDeductions);
 
-    // Check if payroll record already exists for this employee/period
     const existing = existingPayroll.find((p) => p.employee_id === emp.id && p.period === period);
 
     return {

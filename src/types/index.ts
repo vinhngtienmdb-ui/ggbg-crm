@@ -338,6 +338,32 @@ export interface PayrollSheet {
   notes?: string;
 }
 
+export interface AttendanceSettings {
+  standard_workdays: number;
+  work_start_time: string;
+  work_end_time: string;
+  late_grace_minutes: number;
+  ot_min_hours: number;
+  annual_leave_quota: number;
+  gps_radius_meters: number;
+  allowed_ip_range?: string;
+}
+
+export interface PayrollSettings {
+  p2_lunch_allowance: number;
+  p2_phone_allowance: number;
+  p2_transport_allowance: number;
+  bhxh_percent: number;
+  bhyt_percent: number;
+  bhtn_percent: number;
+  late_penalty_per_instance: number;
+  ot_multiplier_standard: number;
+  ot_multiplier_weekend: number;
+  ot_multiplier_holiday: number;
+  personal_tax_deduction_self: number;
+  personal_tax_deduction_dependent: number;
+}
+
 export type EcomPlatform = 'Shopee' | 'TikTokShop' | 'Lazada' | 'Amazon' | 'GGBingoVN';
 
 export interface ProductPackage {
