@@ -18,6 +18,15 @@ import {
   Layers,
   ChevronRight,
   TrendingUp,
+  Clock,
+  MapPin,
+  Calendar,
+  DollarSign,
+  ShieldAlert,
+  Bell,
+  HeartPulse,
+  Gift,
+  Lock,
   X
 } from 'lucide-react';
 import OrgChartTree from '@/components/hrm/OrgChartTree';
@@ -115,6 +124,8 @@ export interface JobTitleConfig {
   salary_grade: string;
   min_salary: number;
   max_salary: number;
+  lunch_allowance: number;
+  travel_allowance: number;
   headcount_count: number;
   description: string;
 }
@@ -128,6 +139,8 @@ const INITIAL_JOB_TITLES: JobTitleConfig[] = [
     salary_grade: 'G6 (Executive)',
     min_salary: 50000000,
     max_salary: 100000000,
+    lunch_allowance: 1500000,
+    travel_allowance: 3000000,
     headcount_count: 1,
     description: 'Điều hành chiến lược toàn bộ hệ thống GGBG CRM & Agency TMĐT.',
   },
@@ -139,6 +152,8 @@ const INITIAL_JOB_TITLES: JobTitleConfig[] = [
     salary_grade: 'G5 (Director)',
     min_salary: 35000000,
     max_salary: 60000000,
+    lunch_allowance: 1200000,
+    travel_allowance: 2000000,
     headcount_count: 2,
     description: 'Chịu trách nhiệm chỉ tiêu doanh số tổng & phát triển kênh bán hàng.',
   },
@@ -150,6 +165,8 @@ const INITIAL_JOB_TITLES: JobTitleConfig[] = [
     salary_grade: 'G4 (Manager)',
     min_salary: 20000000,
     max_salary: 35000000,
+    lunch_allowance: 1000000,
+    travel_allowance: 1500000,
     headcount_count: 3,
     description: 'Quản lý đội ngũ Trưởng nhóm & Chuyên viên tư vấn giải pháp TMĐT.',
   },
@@ -161,6 +178,8 @@ const INITIAL_JOB_TITLES: JobTitleConfig[] = [
     salary_grade: 'G3 (Team Lead)',
     min_salary: 15000000,
     max_salary: 25000000,
+    lunch_allowance: 800000,
+    travel_allowance: 1000000,
     headcount_count: 6,
     description: 'Dẫn dắt 5-8 nhân viên tư vấn chốt đơn dịch vụ gian hàng.',
   },
@@ -172,38 +191,70 @@ const INITIAL_JOB_TITLES: JobTitleConfig[] = [
     salary_grade: 'G2 (Senior Executive)',
     min_salary: 10000000,
     max_salary: 18000000,
+    lunch_allowance: 730000,
+    travel_allowance: 500000,
     headcount_count: 24,
     description: 'Tiếp nhận Lead intake, tư vấn giải pháp gian hàng Shopee/TikTok/Lazada.',
-  },
-  {
-    id: 'jt_6',
-    code: 'CD-EXEC-CSKH',
-    title_name: 'Chuyên Viên CSKH VIP',
-    department: 'Phòng CSKH',
-    salary_grade: 'G2 (Senior Executive)',
-    min_salary: 9000000,
-    max_salary: 15000000,
-    headcount_count: 12,
-    description: 'Chăm sóc và tiếp nhận xử lý yêu cầu phản hồi từ Merchant VIP.',
   },
 ];
 
 export default function HrmSettingsPage() {
-  const [activeTab, setActiveTab] = useState<'ORG_CHART' | 'JOB_TITLES' | 'HR_PARAMS'>('ORG_CHART');
+  const [activeTab, setActiveTab] = useState<
+    'ORG_CHART' | 'JOB_TITLES' | 'TIMEKEEPING_CFG' | 'LEAVES_CFG' | 'PAYROLL_CFG' | 'APPROVAL_CFG'
+  >('ORG_CHART');
+
   const [jobTitles, setJobTitles] = useState<JobTitleConfig[]>(INITIAL_JOB_TITLES);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // Params State
-  const [params, setParams] = useState({
-    annual_leave_days: 12,
-    workday_standard: 26,
-    probation_days: 60,
-    bhxh_employee_rate: 8.0,
-    bhxh_company_rate: 17.5,
-    ot_weekday_multiplier: 1.5,
-    ot_weekend_multiplier: 2.0,
+  // Comprehensive HR Settings State
+  const [timekeepingCfg, setTimekeepingCfg] = useState({
+    shift_name: 'Ca Hành Chính Standard',
+    start_time: '08:00',
+    end_time: '17:30',
+    lunch_start: '12:00',
+    lunch_end: '13:30',
+    grace_period_minutes: 15,
+    gps_radius_meters: 200,
+    office_lat: 21.028511,
+    office_long: 105.782345,
+    max_ot_monthly_hours: 40,
+    ot_weekday_mult: 1.5,
+    ot_weekend_mult: 2.0,
+    ot_holiday_mult: 3.0,
+  });
+
+  const [leavesCfg, setLeavesCfg] = useState({
+    annual_leave_default: 12,
+    seniority_bonus_years: 5,
+    carry_over_max_days: 5,
+    carry_over_deadline: '03-31',
+    marriage_leave_days: 3,
+    bereavement_leave_days: 3,
+    maternity_leave_months: 6,
+  });
+
+  const [payrollCfg, setPayrollCfg] = useState({
+    bhxh_employee_pct: 8.0,
+    bhyt_employee_pct: 1.5,
+    bhtn_employee_pct: 1.0,
+    bhxh_company_pct: 17.5,
+    bhyt_company_pct: 3.0,
+    bhtn_company_pct: 1.0,
+    union_fee_pct: 1.0,
+    min_region_salary: 4960000,
+    personal_deduction: 11000000,
+    dependent_deduction: 4400000,
+    p3_pool_profit_share_pct: 5.0,
+  });
+
+  const [approvalCfg, setApprovalCfg] = useState({
+    leave_approval_levels: '2_LEVELS', // 1_LEVEL | 2_LEVELS
+    ot_approval_levels: '2_LEVELS',
+    contract_expiry_alert_days: 30,
+    birthday_alert: true,
+    checkin_reminder_time: '07:50',
   });
 
   const [newTitle, setNewTitle] = useState({
@@ -212,6 +263,8 @@ export default function HrmSettingsPage() {
     salary_grade: 'G3 (Team Lead)',
     min_salary: 15000000,
     max_salary: 25000000,
+    lunch_allowance: 730000,
+    travel_allowance: 500000,
     description: '',
   });
 
@@ -230,6 +283,8 @@ export default function HrmSettingsPage() {
       salary_grade: newTitle.salary_grade,
       min_salary: Number(newTitle.min_salary),
       max_salary: Number(newTitle.max_salary),
+      lunch_allowance: Number(newTitle.lunch_allowance),
+      travel_allowance: Number(newTitle.travel_allowance),
       headcount_count: 0,
       description: newTitle.description,
     };
@@ -263,13 +318,13 @@ export default function HrmSettingsPage() {
         <div>
           <div className="flex items-center gap-2">
             <Settings className="w-6 h-6 text-purple-600" />
-            <h1 className="text-xl font-bold text-slate-900">Cấu Hình Nhân Sự & Sơ Đồ Tổ Chức</h1>
+            <h1 className="text-xl font-bold text-slate-900">Cấu Hình Nhân Sự & Sơ Đồ Tổ Chức Toàn Diện</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
-              HR Setup & Governance
+              HR Enterprise Governance
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Quản lý Sơ đồ cây tổ chức doanh nghiệp, danh mục Chức danh - Chức vụ, Khung ngạch/bậc lương và Tham số quy trình HR.
+            Trung tâm cấu hình Sơ đồ cây tổ chức, Chức danh ngạch lương, Ca làm việc GPS, Phép năm nghỉ lễ, Tỷ lệ bảo hiểm & Quy trình duyệt HR tự động.
           </p>
         </div>
 
@@ -283,7 +338,7 @@ export default function HrmSettingsPage() {
         )}
       </div>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs (6 Comprehensive HR Settings Tabs) */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
         <button
           onClick={() => setActiveTab('ORG_CHART')}
@@ -291,7 +346,7 @@ export default function HrmSettingsPage() {
             activeTab === 'ORG_CHART' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-4 h-4 text-blue-400" /> 🏛️ 1. Sơ Đồ Tổ Chức (Org Chart Tree)
+          <Building2 className="w-4 h-4 text-blue-400" /> 🏛️ 1. Cơ Cấu Tổ Chức & Phòng Ban
         </button>
 
         <button
@@ -300,20 +355,47 @@ export default function HrmSettingsPage() {
             activeTab === 'JOB_TITLES' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Award className="w-4 h-4 text-purple-400" /> 🏅 2. Danh Mục Chức Danh & Chức Vụ ({jobTitles.length})
+          <Award className="w-4 h-4 text-purple-400" /> 🏅 2. Chức Danh, Ngạch Lương & Phụ Cấp ({jobTitles.length})
         </button>
 
         <button
-          onClick={() => setActiveTab('HR_PARAMS')}
+          onClick={() => setActiveTab('TIMEKEEPING_CFG')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'HR_PARAMS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'TIMEKEEPING_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Settings className="w-4 h-4 text-emerald-400" /> ⚙️ 3. Quy Trình & Tham Số Cấu Hình HR
+          <Clock className="w-4 h-4 text-emerald-400" /> ⏰ 3. Ca Làm Việc, Chấm Công & GPS
+        </button>
+
+        <button
+          onClick={() => setActiveTab('LEAVES_CFG')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'LEAVES_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Calendar className="w-4 h-4 text-amber-400" /> 🌴 4. Phép Năm, Nghỉ Lễ & Phúc Lợi
+        </button>
+
+        <button
+          onClick={() => setActiveTab('PAYROLL_CFG')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'PAYROLL_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <DollarSign className="w-4 h-4 text-blue-400" /> 💰 5. Tỷ Lệ Bảo Hiểm, Thuế TNCN & Quỹ P3
+        </button>
+
+        <button
+          onClick={() => setActiveTab('APPROVAL_CFG')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'APPROVAL_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4 text-indigo-400" /> 🔐 6. Phân Quyền & Quy Trình Duyệt HR
         </button>
       </div>
 
-      {/* TAB 1: SƠ ĐỒ TỔ CHỨC */}
+      {/* TAB 1: SƠ ĐỒ TỔ CHỨC & PHÒNG BAN */}
       {activeTab === 'ORG_CHART' && (
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
@@ -331,7 +413,7 @@ export default function HrmSettingsPage() {
         </div>
       )}
 
-      {/* TAB 2: DANH MỤC CHỨC DANH & CHỨC VỤ */}
+      {/* TAB 2: CHỨC DANH, NGẠCH LƯƠNG & PHỤ CẤP */}
       {activeTab === 'JOB_TITLES' && (
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -359,6 +441,7 @@ export default function HrmSettingsPage() {
                   <th className="p-3">Phòng Ban Trực Thuộc</th>
                   <th className="p-3">Ngạch/Bậc Lương</th>
                   <th className="p-3">Khung Lương Min - Max</th>
+                  <th className="p-3">Định Mức Phụ Cấp</th>
                   <th className="p-3 text-center">Số Nhân Sự</th>
                   <th className="p-3 text-center">Thao Tác</th>
                 </tr>
@@ -383,6 +466,11 @@ export default function HrmSettingsPage() {
                       {new Intl.NumberFormat('vi-VN').format(t.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(t.max_salary)} ₫
                     </td>
 
+                    <td className="p-3 font-mono text-[11px]">
+                      <p className="text-slate-700">Ăn trưa: <strong>{new Intl.NumberFormat('vi-VN').format(t.lunch_allowance)} ₫</strong></p>
+                      <p className="text-slate-500">Đi lại: <strong>{new Intl.NumberFormat('vi-VN').format(t.travel_allowance)} ₫</strong></p>
+                    </td>
+
                     <td className="p-3 text-center font-bold text-slate-900">
                       {t.headcount_count} NV
                     </td>
@@ -404,80 +492,276 @@ export default function HrmSettingsPage() {
         </div>
       )}
 
-      {/* TAB 3: QUY TRÌNH & THAM SỐ CẤU HÌNH HR */}
-      {activeTab === 'HR_PARAMS' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs">
+      {/* TAB 3: CA LÀM VIỆC, CHẤM CÔNG & GPS */}
+      {activeTab === 'TIMEKEEPING_CFG' && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
           <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
-            <Settings className="w-4 h-4 text-emerald-600" /> Tham Số Quy Trình & Đợi Định Định Mức HR
+            <Clock className="w-4 h-4 text-emerald-600" /> Cấu Hình Ca Làm Việc, Đi Muộn & Bán Kính Chấm Công GPS
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-bold">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-purple-700 uppercase font-black tracking-wider text-[11px]">1. Định Mức Ngày Công & Phép Năm</h4>
-              
+              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11px] flex items-center gap-1.5">
+                <Clock className="w-4 h-4" /> 1. Định Mức Thời Gian Ca Làm Việc
+              </h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Giờ Bắt Đầu Ca *</label>
+                  <input
+                    type="time"
+                    value={timekeepingCfg.start_time}
+                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, start_time: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Giờ Kết Thúc Ca *</label>
+                  <input
+                    type="time"
+                    value={timekeepingCfg.end_time}
+                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, end_time: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-slate-900"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <label className="block text-slate-700">Số Ngày Công Chuẩn Trong Tháng (Công)</label>
+                <label className="block text-slate-700">Phút Cho Phép Đi Muộn Không Trừ Công (Grace Period)</label>
                 <input
                   type="number"
-                  value={params.workday_standard}
-                  onChange={(e) => setParams({ ...params, workday_standard: Number(e.target.value) })}
+                  value={timekeepingCfg.grace_period_minutes}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, grace_period_minutes: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700 font-bold"
+                />
+                <p className="text-[11px] text-slate-500 font-normal">Đi muộn dưới {timekeepingCfg.grace_period_minutes} phút được tính đầy đủ 1 ngày công.</p>
+              </div>
+            </div>
+
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <h4 className="text-blue-700 uppercase font-black tracking-wider text-[11px] flex items-center gap-1.5">
+                <MapPin className="w-4 h-4" /> 2. Vị Trí Vẫn Hành & Bán Kính GPS Check-in
+              </h4>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Bán Kính Check-in Hợp Lệ (Meters)</label>
+                <input
+                  type="number"
+                  step={50}
+                  value={timekeepingCfg.gps_radius_meters}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, gps_radius_meters: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700 font-bold"
+                />
+                <p className="text-[11px] text-slate-500 font-normal">Khoảng cách tối đa từ vị trí điện thoại tới Tòa nhà trụ sở (Mặc định: {timekeepingCfg.gps_radius_meters}m).</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Vĩ Độ Office (Latitude)</label>
+                  <input
+                    type="number"
+                    step={0.000001}
+                    value={timekeepingCfg.office_lat}
+                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_lat: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-[11px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Kinh Độ Office (Longitude)</label>
+                  <input
+                    type="number"
+                    step={0.000001}
+                    value={timekeepingCfg.office_long}
+                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_long: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end">
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công cấu hình ca làm việc & bán kính GPS!')}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: PHÉP NĂM, NGHỈ LỄ & PHÚC LỢI */}
+      {activeTab === 'LEAVES_CFG' && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
+          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
+            <Calendar className="w-4 h-4 text-amber-600" /> Cấu Hình Phép Năm, Hạn Dồn Phép & Chế Độ Phúc Lợi Nghỉ Lễ
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <h4 className="text-amber-700 uppercase font-black tracking-wider text-[11px]">1. Định Mức Phép Năm & Dồn Phép</h4>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Số Ngày Phép Năm Tiêu Chuẩn / Năm (Ngày)</label>
+                <input
+                  type="number"
+                  value={leavesCfg.annual_leave_default}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, annual_leave_default: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Số Ngày Phép Chuyển Tối Đa Sang Năm Sau (Ngày)</label>
+                <input
+                  type="number"
+                  value={leavesCfg.carry_over_max_days}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_max_days: Number(e.target.value) })}
                   className="w-full px-3 py-2 bg-white border rounded-xl font-mono"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-slate-700">Số Ngày Phép Năm Mặc Định / Năm (Ngày)</label>
+                <label className="block text-slate-700">Hạn Cuối Dùng Phép Năm Cũ (MM-DD)</label>
                 <input
-                  type="number"
-                  value={params.annual_leave_days}
-                  onChange={(e) => setParams({ ...params, annual_leave_days: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Số Ngày Thử Việc Tiêu Chuẩn (Ngày)</label>
-                <input
-                  type="number"
-                  value={params.probation_days}
-                  onChange={(e) => setParams({ ...params, probation_days: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono"
+                  type="text"
+                  value={leavesCfg.carry_over_deadline}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_deadline: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
                 />
               </div>
             </div>
 
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-blue-700 uppercase font-black tracking-wider text-[11px]">2. Tỷ Lệ Trích Nộp BHXH & Hệ Số OT</h4>
+              <h4 className="text-purple-700 uppercase font-black tracking-wider text-[11px]">2. Nghỉ Hưởng Lương Theo Luật Lao Động</h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Nghỉ Kết Hôn (Ngày)</label>
+                  <input
+                    type="number"
+                    value={leavesCfg.marriage_leave_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_leave_days: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Nghỉ Tang Chế (Ngày)</label>
+                  <input
+                    type="number"
+                    value={leavesCfg.bereavement_leave_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, bereavement_leave_days: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-red-700"
+                  />
+                </div>
+              </div>
 
               <div className="space-y-2">
-                <label className="block text-slate-700">Tỷ Lệ Khấu Trừ BHXH Nhân Viên (%)</label>
+                <label className="block text-slate-700">Nghỉ Thai Sản Nữ Lao Động (Tháng)</label>
                 <input
                   type="number"
-                  step={0.5}
-                  value={params.bhxh_employee_rate}
-                  onChange={(e) => setParams({ ...params, bhxh_employee_rate: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                  value={leavesCfg.maternity_leave_months}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_leave_months: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end">
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công chế độ nghỉ phép & ngày nghỉ hưởng lương!')}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Nghỉ Phép
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: BẢO HIỂM, THUẾ TNCN & QUỸ LƯƠNG P3 */}
+      {activeTab === 'PAYROLL_CFG' && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
+          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
+            <DollarSign className="w-4 h-4 text-blue-600" /> Tỷ Lệ Trích Nộp BHXH, Thuế TNCN & Quỹ Thưởng Lương P3
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <h4 className="text-blue-700 uppercase font-black tracking-wider text-[11px]">1. Tỷ Lệ Đóng BHXH Nhân Viên & Doanh Nghiệp</h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">BHXH Nhân Viên (%)</label>
+                  <input
+                    type="number"
+                    step={0.5}
+                    value={payrollCfg.bhxh_employee_pct}
+                    onChange={(e) => setPayrollCfg({ ...payrollCfg, bhxh_employee_pct: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">BHXH Doanh Nghiệp (%)</label>
+                  <input
+                    type="number"
+                    step={0.5}
+                    value={payrollCfg.bhxh_company_pct}
+                    onChange={(e) => setPayrollCfg({ ...payrollCfg, bhxh_company_pct: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Mức Lương Tối Thiểu Vùng Căn Cứ BHXH (VND)</label>
+                <input
+                  type="number"
+                  step={100000}
+                  value={payrollCfg.min_region_salary}
+                  onChange={(e) => setPayrollCfg({ ...payrollCfg, min_region_salary: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
+                />
+              </div>
+            </div>
+
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11px]">2. Giảm Trừ Thuế TNCN & Quỹ Lương P3</h4>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Mức Giảm Trừ Bản Thân (VND/tháng)</label>
+                <input
+                  type="number"
+                  step={500000}
+                  value={payrollCfg.personal_deduction}
+                  onChange={(e) => setPayrollCfg({ ...payrollCfg, personal_deduction: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-slate-700">Tỷ Lệ Doanh Nghiệp Đóng BHXH (%)</label>
+                <label className="block text-slate-700">Mức Giảm Trừ Người Phụ Thuộc (VND/người/tháng)</label>
                 <input
                   type="number"
-                  step={0.5}
-                  value={params.bhxh_company_rate}
-                  onChange={(e) => setParams({ ...params, bhxh_company_rate: Number(e.target.value) })}
+                  step={100000}
+                  value={payrollCfg.dependent_deduction}
+                  onChange={(e) => setPayrollCfg({ ...payrollCfg, dependent_deduction: Number(e.target.value) })}
                   className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-slate-700">Hệ Số Lương Làm Thêm Ngày Thường (OT)</label>
+                <label className="block text-slate-700">Tỷ Lệ Trích Lợi Nhuận Gộp Vào Quỹ Lương P3 (%)</label>
                 <input
                   type="number"
-                  step={0.1}
-                  value={params.ot_weekday_multiplier}
-                  onChange={(e) => setParams({ ...params, ot_weekday_multiplier: Number(e.target.value) })}
+                  step={0.5}
+                  value={payrollCfg.p3_pool_profit_share_pct}
+                  onChange={(e) => setPayrollCfg({ ...payrollCfg, p3_pool_profit_share_pct: Number(e.target.value) })}
                   className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700"
                 />
               </div>
@@ -486,10 +770,82 @@ export default function HrmSettingsPage() {
 
           <div className="flex items-center justify-end">
             <button
-              onClick={() => showToast('💾 Đã lưu thành công các tham số cấu hình HR vào hệ thống!')}
+              onClick={() => showToast('💾 Đã lưu thành công định mức tỷ lệ đóng BHXH, Thuế TNCN & Quỹ Lương P3!')}
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
             >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Tham Số
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Lương & Thuế
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: PHÂN QUYỀN & QUY TRÌNH DUYỆT HR */}
+      {activeTab === 'APPROVAL_CFG' && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
+          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
+            <ShieldCheck className="w-4 h-4 text-indigo-600" /> Phân Quyền Vai Trò & Quy Trình Duyệt Đơn Tự Động
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <h4 className="text-indigo-700 uppercase font-black tracking-wider text-[11px]">1. Quy Trình Phê Duyệt Đơn Nghỉ Phép / OT</h4>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Quy Trình Duyệt Đơn Nghỉ Phép</label>
+                <select
+                  value={approvalCfg.leave_approval_levels}
+                  onChange={(e) => setApprovalCfg({ ...approvalCfg, leave_approval_levels: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl"
+                >
+                  <option value="1_LEVEL">1 Cấp Duyệt (Quản lý trực tiếp duyệt)</option>
+                  <option value="2_LEVELS">2 Cấp Duyệt (Quản lý trực tiếp → HR Manager)</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Quy Trình Duyệt Làm Thêm Giờ (OT)</label>
+                <select
+                  value={approvalCfg.ot_approval_levels}
+                  onChange={(e) => setApprovalCfg({ ...approvalCfg, ot_approval_levels: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl"
+                >
+                  <option value="1_LEVEL">1 Cấp Duyệt (Quản lý trực tiếp duyệt)</option>
+                  <option value="2_LEVELS">2 Cấp Duyệt (Quản lý trực tiếp → Giám đốc Khối)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <h4 className="text-purple-700 uppercase font-black tracking-wider text-[11px]">2. Nhắc Nhở Tự Động Hệ Thống</h4>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Cảnh Báo Hợp Đồng Sắp Hết Hạn Trước (Ngày)</label>
+                <input
+                  type="number"
+                  value={approvalCfg.contract_expiry_alert_days}
+                  onChange={(e) => setApprovalCfg({ ...approvalCfg, contract_expiry_alert_days: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-slate-700">Giờ Nhắc Nhở Chấm Công Hàng Ngày</label>
+                <input
+                  type="time"
+                  value={approvalCfg.checkin_reminder_time}
+                  onChange={(e) => setApprovalCfg({ ...approvalCfg, checkin_reminder_time: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end">
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công quy trình phê duyệt & hệ thống nhắc nhở tự động!')}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" /> Lưu Quy Trình Phê Duyệt
             </button>
           </div>
         </div>
@@ -556,6 +912,30 @@ export default function HrmSettingsPage() {
                     value={newTitle.min_salary}
                     onChange={(e) => setNewTitle({ ...newTitle, min_salary: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-black"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Phụ Cấp Ăn Trưa (VND)</label>
+                  <input
+                    type="number"
+                    step={50000}
+                    value={newTitle.lunch_allowance}
+                    onChange={(e) => setNewTitle({ ...newTitle, lunch_allowance: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Phụ Cấp Đi Lại (VND)</label>
+                  <input
+                    type="number"
+                    step={50000}
+                    value={newTitle.travel_allowance}
+                    onChange={(e) => setNewTitle({ ...newTitle, travel_allowance: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
                   />
                 </div>
               </div>
