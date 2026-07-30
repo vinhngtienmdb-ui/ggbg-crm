@@ -697,7 +697,7 @@ export default function HRMPage() {
             activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          👤 2. Hồ Sơ Nhân Sự & Sổ Lao Động NĐ 145/2020 ({employees.length})
+          👤 2. Hồ Sơ Nhân Sự ({employees.length})
         </button>
 
         <button
