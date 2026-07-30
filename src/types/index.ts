@@ -432,6 +432,24 @@ export interface EmployeeProfile {
   kyc_documents?: KycDocument[];
   created_at?: string;
 
+  // ===== 7 TABS PROFILE FULL SUPPORT =====
+  ethnicity?: string; // Dân tộc
+  religion?: string; // Tôn giáo
+  hometown?: string; // Nguyên quán
+  health_provider?: string; // Nơi KCB ban đầu
+  bhxh_start_date?: string; // Ngày tham gia BHXH
+
+  family_members?: FamilyMember[];
+  emergency_contact?: EmergencyContact;
+  education_history?: EducationHistoryItem[];
+  work_experience?: WorkExperienceItem[];
+  certificates?: CertificateItem[];
+  work_process?: WorkProcessItem[];
+  rewards?: RewardItem[];
+
+  personal_biography?: string;
+  special_notes?: string;
+
   // ===== SỔ QUẢN LÝ LAO ĐỘNG (Nghị định 145/2020/NĐ-CP) =====
   // Thông tin nhân thân
   gender?: 'Nam' | 'Nữ' | 'Khác';
@@ -458,6 +476,73 @@ export interface EmployeeProfile {
   // Chấm dứt quan hệ lao động
   termination_date?: string;
   termination_reason?: string;
+}
+
+export interface FamilyMember {
+  id: string;
+  name: string;
+  relationship: 'Bố' | 'Mẹ' | 'Vợ' | 'Chồng' | 'Con' | 'Anh/Chị/Em' | 'Khác';
+  date_of_birth?: string;
+  tax_code?: string;
+  phone?: string;
+  is_dependent: boolean;
+}
+
+export interface EmergencyContact {
+  name: string;
+  relationship: string;
+  phone: string;
+  address?: string;
+}
+
+export interface EducationHistoryItem {
+  id: string;
+  school_name: string;
+  major: string;
+  degree_level: string;
+  graduation_year: string;
+  grade?: string;
+}
+
+export interface WorkExperienceItem {
+  id: string;
+  company_name: string;
+  position: string;
+  from_date: string;
+  to_date: string;
+  reason_for_leaving?: string;
+  achievements?: string;
+}
+
+export interface CertificateItem {
+  id: string;
+  cert_name: string;
+  issued_by: string;
+  issue_date: string;
+  expiry_date?: string;
+  cert_type?: string;
+}
+
+export interface WorkProcessItem {
+  id: string;
+  effective_date: string;
+  decision_number: string;
+  old_position: string;
+  new_position: string;
+  old_department: string;
+  new_department: string;
+  old_salary?: number;
+  new_salary?: number;
+  approved_by: string;
+}
+
+export interface RewardItem {
+  id: string;
+  decision_number: string;
+  reward_date: string;
+  reward_type: string;
+  amount?: number;
+  reason: string;
 }
 
 export interface SalaryChange {
