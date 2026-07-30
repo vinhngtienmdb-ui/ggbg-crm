@@ -164,7 +164,42 @@ export interface KPIAssignment {
 }
 
 export type RatingGrade = 'S' | 'A' | 'B' | 'C' | 'D';
-export type ScorecardStatus = 'Draft' | 'Submitted' | 'Approved' | 'Locked';
+export type ScorecardStatus = 'Draft' | 'Submitted' | 'Approved' | 'Locked' | 'DRAFT_SELF' | 'SUBMITTED_MANAGER' | 'REVIEWING_HR' | 'FINAL_LOCKED';
+export type AssessorRole = 'DIRECT_MANAGER' | 'INDIRECT_MANAGER' | 'HR' | 'SELF';
+
+export interface SelfWorkItem {
+  id: string;
+  work_title: string;
+  result_summary: string;
+  proof_note?: string;
+  linked_kpi_id?: string;
+  self_score: number;
+  manager_score?: number;
+  created_at?: string;
+}
+
+export interface CustomCriterionScore {
+  criterion_id: string;
+  criterion_name: string;
+  assessor_role: AssessorRole;
+  weight: number;
+  score: number;
+  assessor_name?: string;
+  notes?: string;
+}
+
+export interface EvaluationCriterion {
+  id: string;
+  code: string;
+  name: string;
+  category?: string;
+  assessor_role?: AssessorRole;
+  weight: number;
+  max_score?: number;
+  description?: string;
+  assigned_positions?: string[];
+  assigned_departments?: string[];
+}
 
 export interface PerformanceScorecard {
   id: string;
@@ -172,6 +207,7 @@ export interface PerformanceScorecard {
   employee_name: string;
   employee_code: string;
   department: string;
+  position?: string;
   region?: 'Sale Miền Bắc' | 'Sale Miền Nam' | 'Khối Enterprise';
   period: string;
   kpi_score: number;
@@ -186,6 +222,15 @@ export interface PerformanceScorecard {
   rating_grade: RatingGrade;
   status: ScorecardStatus;
   reviewer_notes?: string;
+  self_work_items?: SelfWorkItem[];
+  custom_criteria_scores?: CustomCriterionScore[];
+  base_p3_salary?: number;
+  calculated_p3_salary?: number;
+  p3_multiplier?: number;
+  auto_synced_kpis?: boolean;
+  direct_manager_name?: string;
+  indirect_manager_name?: string;
+  hr_evaluator_name?: string;
   created_at?: string;
 }
 
@@ -199,6 +244,11 @@ export interface FormulaWeights {
   grade_a_threshold: number;
   grade_b_threshold: number;
   grade_c_threshold: number;
+  grade_s_p3_multiplier?: number; // e.g. 1.2 (120%)
+  grade_a_p3_multiplier?: number; // e.g. 1.0 (100%)
+  grade_b_p3_multiplier?: number; // e.g. 0.85 (85%)
+  grade_c_p3_multiplier?: number; // e.g. 0.50 (50%)
+  grade_d_p3_multiplier?: number; // e.g. 0.00 (0%)
 }
 
 export type EcomPlatform = 'Shopee' | 'TikTokShop' | 'Lazada' | 'Amazon' | 'GGBingoVN';
@@ -381,15 +431,6 @@ export interface OrgNode {
 export type ReviewCyclePeriodType = 'QUARTERLY' | 'HALF_YEARLY' | 'ANNUAL';
 export type ReviewerPerspective = 'SELF' | 'MANAGER' | 'PEER' | 'SUBORDINATE';
 
-export interface EvaluationCriterion {
-  id: string;
-  code: string;
-  name: string;
-  category: string;
-  description: string;
-  weight: number;
-  max_score: number;
-}
 
 export interface FeedbackSubmission {
   id: string;
