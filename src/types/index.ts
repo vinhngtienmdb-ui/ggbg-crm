@@ -251,6 +251,93 @@ export interface FormulaWeights {
   grade_d_p3_multiplier?: number; // e.g. 0.00 (0%)
 }
 
+// ===== CHẤM CÔNG, NGHỈ PHÉP & TÍNH LƯƠNG =====
+export type AttendanceStatus = 'ON_TIME' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'PAID_LEAVE' | 'UNPAID_LEAVE' | 'OVERTIME';
+export type LeaveType = 'ANNUAL' | 'SICK' | 'MATERNITY' | 'UNPAID' | 'COMPENSATORY';
+export type LeaveStatus = 'PENDING' | 'MANAGER_APPROVED' | 'HR_APPROVED' | 'REJECTED';
+export type PayrollStatus = 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'SENT_PAYSTUB';
+
+export interface AttendanceRecord {
+  id: string;
+  employee_id: string;
+  employee_name: string;
+  employee_code: string;
+  department: string;
+  date: string;
+  check_in_time?: string;
+  check_out_time?: string;
+  status: AttendanceStatus;
+  late_minutes: number;
+  early_minutes: number;
+  ot_hours: number;
+  notes?: string;
+}
+
+export interface LeaveRequest {
+  id: string;
+  request_code: string;
+  employee_id: string;
+  employee_name: string;
+  employee_code: string;
+  department: string;
+  leave_type: LeaveType;
+  start_date: string;
+  end_date: string;
+  total_days: number;
+  reason: string;
+  status: LeaveStatus;
+  approver_note?: string;
+  created_at: string;
+}
+
+export interface TimekeepingSummary {
+  id: string;
+  employee_id: string;
+  employee_name: string;
+  employee_code: string;
+  department: string;
+  period: string;
+  standard_workdays: number;
+  actual_workdays: number;
+  paid_leave_days: number;
+  unpaid_leave_days: number;
+  absent_unexcused_days: number;
+  late_count: number;
+  total_late_minutes: number;
+  total_ot_hours: number;
+  billable_workdays: number;
+}
+
+export interface PayrollSheet {
+  id: string;
+  payroll_code: string;
+  employee_id: string;
+  employee_name: string;
+  employee_code: string;
+  department: string;
+  position: string;
+  bank_name?: string;
+  bank_account?: string;
+  period: string;
+  base_salary: number;
+  p1_calculated_salary: number;
+  p2_allowances: number;
+  p3_performance_salary: number;
+  ot_salary: number;
+  bonus_amount: number;
+  total_gross_income: number;
+  bhxh_deduction: number;
+  bhyt_deduction: number;
+  bhtn_deduction: number;
+  late_penalty_deduction: number;
+  personal_income_tax: number;
+  total_deductions: number;
+  net_salary: number;
+  status: PayrollStatus;
+  paystub_sent_at?: string;
+  notes?: string;
+}
+
 export type EcomPlatform = 'Shopee' | 'TikTokShop' | 'Lazada' | 'Amazon' | 'GGBingoVN';
 
 export interface ProductPackage {

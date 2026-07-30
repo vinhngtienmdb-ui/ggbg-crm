@@ -174,6 +174,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'HR_MANAGER'],
       },
       {
+        name: 'Chấm Công & Bảng Lương',
+        href: '/payroll',
+        iconName: 'PieChart',
+        moduleKey: 'hrm',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER', 'SALES_MANAGER'],
+      },
+      {
         name: 'Đánh Giá 360°',
         href: '/reviews',
         iconName: 'UserCog',
