@@ -226,14 +226,40 @@ export default function HrmSettingsPage() {
   });
 
   const [leavesCfg, setLeavesCfg] = useState({
+    accrual_method: 'MONTHLY' as 'MONTHLY' | 'FULL_GRANT',
+    probation_leave_enabled: true,
     annual_leave_default: 12,
+    manager_leave_default: 15,
     seniority_bonus_years: 5,
+    seniority_bonus_days: 1,
     carry_over_max_days: 5,
     carry_over_deadline: '03-31',
-    marriage_leave_days: 3,
+    encashment_policy: 'PAY_FULL_AVERAGE' as 'PAY_FULL_AVERAGE' | 'FORFEIT' | 'EXPIRE',
+    marriage_self_days: 3,
+    marriage_child_days: 1,
     bereavement_leave_days: 3,
-    maternity_leave_months: 6,
+    maternity_female_months: 6,
+    maternity_male_days: 5,
+    maternity_bonus_vnd: 1000000,
+    unpaid_leave_max_days: 30,
+    birthday_gift_vnd: 500000,
+    team_building_budget_monthly: 500000,
+    health_check_budget_annual: 2500000,
+    seniority_reward_1y: 1000000,
+    seniority_reward_3y: 3000000,
+    seniority_reward_5y: 10000000,
   });
+
+  const [holidaysList, setHolidaysList] = useState([
+    { id: 'h1', name: 'Tết Dương Lịch 2026', date: '01/01/2026', days: 1, type: 'Statutory', active: true },
+    { id: 'h2', name: 'Tết Nguyên Đán (Âm Lịch 2026)', date: '16/02/2026 - 20/02/2026', days: 5, type: 'Statutory', active: true },
+    { id: 'h3', name: 'Giỗ Tổ Hùng Vương (10/3 Âm Lịch)', date: '26/04/2026', days: 1, type: 'Statutory', active: true },
+    { id: 'h4', name: 'Ngày Giải Phóng Miền Nam (30/04)', date: '30/04/2026', days: 1, type: 'Statutory', active: true },
+    { id: 'h5', name: 'Quốc Tế Lao Động (01/05)', date: '01/05/2026', days: 1, type: 'Statutory', active: true },
+    { id: 'h6', name: 'Quốc Khánh 02/09', date: '01/09/2026 - 02/09/2026', days: 2, type: 'Statutory', active: true },
+    { id: 'h7', name: 'Sinh Nhật Công Ty GGBG CRM', date: '15/10/2026', days: 1, type: 'Corporate', active: true },
+    { id: 'h8', name: 'Nghỉ Du Lịch Team Building', date: '18/07/2026 - 19/07/2026', days: 2, type: 'Corporate', active: true },
+  ]);
 
   const [payrollCfg, setPayrollCfg] = useState({
     bhxh_employee_pct: 8.0,
@@ -593,92 +619,361 @@ export default function HrmSettingsPage() {
         </div>
       )}
 
-      {/* TAB 4: PHÉP NĂM, NGHỈ LỄ & PHÚC LỢI */}
+      {/* TAB 4: PHÉP NĂM, NGHỈ LỄ & PHÚC LỢI (UPGRADED ENTERPRISE LEAVES ENGINE) */}
       {activeTab === 'LEAVES_CFG' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
-            <Calendar className="w-4 h-4 text-amber-600" /> Cấu Hình Phép Năm, Hạn Dồn Phép & Chế Độ Phúc Lợi Nghỉ Lễ
-          </h3>
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-8 text-xs font-bold">
+          <div className="flex items-center justify-between border-b pb-4">
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-amber-600" /> Hệ Thống Cấu Hình Phép Năm, Lịch Nghỉ Lễ & Chế Độ Phúc Lợi Chuyên Sâu
+              </h3>
+              <p className="text-xs text-slate-500 font-normal mt-0.5">
+                Chuẩn hóa quy tắc cấp phép năm, dồn phép, chi trả phép tồn, lịch nghỉ lễ Tết quốc gia/công ty & ngân sách phúc lợi hiếu hỷ, thâm niên.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-amber-700 uppercase font-black tracking-wider text-[11px]">1. Định Mức Phép Năm & Dồn Phép</h4>
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công toàn bộ cấu hình Phép năm, Lịch nghỉ lễ & Phúc lợi!')}
+              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-extrabold shadow-lg shadow-amber-600/30 flex items-center gap-2 transition-all active:scale-95"
+            >
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Toàn Bộ
+            </button>
+          </div>
 
-              <div className="space-y-2">
-                <label className="block text-slate-700">Số Ngày Phép Năm Tiêu Chuẩn / Năm (Ngày)</label>
+          {/* SECTION 1: CẤU HÌNH QUY TẮC PHÉP NĂM & THÂM NIÊN */}
+          <div className="p-5 bg-amber-50/40 border border-amber-200/80 rounded-2xl space-y-4">
+            <h4 className="text-amber-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-amber-600" /> 1. Quy Tắc Cấp Phép Năm, Tích Lũy & Thanh Toán Phép Tồn (Accrual & Encashment)
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Phương Thức Cấp Phép Năm</label>
+                <select
+                  value={leavesCfg.accrual_method}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, accrual_method: e.target.value as any })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                >
+                  <option value="MONTHLY">Tích lũy từng tháng (+1 ngày / tháng)</option>
+                  <option value="FULL_GRANT">Cấp trọn gói từ đầu năm (12 ngày / năm)</option>
+                </select>
+                <p className="text-[10.5px] text-slate-500 font-normal">Quy định thời điểm nhân viên được ghi nhận số ngày phép sử dụng.</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Định Mức Phép Năm Nhân Viên (Ngày/Năm)</label>
                 <input
                   type="number"
                   value={leavesCfg.annual_leave_default}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, annual_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-black"
                 />
+                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho Hợp đồng lao động chính thức từ 1 năm trở lên.</p>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-slate-700">Số Ngày Phép Chuyển Tối Đa Sang Năm Sau (Ngày)</label>
+              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Định Mức Phép Cấp Quản Lý (Ngày/Năm)</label>
                 <input
                   type="number"
-                  value={leavesCfg.carry_over_max_days}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_max_days: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono"
+                  value={leavesCfg.manager_leave_default}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, manager_leave_default: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Hạn Cuối Dùng Phép Năm Cũ (MM-DD)</label>
-                <input
-                  type="text"
-                  value={leavesCfg.carry_over_deadline}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_deadline: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
-                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Dành cho cấp Trưởng phòng, Giám đốc Khối & C-Level.</p>
               </div>
             </div>
 
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-purple-700 uppercase font-black tracking-wider text-[11px]">2. Nghỉ Hưởng Lương Theo Luật Lao Động</h4>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Nghỉ Kết Hôn (Ngày)</label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Phép Thâm Niên (+Ngày/Số Năm)</label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-600">Cộng</span>
                   <input
                     type="number"
-                    value={leavesCfg.marriage_leave_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_leave_days: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                    value={leavesCfg.seniority_bonus_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_bonus_days: Number(e.target.value) })}
+                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center text-amber-700 font-bold"
+                  />
+                  <span className="text-[11px] text-slate-600">ngày mỗi</span>
+                  <input
+                    type="number"
+                    value={leavesCfg.seniority_bonus_years}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_bonus_years: Number(e.target.value) })}
+                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center font-bold"
+                  />
+                  <span className="text-[11px] text-slate-600">năm thâm niên</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Dồn Phép Sang Năm Sau</label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-600">Tối đa</span>
+                  <input
+                    type="number"
+                    value={leavesCfg.carry_over_max_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_max_days: Number(e.target.value) })}
+                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center font-bold"
+                  />
+                  <span className="text-[11px] text-slate-600">ngày, hạn</span>
+                  <input
+                    type="text"
+                    value={leavesCfg.carry_over_deadline}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_deadline: e.target.value })}
+                    className="w-20 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center text-purple-700 font-bold"
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-slate-700 mb-1">Nghỉ Tang Chế (Ngày)</label>
+              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Quy Định Chi Trả Tiền Phép Tồn</label>
+                <select
+                  value={leavesCfg.encashment_policy}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, encashment_policy: e.target.value as any })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                >
+                  <option value="PAY_FULL_AVERAGE">Thanh toán 100% lương bình quân khi thôi việc</option>
+                  <option value="EXPIRE">Tự động hủy số phép dư hết hạn ngày 31/03</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 2: QUẢN LÝ LỊCH NGÀY NGHỈ LỄ TẾT QUỐC GIA & CÔNG TY */}
+          <div className="p-5 bg-purple-50/40 border border-purple-200/80 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-purple-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+                <Gift className="w-4 h-4 text-purple-600" /> 2. Danh Mục Các Ngày Nghỉ Lễ / Tết Hưởng Nguyên Lương ({holidaysList.length} Dịp)
+              </h4>
+              <button
+                onClick={() => showToast('➕ Đã thêm dịp Nghỉ Lễ mới vào danh mục')}
+                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 shadow-sm"
+              >
+                <Plus className="w-3.5 h-3.5" /> Thêm Ngày Nghỉ Lễ Mới
+              </button>
+            </div>
+
+            <div className="overflow-x-auto bg-white rounded-xl border border-purple-100">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-purple-100 bg-purple-50/50 text-purple-900 font-extrabold text-[10.5px]">
+                    <th className="p-3">Tên Dịp Nghỉ Lễ / Tết</th>
+                    <th className="p-3">Thời Gian / Ngày Nghỉ</th>
+                    <th className="p-3 text-center">Số Ngày Nghỉ Hưởng Lương</th>
+                    <th className="p-3">Phân Loại Nghỉ</th>
+                    <th className="p-3 text-center">Trạng Thái</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-purple-50">
+                  {holidaysList.map((h) => (
+                    <tr key={h.id} className="hover:bg-purple-50/30 transition-colors">
+                      <td className="p-3 font-extrabold text-slate-900">{h.name}</td>
+                      <td className="p-3 font-mono text-purple-700">{h.date}</td>
+                      <td className="p-3 text-center font-mono font-black text-emerald-700">{h.days} ngày</td>
+                      <td className="p-3">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                          h.type === 'Statutory' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-purple-100 text-purple-800 border border-purple-200'
+                        }`}>
+                          {h.type === 'Statutory' ? '🏛️ Luật Lao Động' : '🏢 Ngày Nghỉ Công Ty'}
+                        </span>
+                      </td>
+                      <td className="p-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={h.active}
+                          onChange={() => {
+                            setHolidaysList(
+                              holidaysList.map((item) => (item.id === h.id ? { ...item, active: !item.active } : item))
+                            );
+                          }}
+                          className="w-4 h-4 accent-purple-600 rounded cursor-pointer"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* SECTION 3: NGHỈ CHẾ ĐỘ ĐẶC BIỆT & THAI SẢN */}
+          <div className="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
+            <h4 className="text-blue-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+              <HeartPulse className="w-4 h-4 text-blue-600" /> 3. Chế Độ Nghỉ Việc Riêng, Tang Chế & Thai Sản (Statutory Leave Policy)
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Kết Hôn Bản Thân</label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    value={leavesCfg.marriage_self_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_self_days: Number(e.target.value) })}
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
+                  />
+                  <span className="text-slate-500 shrink-0">ngày</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Kết Hôn Con Cái</label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    value={leavesCfg.marriage_child_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_child_days: Number(e.target.value) })}
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
+                  />
+                  <span className="text-slate-500 shrink-0">ngày</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Tang Chế (Tứ Thân)</label>
+                <div className="flex items-center gap-1.5">
                   <input
                     type="number"
                     value={leavesCfg.bereavement_leave_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, bereavement_leave_days: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-red-700"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-red-700 font-bold"
                   />
+                  <span className="text-slate-500 shrink-0">ngày</span>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-slate-700">Nghỉ Thai Sản Nữ Lao Động (Tháng)</label>
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Không Hưởng Lương Max</label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    value={leavesCfg.unpaid_leave_max_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, unpaid_leave_max_days: Number(e.target.value) })}
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-slate-700 font-bold"
+                  />
+                  <span className="text-slate-500 shrink-0">ngày/năm</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Thai Sản Nữ Lao Động</label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    value={leavesCfg.maternity_female_months}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_female_months: Number(e.target.value) })}
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
+                  />
+                  <span className="text-slate-500 shrink-0">tháng</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Thai Sản Nam Lao Động (Vợ Sinh)</label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    value={leavesCfg.maternity_male_days}
+                    onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_male_days: Number(e.target.value) })}
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                  />
+                  <span className="text-slate-500 shrink-0">ngày</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Trợ Cấp Sinh Con Công Ty Tặng</label>
                 <input
                   type="number"
-                  value={leavesCfg.maternity_leave_months}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_leave_months: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
+                  step={500000}
+                  value={leavesCfg.maternity_bonus_vnd}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_bonus_vnd: Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end">
-            <button
-              onClick={() => showToast('💾 Đã lưu thành công chế độ nghỉ phép & ngày nghỉ hưởng lương!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Nghỉ Phép
-            </button>
+          {/* SECTION 4: CHẾ ĐỘ PHÚC LỢI, THÂM NIÊN & THĂM HỎI HIẾU HỶ */}
+          <div className="p-5 bg-emerald-50/40 border border-emerald-200/80 rounded-2xl space-y-4">
+            <h4 className="text-emerald-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+              <Gift className="w-4 h-4 text-emerald-600" /> 4. Chế Độ Phúc Lợi, Quà Sinh Nhật, Thâm Niên & Thăm Hỏi Hiếu Hỷ
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Quà Mừng Sinh Nhật Nhân Sự</label>
+                <input
+                  type="number"
+                  step={100000}
+                  value={leavesCfg.birthday_gift_vnd}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, birthday_gift_vnd: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Gửi quà tặng kèm thiệp chúc mừng tự động vào ngày sinh nhật.</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Ngân Sách Team Building Hàng Tháng</label>
+                <input
+                  type="number"
+                  step={100000}
+                  value={leavesCfg.team_building_budget_monthly}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, team_building_budget_monthly: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Quỹ ăn uống & gắn kết đội nhóm (VND/nhân sự/tháng).</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Định Mức Khám Sức Khỏe Định Kỳ</label>
+                <input
+                  type="number"
+                  step={500000}
+                  value={leavesCfg.health_check_budget_annual}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, health_check_budget_annual: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Gói khám sức khỏe tổng quát hàng năm tại Bệnh viện Quốc tế.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 1 Năm</label>
+                <input
+                  type="number"
+                  step={500000}
+                  value={leavesCfg.seniority_reward_1y}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_1y: Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-slate-900 font-bold"
+                />
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 3 Năm</label>
+                <input
+                  type="number"
+                  step={1000000}
+                  value={leavesCfg.seniority_reward_3y}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_3y: Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                />
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
+                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 5 Năm (VIP)</label>
+                <input
+                  type="number"
+                  step={2000000}
+                  value={leavesCfg.seniority_reward_5y}
+                  onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_5y: Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-amber-700 font-black"
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
