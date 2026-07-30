@@ -374,7 +374,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'APPROVAL_PIPELINE' ? 'bg-amber-600 text-white shadow-md' : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
           }`}
         >
-          ⏳ 4. Phê Duyệt Nhân Sự Mới (3 Cấp)
+          ⏳ 4. Phê Duyệt
           {pendingCount > 0 && (
             <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full animate-pulse">
               {pendingCount}
