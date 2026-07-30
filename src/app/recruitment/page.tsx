@@ -27,7 +27,9 @@ import {
   TrendingUp,
   XCircle,
   X,
-  History
+  History,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import {
   BarChart,
@@ -197,7 +199,8 @@ const SOURCE_CHART_DATA = [
 
 export default function RecruitmentModulePage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
-  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'KANBAN' | 'LIST' | 'ONBOARDING' | 'APPROVAL_PIPELINE'>('ANALYTICS');
+  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'PIPELINE' | 'ONBOARDING' | 'APPROVAL_PIPELINE'>('PIPELINE');
+  const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
   const [searchTerm, setSearchTerm] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -318,11 +321,11 @@ export default function RecruitmentModulePage() {
             <UserPlus className="w-6 h-6 text-blue-600" />
             <h1 className="text-xl font-bold text-slate-900">Module Tuyển Dụng, Phê Duyệt & Onboarding Nhân Sự</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-              Recruitment, Approval & Onboarding Engine
+              Recruitment Engine & Pipeline
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Quản lý phễu tuyển dụng 5 bước, Phê duyệt nhân sự mới 3 cấp, Tiếp nhận ứng viên, Gửi offer và Quy trình hội nhập thử việc 60 ngày.
+            Hệ thống quản lý phễu tuyển dụng Dual-View (Kanban 5 bước & Bảng Danh Sách), Upload CV, Phê duyệt nhân sự mới 3 cấp và Onboarding 60 ngày.
           </p>
         </div>
 
@@ -339,30 +342,21 @@ export default function RecruitmentModulePage() {
       {/* Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
         <button
+          onClick={() => setActiveTab('PIPELINE')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'PIPELINE' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <UserPlus className="w-4 h-4 text-amber-400" /> 🎯 1. Phễu Tuyển Dụng & Danh Sách Ứng Viên ({filteredCandidates.length})
+        </button>
+
+        <button
           onClick={() => setActiveTab('ANALYTICS')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
             activeTab === 'ANALYTICS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <BarChart className="w-4 h-4 text-blue-400" /> 📊 1. Báo Cáo Tuyển Dụng & Onboarding
-        </button>
-
-        <button
-          onClick={() => setActiveTab('KANBAN')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'KANBAN' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <UserPlus className="w-4 h-4 text-amber-400" /> 🎯 2. Phễu Tuyển Dụng (Kanban 5 Bước)
-        </button>
-
-        <button
-          onClick={() => setActiveTab('LIST')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'LIST' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <Users className="w-4 h-4 text-emerald-400" /> 📋 3. Danh Sách Ứng Viên ({filteredCandidates.length})
+          <BarChart className="w-4 h-4 text-blue-400" /> 📊 2. Báo Cáo Tuyển Dụng & Onboarding
         </button>
 
         <button
@@ -371,7 +365,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'ONBOARDING' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <UserCheck className="w-4 h-4 text-purple-400" /> 🚀 4. Quy Trình Onboarding (Hội Nhập 60 Ngày)
+          <UserCheck className="w-4 h-4 text-purple-400" /> 🚀 3. Quy Trình Onboarding (Hội Nhập 60 Ngày)
         </button>
 
         <button
@@ -380,7 +374,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'APPROVAL_PIPELINE' ? 'bg-amber-600 text-white shadow-md' : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
           }`}
         >
-          ⏳ 5. Phê Duyệt Nhân Sự Mới (3 Cấp)
+          ⏳ 4. Phê Duyệt Nhân Sự Mới (3 Cấp)
           {pendingCount > 0 && (
             <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full animate-pulse">
               {pendingCount}
@@ -389,10 +383,220 @@ export default function RecruitmentModulePage() {
         </button>
       </div>
 
-      {/* TAB 1: BÁO CÁO & DASHBOARD */}
+      {/* MERGED TAB 1: PHỄU TUYỂN DỤNG & DANH SÁCH ỨNG VIÊN (DUAL-VIEW: KANBAN VS LIST) */}
+      {activeTab === 'PIPELINE' && (
+        <div className="space-y-4 text-xs">
+          {/* Controls Bar & View Switcher */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm tên ứng viên, mã UV, vị trí..."
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
+                />
+              </div>
+
+              <select
+                value={deptFilter}
+                onChange={(e) => setDeptFilter(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 bg-slate-50 border rounded-xl font-bold"
+              >
+                <option value="ALL">Tất Cả Phòng Ban</option>
+                <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
+                <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
+                <option value="Phòng CSKH">Phòng CSKH</option>
+                <option value="Phòng Marketing">Phòng Marketing</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+              <span className="font-bold text-slate-600 uppercase tracking-wider text-[10.5px]">Chế Độ Xem:</span>
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                <button
+                  onClick={() => setViewMode('KANBAN')}
+                  className={`px-3 py-1.5 rounded-lg font-extrabold flex items-center gap-1.5 transition-all ${
+                    viewMode === 'KANBAN' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" /> Dạng Thẻ Kanban (5 Bước)
+                </button>
+                <button
+                  onClick={() => setViewMode('LIST')}
+                  className={`px-3 py-1.5 rounded-lg font-extrabold flex items-center gap-1.5 transition-all ${
+                    viewMode === 'LIST' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <List className="w-3.5 h-3.5" /> Dạng Bảng Danh Sách
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* VIEW MODE 1: KANBAN PIPELINE 5 BƯỚC */}
+          {viewMode === 'KANBAN' && (
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 overflow-x-auto">
+              {(['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED_ONBOARDING'] as const).map((stgKey) => {
+                const stgCand = filteredCandidates.filter((c) => c.stage === stgKey);
+                const cfg = STAGE_CONFIG[stgKey];
+                return (
+                  <div key={stgKey} className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-3 min-w-[220px]">
+                    <div className={`p-2.5 rounded-xl border font-black flex items-center justify-between ${cfg.cls} ${cfg.border}`}>
+                      <span>{cfg.label}</span>
+                      <span className="w-5 h-5 rounded-full bg-white text-slate-900 flex items-center justify-center text-[10px] shadow-sm">
+                        {stgCand.length}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {stgCand.map((cand) => (
+                        <div key={cand.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-[10px] font-bold text-blue-700">{cand.candidate_code}</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">{cand.source}</span>
+                          </div>
+                          <p className="font-extrabold text-slate-900 text-xs">{cand.full_name}</p>
+                          <p className="text-[11px] text-slate-500">{cand.position_applied}</p>
+                          <p className="text-[10px] text-slate-400">{cand.department}</p>
+
+                          <div className="flex items-center justify-between text-[10px] pt-1">
+                            <a
+                              href={`https://${cand.cv_file}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline font-bold flex items-center gap-1"
+                            >
+                              <FileText className="w-3 h-3 text-blue-500" /> Xem CV
+                            </a>
+                            <label className="cursor-pointer text-amber-700 hover:text-amber-800 font-extrabold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 transition-colors">
+                              <Upload className="w-3 h-3 text-amber-600" /> Upload CV
+                              <input
+                                type="file"
+                                accept=".pdf,.doc,.docx"
+                                className="hidden"
+                                onChange={(e) => handleCvFileUpload(cand.id, e)}
+                              />
+                            </label>
+                          </div>
+
+                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span className="font-mono font-black text-emerald-700">
+                              {new Intl.NumberFormat('vi-VN').format(cand.expected_salary)} ₫
+                            </span>
+                            <select
+                              value={cand.stage}
+                              onChange={(e) => handleStageChange(cand.id, e.target.value as any)}
+                              className="px-2 py-1 bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-800 focus:outline-none"
+                            >
+                              <option value="APPLIED">1. Ứng Viên Mới</option>
+                              <option value="SCREENING">2. Sàng Lọc CV</option>
+                              <option value="INTERVIEW">3. Phỏng Vấn</option>
+                              <option value="OFFER">4. Gửi Offer</option>
+                              <option value="HIRED_ONBOARDING">5. Onboarding</option>
+                            </select>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* VIEW MODE 2: BẢNG DANH SÁCH ỨNG VIÊN */}
+          {viewMode === 'LIST' && (
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                      <th className="p-3">Mã & Họ Tên Ứng Viên</th>
+                      <th className="p-3">Vị Trí & Phòng Ban</th>
+                      <th className="p-3">Kinh Nghiệm & Lương Kỳ Vọng</th>
+                      <th className="p-3">Nguồn Tuyển Dụng</th>
+                      <th className="p-3">Bước Phễu Hiện Tại</th>
+                      <th className="p-3 text-center">Thao Tác File CV</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {filteredCandidates.map((c) => (
+                      <tr key={c.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3">
+                          <p className="font-extrabold text-slate-900">{c.full_name}</p>
+                          <p className="font-mono text-blue-700 text-[11px]">{c.candidate_code} · {c.phone}</p>
+                        </td>
+
+                        <td className="p-3">
+                          <p className="font-bold text-slate-800">{c.position_applied}</p>
+                          <p className="text-slate-500 text-[11px]">{c.department}</p>
+                        </td>
+
+                        <td className="p-3 font-mono">
+                          <p className="font-black text-emerald-700">
+                            {new Intl.NumberFormat('vi-VN').format(c.expected_salary)} ₫
+                          </p>
+                          <p className="text-slate-500 text-[10px]">{c.experience_years} năm kinh nghiệm</p>
+                        </td>
+
+                        <td className="p-3">
+                          <span className="px-2.5 py-1 bg-slate-100 rounded-full font-bold text-slate-700">
+                            {c.source}
+                          </span>
+                        </td>
+
+                        <td className="p-3">
+                          <select
+                            value={c.stage}
+                            onChange={(e) => handleStageChange(c.id, e.target.value as any)}
+                            className={`px-2.5 py-1 rounded-full font-bold text-[11px] focus:outline-none ${STAGE_CONFIG[c.stage].cls}`}
+                          >
+                            <option value="APPLIED">⚪ 1. Ứng Viên Mới</option>
+                            <option value="SCREENING">🔵 2. Sàng Lọc CV</option>
+                            <option value="INTERVIEW">🟡 3. Phỏng Vấn</option>
+                            <option value="OFFER">🟢 4. Gửi Offer</option>
+                            <option value="HIRED_ONBOARDING">🟣 5. Onboarding</option>
+                          </select>
+                        </td>
+
+                        <td className="p-3 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <a
+                              href={`https://${c.cv_file}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 bg-blue-50 text-blue-700 font-extrabold rounded-xl hover:bg-blue-100 transition-all inline-block border border-blue-200"
+                            >
+                              📄 Xem CV
+                            </a>
+                            <label className="cursor-pointer px-3 py-1.5 bg-amber-50 text-amber-800 font-extrabold rounded-xl hover:bg-amber-100 transition-all inline-block border border-amber-200">
+                              📤 Upload CV
+                              <input
+                                type="file"
+                                accept=".pdf,.doc,.docx"
+                                className="hidden"
+                                onChange={(e) => handleCvFileUpload(c.id, e)}
+                              />
+                            </label>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 2: BÁO CÁO & DASHBOARD */}
       {activeTab === 'ANALYTICS' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-bold">
+        <div className="space-y-6 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-bold">
             <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
               <span className="text-slate-500 uppercase text-[10.5px]">Tổng Ứng Viên Tiếp Nhận</span>
               <p className="text-2xl font-black text-slate-900">45 Ứng Viên</p>
@@ -457,185 +661,7 @@ export default function RecruitmentModulePage() {
         </div>
       )}
 
-      {/* TAB 2: KANBAN PIPELINE 5 BƯỚC */}
-      {activeTab === 'KANBAN' && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 overflow-x-auto text-xs">
-          {(['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED_ONBOARDING'] as const).map((stgKey) => {
-            const stgCand = candidates.filter((c) => c.stage === stgKey);
-            const cfg = STAGE_CONFIG[stgKey];
-            return (
-              <div key={stgKey} className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-3 min-w-[220px]">
-                <div className={`p-2.5 rounded-xl border font-black flex items-center justify-between ${cfg.cls} ${cfg.border}`}>
-                  <span>{cfg.label}</span>
-                  <span className="w-5 h-5 rounded-full bg-white text-slate-900 flex items-center justify-center text-[10px] shadow-sm">
-                    {stgCand.length}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {stgCand.map((cand) => (
-                    <div key={cand.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[10px] font-bold text-blue-700">{cand.candidate_code}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">{cand.source}</span>
-                      </div>
-                      <p className="font-extrabold text-slate-900">{cand.full_name}</p>
-                      <p className="text-[11px] text-slate-500">{cand.position_applied}</p>
-                      <p className="text-[10px] text-slate-400">{cand.department}</p>
-
-                      <div className="flex items-center justify-between text-[10px] pt-1">
-                        <a
-                          href={`https://${cand.cv_file}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline font-bold flex items-center gap-1"
-                        >
-                          <FileText className="w-3 h-3 text-blue-500" /> Xem CV
-                        </a>
-                        <label className="cursor-pointer text-amber-700 hover:text-amber-800 font-extrabold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 transition-colors">
-                          <Upload className="w-3 h-3 text-amber-600" /> Upload CV
-                          <input
-                            type="file"
-                            accept=".pdf,.doc,.docx"
-                            className="hidden"
-                            onChange={(e) => handleCvFileUpload(cand.id, e)}
-                          />
-                        </label>
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                        <span className="font-mono font-black text-emerald-700">
-                          {new Intl.NumberFormat('vi-VN').format(cand.expected_salary)} ₫
-                        </span>
-                        <select
-                          value={cand.stage}
-                          onChange={(e) => handleStageChange(cand.id, e.target.value as any)}
-                          className="px-2 py-1 bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-800 focus:outline-none"
-                        >
-                          <option value="APPLIED">Ứng Viên Mới</option>
-                          <option value="SCREENING">Sàng Lọc CV</option>
-                          <option value="INTERVIEW">Phỏng Vấn</option>
-                          <option value="OFFER">Gửi Offer</option>
-                          <option value="HIRED_ONBOARDING">Onboarding</option>
-                        </select>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* TAB 3: DANH SÁCH ỨNG VIÊN */}
-      {activeTab === 'LIST' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="relative w-72">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Tìm tên ứng viên, vị trí, mã..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
-                />
-              </div>
-
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border rounded-xl font-bold"
-              >
-                <option value="ALL">Tất Cả Phòng Ban</option>
-                <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
-                <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
-                <option value="Phòng CSKH">Phòng CSKH</option>
-                <option value="Phòng Marketing">Phòng Marketing</option>
-              </select>
-            </div>
-
-            <span className="text-slate-500 font-bold">
-              Hiển thị <strong className="text-slate-900">{filteredCandidates.length} Ứng Viên</strong>
-            </span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
-                  <th className="p-3">Mã & Họ Tên Ứng Viên</th>
-                  <th className="p-3">Vị Trí & Phòng Ban</th>
-                  <th className="p-3">Kinh Nghiệm & Lương Kỳ Vọng</th>
-                  <th className="p-3">Nguồn Tuyển Dụng</th>
-                  <th className="p-3">Bước Phễu Hiện Tại</th>
-                  <th className="p-3 text-center">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {filteredCandidates.map((c) => (
-                  <tr key={c.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <p className="font-extrabold text-slate-900">{c.full_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{c.candidate_code} · {c.phone}</p>
-                    </td>
-
-                    <td className="p-3">
-                      <p className="font-bold text-slate-800">{c.position_applied}</p>
-                      <p className="text-slate-500 text-[11px]">{c.department}</p>
-                    </td>
-
-                    <td className="p-3 font-mono">
-                      <p className="font-black text-emerald-700">
-                        {new Intl.NumberFormat('vi-VN').format(c.expected_salary)} ₫
-                      </p>
-                      <p className="text-slate-500 text-[10px]">{c.experience_years} năm kinh nghiệm</p>
-                    </td>
-
-                    <td className="p-3">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-full font-bold text-slate-700">
-                        {c.source}
-                      </span>
-                    </td>
-
-                    <td className="p-3">
-                      <span className={`px-2.5 py-1 rounded-full font-bold text-[11px] ${STAGE_CONFIG[c.stage].cls}`}>
-                        {STAGE_CONFIG[c.stage].label}
-                      </span>
-                    </td>
-
-                    <td className="p-3 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <a
-                          href={`https://${c.cv_file}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 bg-blue-50 text-blue-700 font-extrabold rounded-xl hover:bg-blue-100 transition-all inline-block border border-blue-200"
-                        >
-                          📄 Xem CV
-                        </a>
-                        <label className="cursor-pointer px-3 py-1.5 bg-amber-50 text-amber-800 font-extrabold rounded-xl hover:bg-amber-100 transition-all inline-block border border-amber-200">
-                          📤 Upload CV
-                          <input
-                            type="file"
-                            accept=".pdf,.doc,.docx"
-                            className="hidden"
-                            onChange={(e) => handleCvFileUpload(c.id, e)}
-                          />
-                        </label>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: QUY TRÌNH ONBOARDING HỘI NHẬP */}
+      {/* TAB 3: QUY TRÌNH ONBOARDING HỘI NHẬP */}
       {activeTab === 'ONBOARDING' && (
         <div className="space-y-6 text-xs">
           <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
@@ -698,7 +724,7 @@ export default function RecruitmentModulePage() {
         </div>
       )}
 
-      {/* TAB 5: PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
+      {/* TAB 4: PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
       {activeTab === 'APPROVAL_PIPELINE' && (
         <div className="space-y-6 text-xs">
           <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
