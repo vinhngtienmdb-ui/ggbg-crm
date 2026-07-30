@@ -39,22 +39,6 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         ],
       },
       {
-        name: 'Báo Cáo & Phân Tích',
-        href: '/reports',
-        iconName: 'BarChart3',
-        allowedRoles: [
-          'SUPER_ADMIN',
-          'DIRECTOR',
-          'SALES_MANAGER',
-          'SALES_REP',
-          'SALE_EXEC',
-          'TEAM_LEADER',
-          'CSKH',
-          'AUDITOR',
-          'HR_MANAGER',
-        ],
-      },
-      {
         name: 'Báo Cáo Tài Chính',
         href: '/finance',
         iconName: 'PieChart',
