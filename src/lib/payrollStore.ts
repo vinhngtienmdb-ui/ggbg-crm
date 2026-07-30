@@ -331,6 +331,7 @@ export function generateMonthlyPayroll(period: string = 'Tháng 07/2026'): Payro
       billable_workdays: 26,
       total_ot_hours: 0,
       total_late_minutes: 0,
+      late_count: 0,
     };
 
     const scorecard = scorecards.find((sc) => sc.employee_id === emp.id);
