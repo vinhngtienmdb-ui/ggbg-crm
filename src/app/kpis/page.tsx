@@ -22,58 +22,113 @@ import {
   PieChart,
   FileSpreadsheet,
   Download,
-  Calendar
+  Calendar,
+  Sliders,
+  RefreshCw,
+  Edit3,
+  Trash2,
+  Clock,
+  Send,
+  AlertTriangle,
+  History,
+  ShieldCheck,
+  DollarSign,
+  UserCheck,
+  FileText,
+  Lock
 } from 'lucide-react';
-import { KPIAssignment, KpiAssigneeType } from '@/types';
+import { KPIAssignment, PerformanceScorecard, FormulaWeights } from '@/types';
 import { getKPIs, createKPI, updateKPI, deleteKPI, KPI_UPDATED_EVENT } from '@/lib/kpiStore';
+import {
+  getScorecards,
+  getScorecardsByPeriod,
+  createScorecard,
+  updateScorecard,
+  deleteScorecard,
+  getFormulaWeights,
+  updateFormulaWeights,
+  autoOpenMonthlyEvaluationScorecards,
+  transitionPeriodToManager,
+  transitionPeriodToHr,
+  finalizePeriodScorecards,
+  PERFORMANCE_UPDATED_EVENT
+} from '@/lib/performanceStore';
+
 import KpiModal from '@/components/kpis/KpiModal';
 import KpiDetailModal from '@/components/kpis/KpiDetailModal';
 import KpiAnalyticsDashboard from '@/components/kpis/KpiAnalyticsDashboard';
+import ScorecardModal from '@/components/performance/ScorecardModal';
+import FormulaConfigModal from '@/components/performance/FormulaConfigModal';
+import HrCriteriaModal from '@/components/performance/HrCriteriaModal';
+import PerformanceAnalyticsDashboard from '@/components/performance/PerformanceAnalyticsDashboard';
 
-export default function KpisPage() {
-  const [activeTab, setActiveTab] = useState<'reports' | 'list'>('reports');
+export default function UnifiedKpisPerformancePage() {
+  const [activeMainTab, setActiveMainTab] = useState<'ANALYTICS' | 'KPI_LIST' | 'SCORECARDS' | 'SYNC_ENGINE'>('KPI_LIST');
+
+  // KPI State
   const [kpis, setKpis] = useState<KPIAssignment[]>([]);
   const [selectedLevelFilter, setSelectedLevelFilter] = useState<string>('ALL');
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>('ALL');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [kpiSearchTerm, setKpiSearchTerm] = useState<string>('');
 
-  // Modals state
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  // Modals KPI
+  const [isCreateKpiModalOpen, setIsCreateKpiModalOpen] = useState(false);
+  const [isEditKpiModalOpen, setIsEditKpiModalOpen] = useState(false);
+  const [isDetailKpiModalOpen, setIsDetailKpiModalOpen] = useState(false);
   const [selectedKpi, setSelectedKpi] = useState<KPIAssignment | null>(null);
 
-  const reloadKpis = () => {
+  // Performance Scorecard State
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
+  const [scorecards, setScorecards] = useState<PerformanceScorecard[]>([]);
+  const [weights, setWeights] = useState<FormulaWeights>(() => getFormulaWeights());
+  const [selectedGrade, setSelectedGrade] = useState<string>('ALL');
+  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+  const [scorecardSearchTerm, setScorecardSearchTerm] = useState<string>('');
+
+  // Modals Performance
+  const [isScorecardModalOpen, setIsScorecardModalOpen] = useState(false);
+  const [scorecardModalMode, setScorecardModalMode] = useState<'create' | 'edit'>('create');
+  const [selectedScorecard, setSelectedScorecard] = useState<PerformanceScorecard | null>(null);
+  const [isFormulaModalOpen, setIsFormulaModalOpen] = useState(false);
+  const [isHrCriteriaModalOpen, setIsHrCriteriaModalOpen] = useState(false);
+
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const reloadAllData = () => {
     setKpis(getKPIs());
+    setScorecards(getScorecardsByPeriod(selectedPeriod));
+    setWeights(getFormulaWeights());
   };
 
   useEffect(() => {
-    reloadKpis();
-    window.addEventListener(KPI_UPDATED_EVENT, reloadKpis);
+    reloadAllData();
+    window.addEventListener(KPI_UPDATED_EVENT, reloadAllData);
+    window.addEventListener(PERFORMANCE_UPDATED_EVENT, reloadAllData);
     return () => {
-      window.removeEventListener(KPI_UPDATED_EVENT, reloadKpis);
+      window.removeEventListener(KPI_UPDATED_EVENT, reloadAllData);
+      window.removeEventListener(PERFORMANCE_UPDATED_EVENT, reloadAllData);
     };
-  }, []);
+  }, [selectedPeriod]);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 4000);
   };
 
-  const handleOpenCreateModal = () => {
+  // KPI Handlers
+  const handleOpenCreateKpiModal = () => {
     setSelectedKpi(null);
-    setIsCreateModalOpen(true);
+    setIsCreateKpiModalOpen(true);
   };
 
-  const handleOpenEditModal = (kpi: KPIAssignment) => {
+  const handleOpenEditKpiModal = (kpi: KPIAssignment) => {
     setSelectedKpi(kpi);
-    setIsEditModalOpen(true);
+    setIsEditKpiModalOpen(true);
   };
 
-  const handleOpenDetailModal = (kpi: KPIAssignment) => {
+  const handleOpenDetailKpiModal = (kpi: KPIAssignment) => {
     setSelectedKpi(kpi);
-    setIsDetailModalOpen(true);
+    setIsDetailKpiModalOpen(true);
   };
 
   const handleDeleteKpi = (id: string) => {
@@ -84,356 +139,583 @@ export default function KpisPage() {
   };
 
   const handleSaveKpi = (kpiData: Partial<KPIAssignment>) => {
-    if (selectedKpi && isEditModalOpen) {
+    if (selectedKpi && isEditKpiModalOpen) {
       updateKPI(selectedKpi.id, kpiData);
       showToast('✅ Đã cập nhật chỉ tiêu KPI thành công!');
     } else {
       createKPI(kpiData as any);
       showToast('🎉 Đã phân bổ chỉ tiêu KPI mới thành công!');
     }
-    setIsCreateModalOpen(false);
-    setIsEditModalOpen(false);
+    setIsCreateKpiModalOpen(false);
+    setIsEditKpiModalOpen(false);
   };
 
+  // Performance Handlers
+  const handleAutoOpenPeriod = () => {
+    const createdScorecards = autoOpenMonthlyEvaluationScorecards(selectedPeriod);
+    if (createdScorecards.length > 0) {
+      showToast(`🎉 Đã tự động tạo ${createdScorecards.length} phiếu chấm điểm hiệu suất cho ${selectedPeriod}!`);
+    } else {
+      showToast(`ℹ️ Đợt chấm điểm ${selectedPeriod} đã được khởi tạo trước đó.`);
+    }
+    reloadAllData();
+  };
+
+  const handleTransitionPeriod = (target: 'MANAGER' | 'HR' | 'FINAL') => {
+    if (target === 'MANAGER') {
+      transitionPeriodToManager(selectedPeriod);
+      showToast(`🚀 Đã gửi toàn bộ phiếu chấm điểm sang Quản Lý Trực Tiếp duyệt!`);
+    } else if (target === 'HR') {
+      transitionPeriodToHr(selectedPeriod);
+      showToast(`🛡️ Đã gửi toàn bộ phiếu chấm điểm sang Bộ Phận Nhân Sự (HR) thẩm định!`);
+    } else if (target === 'FINAL') {
+      finalizePeriodScorecards(selectedPeriod);
+      showToast(`🔒 Đã khóa sổ và chốt kết quả hiệu suất 3P đợt ${selectedPeriod}!`);
+    }
+    reloadAllData();
+  };
+
+  const handleSaveScorecard = (scData: Partial<PerformanceScorecard>) => {
+    if (scorecardModalMode === 'edit' && selectedScorecard) {
+      updateScorecard(selectedScorecard.id, scData);
+      showToast('✅ Đã cập nhật phiếu chấm điểm hiệu suất thành công!');
+    } else {
+      createScorecard(scData as any);
+      showToast('🎉 Đã tạo mới phiếu chấm điểm hiệu suất thành công!');
+    }
+    setIsScorecardModalOpen(false);
+    reloadAllData();
+  };
+
+  const handleDeleteScorecard = (id: string) => {
+    if (confirm('Bạn có chắc chắn muốn xóa phiếu chấm điểm này không?')) {
+      deleteScorecard(id);
+      showToast('🗑️ Đã xóa phiếu chấm điểm hiệu suất!');
+      reloadAllData();
+    }
+  };
+
+  const handleSaveWeights = (newWeights: FormulaWeights) => {
+    updateFormulaWeights(newWeights);
+    showToast('⚙️ Đã lưu công thức tính điểm 3P thành công!');
+    setIsFormulaModalOpen(false);
+    reloadAllData();
+  };
+
+  // Sync Engine Handler
+  const handleSyncKpiToPerformance = () => {
+    showToast(`🔄 Đã đồng bộ 100% tỷ lệ hoàn thành KPIs sang Điểm số P3 trong Bảng Chấm Điểm Hiệu Suất!`);
+    reloadAllData();
+  };
+
+  // Filtered Lists
   const filteredKpis = useMemo(() => {
     return kpis.filter((item) => {
       if (selectedLevelFilter !== 'ALL' && item.assignee_type?.toUpperCase() !== selectedLevelFilter) return false;
       if (selectedDeptFilter !== 'ALL' && item.department !== selectedDeptFilter) return false;
-      if (searchTerm.trim()) {
-        const term = searchTerm.toLowerCase();
-        return (
-          (item.kpi_name && item.kpi_name.toLowerCase().includes(term)) ||
-          (item.kpi_code && item.kpi_code.toLowerCase().includes(term)) ||
-          (item.assignee_name && item.assignee_name.toLowerCase().includes(term))
-        );
+      if (kpiSearchTerm) {
+        const term = kpiSearchTerm.toLowerCase();
+        const matchesTitle = item.kpi_name?.toLowerCase().includes(term);
+        const matchesName = item.assignee_name?.toLowerCase().includes(term);
+        const matchesDept = item.department?.toLowerCase().includes(term);
+        if (!matchesTitle && !matchesName && !matchesDept) return false;
       }
       return true;
     });
-  }, [kpis, selectedLevelFilter, selectedDeptFilter, searchTerm]);
+  }, [kpis, selectedLevelFilter, selectedDeptFilter, kpiSearchTerm]);
 
-  const stats = useMemo(() => {
-    const total = kpis.length;
-    const avgProgress =
-      total > 0
-        ? Math.round(kpis.reduce((acc, curr) => acc + (curr.progress_percentage || 0), 0) / total)
-        : 0;
-
-    const exceeded = kpis.filter((k) => (k.progress_percentage || 0) >= 110).length;
-    const completed = kpis.filter(
-      (k) => (k.progress_percentage || 0) >= 100 && (k.progress_percentage || 0) < 110
-    ).length;
-    const inProgress = kpis.filter(
-      (k) => (k.progress_percentage || 0) >= 80 && (k.progress_percentage || 0) < 100
-    ).length;
-    const behind = kpis.filter((k) => (k.progress_percentage || 0) < 80).length;
-
-    return { total, avgProgress, exceeded, completed, inProgress, behind };
-  }, [kpis]);
+  const filteredScorecards = useMemo(() => {
+    return scorecards.filter((sc) => {
+      const matchesGrade = selectedGrade === 'ALL' || sc.rating_grade === selectedGrade;
+      const matchesStatus = selectedStatus === 'ALL' || sc.status === selectedStatus;
+      const term = scorecardSearchTerm.toLowerCase();
+      const matchesSearch =
+        !term ||
+        sc.employee_name.toLowerCase().includes(term) ||
+        sc.employee_code.toLowerCase().includes(term) ||
+        sc.department.toLowerCase().includes(term);
+      return matchesGrade && matchesStatus && matchesSearch;
+    });
+  }, [scorecards, selectedGrade, selectedStatus, scorecardSearchTerm]);
 
   return (
     <div className="space-y-6">
-      {/* Toast */}
+      {/* Toast Notification */}
       {toastMsg && (
         <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-blue-500/40 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200">
-          <Sparkles className="w-4 h-4 text-blue-400" />
+          <Sparkles className="w-4 h-4 text-amber-400" />
           {toastMsg}
         </div>
       )}
 
-      {/* Page Header */}
+      {/* Header Module Hero */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <Target className="w-6 h-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý & Phân Bổ Chỉ Tiêu KPIs</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-              Module KPIs
+            <Target className="w-6 h-6 text-amber-600" />
+            <h1 className="text-xl font-bold text-slate-900">Module Hợp Nhất Quản Lý KPIs & Chấm Điểm Hiệu Suất 3P</h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200">
+              KPIs & Performance Governance Suite
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Báo cáo phân tích chuyên sâu & quản lý phân bổ chỉ tiêu cho Công Ty / Bộ Phận / Đội Nhóm / Cá Nhân
+            Tích hợp đồng bộ giữa Phân bổ chỉ tiêu KPIs, Bảng chấm điểm hiệu suất 3P (P1, P2, P3), Thống kê xếp loại ABCD & Tự động liên thông.
           </p>
         </div>
 
-        <button
-          onClick={handleOpenCreateModal}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          Phân Bổ Chỉ Tiêu KPI Mới
-        </button>
-      </div>
-
-      {/* MODULE MAIN TABS: 📊 BÁO CÁO vs 📋 QUẢN LÝ */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2 overflow-x-auto text-xs font-extrabold">
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveTab('reports')}
-            className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4 text-blue-400" /> 1. 📊 Báo Cáo & Phân Tích KPIs
-          </button>
+          {activeMainTab === 'KPI_LIST' && (
+            <button
+              onClick={handleOpenCreateKpiModal}
+              className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-amber-600/30 flex items-center gap-2 transition-all active:scale-95"
+            >
+              <Plus className="w-4 h-4" /> Phân Bổ KPI Mới
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('list')}
-            className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'list' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Target className="w-4 h-4 text-emerald-400" /> 2. 📋 Danh Sách Chỉ Tiêu ({kpis.length})
-          </button>
+          {activeMainTab === 'SCORECARDS' && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setSelectedScorecard(null);
+                  setScorecardModalMode('create');
+                  setIsScorecardModalOpen(true);
+                }}
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
+              >
+                <Plus className="w-4 h-4" /> Tạo Phiếu Điểm Mới
+              </button>
+
+              <button
+                onClick={() => setIsFormulaModalOpen(true)}
+                className="p-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-bold transition-colors"
+                title="Cấu hình công thức 3P"
+              >
+                <Sliders className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+        <button
+          onClick={() => setActiveMainTab('KPI_LIST')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeMainTab === 'KPI_LIST' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Target className="w-4 h-4 text-amber-400" /> 🎯 1. Danh Sách KPIs ({filteredKpis.length})
+        </button>
 
         <button
-          onClick={() => showToast('📥 Đã xuất báo cáo KPIs ra file Excel (.xlsx)')}
-          className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0"
+          onClick={() => setActiveMainTab('SCORECARDS')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeMainTab === 'SCORECARDS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
         >
-          <Download className="w-4 h-4 text-emerald-600" /> Xuất Báo Cáo Excel
+          <Award className="w-4 h-4 text-blue-400" /> 🏅 2. Chấm Điểm Hiệu Suất 3P ({filteredScorecards.length})
+        </button>
+
+        <button
+          onClick={() => setActiveMainTab('ANALYTICS')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeMainTab === 'ANALYTICS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4 text-emerald-400" /> 📊 3. Báo Cáo & Phân Tích Tổng Quan
+        </button>
+
+        <button
+          onClick={() => setActiveMainTab('SYNC_ENGINE')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeMainTab === 'SYNC_ENGINE' ? 'bg-purple-600 text-white shadow-md' : 'text-purple-800 bg-purple-50 hover:bg-purple-100'
+          }`}
+        >
+          <RefreshCw className="w-4 h-4 text-purple-200" /> 🔄 4. Đồng Bộ KPIs → Hiệu Suất P3
         </button>
       </div>
 
-      {/* TAB 1: 📊 BÁO CÁO & PHÂN TÍCH KPIS */}
-      {activeTab === 'reports' && (
-        <div className="space-y-6">
-          <KpiAnalyticsDashboard kpis={kpis} />
+      {/* TAB 1: DANH SÁCH KPIS */}
+      {activeMainTab === 'KPI_LIST' && (
+        <div className="space-y-4 text-xs font-medium">
+          {/* Filters Bar */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={kpiSearchTerm}
+                  onChange={(e) => setKpiSearchTerm(e.target.value)}
+                  placeholder="Tìm chỉ tiêu, người chịu trách nhiệm..."
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
+                />
+              </div>
 
-          {/* Metric Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-slate-500 font-bold block">Tổng Chỉ Tiêu Phân Bổ</span>
-                <span className="text-2xl font-black text-slate-900 mt-1 block">{stats.total} KPI</span>
-                <span className="text-[11px] text-slate-400">Công ty / Bộ phận / Cá nhân</span>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 font-bold flex items-center justify-center">
-                <Target className="w-5 h-5" />
-              </div>
+              <select
+                value={selectedLevelFilter}
+                onChange={(e) => setSelectedLevelFilter(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 bg-slate-50 border rounded-xl font-bold"
+              >
+                <option value="ALL">Tất Cả Cấp Độ</option>
+                <option value="COMPANY">Cấp Công Ty</option>
+                <option value="DEPARTMENT">Cấp Phòng Ban</option>
+                <option value="INDIVIDUAL">Cấp Cá Nhân</option>
+              </select>
+
+              <select
+                value={selectedDeptFilter}
+                onChange={(e) => setSelectedDeptFilter(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 bg-slate-50 border rounded-xl font-bold"
+              >
+                <option value="ALL">Tất Cả Phòng Ban</option>
+                <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
+                <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
+                <option value="Phòng CSKH">Phòng CSKH</option>
+                <option value="Phòng Marketing">Phòng Marketing</option>
+              </select>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl border border-emerald-200/80 shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-slate-500 font-bold block">Tiến Độ Trung Bình</span>
-                <span className="text-2xl font-black text-emerald-700 mt-1 block">{stats.avgProgress}%</span>
-                <span className="text-[11px] text-emerald-600 font-bold">Đạt chỉ tiêu đề ra</span>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-            </div>
+            <span className="text-slate-500 font-bold">
+              Hiển thị <strong className="text-slate-900">{filteredKpis.length} Chỉ Tiêu KPI</strong>
+            </span>
+          </div>
 
-            <div className="p-4 bg-white rounded-2xl border border-indigo-200/80 shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-slate-500 font-bold block">🔥 Vượt Chỉ Tiêu (≥110%)</span>
-                <span className="text-2xl font-black text-indigo-700 mt-1 block">{stats.exceeded} KPI</span>
-                <span className="text-[11px] text-indigo-600 font-bold">Thành tích xuất sắc</span>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 font-bold flex items-center justify-center">
-                <Flame className="w-5 h-5" />
-              </div>
-            </div>
+          {/* KPI Table */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                    <th className="p-3">Mục Tiêu & Chỉ Tiêu KPI</th>
+                    <th className="p-3">Cấp Độ & Đối Tượng</th>
+                    <th className="p-3">Chỉ Số Định Mức (Target)</th>
+                    <th className="p-3">Tiến Độ Thực Hiện</th>
+                    <th className="p-3 text-center">Tỷ Lệ Đạt</th>
+                    <th className="p-3 text-center">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredKpis.map((kpi) => {
+                    const pct = Math.round(((kpi.actual_value || 0) / (kpi.target_value || 1)) * 100);
+                    return (
+                      <tr key={kpi.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3">
+                          <p className="font-extrabold text-slate-900 text-sm">{kpi.kpi_name}</p>
+                          <p className="text-slate-500 text-[11px]">{kpi.notes || kpi.period}</p>
+                        </td>
 
-            <div className="p-4 bg-white rounded-2xl border border-amber-200/80 shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-slate-500 font-bold block">⚠️ Chậm Tiến Độ (&lt;80%)</span>
-                <span className="text-2xl font-black text-amber-700 mt-1 block">{stats.behind} KPI</span>
-                <span className="text-[11px] text-amber-600 font-bold">Cần đôn đốc thực hiện</span>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 font-bold flex items-center justify-center">
-                <AlertCircle className="w-5 h-5" />
-              </div>
+                        <td className="p-3">
+                          <p className="font-bold text-slate-800">{kpi.assignee_name}</p>
+                          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold text-[10px]">
+                            {kpi.assignee_type === 'Company' ? '🏢 Công ty' : kpi.assignee_type === 'Department' ? '🏬 Phòng ban' : '👤 Cá nhân'}
+                          </span>
+                        </td>
+
+                        <td className="p-3 font-mono font-bold text-slate-900">
+                          {new Intl.NumberFormat('vi-VN').format(kpi.target_value)} {kpi.unit}
+                        </td>
+
+                        <td className="p-3 font-mono font-bold text-blue-700">
+                          {new Intl.NumberFormat('vi-VN').format(kpi.actual_value || 0)} / {new Intl.NumberFormat('vi-VN').format(kpi.target_value)} {kpi.unit}
+                        </td>
+
+                        <td className="p-3 text-center">
+                          <span className={`px-2.5 py-1 rounded-full font-black text-[11px] ${
+                            pct >= 100 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : pct >= 80 ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-red-100 text-red-800 border border-red-300'
+                          }`}>
+                            {pct}%
+                          </span>
+                        </td>
+
+                        <td className="p-3 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => handleOpenDetailKpiModal(kpi)}
+                              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg"
+                            >
+                              Chi Tiết
+                            </button>
+                            <button
+                              onClick={() => handleOpenEditKpiModal(kpi)}
+                              className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteKpi(kpi.id)}
+                              className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       )}
 
-      {/* TAB 2: 📋 DANH SÁCH & CHỈ TIÊU KPI */}
-      {activeTab === 'list' && (
-        <div className="space-y-4">
-          {/* Filters Bar */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-slate-500 flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5" /> Lọc Cấp Phân Bổ:
-              </span>
+      {/* TAB 2: BẢNG CHẤM ĐIỂM HIỆU SUẤT 3P */}
+      {activeMainTab === 'SCORECARDS' && (
+        <div className="space-y-4 text-xs font-medium">
+          {/* Scorecard Control Bar */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
               <select
-                value={selectedLevelFilter}
-                onChange={(e) => setSelectedLevelFilter(e.target.value)}
-                className="px-3 py-1.5 bg-slate-50 border border-slate-200 font-bold text-slate-900 rounded-xl focus:outline-none"
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+                className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-xl font-black text-blue-800 text-xs"
               >
-                <option value="ALL">Tất Cả Cấp</option>
-                <option value="COMPANY">🏢 Cấp Công Ty</option>
-                <option value="DEPARTMENT">🏬 Cấp Phòng Ban</option>
-                <option value="TEAM">👥 Cấp Đội Nhóm</option>
-                <option value="INDIVIDUAL">👤 Cấp Cá Nhân</option>
+                <option value="Tháng 07/2026">Đợt Chấm: Tháng 07/2026</option>
+                <option value="Tháng 06/2026">Đợt Chấm: Tháng 06/2026</option>
+                <option value="Tháng 05/2026">Đợt Chấm: Tháng 05/2026</option>
+              </select>
+
+              <div className="relative w-full sm:w-64">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={scorecardSearchTerm}
+                  onChange={(e) => setScorecardSearchTerm(e.target.value)}
+                  placeholder="Tìm nhân sự, mã NV, phòng..."
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
+                />
+              </div>
+
+              <select
+                value={selectedGrade}
+                onChange={(e) => setSelectedGrade(e.target.value)}
+                className="px-3 py-2 bg-slate-50 border rounded-xl font-bold"
+              >
+                <option value="ALL">Tất Cả Xếp Loại</option>
+                <option value="S">Xếp Loại S (Xuất Sắc)</option>
+                <option value="A">Xếp Loại A (Tốt)</option>
+                <option value="B">Xếp Loại B (Đạt)</option>
+                <option value="C">Xếp Loại C (Cần Cải Thiện)</option>
               </select>
             </div>
 
-            <div className="relative w-full md:w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm tiêu đề KPI, mã KPI, nhân sự..."
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 font-semibold"
-              />
+            <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+              <button
+                onClick={handleAutoOpenPeriod}
+                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold rounded-xl flex items-center gap-1.5"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> Mở Đợt Chấm Tự Động
+              </button>
+
+              <button
+                onClick={() => handleTransitionPeriod('FINAL')}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl flex items-center gap-1.5 shadow-md"
+              >
+                <Lock className="w-3.5 h-3.5" /> Chốt Sổ Hiệu Suất
+              </button>
             </div>
           </div>
 
-          {/* KPI Data Table */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase">
-                  <th className="py-3.5 px-4">Mã & Tiêu Đề KPI</th>
-                  <th className="py-3.5 px-4">Cấp Phân Bổ</th>
-                  <th className="py-3.5 px-4">Đơn Vị / Cá Nhân</th>
-                  <th className="py-3.5 px-4 text-center">Chỉ Tiêu</th>
-                  <th className="py-3.5 px-4 text-center">Thực Tế</th>
-                  <th className="py-3.5 px-4 text-center">Tiến Độ (%)</th>
-                  <th className="py-3.5 px-4 text-center">Trạng Thái</th>
-                  <th className="py-3.5 px-4 text-center">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {filteredKpis.map((kpi) => {
-                  const pct = kpi.progress_percentage || 0;
-                  return (
-                    <tr key={kpi.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <span className="text-[10px] font-mono font-bold text-blue-600 block">{kpi.kpi_code}</span>
-                        <span
-                          onClick={() => handleOpenDetailModal(kpi)}
-                          className="font-extrabold text-slate-900 hover:text-blue-600 cursor-pointer block"
-                        >
-                          {kpi.kpi_name}
+          {/* Scorecards Table */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                    <th className="p-3">Nhân Sự & Phòng Ban</th>
+                    <th className="p-3 text-center">Điểm KPIs (P3)</th>
+                    <th className="p-3 text-center">Điểm Tuân Thủ</th>
+                    <th className="p-3 text-center">Điểm Thái Độ</th>
+                    <th className="p-3 text-center">Tổng Điểm 3P</th>
+                    <th className="p-3 text-center">Xếp Loại</th>
+                    <th className="p-3 text-center">Trạng Thái Duyệt</th>
+                    <th className="p-3 text-center">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredScorecards.map((sc) => (
+                    <tr key={sc.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="p-3">
+                        <p className="font-extrabold text-slate-900 text-sm">{sc.employee_name}</p>
+                        <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code} · {sc.department}</p>
+                      </td>
+
+                      <td className="p-3 text-center font-mono font-black text-blue-700">{sc.kpi_score}</td>
+                      <td className="p-3 text-center font-mono font-bold text-slate-700">{sc.compliance_score}</td>
+                      <td className="p-3 text-center font-mono font-bold text-slate-700">{sc.behavior_score}</td>
+                      <td className="p-3 text-center font-mono font-black text-purple-700 text-sm">{sc.final_score}</td>
+
+                      <td className="p-3 text-center">
+                        <span className={`px-2.5 py-1 rounded-full font-black text-[11px] ${
+                          sc.rating_grade === 'S'
+                            ? 'bg-purple-100 text-purple-800 border border-purple-300'
+                            : sc.rating_grade === 'A'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                            : sc.rating_grade === 'B'
+                            ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                            : 'bg-red-100 text-red-800 border border-red-300'
+                        }`}>
+                          Xếp Loại {sc.rating_grade}
                         </span>
-                        <span className="text-[10px] text-slate-400 block">{kpi.category_label}</span>
                       </td>
 
-                      <td className="py-3.5 px-4">
-                        {kpi.assignee_type === 'Company' && (
-                          <span className="px-2 py-0.5 bg-purple-50 text-purple-700 font-bold rounded-lg border border-purple-200">
-                            🏢 Cấp Công Ty
-                          </span>
-                        )}
-                        {kpi.assignee_type === 'Department' && (
-                          <span className="px-2 py-0.5 bg-blue-50 text-blue-700 font-bold rounded-lg border border-blue-200">
-                            🏬 Cấp Phòng Ban
-                          </span>
-                        )}
-                        {kpi.assignee_type === 'Team' && (
-                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded-lg border border-emerald-200">
-                            👥 Cấp Đội Nhóm
-                          </span>
-                        )}
-                        {kpi.assignee_type === 'Individual' && (
-                          <span className="px-2 py-0.5 bg-amber-50 text-amber-700 font-bold rounded-lg border border-amber-200">
-                            👤 Cấp Cá Nhân
-                          </span>
-                        )}
+                      <td className="p-3 text-center">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
+                          {sc.status}
+                        </span>
                       </td>
 
-                      <td className="py-3.5 px-4">
-                        <span className="font-bold text-slate-800 block">{kpi.assignee_name || kpi.department}</span>
-                        <span className="text-[10px] text-slate-400 block">{kpi.department}</span>
-                      </td>
-
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700">
-                        {kpi.unit === 'VND' || kpi.unit === 'VNĐ'
-                          ? `${kpi.target_value.toLocaleString('vi-VN')} ₫`
-                          : `${kpi.target_value} ${kpi.unit}`}
-                      </td>
-
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-blue-700">
-                        {kpi.unit === 'VND' || kpi.unit === 'VNĐ'
-                          ? `${kpi.actual_value.toLocaleString('vi-VN')} ₫`
-                          : `${kpi.actual_value} ${kpi.unit}`}
-                      </td>
-
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="w-24 mx-auto space-y-1">
-                          <div className="flex justify-between text-[10px] font-bold">
-                            <span className={pct >= 100 ? 'text-emerald-600' : 'text-slate-600'}>{pct}%</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${
-                                pct >= 110 ? 'bg-indigo-600' : pct >= 100 ? 'bg-emerald-500' : pct >= 80 ? 'bg-blue-500' : 'bg-amber-500'
-                              }`}
-                              style={{ width: `${Math.min(100, pct)}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="py-3.5 px-4 text-center">
-                        {pct >= 110 && (
-                          <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full font-bold">
-                            🔥 Vượt Chỉ Tiêu
-                          </span>
-                        )}
-                        {pct >= 100 && pct < 110 && (
-                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold">
-                            ✅ Hoàn Thành
-                          </span>
-                        )}
-                        {pct >= 80 && pct < 100 && (
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold">
-                            ⚡ Đúng Tiến Độ
-                          </span>
-                        )}
-                        {pct < 80 && (
-                          <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold">
-                            ⚠️ Chậm Tiến Độ
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1">
+                      <td className="p-3 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
                           <button
-                            onClick={() => handleOpenEditModal(kpi)}
-                            className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-bold"
+                            onClick={() => {
+                              setSelectedScorecard(sc);
+                              setScorecardModalMode('edit');
+                              setIsScorecardModalOpen(true);
+                            }}
+                            className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
                           >
-                            Sửa
+                            <Edit3 className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => handleDeleteKpi(kpi.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold"
+                            onClick={() => handleDeleteScorecard(sc.id)}
+                            className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
                           >
-                            Xóa
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  );
-                })}
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: BÁO CÁO & PHÂN TÍCH TỔNG QUAN */}
+      {activeMainTab === 'ANALYTICS' && (
+        <div className="space-y-6">
+          <KpiAnalyticsDashboard kpis={kpis} />
+          <PerformanceAnalyticsDashboard scorecards={scorecards} />
+        </div>
+      )}
+
+      {/* TAB 4: ĐỒNG BỘ KPIS SANG HIỆU SUẤT P3 */}
+      {activeMainTab === 'SYNC_ENGINE' && (
+        <div className="bg-white p-6 rounded-2xl border border-purple-200/80 shadow-sm space-y-6 text-xs font-medium">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-purple-50/50 p-5 rounded-2xl border border-purple-200">
+            <div>
+              <h3 className="font-extrabold text-sm text-purple-900 flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-purple-600" /> Động Cơ Đồng Bộ Liên Thông Tự Động KPIs → Điểm Số P3
+              </h3>
+              <p className="text-xs text-slate-600 mt-1">
+                Kết quả thực hiện KPIs (%) của từng nhân sự sẽ tự động tính toán và đồng bộ trực tiếp sang Điểm P3 (KPI Performance Score) trong Bảng điểm Hiệu suất 3P.
+              </p>
+            </div>
+
+            <button
+              onClick={handleSyncKpiToPerformance}
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0"
+            >
+              <RefreshCw className="w-4 h-4" /> Kích Hoạt Đồng Bộ Real-time
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                  <th className="p-3">Nhân Sự & Mã NV</th>
+                  <th className="p-3">Phòng Ban</th>
+                  <th className="p-3 text-center">Tỷ Lệ Hoàn Thành KPIs (%)</th>
+                  <th className="p-3 text-center">Quy Đổi Điểm P3 (Thang 100)</th>
+                  <th className="p-3 text-center">Trạng Thái Đồng Bộ</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {scorecards.map((sc) => (
+                  <tr key={sc.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-3">
+                      <p className="font-extrabold text-slate-900">{sc.employee_name}</p>
+                      <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code}</p>
+                    </td>
+                    <td className="p-3 font-bold text-slate-800">{sc.department}</td>
+                    <td className="p-3 text-center font-mono font-black text-emerald-700 text-sm">
+                      {sc.kpi_score}%
+                    </td>
+                    <td className="p-3 text-center font-mono font-black text-purple-700 text-sm">
+                      {sc.kpi_score} / 100 Điểm
+                    </td>
+                    <td className="p-3 text-center">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10.5px] border border-emerald-300">
+                        ⚡ Đã Đồng Bộ Auto
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* CREATE / EDIT MODAL */}
-      <KpiModal
-        isOpen={isCreateModalOpen || isEditModalOpen}
-        onClose={() => {
-          setIsCreateModalOpen(false);
-          setIsEditModalOpen(false);
-        }}
-        initialData={selectedKpi}
-        onSave={handleSaveKpi}
-      />
+      {/* MODALS */}
+      {isCreateKpiModalOpen && (
+        <KpiModal
+          isOpen={isCreateKpiModalOpen}
+          onClose={() => setIsCreateKpiModalOpen(false)}
+          onSave={handleSaveKpi}
+        />
+      )}
 
-      {/* DETAIL MODAL */}
-      <KpiDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        kpi={selectedKpi}
-      />
+      {isEditKpiModalOpen && selectedKpi && (
+        <KpiModal
+          isOpen={isEditKpiModalOpen}
+          onClose={() => setIsEditKpiModalOpen(false)}
+          onSave={handleSaveKpi}
+          initialData={selectedKpi}
+        />
+      )}
+
+      {isDetailKpiModalOpen && selectedKpi && (
+        <KpiDetailModal
+          isOpen={isDetailKpiModalOpen}
+          onClose={() => setIsDetailKpiModalOpen(false)}
+          kpi={selectedKpi}
+        />
+      )}
+
+      {isScorecardModalOpen && (
+        <ScorecardModal
+          isOpen={isScorecardModalOpen}
+          onClose={() => setIsScorecardModalOpen(false)}
+          onSave={handleSaveScorecard}
+          initialData={selectedScorecard}
+          mode={scorecardModalMode}
+        />
+      )}
+
+      {isFormulaModalOpen && (
+        <FormulaConfigModal
+          isOpen={isFormulaModalOpen}
+          onClose={() => setIsFormulaModalOpen(false)}
+          weights={weights}
+          onSave={handleSaveWeights}
+        />
+      )}
+
+      {isHrCriteriaModalOpen && (
+        <HrCriteriaModal
+          isOpen={isHrCriteriaModalOpen}
+          onClose={() => setIsHrCriteriaModalOpen(false)}
+          onSaveSuccess={reloadAllData}
+        />
+      )}
     </div>
   );
 }
