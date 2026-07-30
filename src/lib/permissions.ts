@@ -160,6 +160,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER'],
       },
       {
+        name: 'Tuyển Dụng & Onboarding',
+        href: '/recruitment',
+        iconName: 'UserPlus',
+        moduleKey: 'hrm',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER'],
+      },
+      {
         name: 'Quản Lý KPIs',
         href: '/kpis',
         iconName: 'TrendingUp',

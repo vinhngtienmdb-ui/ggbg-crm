@@ -715,30 +715,12 @@ export default function HRMPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('RECRUITMENT')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'RECRUITMENT' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          💼 Phễu Tuyển Dụng Dual-View ({candidates.length})
-        </button>
-
-        <button
           onClick={() => setActiveTab('CONTRACTS')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'CONTRACTS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           📄 Quản Lý Hợp Đồng & Lương
-        </button>
-
-        <button
-          onClick={() => setActiveTab('ONBOARDING')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'ONBOARDING' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          📋 Checklist Onboarding ({onboardingList.length})
         </button>
 
         <button
