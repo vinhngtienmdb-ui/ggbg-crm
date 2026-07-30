@@ -26,6 +26,29 @@ export interface DebtInvoice {
   payment_status: 'PAID' | 'UNPAID' | 'OVERDUE';
   reminder_sent_count: number;
   last_reminder_at?: string;
+  overdue_days?: number;
+}
+
+export interface CashFlowTransaction {
+  id: string;
+  code: string;
+  date: string;
+  type: 'INCOME' | 'EXPENSE';
+  category: 'Hợp Đồng Dịch Vụ' | 'Chi Lương Nhân Sự' | 'Chi Marketing Ads' | 'Chi Server & SaaS' | 'Chi Tiền Điện Nước VP' | 'Khác';
+  amount: number;
+  account: 'Techcombank' | 'Vietcombank' | 'Quỹ Tiền Mặt';
+  description: string;
+  approval_status: 'APPROVED' | 'PENDING';
+}
+
+export interface DepartmentBudget {
+  id: string;
+  department_name: string;
+  allocated_budget: number;
+  spent_amount: number;
+  remaining_amount: number;
+  utilization_pct: number;
+  status: 'SAFE' | 'WARNING' | 'OVER_BUDGET';
 }
 
 export interface FinancialSummary {
@@ -34,4 +57,5 @@ export interface FinancialSummary {
   avg_profit_margin: number;
   total_overdue_debt: number;
   contracts_count: number;
+  net_cash_flow?: number;
 }
