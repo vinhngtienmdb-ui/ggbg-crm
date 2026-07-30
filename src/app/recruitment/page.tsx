@@ -255,6 +255,16 @@ export default function RecruitmentModulePage() {
     showToast(`🔄 Đã chuyển bước ứng viên sang: ${STAGE_CONFIG[newStage].label}`);
   };
 
+  const handleCvFileUpload = (candId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const path = `storage.ggbingo.vn/cv/${file.name}`;
+    setCandidates((prev) =>
+      prev.map((c) => (c.id === candId ? { ...c, cv_file: path } : c))
+    );
+    showToast(`📄 Đã upload CV thành công: ${file.name}`);
+  };
+
   const handleApproveDirectManager = (cand: Candidate) => {
     setCandidates((prev) =>
       prev.map((c) => (c.id === cand.id ? { ...c, approval_status: 'PENDING_SALES_DIRECTOR' } : c))
@@ -473,6 +483,26 @@ export default function RecruitmentModulePage() {
                       <p className="text-[11px] text-slate-500">{cand.position_applied}</p>
                       <p className="text-[10px] text-slate-400">{cand.department}</p>
 
+                      <div className="flex items-center justify-between text-[10px] pt-1">
+                        <a
+                          href={`https://${cand.cv_file}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline font-bold flex items-center gap-1"
+                        >
+                          <FileText className="w-3 h-3 text-blue-500" /> Xem CV
+                        </a>
+                        <label className="cursor-pointer text-amber-700 hover:text-amber-800 font-extrabold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 transition-colors">
+                          <Upload className="w-3 h-3 text-amber-600" /> Upload CV
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            className="hidden"
+                            onChange={(e) => handleCvFileUpload(cand.id, e)}
+                          />
+                        </label>
+                      </div>
+
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                         <span className="font-mono font-black text-emerald-700">
                           {new Intl.NumberFormat('vi-VN').format(cand.expected_salary)} ₫
@@ -577,14 +607,25 @@ export default function RecruitmentModulePage() {
                     </td>
 
                     <td className="p-3 text-center">
-                      <a
-                        href={`https://${c.cv_file}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 bg-blue-50 text-blue-700 font-extrabold rounded-xl hover:bg-blue-100 transition-all inline-block"
-                      >
-                        Xem File CV
-                      </a>
+                      <div className="flex items-center justify-center gap-2">
+                        <a
+                          href={`https://${c.cv_file}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 bg-blue-50 text-blue-700 font-extrabold rounded-xl hover:bg-blue-100 transition-all inline-block border border-blue-200"
+                        >
+                          📄 Xem CV
+                        </a>
+                        <label className="cursor-pointer px-3 py-1.5 bg-amber-50 text-amber-800 font-extrabold rounded-xl hover:bg-amber-100 transition-all inline-block border border-amber-200">
+                          📤 Upload CV
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            className="hidden"
+                            onChange={(e) => handleCvFileUpload(c.id, e)}
+                          />
+                        </label>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -862,6 +903,26 @@ export default function RecruitmentModulePage() {
                     onChange={(e) => setNewForm({ ...newForm, expected_salary: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-black"
                   />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1">File CV Đính Kèm (.pdf, .doc, .docx)</label>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-blue-50 border border-dashed border-blue-300 rounded-xl text-blue-700 font-bold hover:bg-blue-100 transition-colors">
+                    <Upload className="w-4 h-4" /> Tải Lên File CV Tốt Nhất
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          showToast(`📄 Đã chọn file CV: ${file.name}`);
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
               </div>
 
