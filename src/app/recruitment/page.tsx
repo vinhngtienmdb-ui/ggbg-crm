@@ -25,7 +25,9 @@ import {
   BookOpen,
   ArrowRight,
   TrendingUp,
-  X
+  XCircle,
+  X,
+  History
 } from 'lucide-react';
 import {
   BarChart,
@@ -58,6 +60,8 @@ export interface Candidate {
   interview_score?: number;
   interviewer_name?: string;
   onboarding_progress?: number; // 0 - 100%
+  approval_status?: 'PENDING_DIRECT_MANAGER' | 'PENDING_SALES_DIRECTOR' | 'APPROVED' | 'REJECTED';
+  direct_manager_name?: string;
   status: 'In_Progress' | 'Passed' | 'Rejected' | 'Onboarded';
 }
 
@@ -80,6 +84,8 @@ const INITIAL_CANDIDATES: Candidate[] = [
     interview_score: 8.5,
     interviewer_name: 'Nguyễn Văn Minh (Trưởng Phòng KD1)',
     onboarding_progress: 80,
+    approval_status: 'APPROVED',
+    direct_manager_name: 'Trần Văn Hoàng (Leader Team 1)',
     status: 'Onboarded',
   },
   {
@@ -100,6 +106,8 @@ const INITIAL_CANDIDATES: Candidate[] = [
     interview_score: 9.0,
     interviewer_name: 'Đặng Tuấn Tú (Giám Đốc Vận Hành)',
     onboarding_progress: 20,
+    approval_status: 'PENDING_SALES_DIRECTOR',
+    direct_manager_name: 'Đặng Tuấn Tú (Giám Đốc Vận Hành)',
     status: 'Passed',
   },
   {
@@ -120,6 +128,8 @@ const INITIAL_CANDIDATES: Candidate[] = [
     interview_score: 7.5,
     interviewer_name: 'Hoàng Kim Ngân (Trưởng Phòng CSKH)',
     onboarding_progress: 0,
+    approval_status: 'PENDING_DIRECT_MANAGER',
+    direct_manager_name: 'Hoàng Kim Ngân (Trưởng Phòng CSKH)',
     status: 'In_Progress',
   },
   {
@@ -137,6 +147,8 @@ const INITIAL_CANDIDATES: Candidate[] = [
     cv_file: 'storage.ggbingo.vn/cv/DoManhCuong_CV.pdf',
     applied_date: '2026-07-22',
     onboarding_progress: 0,
+    approval_status: 'PENDING_DIRECT_MANAGER',
+    direct_manager_name: 'Nguyễn Tiến Vinh (CEO)',
     status: 'In_Progress',
   },
   {
@@ -154,6 +166,8 @@ const INITIAL_CANDIDATES: Candidate[] = [
     cv_file: 'storage.ggbingo.vn/cv/NguyenThiMai_CV.pdf',
     applied_date: '2026-07-28',
     onboarding_progress: 0,
+    approval_status: 'PENDING_DIRECT_MANAGER',
+    direct_manager_name: 'Nguyễn Thị Bích Ngọc (CHRO)',
     status: 'In_Progress',
   },
 ];
@@ -183,11 +197,13 @@ const SOURCE_CHART_DATA = [
 
 export default function RecruitmentModulePage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
-  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'KANBAN' | 'LIST' | 'ONBOARDING'>('ANALYTICS');
+  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'KANBAN' | 'LIST' | 'ONBOARDING' | 'APPROVAL_PIPELINE'>('ANALYTICS');
   const [searchTerm, setSearchTerm] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [approvalNote, setApprovalNote] = useState('');
+  const [selectedApprovalCand, setSelectedApprovalCand] = useState<Candidate | null>(null);
 
   const [newForm, setNewForm] = useState({
     full_name: '',
@@ -198,6 +214,7 @@ export default function RecruitmentModulePage() {
     source: 'TopCV' as const,
     expected_salary: 12000000,
     experience_years: 2,
+    direct_manager_name: 'Nguyễn Văn Minh (Trưởng Phòng KD1)',
   });
 
   const showToast = (msg: string) => {
@@ -222,6 +239,8 @@ export default function RecruitmentModulePage() {
       cv_file: `storage.ggbingo.vn/cv/${newForm.full_name.replace(/\s+/g, '')}_CV.pdf`,
       applied_date: new Date().toISOString().split('T')[0],
       onboarding_progress: 0,
+      approval_status: 'PENDING_DIRECT_MANAGER',
+      direct_manager_name: newForm.direct_manager_name,
       status: 'In_Progress',
     };
     setCandidates([newCand, ...candidates]);
@@ -235,6 +254,31 @@ export default function RecruitmentModulePage() {
     );
     showToast(`🔄 Đã chuyển bước ứng viên sang: ${STAGE_CONFIG[newStage].label}`);
   };
+
+  const handleApproveDirectManager = (cand: Candidate) => {
+    setCandidates((prev) =>
+      prev.map((c) => (c.id === cand.id ? { ...c, approval_status: 'PENDING_SALES_DIRECTOR' } : c))
+    );
+    showToast(`✅ Quản lý trực tiếp đã duyệt hồ sơ ${cand.full_name} → Chuyển Giám Đốc Kinh Doanh duyệt cuối!`);
+  };
+
+  const handleApproveSalesDirector = (cand: Candidate) => {
+    setCandidates((prev) =>
+      prev.map((c) => (c.id === cand.id ? { ...c, approval_status: 'APPROVED', stage: 'HIRED_ONBOARDING' } : c))
+    );
+    showToast(`🎉 Giám Đốc Kinh Doanh đã duyệt thành công! Nhân sự ${cand.full_name} đã chuyển sang bước Onboarding Thử Việc.`);
+  };
+
+  const handleRejectApproval = (cand: Candidate) => {
+    setCandidates((prev) =>
+      prev.map((c) => (c.id === cand.id ? { ...c, approval_status: 'REJECTED', status: 'Rejected' } : c))
+    );
+    showToast(`❌ Đã từ chối duyệt hồ sơ tuyển dụng nhân sự ${cand.full_name}`);
+  };
+
+  const pendingCount = candidates.filter(
+    (c) => c.approval_status === 'PENDING_DIRECT_MANAGER' || c.approval_status === 'PENDING_SALES_DIRECTOR'
+  ).length;
 
   const filteredCandidates = candidates.filter((c) => {
     const q = searchTerm.toLowerCase();
@@ -262,13 +306,13 @@ export default function RecruitmentModulePage() {
         <div>
           <div className="flex items-center gap-2">
             <UserPlus className="w-6 h-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-slate-900">Module Tuyển Dụng & Onboarding Nhân Sự</h1>
+            <h1 className="text-xl font-bold text-slate-900">Module Tuyển Dụng, Phê Duyệt & Onboarding Nhân Sự</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-              Recruitment & Onboarding Engine
+              Recruitment, Approval & Onboarding Engine
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Quản lý phễu tuyển dụng 5 bước, tiếp nhận ứng viên, phỏng vấn, gửi offer và quy trình hội nhập nhân sự mới (Onboarding Checklist 60 ngày).
+            Quản lý phễu tuyển dụng 5 bước, Phê duyệt nhân sự mới 3 cấp, Tiếp nhận ứng viên, Gửi offer và Quy trình hội nhập thử việc 60 ngày.
           </p>
         </div>
 
@@ -318,6 +362,20 @@ export default function RecruitmentModulePage() {
           }`}
         >
           <UserCheck className="w-4 h-4 text-purple-400" /> 🚀 4. Quy Trình Onboarding (Hội Nhập 60 Ngày)
+        </button>
+
+        <button
+          onClick={() => setActiveTab('APPROVAL_PIPELINE')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'APPROVAL_PIPELINE' ? 'bg-amber-600 text-white shadow-md' : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
+          }`}
+        >
+          ⏳ 5. Phê Duyệt Nhân Sự Mới (3 Cấp)
+          {pendingCount > 0 && (
+            <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full animate-pulse">
+              {pendingCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -590,6 +648,108 @@ export default function RecruitmentModulePage() {
                       </div>
                       <div className="p-2.5 bg-white rounded-xl border flex items-center gap-2 font-bold text-slate-800">
                         <Clock className="w-4 h-4 text-amber-500" /> 6. Đánh Giá Đạt Thử Việc (Day 60)
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
+      {activeTab === 'APPROVAL_PIPELINE' && (
+        <div className="space-y-6 text-xs">
+          <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-900 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-amber-700" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Mới (3 Cấp Nối Tiếp):
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="p-3.5 bg-white rounded-xl border border-amber-200 shadow-sm">
+                <p className="font-bold text-amber-800">Bước 1: Quản Lý Trực Tiếp</p>
+                <p className="text-[11px] text-slate-500 mt-1">Trưởng phòng / Leader kiểm tra năng lực ứng viên & duyệt đề xuất nhận việc sơ bộ.</p>
+              </div>
+
+              <div className="p-3.5 bg-white rounded-xl border border-amber-200 shadow-sm">
+                <p className="font-bold text-blue-800">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
+                <p className="text-[11px] text-slate-500 mt-1">Giám đốc Khối xem xét định biên ngân sách & quyết định tiếp nhận chính thức.</p>
+              </div>
+
+              <div className="p-3.5 bg-white rounded-xl border border-amber-200 shadow-sm">
+                <p className="font-bold text-emerald-800">Bước 3: HR Onboarding & Thử Việc</p>
+                <p className="text-[11px] text-slate-500 mt-1">HR tiếp nhận nhân sự đã duyệt, phát hành Offer letter, cấp tài khoản & mở Checklist Onboarding.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" /> Danh Sách Hồ Sơ Đang Chờ Phê Duyệt ({pendingCount})
+            </h3>
+
+            <div className="space-y-4">
+              {candidates
+                .filter((c) => c.approval_status === 'PENDING_DIRECT_MANAGER' || c.approval_status === 'PENDING_SALES_DIRECTOR')
+                .map((cand) => (
+                  <div key={cand.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 hover:border-blue-300 transition-all">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-extrabold text-base text-slate-900">{cand.full_name}</h4>
+                          <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">{cand.candidate_code}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Vị trí: <strong>{cand.position_applied}</strong> • Phòng Ban: {cand.department} • Người duyệt cấp 1: <strong>{cand.direct_manager_name || 'Trưởng Phòng KD1'}</strong>
+                        </p>
+                      </div>
+
+                      <span className={`px-3 py-1 rounded-full font-bold text-[11px] ${
+                        cand.approval_status === 'PENDING_DIRECT_MANAGER' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-100 text-blue-900 border border-blue-300'
+                      }`}>
+                        {cand.approval_status === 'PENDING_DIRECT_MANAGER' ? '⏳ Chờ QL Trực Tiếp Duyệt' : '⏳ Chờ Giám Đốc Duyệt Cuối'}
+                      </span>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                      <div className="w-full md:w-1/2">
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Ghi Chú Ý Kiến Phê Duyệt:</label>
+                        <input
+                          type="text"
+                          value={selectedApprovalCand?.id === cand.id ? approvalNote : ''}
+                          onChange={(e) => {
+                            setSelectedApprovalCand(cand);
+                            setApprovalNote(e.target.value);
+                          }}
+                          placeholder="Nhập ghi chú hoặc lý do..."
+                          className="w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full md:w-auto justify-end font-bold">
+                        {cand.approval_status === 'PENDING_DIRECT_MANAGER' && (
+                          <button
+                            onClick={() => handleApproveDirectManager(cand)}
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                          >
+                            <CheckCircle2 className="w-4 h-4" /> 1️⃣ QL Trực Tiếp Duyệt
+                          </button>
+                        )}
+
+                        {cand.approval_status === 'PENDING_SALES_DIRECTOR' && (
+                          <button
+                            onClick={() => handleApproveSalesDirector(cand)}
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                          >
+                            <ShieldCheck className="w-4 h-4" /> 2️⃣ Giám Đốc Duyệt Cuối
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => handleRejectApproval(cand)}
+                          className="px-3.5 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl text-xs flex items-center gap-1 transition-all"
+                        >
+                          <XCircle className="w-4 h-4" /> Từ Chối
+                        </button>
                       </div>
                     </div>
                   </div>

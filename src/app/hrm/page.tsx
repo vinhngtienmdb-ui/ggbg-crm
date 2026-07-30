@@ -700,19 +700,7 @@ export default function HRMPage() {
           👤 2. Hồ Sơ Nhân Sự ({employees.length})
         </button>
 
-        <button
-          onClick={() => setActiveTab('APPROVAL_PIPELINE')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-            activeTab === 'APPROVAL_PIPELINE' ? 'bg-amber-600 text-white shadow-sm' : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
-          }`}
-        >
-          ⏳ Phê Duyệt Nhân Sự Mới
-          {pendingApprovalCount > 0 && (
-            <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full animate-pulse">
-              {pendingApprovalCount}
-            </span>
-          )}
-        </button>
+
 
         <button
           onClick={() => setActiveTab('CONTRACTS')}
@@ -745,103 +733,7 @@ export default function HRMPage() {
         />
       )}
 
-      {/* TAB 2: QUY TRÌNH PHÊ DUYỆT NHÂN SỰ MỚI (MULTI-STAGE APPROVAL PIPELINE) */}
-      {activeTab === 'APPROVAL_PIPELINE' && (
-        <div className="space-y-6">
-          <div className="gg-hero p-6 space-y-3">
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-blue-700 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-blue-600" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Nối Tiếp (3 Cấp):
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-3 bg-white rounded-xl border border-blue-100">
-                <p className="text-xs font-bold text-amber-700">Bước 1: Quản Lý Trực Tiếp</p>
-                <p className="text-[11px] text-slate-500 mt-1">Trưởng nhóm (Leader) / Trưởng phòng trực tiếp kiểm tra hồ sơ & phê duyệt vòng sơ bộ.</p>
-              </div>
 
-              <div className="p-3 bg-white rounded-xl border border-blue-100">
-                <p className="text-xs font-bold text-blue-700">Bước 2: Giám Đốc Kinh Doanh (Duyệt Cuối)</p>
-                <p className="text-[11px] text-slate-500 mt-1">Giám đốc Kinh doanh xem xét định mức định biên & phê duyệt quyết định tiếp nhận chính thức.</p>
-              </div>
-
-              <div className="p-3 bg-white rounded-xl border border-blue-100">
-                <p className="text-xs font-bold text-emerald-700">Bước 3: HR Onboarding & Ký HĐ</p>
-                <p className="text-[11px] text-slate-500 mt-1">Bộ phận HR tiếp nhận nhân sự đã duyệt, lập Checklist Onboard (giao máy, cấp tài khoản, ký HĐLĐ).</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" /> Danh Sách Hồ Sơ Đang Chờ Phê Duyệt ({pendingApprovalCount})
-            </h3>
-
-            <div className="space-y-4">
-              {employees
-                .filter((e) => e.approval_status === 'PENDING_DIRECT_MANAGER' || e.approval_status === 'PENDING_SALES_DIRECTOR')
-                .map((emp) => (
-                  <div key={emp.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 hover:border-blue-300 transition-all">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-extrabold text-base text-slate-900">{emp.full_name}</h4>
-                          <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">{emp.employee_code}</span>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {emp.position} • {emp.department} • Quản lý trực tiếp: <strong>{emp.direct_manager_name || 'Chưa chỉ định'}</strong>
-                        </p>
-                      </div>
-
-                      {renderApprovalBadge(emp.approval_status)}
-                    </div>
-
-                    <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-                      <div className="w-full md:w-1/2">
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Ghi Chú Phê Duyệt / Lý Do:</label>
-                        <input
-                          type="text"
-                          value={selectedApprovalEmp?.id === emp.id ? approvalNote : ''}
-                          onChange={(e) => {
-                            setSelectedApprovalEmp(emp);
-                            setApprovalNote(e.target.value);
-                          }}
-                          placeholder="Nhập ý kiến phê duyệt hoặc lý do từ chối..."
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs"
-                        />
-                      </div>
-
-                      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-                        {emp.approval_status === 'PENDING_DIRECT_MANAGER' && (
-                          <button
-                            onClick={() => handleApproveDirectManager(emp)}
-                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
-                          >
-                            <CheckCircle2 className="w-4 h-4" /> 1️⃣ Quản Lý Trực Tiếp Duyệt
-                          </button>
-                        )}
-
-                        {emp.approval_status === 'PENDING_SALES_DIRECTOR' && (
-                          <button
-                            onClick={() => handleApproveSalesDirector(emp)}
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
-                          >
-                            <ShieldCheck className="w-4 h-4" /> 2️⃣ Giám Đốc Kinh Doanh Duyệt (Duyệt Cuối)
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => handleRejectApproval(emp)}
-                          className="px-3.5 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl text-xs flex items-center gap-1 transition-all"
-                        >
-                          <XCircle className="w-4 h-4" /> Từ Chối
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* TAB 3: PHỄU TUYỂN DỤNG DUAL-VIEW (KANBAN VS LIST) KÈM GHI LOG 100% */}
       {activeTab === 'RECRUITMENT' && (
