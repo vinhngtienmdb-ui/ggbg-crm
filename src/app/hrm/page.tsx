@@ -174,7 +174,7 @@ export default function HRMPage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'DASHBOARD' | 'LABOR_BOOK' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('PROFILE');
+  const [activeTab, setActiveTab] = useState<'PROFILE' | 'DASHBOARD' | 'LABOR_BOOK' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('DASHBOARD');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -683,21 +683,21 @@ export default function HRMPage() {
       {/* Navigation Tabs */}
       <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 w-fit">
         <button
-          onClick={() => setActiveTab('PROFILE')}
+          onClick={() => setActiveTab('DASHBOARD')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'PROFILE' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'DASHBOARD' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          👤 Hồ Sơ Nhân Sự ({filteredEmployees.length})
+          📊 1. Báo Cáo & Dashboard HR
         </button>
 
         <button
-          onClick={() => setActiveTab('DASHBOARD')}
+          onClick={() => setActiveTab('PROFILE')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'DASHBOARD' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          📊 Dashboard Nhân Sự
+          👤 2. Hồ Sơ Nhân Sự ({filteredEmployees.length})
         </button>
 
         <button

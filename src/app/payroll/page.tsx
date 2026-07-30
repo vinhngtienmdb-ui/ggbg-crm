@@ -41,7 +41,7 @@ import PaystubModal from '@/components/payroll/PaystubModal';
 import PayrollAnalyticsDashboard from '@/components/payroll/PayrollAnalyticsDashboard';
 
 export default function PayrollPage() {
-  const [activeTab, setActiveTab] = useState<'payroll' | 'paystubs' | 'settings'>('payroll');
+  const [activeTab, setActiveTab] = useState<'reports' | 'payroll' | 'paystubs' | 'settings'>('reports');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
 
   // Store states
@@ -161,18 +161,24 @@ export default function PayrollPage() {
         </div>
       </div>
 
-      {/* DEDICATED PAYROLL & COMPENSATION ANALYTICS DASHBOARD PANEL */}
-      <PayrollAnalyticsDashboard payrolls={payrolls} />
-
       {/* Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <DollarSign className="w-4 h-4 text-emerald-400" /> 1. 📊 Báo Cáo Chi Phí Lương & 3P
+        </button>
+
         <button
           onClick={() => setActiveTab('payroll')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
             activeTab === 'payroll' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-emerald-400" /> 1. Bảng Lương Tổng Hợp (3P Payroll)
+          <DollarSign className="w-4 h-4 text-blue-400" /> 2. Bảng Lương Tổng Hợp 3P
         </button>
 
         <button
@@ -181,7 +187,7 @@ export default function PayrollPage() {
             activeTab === 'paystubs' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Eye className="w-4 h-4 text-blue-400" /> 2. Danh Sách Phiếu Lương ({payrolls.length})
+          <Eye className="w-4 h-4 text-purple-400" /> 3. Danh Sách Phiếu Lương ({payrolls.length})
         </button>
 
         <button
@@ -190,9 +196,14 @@ export default function PayrollPage() {
             activeTab === 'settings' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Settings className="w-4 h-4 text-purple-400" /> ⚙️ Cài Đặt Lương & Phụ Cấp
+          <Settings className="w-4 h-4 text-amber-400" /> ⚙️ Cài Đặt Lương & Phụ Cấp
         </button>
       </div>
+
+      {/* TAB 1: DEDICATED PAYROLL ANALYTICS DASHBOARD */}
+      {activeTab === 'reports' && (
+        <PayrollAnalyticsDashboard payrolls={payrolls} />
+      )}
 
       {/* Top Cards Summary */}
       {activeTab !== 'settings' && (

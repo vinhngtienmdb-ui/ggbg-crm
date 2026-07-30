@@ -24,7 +24,9 @@ import {
   UserCheck,
   FileText,
   Lock,
-  ChevronRight
+  ChevronRight,
+  BarChart3,
+  Download
 } from 'lucide-react';
 import { PerformanceScorecard, FormulaWeights, RatingGrade, ScorecardStatus } from '@/types';
 import {
@@ -49,6 +51,7 @@ const HrCriteriaModal = dynamic(() => import('@/components/performance/HrCriteri
 import PerformanceAnalyticsDashboard from '@/components/performance/PerformanceAnalyticsDashboard';
 
 export default function PerformancePage() {
+  const [activeTab, setActiveTab] = useState<'reports' | 'list'>('reports');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
   const [scorecards, setScorecards] = useState<PerformanceScorecard[]>([]);
   const [weights, setWeights] = useState<FormulaWeights>(() => getFormulaWeights());
@@ -255,8 +258,40 @@ export default function PerformancePage() {
         </div>
       </div>
 
-      {/* DEDICATED PERFORMANCE & P3 SALARY ANALYTICS DASHBOARD PANEL */}
-      <PerformanceAnalyticsDashboard scorecards={scorecards} />
+      {/* MODULE MAIN TABS: 📊 BÁO CÁO vs 📋 QUẢN LÝ */}
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2 overflow-x-auto text-xs font-extrabold">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 text-purple-400" /> 1. 📊 Báo Cáo & Phân Tích Hiệu Suất
+          </button>
+
+          <button
+            onClick={() => setActiveTab('list')}
+            className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'list' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Award className="w-4 h-4 text-emerald-400" /> 2. 📋 Bảng Chấm Điểm ({scorecards.length})
+          </button>
+        </div>
+
+        <button
+          onClick={() => showToast('📥 Đã xuất báo cáo Hiệu Suất & Lương P3 ra file Excel')}
+          className="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0"
+        >
+          <Download className="w-4 h-4 text-purple-600" /> Xuất Báo Cáo Excel
+        </button>
+      </div>
+
+      {/* TAB 1: 📊 BÁO CÁO & PHÂN TÍCH */}
+      {activeTab === 'reports' && (
+        <PerformanceAnalyticsDashboard scorecards={scorecards} />
+      )}
 
       {/* AUTOMATED WORKFLOW TRIGGER BAR (Quy trình ngày 01 tự động) */}
       <div className="p-4 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl space-y-3 border border-indigo-800/40">

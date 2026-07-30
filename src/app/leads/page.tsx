@@ -202,7 +202,7 @@ export default function LeadsPage() {
   const [existingCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS_LIST);
 
   // VIEW MODE TOGGLE (KANBAN VS LIST VIEW)
-  const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
+  const [viewMode, setViewMode] = useState<'REPORTS' | 'KANBAN' | 'LIST'>('REPORTS');
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
   const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
   const [isChannelDrawerOpen, setIsChannelDrawerOpen] = useState(false);
@@ -576,65 +576,77 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* DEDICATED LEAD ANALYTICS DASHBOARD PANEL */}
-      <LeadAnalyticsDashboard leads={leads} />
-
-      {/* View Switcher & Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* VIEW MODE TOGGLE BUTTONS */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 w-full md:w-auto">
+      {/* VIEW MODE TOGGLE BUTTONS */}
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2 overflow-x-auto text-xs font-extrabold">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
           <button
-            onClick={() => setViewMode('KANBAN')}
-            className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-              viewMode === 'KANBAN' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
+            onClick={() => setViewMode('REPORTS')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              viewMode === 'REPORTS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <LayoutGrid className="w-4 h-4" /> Dạng Thẻ Kanban (7 Bước)
+            <BarChart3 className="w-4 h-4 text-blue-400" /> 1. 📊 Báo Cáo Phễu & Intake Lead
+          </button>
+          <button
+            onClick={() => setViewMode('KANBAN')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              viewMode === 'KANBAN' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4 text-purple-400" /> 2. Dạng Thẻ Kanban (7 Bước)
           </button>
           <button
             onClick={() => setViewMode('LIST')}
-            className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-              viewMode === 'LIST' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              viewMode === 'LIST' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <List className="w-4 h-4" /> Dạng Bảng Danh Sách
+            <List className="w-4 h-4 text-emerald-400" /> 3. Dạng Bảng Danh Sách
           </button>
         </div>
-
-        <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
-          <div className="relative w-full md:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm Mã Lead, Tên, SĐT, Shop..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
-          </div>
-
-          <select
-            value={selectedSourceFilter}
-            onChange={(e) => setSelectedSourceFilter(e.target.value)}
-            className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700"
-          >
-            <option value="ALL">Tất cả Nguồn Lead</option>
-            <option value="Facebook Ads">Facebook Ads</option>
-            <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option>
-            <option value="TikTok Ads">TikTok Ads</option>
-            <option value="TikTok Lead Gen">TikTok Lead Gen</option>
-            <option value="Google Ads">Google Ads</option>
-            <option value="Google Ads Form">Google Ads Form</option>
-            <option value="Zalo OA Form">Zalo OA Form</option>
-            <option value="Hotline Zalo">Hotline Zalo</option>
-            <option value="Website GGBingoVN">Website GGBingoVN</option>
-            <option value="Event / Hội Thảo">Event / Hội Thảo</option>
-            <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
-            <option value="Bulk Import Excel">Bulk Import Excel</option>
-            <option value="Universal Webhook">Universal Webhook API</option>
-          </select>
-        </div>
       </div>
+
+      {/* DEDICATED LEAD ANALYTICS DASHBOARD PANEL */}
+      {viewMode === 'REPORTS' && <LeadAnalyticsDashboard leads={leads} />}
+
+      {/* Filter Bar for Kanban & List */}
+      {viewMode !== 'REPORTS' && (
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
+            <div className="relative w-full md:w-64">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Tìm Mã Lead, Tên, SĐT, Shop..."
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+
+            <select
+              value={selectedSourceFilter}
+              onChange={(e) => setSelectedSourceFilter(e.target.value)}
+              className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700"
+            >
+              <option value="ALL">Tất cả Nguồn Lead</option>
+              <option value="Facebook Ads">Facebook Ads</option>
+              <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option>
+              <option value="TikTok Ads">TikTok Ads</option>
+              <option value="TikTok Lead Gen">TikTok Lead Gen</option>
+              <option value="Google Ads">Google Ads</option>
+              <option value="Google Ads Form">Google Ads Form</option>
+              <option value="Zalo OA Form">Zalo OA Form</option>
+              <option value="Hotline Zalo">Hotline Zalo</option>
+              <option value="Website GGBingoVN">Website GGBingoVN</option>
+              <option value="Event / Hội Thảo">Event / Hội Thảo</option>
+              <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
+              <option value="Bulk Import Excel">Bulk Import Excel</option>
+              <option value="Universal Webhook">Universal Webhook API</option>
+            </select>
+          </div>
+        </div>
+      )}
 
       {/* VIEW MODE 1: KANBAN BOARD */}
       {viewMode === 'KANBAN' && (

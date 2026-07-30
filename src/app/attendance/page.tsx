@@ -45,7 +45,7 @@ import { getEmployees } from '@/lib/hrmStore';
 import AttendanceAnalyticsDashboard from '@/components/attendance/AttendanceAnalyticsDashboard';
 
 export default function AttendancePage() {
-  const [activeTab, setActiveTab] = useState<'daily' | 'leaves' | 'timesheet' | 'settings'>('daily');
+  const [activeTab, setActiveTab] = useState<'reports' | 'daily' | 'leaves' | 'timesheet' | 'settings'>('reports');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
 
   // Store States
@@ -176,18 +176,24 @@ export default function AttendancePage() {
         </button>
       </div>
 
-      {/* DEDICATED ATTENDANCE & LEAVE ANALYTICS DASHBOARD PANEL */}
-      <AttendanceAnalyticsDashboard attendance={attendance} leaves={leaves} timesheets={timesheets} />
-
       {/* Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Clock className="w-4 h-4 text-blue-400" /> 1. 📊 Báo Cáo Chấm Công
+        </button>
+
         <button
           onClick={() => setActiveTab('daily')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
             activeTab === 'daily' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Clock className="w-4 h-4 text-blue-400" /> 1. Chấm Công Hàng Ngày
+          <Clock className="w-4 h-4 text-emerald-400" /> 2. Nhật Ký Chấm Công
         </button>
 
         <button
@@ -196,7 +202,7 @@ export default function AttendancePage() {
             activeTab === 'leaves' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Calendar className="w-4 h-4 text-purple-400" /> 2. Quản Lý Nghỉ Phép ({leaves.length})
+          <Calendar className="w-4 h-4 text-purple-400" /> 3. Quản Lý Nghỉ Phép ({leaves.length})
         </button>
 
         <button
@@ -205,7 +211,7 @@ export default function AttendancePage() {
             activeTab === 'timesheet' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <FileSpreadsheet className="w-4 h-4 text-amber-400" /> 3. Tổng Hợp Chấm Công
+          <FileSpreadsheet className="w-4 h-4 text-amber-400" /> 4. Bảng Tổng Hợp Công
         </button>
 
         <button
@@ -214,9 +220,14 @@ export default function AttendancePage() {
             activeTab === 'settings' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Settings className="w-4 h-4 text-emerald-400" /> ⚙️ Cài Đặt Chấm Công
+          <Settings className="w-4 h-4 text-indigo-400" /> ⚙️ Cài Đặt Chấm Công
         </button>
       </div>
+
+      {/* TAB 1: DEDICATED ATTENDANCE & LEAVE ANALYTICS DASHBOARD PANEL */}
+      {activeTab === 'reports' && (
+        <AttendanceAnalyticsDashboard attendance={attendance} leaves={leaves} timesheets={timesheets} />
+      )}
 
       {/* Filter Bar */}
       {activeTab !== 'settings' && (
