@@ -356,7 +356,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'ANALYTICS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <BarChart className="w-4 h-4 text-blue-400" /> 📊 2. Báo Cáo Tuyển Dụng & Onboarding
+          <BarChart className="w-4 h-4 text-blue-400" /> 📊 2. Báo Cáo
         </button>
 
         <button
