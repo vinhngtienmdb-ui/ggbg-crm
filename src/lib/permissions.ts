@@ -174,17 +174,10 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER'],
       },
       {
-        name: 'Quản Lý KPIs',
+        name: 'Quản Lý Hiệu Suất',
         href: '/kpis',
         iconName: 'TrendingUp',
         moduleKey: 'kpis',
-        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'HR_MANAGER'],
-      },
-      {
-        name: 'Chấm Điểm Hiệu Suất',
-        href: '/performance',
-        iconName: 'Award',
-        moduleKey: 'performance',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'HR_MANAGER'],
       },
       {

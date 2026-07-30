@@ -253,7 +253,7 @@ export default function UnifiedKpisPerformancePage() {
         <div>
           <div className="flex items-center gap-2">
             <Target className="w-6 h-6 text-amber-600" />
-            <h1 className="text-xl font-bold text-slate-900">Module Hợp Nhất Quản Lý KPIs & Chấm Điểm Hiệu Suất 3P</h1>
+            <h1 className="text-xl font-bold text-slate-900">Quản Lý Hiệu Suất (KPIs & Chấm Điểm 3P)</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200">
               KPIs & Performance Governance Suite
             </span>
