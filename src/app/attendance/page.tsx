@@ -564,7 +564,7 @@ export default function AttendancePage() {
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Chọn Nhân Sự</label>
                 <select
-                  value={newLeave.employee_id || employees[0]?.id}
+                  value={newLeave.employee_id || employees[0]?.id || ''}
                   onChange={(e) => setNewLeave({ ...newLeave, employee_id: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-bold"
                 >
@@ -578,7 +578,7 @@ export default function AttendancePage() {
                 <label className="block font-bold text-slate-700 mb-1">Lý Do Xin Nghỉ</label>
                 <textarea
                   rows={2}
-                  value={newLeave.reason}
+                  value={newLeave.reason || ''}
                   onChange={(e) => setNewLeave({ ...newLeave, reason: e.target.value })}
                   placeholder="Nhập lý do nghỉ phép..."
                   className="w-full px-3 py-2 bg-slate-50 border rounded-xl"

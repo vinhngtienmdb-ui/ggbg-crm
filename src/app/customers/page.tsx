@@ -1118,7 +1118,7 @@ export default function CustomersPage() {
                     <label className="block text-xs font-bold text-slate-700 mb-1">Tên Doanh Nghiệp</label>
                     <input
                       type="text"
-                      value={editForm.company_name}
+                      value={editForm.company_name || ''}
                       onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })}
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
                     />
@@ -1128,7 +1128,7 @@ export default function CustomersPage() {
                     <label className="block text-xs font-bold text-slate-700 mb-1">Mã Số Thuế (MST)</label>
                     <input
                       type="text"
-                      value={editForm.tax_code}
+                      value={editForm.tax_code || ''}
                       onChange={(e) => setEditForm({ ...editForm, tax_code: e.target.value })}
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-blue-700"
                     />
@@ -1140,7 +1140,7 @@ export default function CustomersPage() {
                     <label className="block text-xs font-bold text-slate-700 mb-1">Số CCCD / CMND Định Danh</label>
                     <input
                       type="text"
-                      value={editForm.id_card_number}
+                      value={editForm.id_card_number || ''}
                       onChange={(e) => setEditForm({ ...editForm, id_card_number: e.target.value })}
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-purple-700"
                     />
@@ -1150,7 +1150,7 @@ export default function CustomersPage() {
                     <label className="block text-xs font-bold text-slate-700 mb-1">Ngày & Nơi Cấp CCCD</label>
                     <input
                       type="text"
-                      value={editForm.id_card_issue_date}
+                      value={editForm.id_card_issue_date || ''}
                       onChange={(e) => setEditForm({ ...editForm, id_card_issue_date: e.target.value })}
                       placeholder="2021-05-10 • Cục QLHC"
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
@@ -1165,7 +1165,7 @@ export default function CustomersPage() {
                   <input
                     type="text"
                     required
-                    value={editForm.phone}
+                    value={editForm.phone || ''}
                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
                   />
@@ -1175,7 +1175,7 @@ export default function CustomersPage() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">Email Liên Hệ</label>
                   <input
                     type="email"
-                    value={editForm.email}
+                    value={editForm.email || ''}
                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
                   />
@@ -1186,7 +1186,7 @@ export default function CustomersPage() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">Địa Chỉ Thường Trú / ĐKKD</label>
                 <input
                   type="text"
-                  value={editForm.address}
+                  value={editForm.address || ''}
                   onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
                 />
@@ -1197,7 +1197,7 @@ export default function CustomersPage() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">Số Tài Khoản Ngân Hàng</label>
                   <input
                     type="text"
-                    value={editForm.bank_account}
+                    value={editForm.bank_account || ''}
                     onChange={(e) => setEditForm({ ...editForm, bank_account: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
                   />
@@ -1207,7 +1207,7 @@ export default function CustomersPage() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">Tên Ngân Hàng & CN</label>
                   <input
                     type="text"
-                    value={editForm.bank_name}
+                    value={editForm.bank_name || ''}
                     onChange={(e) => setEditForm({ ...editForm, bank_name: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
                   />
@@ -1217,7 +1217,7 @@ export default function CustomersPage() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">Hạn Mức Tín Dụng (VNĐ)</label>
                   <input
                     type="number"
-                    value={editForm.credit_limit}
+                    value={editForm.credit_limit ?? 0}
                     onChange={(e) => setEditForm({ ...editForm, credit_limit: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-emerald-700"
                   />
