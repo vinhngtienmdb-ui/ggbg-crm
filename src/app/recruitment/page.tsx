@@ -347,7 +347,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'PIPELINE' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <UserPlus className="w-4 h-4 text-amber-400" /> 🎯 1. Phễu Tuyển Dụng & Danh Sách Ứng Viên ({filteredCandidates.length})
+          <UserPlus className="w-4 h-4 text-amber-400" /> 🎯 1. Tuyển Dụng ({filteredCandidates.length})
         </button>
 
         <button
