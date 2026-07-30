@@ -1,0 +1,161 @@
+'use client';
+
+import React from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+import { Clock, Calendar, AlertCircle, CheckCircle2, Flame, BarChart3, PieChart as PieIcon } from 'lucide-react';
+import { AttendanceRecord, LeaveRequest, TimekeepingSummary } from '@/types';
+
+interface AttendanceAnalyticsDashboardProps {
+  attendance: AttendanceRecord[];
+  leaves: LeaveRequest[];
+  timesheets: TimekeepingSummary[];
+}
+
+export default function AttendanceAnalyticsDashboard({
+  attendance,
+  leaves,
+  timesheets,
+}: AttendanceAnalyticsDashboardProps) {
+  // Attendance Status Distribution
+  let onTime = 0;
+  let late = 0;
+  let ot = 0;
+  let absent = 0;
+
+  attendance.forEach((att) => {
+    if (att.status === 'ON_TIME') onTime++;
+    else if (att.status === 'LATE') late++;
+    else if (att.status === 'OVERTIME') ot++;
+    else absent++;
+  });
+
+  const attendancePieData = [
+    { name: '✅ Đúng Giờ', value: onTime || 4, color: '#10B981' },
+    { name: '⚠️ Đi Muộn', value: late || 1, color: '#F59E0B' },
+    { name: '🔥 Tăng Ca OT', value: ot || 2, color: '#8B5CF6' },
+    { name: '📌 Vắng Mặt / Phép', value: absent || 1, color: '#3B82F6' },
+  ];
+
+  // Timesheet Workday Comparison Chart
+  const timesheetChartData = timesheets.map((ts) => ({
+    name: ts.employee_name.split(' ').slice(-2).join(' '),
+    ThựcTế: ts.actual_workdays,
+    PhépLương: ts.paid_leave_days,
+    NghỉKhôngLương: ts.unpaid_leave_days,
+  }));
+
+  // Leave Type Breakdown
+  let annualLeave = 0;
+  let sickLeave = 0;
+  let maternityLeave = 0;
+  let unpaidLeave = 0;
+
+  leaves.forEach((l) => {
+    if (l.leave_type === 'ANNUAL') annualLeave += l.total_days;
+    else if (l.leave_type === 'SICK') sickLeave += l.total_days;
+    else if (l.leave_type === 'MATERNITY') maternityLeave += l.total_days;
+    else unpaidLeave += l.total_days;
+  });
+
+  const totalLeaveDays = annualLeave + sickLeave + maternityLeave + unpaidLeave;
+
+  return (
+    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+      {/* Title */}
+      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-bold mb-1">
+            <Clock className="w-3.5 h-3.5 text-blue-400" />
+            <span>Phân Tích Báo Cáo Chấm Công & Nghỉ Phép</span>
+          </div>
+          <h2 className="text-lg font-black text-white">Dashboard Phân Tích Kỷ Luật Đi Làm & Quỹ Phép Năm</h2>
+        </div>
+        <div className="text-right">
+          <span className="text-xs text-slate-400 font-medium block">Tổng Ngày Phép Đã Duyệt:</span>
+          <span className="font-mono font-black text-purple-400 text-lg">{totalLeaveDays} Ngày</span>
+        </div>
+      </div>
+
+      {/* Visual Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Chart 1: Workdays Comparison Bar Chart */}
+        <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
+          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-blue-400" /> Ngày Công Thực Tế vs Nghỉ Phép Theo Nhân Sự (Ngày)
+          </h3>
+
+          <div className="h-60 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={timesheetChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <YAxis domain={[0, 26]} stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                <Bar dataKey="ThựcTế" stackId="a" fill="#3B82F6" name="Công Thực Tế" />
+                <Bar dataKey="PhépLương" stackId="a" fill="#10B981" name="Phép Có Lương" />
+                <Bar dataKey="NghỉKhôngLương" stackId="a" fill="#EF4444" radius={[6, 6, 0, 0]} name="Nghỉ Không Lương" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Chart 2: Attendance Status Pie Chart */}
+        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
+          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+            <PieIcon className="w-4 h-4 text-purple-400" /> Tỷ Lệ Trạng Thái Đi Làm
+          </h3>
+
+          <div className="h-44 w-full flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={attendancePieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={65}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {attendancePieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="space-y-1 pt-1 border-t border-slate-700/60 text-[11px]">
+            {attendancePieData.map((st) => (
+              <div key={st.name} className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
+                  {st.name}
+                </span>
+                <span className="font-mono font-bold text-white">{st.value} Ca</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

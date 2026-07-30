@@ -38,6 +38,7 @@ import {
   PAYROLL_UPDATED_EVENT
 } from '@/lib/payrollStore';
 import PaystubModal from '@/components/payroll/PaystubModal';
+import PayrollAnalyticsDashboard from '@/components/payroll/PayrollAnalyticsDashboard';
 
 export default function PayrollPage() {
   const [activeTab, setActiveTab] = useState<'payroll' | 'paystubs' | 'settings'>('payroll');
@@ -159,6 +160,9 @@ export default function PayrollPage() {
           </button>
         </div>
       </div>
+
+      {/* DEDICATED PAYROLL & COMPENSATION ANALYTICS DASHBOARD PANEL */}
+      <PayrollAnalyticsDashboard payrolls={payrolls} />
 
       {/* Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">

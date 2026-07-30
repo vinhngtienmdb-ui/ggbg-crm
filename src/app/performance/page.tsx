@@ -46,6 +46,7 @@ import dynamic from 'next/dynamic';
 const ScorecardModal = dynamic(() => import('@/components/performance/ScorecardModal'), { ssr: false });
 const FormulaConfigModal = dynamic(() => import('@/components/performance/FormulaConfigModal'), { ssr: false });
 const HrCriteriaModal = dynamic(() => import('@/components/performance/HrCriteriaModal'), { ssr: false });
+import PerformanceAnalyticsDashboard from '@/components/performance/PerformanceAnalyticsDashboard';
 
 export default function PerformancePage() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
@@ -253,6 +254,9 @@ export default function PerformancePage() {
           </button>
         </div>
       </div>
+
+      {/* DEDICATED PERFORMANCE & P3 SALARY ANALYTICS DASHBOARD PANEL */}
+      <PerformanceAnalyticsDashboard scorecards={scorecards} />
 
       {/* AUTOMATED WORKFLOW TRIGGER BAR (Quy trình ngày 01 tự động) */}
       <div className="p-4 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl space-y-3 border border-indigo-800/40">

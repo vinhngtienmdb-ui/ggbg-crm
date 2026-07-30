@@ -29,6 +29,7 @@ import { KPIAssignment, KpiAssigneeType, KpiCategory } from '@/types';
 import { getKPIs, createKPI, updateKPI, deleteKPI, KPI_UPDATED_EVENT } from '@/lib/kpiStore';
 import KpiModal from '@/components/kpis/KpiModal';
 import KpiDetailModal from '@/components/kpis/KpiDetailModal';
+import KpiAnalyticsDashboard from '@/components/kpis/KpiAnalyticsDashboard';
 
 export default function KpisPage() {
   const [kpis, setKpis] = useState<KPIAssignment[]>([]);
@@ -192,6 +193,9 @@ export default function KpisPage() {
           Phân Bổ Chỉ Tiêu KPI Mới
         </button>
       </div>
+
+      {/* DEDICATED KPI ANALYTICS DASHBOARD PANEL */}
+      <KpiAnalyticsDashboard kpis={kpis} />
 
       {/* Metric Cards Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">

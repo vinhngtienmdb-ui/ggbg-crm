@@ -42,6 +42,7 @@ import {
   PAYROLL_UPDATED_EVENT
 } from '@/lib/payrollStore';
 import { getEmployees } from '@/lib/hrmStore';
+import AttendanceAnalyticsDashboard from '@/components/attendance/AttendanceAnalyticsDashboard';
 
 export default function AttendancePage() {
   const [activeTab, setActiveTab] = useState<'daily' | 'leaves' | 'timesheet' | 'settings'>('daily');
@@ -174,6 +175,9 @@ export default function AttendancePage() {
           <Plus className="w-4 h-4" /> Tạo Đơn Xin Nghỉ Phép
         </button>
       </div>
+
+      {/* DEDICATED ATTENDANCE & LEAVE ANALYTICS DASHBOARD PANEL */}
+      <AttendanceAnalyticsDashboard attendance={attendance} leaves={leaves} timesheets={timesheets} />
 
       {/* Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">

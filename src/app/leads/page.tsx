@@ -46,6 +46,7 @@ import dynamic from 'next/dynamic';
 
 const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
 const ChannelAnalyticsDrawer = dynamic(() => import('@/components/leads/ChannelAnalyticsDrawer'), { ssr: false });
+import LeadAnalyticsDashboard from '@/components/leads/LeadAnalyticsDashboard';
 
 interface StageDefinition {
   id: string;
@@ -574,6 +575,9 @@ export default function LeadsPage() {
         </div>
         </div>
       </div>
+
+      {/* DEDICATED LEAD ANALYTICS DASHBOARD PANEL */}
+      <LeadAnalyticsDashboard leads={leads} />
 
       {/* View Switcher & Filter Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
