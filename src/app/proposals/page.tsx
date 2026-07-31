@@ -39,6 +39,7 @@ import {
   addProposalSubmission,
   updateProposalSubmission
 } from '@/lib/proposalStore';
+import { createLeaveRequest } from '@/lib/payrollStore';
 
 export default function ProposalsPage() {
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
@@ -134,13 +135,35 @@ export default function ProposalsPage() {
       status: isFullyApproved ? 'APPROVED' : 'PENDING',
     };
 
+    if (isFullyApproved) {
+      // Sync with HRM & Attendance if Leave/Resignation Proposal
+      if (selectedSub.template_id === 'tmpl_2' || selectedSub.template_title.includes('Nghỉ Phép')) {
+        const leaveMode = selectedSub.field_values['duration_mode'] || 'Cả Ngày';
+        const specificTime = selectedSub.field_values['specific_time_range'] ? ` (${selectedSub.field_values['specific_time_range']})` : '';
+        const totalDays = leaveMode.includes('1/2') ? 0.5 : 1.0;
+
+        createLeaveRequest({
+          employee_id: 'e1',
+          employee_name: selectedSub.applicant_name,
+          employee_code: 'NV-00101',
+          department: selectedSub.applicant_department,
+          leave_type: 'ANNUAL',
+          start_date: selectedSub.field_values['start_date'] || selectedSub.submitted_date,
+          end_date: selectedSub.field_values['end_date'] || selectedSub.submitted_date,
+          total_days: totalDays,
+          reason: `[Tờ trình ${selectedSub.proposal_code}] ${leaveMode}${specificTime} - ${selectedSub.field_values['leave_type'] || 'Phép năm'}`,
+          approver_note: 'Đã tự động đồng bộ từ Phân Hệ Tờ Trình Đề Xuất Phê Duyệt',
+        });
+      }
+    }
+
     const updated = updateProposalSubmission(updatedSub);
     setSubmissions([...updated]);
     setSelectedSub(updatedSub);
     setApprovalComment('');
     showToast(
       isFullyApproved
-        ? `🎉 Tờ trình ${selectedSub.proposal_code} đã được PHÊ DUYỆT HOÀN TẤT!`
+        ? `🎉 Tờ trình ${selectedSub.proposal_code} đã được PHÊ DUYỆT & ĐỒNG BỘ HRM THÀNH CÔNG!`
         : `✅ Đã phê duyệt Bước ${selectedSub.current_step_order}. Chuyển duyệt cấp tiếp theo.`
     );
   };
