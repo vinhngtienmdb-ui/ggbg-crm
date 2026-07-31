@@ -24,7 +24,10 @@ import {
   FileText,
   Layers,
   Settings,
-  PlusCircle
+  PlusCircle,
+  Copy,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 import {
   ProposalTemplate,
@@ -37,7 +40,10 @@ import {
   addProposalTemplate,
   getProposalSubmissions,
   addProposalSubmission,
-  updateProposalSubmission
+  updateProposalSubmission,
+  toggleProposalTemplateActive,
+  duplicateProposalTemplate,
+  deleteProposalTemplate
 } from '@/lib/proposalStore';
 import { createLeaveRequest } from '@/lib/payrollStore';
 
@@ -221,6 +227,27 @@ export default function ProposalsPage() {
     setBuilderDesc('');
     setActiveTab('CREATE_NEW');
     showToast(`⚙️ Đã thiết kế & lưu Mẫu Form Đề Xuất mới thành công: ${newTmpl.title}`);
+  };
+
+  // Multi-Template Management Handlers
+  const handleToggleTemplateActive = (id: string) => {
+    const updated = toggleProposalTemplateActive(id);
+    setTemplates([...updated]);
+    showToast('⚙️ Đã cập nhật trạng thái Bật / Tắt của Mẫu Form Đề Xuất!');
+  };
+
+  const handleDuplicateTemplate = (id: string) => {
+    const updated = duplicateProposalTemplate(id);
+    setTemplates([...updated]);
+    showToast('📋 Đã nhân bản 1-Click Mẫu Form Đề Xuất mới thành công!');
+  };
+
+  const handleDeleteTemplate = (id: string) => {
+    if (confirm('Bạn có chắc chắn muốn xóa mẫu biểu đề xuất này?')) {
+      const updated = deleteProposalTemplate(id);
+      setTemplates([...updated]);
+      showToast('🗑️ Đã xóa Mẫu Form Đề Xuất khỏi hệ thống!');
+    }
   };
 
   const filteredSubmissions = submissions.filter((s) => {
@@ -544,6 +571,88 @@ export default function ProposalsPage() {
                 <p className="text-[11px] text-slate-500 font-normal mt-0.5">
                   Tự do thiết kế Biểu mẫu Tờ trình mới, cấu hình từng loại dữ liệu trường thông tin (Text, Number, Date, Select, File) & Cấu hình luồng duyệt.
                 </p>
+              </div>
+            </div>
+
+            {/* MULTI-TEMPLATE CATALOG TABLE */}
+            <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <h4 className="font-extrabold text-slate-900 text-xs text-amber-600 uppercase tracking-wider">
+                1. Danh Sách Các Loại Mẫu Form Tờ Trình Đề Xuất ({templates.length} Mẫu Form)
+              </h4>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                      <th className="p-3">Mã & Tên Mẫu Form</th>
+                      <th className="p-3">Nhóm Danh Mục</th>
+                      <th className="p-3 text-center">Số Trường Form</th>
+                      <th className="p-3 text-center">Các Bước Duyệt</th>
+                      <th className="p-3 text-center">Trạng Thái</th>
+                      <th className="p-3 text-center">Thao Tác Admin</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {templates.map((t) => (
+                      <tr key={t.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3">
+                          <p className="font-extrabold text-slate-900 text-xs leading-snug">{t.title}</p>
+                          <p className="font-mono text-purple-700 text-[11px] font-bold">Mã biểu mẫu: {t.template_code}</p>
+                        </td>
+
+                        <td className="p-3">
+                          <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full font-bold text-[10.5px]">
+                            {t.category_name}
+                          </span>
+                        </td>
+
+                        <td className="p-3 text-center font-mono font-bold text-slate-700">
+                          {t.fields.length} Trường Dữ Liệu
+                        </td>
+
+                        <td className="p-3 text-center font-mono text-[10.5px] text-purple-700 font-bold">
+                          {t.approval_steps.length} Cấp Duyệt
+                        </td>
+
+                        <td className="p-3 text-center">
+                          <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                            t.is_active ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500'
+                          }`}>
+                            {t.is_active ? '🟢 Bật (Active)' : '⚪ Tắt (Inactive)'}
+                          </span>
+                        </td>
+
+                        <td className="p-3 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => handleToggleTemplateActive(t.id)}
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl"
+                              title={t.is_active ? 'Tắt Form Mẫu' : 'Bật Form Mẫu'}
+                            >
+                              {t.is_active ? <ToggleRight className="w-4 h-4 text-emerald-600" /> : <ToggleLeft className="w-4 h-4 text-slate-400" />}
+                            </button>
+
+                            <button
+                              onClick={() => handleDuplicateTemplate(t.id)}
+                              className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl"
+                              title="Nhân bản Mẫu Form 1-Click"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteTemplate(t.id)}
+                              className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl"
+                              title="Xóa Mẫu Form"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 

@@ -130,3 +130,27 @@ export function updateProposalSubmission(updated: ProposalSubmission): ProposalS
   submissionsStore = submissionsStore.map(s => s.id === updated.id ? updated : s);
   return submissionsStore;
 }
+
+export function toggleProposalTemplateActive(id: string): ProposalTemplate[] {
+  templatesStore = templatesStore.map(t => t.id === id ? { ...t, is_active: !t.is_active } : t);
+  return templatesStore;
+}
+
+export function duplicateProposalTemplate(id: string): ProposalTemplate[] {
+  const target = templatesStore.find(t => t.id === id);
+  if (target) {
+    const copy: ProposalTemplate = {
+      ...target,
+      id: `tmpl_${Date.now()}`,
+      template_code: `${target.template_code}-COPY`,
+      title: `${target.title} (Bản sao)`,
+    };
+    templatesStore = [copy, ...templatesStore];
+  }
+  return templatesStore;
+}
+
+export function deleteProposalTemplate(id: string): ProposalTemplate[] {
+  templatesStore = templatesStore.filter(t => t.id !== id);
+  return templatesStore;
+}
