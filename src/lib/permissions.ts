@@ -52,6 +52,20 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         moduleKey: 'finance',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'AUDITOR'],
       },
+      {
+        name: 'Mua Hàng & NCC',
+        href: '/purchasing',
+        iconName: 'ShoppingCart',
+        moduleKey: 'finance',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'AUDITOR'],
+      },
+      {
+        name: 'Hóa Đơn Điện Tử',
+        href: '/invoices',
+        iconName: 'FileSpreadsheet',
+        moduleKey: 'finance',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'AUDITOR'],
+      },
     ],
   },
   {

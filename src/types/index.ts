@@ -927,3 +927,60 @@ export interface ProposalSubmission {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   rejection_reason?: string;
 }
+
+export interface Supplier {
+  id: string;
+  supplier_code: string;
+  name: string;
+  tax_code: string;
+  contact_person: string;
+  phone: string;
+  email: string;
+  address: string;
+  rating: 'A' | 'B' | 'C' | 'D';
+  payable_balance: number;
+  category: string;
+  created_at: string;
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  item_name: string;
+  quantity: number;
+  unit_price: number;
+  total_amount: number;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  po_code: string;
+  supplier_id: string;
+  supplier_name: string;
+  order_date: string;
+  expected_delivery_date: string;
+  total_amount: number;
+  tax_amount: number;
+  grand_total: number;
+  payment_status: 'UNPAID' | 'PARTIAL' | 'PAID';
+  delivery_status: 'PENDING' | 'SHIPPED' | 'DELIVERED';
+  approval_status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  items: PurchaseOrderItem[];
+  notes?: string;
+}
+
+export interface InvoiceVAT {
+  id: string;
+  invoice_number: string;
+  invoice_symbol: string;
+  tax_authority_code: string;
+  issue_date: string;
+  buyer_name: string;
+  buyer_tax_code: string;
+  buyer_address: string;
+  subtotal: number;
+  tax_rate: number;
+  tax_amount: number;
+  total_amount: number;
+  status: 'DRAFT' | 'ISSUED' | 'CANCELLED';
+  created_at: string;
+}
