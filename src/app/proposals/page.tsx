@@ -46,6 +46,7 @@ import {
   deleteProposalTemplate
 } from '@/lib/proposalStore';
 import { createLeaveRequest } from '@/lib/payrollStore';
+import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters';
 
 export default function ProposalsPage() {
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
@@ -365,7 +366,7 @@ export default function ProposalsPage() {
                         <p className="text-[11px] text-slate-500">🏢 {sub.applicant_department}</p>
                       </td>
 
-                      <td className="p-3 font-mono font-bold text-slate-600">📅 {sub.submitted_date}</td>
+                      <td className="p-3 font-mono font-bold text-slate-600">📅 {formatDate(sub.submitted_date)}</td>
 
                       <td className="p-3 text-center">
                         <div className="flex items-center justify-center gap-1 font-mono text-[10.5px]">
@@ -825,7 +826,7 @@ export default function ProposalsPage() {
                   <div key={key} className="flex flex-col sm:flex-row justify-between border-b border-slate-100 pb-1.5">
                     <span className="text-slate-500 font-bold">{key}:</span>
                     <span className="text-slate-900 font-extrabold font-mono">
-                      {typeof val === 'number' ? `${val.toLocaleString('vi-VN')} ₫` : String(val)}
+                      {typeof val === 'number' ? formatCurrency(val) : String(val)}
                     </span>
                   </div>
                 ))}
