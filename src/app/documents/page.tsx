@@ -42,6 +42,7 @@ import {
   updateOfficialDocument,
   deleteOfficialDocument
 } from '@/lib/documentStore';
+import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
 
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
@@ -53,6 +54,7 @@ export default function DocumentsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<OfficialDocument | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isSignModalOpen, setIsSignModalOpen] = useState(false);
   const [directiveInput, setDirectiveInput] = useState('');
 
   const [newDoc, setNewDoc] = useState({
@@ -635,7 +637,14 @@ export default function DocumentsPage() {
               </form>
             </div>
 
-            <div className="flex items-center justify-end pt-2">
+            <div className="flex items-center justify-between pt-2">
+              <button
+                onClick={() => setIsSignModalOpen(true)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <ShieldCheck className="w-4 h-4" /> ✍️ Trình Ký Số Điện Tử (E-Sign)
+              </button>
+
               <button
                 onClick={() => setIsViewOpen(false)}
                 className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
@@ -645,6 +654,30 @@ export default function DocumentsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* MODAL TRÌNH KÝ SỐ ĐIỆN TỬ */}
+      {selectedDoc && (
+        <DigitalSignatureModal
+          isOpen={isSignModalOpen}
+          onClose={() => setIsSignModalOpen(false)}
+          documentCode={selectedDoc.document_code}
+          documentTitle={selectedDoc.title}
+          signerName="Nguyễn Tiến Vinh"
+          signerRole="CEO / Ban Giám Đốc"
+          onSignComplete={(sig) => {
+            const updated = {
+              ...selectedDoc,
+              has_digital_stamp: true,
+              stamped_at: sig.signed_at,
+              directive_note: (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') + `[Chữ ký số: ${sig.signature_type} • ${sig.sha256_hash.slice(0, 16)}...]`,
+            };
+            updateOfficialDocument(updated);
+            setSelectedDoc(updated);
+            setDocuments(getOfficialDocuments());
+            showToast(`✍️ Đã ký số điện tử thành công cho văn bản ${selectedDoc.document_code}! Mã Checksum: ${sig.sha256_hash.slice(0, 18)}...`);
+          }}
+        />
       )}
     </div>
   );
