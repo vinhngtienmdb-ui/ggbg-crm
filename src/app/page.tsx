@@ -129,6 +129,53 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* EXECUTIVE BI HEALTH ANALYTICS PANEL */}
+      <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md">
+              <BarChart3 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                Executive BI Analytics · Chỉ Số Sức Khỏe Doanh Nghiệp 360°
+              </h3>
+              <p className="text-xs text-slate-500">Phân tích hiệu quả đầu tư CAC, LTV, Retention Rate & ROI Kênh Marketing</p>
+            </div>
+          </div>
+
+          <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs rounded-full">
+            🟢 Chỉ Số Kinh Doanh Khỏe Mạnh
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-medium">
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+            <span className="text-slate-500 font-extrabold uppercase text-[10.5px]">CAC (Cost per Acquisition)</span>
+            <p className="text-xl font-black text-slate-900">3.250.000 ₫</p>
+            <p className="text-emerald-600 text-[11px] font-bold">📉 -12.5% Chi phí thu hái KH</p>
+          </div>
+
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+            <span className="text-slate-500 font-extrabold uppercase text-[10.5px]">LTV (Customer Lifetime Value)</span>
+            <p className="text-xl font-black text-blue-700">185.000.000 ₫</p>
+            <p className="text-blue-600 text-[11px] font-bold">📈 +24.1% Giá trị trọn đời KH</p>
+          </div>
+
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+            <span className="text-slate-500 font-extrabold uppercase text-[10.5px]">Retention vs Churn Rate</span>
+            <p className="text-xl font-black text-purple-700">94.2% / 5.8%</p>
+            <p className="text-purple-600 text-[11px] font-bold">🛡️ Tỷ lệ duy trì KH vượt trội</p>
+          </div>
+
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+            <span className="text-slate-500 font-extrabold uppercase text-[10.5px]">ROI Kênh Quảng Cáo Trung Bình</span>
+            <p className="text-xl font-black text-emerald-700">440% ROI</p>
+            <p className="text-emerald-600 text-[11px] font-bold">🚀 Top ROI: Referral (650%)</p>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content Grid: Pipeline Summary & Operational Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left Column: Pipeline Summary */}

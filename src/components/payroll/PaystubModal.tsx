@@ -187,6 +187,17 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
             </div>
           </div>
 
+          {/* PIN PROTECTION SECURITY NOTICE */}
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between text-[11px]">
+            <div className="flex items-center gap-2 text-amber-900 font-bold">
+              <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>Bảo Mật PDF: File Phiếu Lương PDF được tự động cài Mã PIN (Là Số Điện Thoại hoặc Số CCCD cá nhân)</span>
+            </div>
+            <span className="px-2 py-0.5 bg-amber-200/80 text-amber-900 font-black rounded-md text-[10px]">
+              🔒 PIN Encrypted
+            </span>
+          </div>
+
           {/* Signatures Footer for printing */}
           <div className="hidden print:grid grid-cols-2 gap-4 text-center pt-8">
             <div>
