@@ -155,12 +155,27 @@ export default function ContractsPage() {
                     )}
                   </td>
                   <td className="p-3 text-right">
-                    <button
-                      onClick={() => handleOpenPdf(cnt)}
-                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-[11px] inline-flex items-center gap-1 shadow-xs transition-colors"
-                    >
-                      <Eye className="w-3.5 h-3.5" /> Xem Hợp Đồng PDF
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      {cnt.status === 'PENDING_RENEWAL' && (
+                        <button
+                          onClick={() => {
+                            cnt.status = 'ACTIVE';
+                            cnt.expiry_date = '2027-09-01';
+                            alert(`📜 Đã sinh Phụ lục Gia hạn Hợp đồng thêm 12 tháng thành công cho ${cnt.company_name}!`);
+                          }}
+                          className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded text-[11px] inline-flex items-center gap-1 shadow-xs transition-colors"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" /> Phụ Lục Gia Hạn 1-Click
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleOpenPdf(cnt)}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-[11px] inline-flex items-center gap-1 shadow-xs transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" /> Xem Hợp Đồng PDF
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

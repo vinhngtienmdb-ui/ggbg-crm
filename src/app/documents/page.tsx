@@ -564,6 +564,42 @@ export default function DocumentsPage() {
               </a>
             </div>
 
+            {/* Digital Red Stamp Seal Badge */}
+            <div className="p-4 bg-red-50/60 border border-red-200 rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-red-600 text-red-600 flex items-center justify-center font-black text-xs uppercase tracking-wider rotate-[-12deg] bg-white shadow-sm">
+                  GGBG
+                </div>
+                <div>
+                  <p className="font-extrabold text-red-900">
+                    {selectedDoc.has_digital_stamp ? '🔴 Dấu Mộc Đỏ Điện Tử: ĐÃ ĐÓNG DẤU CHÍNH THỨC' : '⚪ Dấu Mộc Điện Tử: CHƯA ĐÓNG DẤU MỘC'}
+                  </p>
+                  <p className="text-[11px] text-slate-500 font-normal">
+                    {selectedDoc.has_digital_stamp ? `Phát hành & xác thực ngày ${selectedDoc.stamped_at || selectedDoc.issued_date}` : 'Văn bản dự thảo chờ Giám đốc đóng dấu mộc'}
+                  </p>
+                </div>
+              </div>
+
+              {!selectedDoc.has_digital_stamp && (
+                <button
+                  onClick={() => {
+                    const updated = {
+                      ...selectedDoc,
+                      has_digital_stamp: true,
+                      stamped_at: new Date().toLocaleString('vi-VN'),
+                    };
+                    updateOfficialDocument(updated);
+                    setSelectedDoc(updated);
+                    setDocuments(getOfficialDocuments());
+                    showToast(`🔴 Đã đóng dấu mộc đỏ điện tử chính thức cho văn bản ${selectedDoc.document_code}`);
+                  }}
+                  className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-extrabold text-[11px] flex items-center gap-1.5 shadow-md shadow-red-600/30 transition-all active:scale-95 shrink-0"
+                >
+                  <FileCheck className="w-3.5 h-3.5" /> Đóng Dấu Mộc Đỏ
+                </button>
+              )}
+            </div>
+
             {/* Bút Phê Chỉ Đạo Section */}
             <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-2xl space-y-3">
               <h4 className="font-extrabold text-amber-900 text-xs flex items-center gap-2">

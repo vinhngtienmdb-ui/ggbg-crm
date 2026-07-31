@@ -44,6 +44,8 @@ export const INITIAL_DOCUMENTS: OfficialDocument[] = [
     file_name: 'Quyet-Dinh-88-SOP-Lead-Intake.pdf',
     file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
     file_size: '1.8 MB',
+    has_digital_stamp: true,
+    stamped_at: '2026-07-15 10:00:00',
     comments: [],
     created_at: '2026-07-15',
   },

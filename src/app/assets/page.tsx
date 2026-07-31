@@ -170,6 +170,28 @@ export default function FixedAssetsPage() {
         </div>
       </div>
 
+      {/* Equipment Maintenance Schedule & Warranty Alerts */}
+      <div className="bg-amber-50/60 p-5 rounded-2xl border border-amber-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs font-bold">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold shrink-0">
+            <Building2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-amber-900 text-sm">🛠️ Lịch Bảo Trì Thiết Bị Định Kỳ & Bảo Hành 2026</h4>
+            <p className="text-amber-700 font-medium text-[11.5px] mt-0.5">
+              • Máy chủ Server Dell T340: <strong>Bảo trì định kỳ ngày 15/08/2026</strong> | • Xe Tải Suzuki Carry: <strong>Bảo dưỡng định kỳ 20.000km ngày 25/08/2026</strong>
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => showToast('🔔 Đã đặt lịch nhắc bảo trì thiết bị tự động cho Phòng Vận Hành')}
+          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-md shrink-0 transition-all active:scale-95"
+        >
+          🔔 Đặt Lịch Nhắc Bảo Trì
+        </button>
+      </div>
+
       {/* Main Assets Table */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 text-xs font-bold">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

@@ -867,6 +867,8 @@ export interface OfficialDocument {
   file_name?: string;
   file_url?: string;
   file_size?: string;
+  has_digital_stamp?: boolean;
+  stamped_at?: string;
   comments?: DocumentComment[];
   created_at: string;
 }
