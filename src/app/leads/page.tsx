@@ -42,6 +42,8 @@ import {
 } from 'lucide-react';
 import { Lead, VoIPCallLog, LeadSource, Customer, CustomerEntityType } from '@/types';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
+import { INITIAL_PRODUCTS } from '@/lib/productStore';
+import { formatFullAddressPost2025 } from '@/lib/locationService';
 import dynamic from 'next/dynamic';
 
 const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
@@ -230,6 +232,7 @@ export default function LeadsPage() {
   const [companyName, setCompanyName] = useState('');
   const [taxCode, setTaxCode] = useState('');
   const [idCardNumber, setIdCardNumber] = useState('');
+  const [selectedProductId, setSelectedProductId] = useState<string>('p1');
   const [sourceName, setSourceName] = useState<LeadSource>('Facebook Ads');
   const [estimatedBudget, setEstimatedBudget] = useState<string>('150000000');
   const [assignedSaleName, setAssignedSaleName] = useState('Trần Văn Hoàng (Đội 1)');
@@ -367,9 +370,54 @@ export default function LeadsPage() {
     e.preventDefault();
     setFormError('');
 
+    if (!fullName.trim()) {
+      setFormError('⚠️ Bắt buộc nhập đầy đủ Họ và Tên Khách Hàng!');
+      return;
+    }
+
     const cleanPhone = phone.replace(/\D/g, '');
-    if (!fullName.trim() || cleanPhone.length < 9) {
-      setFormError('Vui lòng nhập Họ tên và Số điện thoại hợp lệ!');
+    if (!phone.trim() || cleanPhone.length < 9) {
+      setFormError('⚠️ Bắt buộc nhập Số Điện Thoại hợp lệ (tối thiểu 9-10 chữ số)!');
+      return;
+    }
+
+    if (!email.trim() || !email.includes('@')) {
+      setFormError('⚠️ Bắt buộc nhập Email hợp lệ (ví dụ: khachhang@company.com)!');
+      return;
+    }
+
+    if (!companyName.trim()) {
+      setFormError('⚠️ Bắt buộc nhập Tên Doanh Nghiệp / Công Ty / Hộ Kinh Doanh!');
+      return;
+    }
+
+    if (entityType === 'ENTERPRISE' && !taxCode.trim()) {
+      setFormError('⚠️ Bắt buộc nhập Mã Số Thuế (MST) cho khách hàng Doanh Nghiệp!');
+      return;
+    }
+
+    if (entityType === 'INDIVIDUAL' && !idCardNumber.trim()) {
+      setFormError('⚠️ Bắt buộc nhập Số CCCD cho khách hàng Cá Nhân!');
+      return;
+    }
+
+    if (!selectedProductId) {
+      setFormError('⚠️ Bắt buộc chọn Sản Phẩm / Gói Dịch Vụ Khách Hàng Quan Tâm!');
+      return;
+    }
+
+    if (!addressData.provinceCode || !addressData.provinceName) {
+      setFormError('⚠️ Bắt buộc chọn Tỉnh / Thành Phố thuộc Cấu Hình Địa Chỉ Hành Chính 2 Cấp!');
+      return;
+    }
+
+    if (!addressData.wardCode || !addressData.wardName) {
+      setFormError('⚠️ Bắt buộc chọn Phường / Xã / Quận / Huyện thuộc Cấu Hình Địa Chỉ Hành Chính 2 Cấp!');
+      return;
+    }
+
+    if (!addressData.detailAddress || !addressData.detailAddress.trim()) {
+      setFormError('⚠️ Bắt buộc nhập Số Nhà / Tên Đường Địa Chỉ Chi Tiết!');
       return;
     }
 
@@ -383,6 +431,9 @@ export default function LeadsPage() {
       }
     }
 
+    const selectedProd = INITIAL_PRODUCTS.find((p) => p.id === selectedProductId);
+    const formattedAddress = formatFullAddressPost2025(addressData.detailAddress, addressData.wardName, addressData.provinceName);
+
     const firstStage = SEVEN_STAGES[0];
     const newCode = `LD-${1031 + leads.length}`;
     const calculatedScore = Math.floor(75 + Math.random() * 20);
@@ -394,16 +445,19 @@ export default function LeadsPage() {
       full_name: fullName.trim(),
       entity_type: entityType,
       phone: phone.trim(),
-      email: email.trim() || `${newCode.toLowerCase()}@lead.vn`,
-      company_name: companyName.trim() || (entityType === 'ENTERPRISE' ? 'Doanh Nghiệp Mới' : 'Cá Nhân Mới'),
+      email: email.trim(),
+      company_name: companyName.trim(),
       tax_code: taxCode.trim(),
       id_card_number: idCardNumber.trim(),
+      interested_product_id: selectedProductId,
+      interested_product_name: selectedProd ? selectedProd.name : '',
+      address: formattedAddress,
       source_name: sourceName,
       pipeline_id: 'AGENCY',
       stage_id: firstStage.id,
       stage_name: firstStage.name,
       assigned_sale_name: assignedSaleName,
-      estimated_budget: Number(estimatedBudget) || 150000000,
+      estimated_budget: selectedProd ? selectedProd.base_price : Number(estimatedBudget) || 150000000,
       lead_score: calculatedScore,
       status: 'New',
       kyc_status: 'PENDING',
@@ -420,12 +474,12 @@ export default function LeadsPage() {
       to_stage: firstStage.name,
       actor_name: 'Super Admin',
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-      note: 'Tiếp nhận Lead mới vào phễu',
+      note: `Tạo Lead mới cho sản phẩm "${selectedProd?.name}" tại ${formattedAddress}`,
     };
     setStageLogs((prev) => [createLog, ...prev]);
 
     setIsAddModalOpen(false);
-    setSuccessToast(`Đã tạo thành công Lead ${fullName} (${newCode})!`);
+    setSuccessToast(`🎉 Đã tạo thành công Lead ${fullName} (${newCode}) kèm Sản Phẩm & Địa Chỉ Hành Chính!`);
 
     setFullName('');
     setPhone('');
@@ -988,7 +1042,7 @@ export default function LeadsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Loại Thể Nhân Lead</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Loại Thể Nhân Lead *</label>
                   <select
                     value={entityType}
                     onChange={(e) => setEntityType(e.target.value as CustomerEntityType)}
@@ -1000,7 +1054,7 @@ export default function LeadsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nguồn Lead Tiếp Nhận</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Nguồn Lead Tiếp Nhận *</label>
                   <select
                     value={sourceName}
                     onChange={(e) => setSourceName(e.target.value as LeadSource)}
@@ -1017,7 +1071,7 @@ export default function LeadsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Họ và Tên Lead *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Họ và Tên Khách Hàng / Lead <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     required
@@ -1029,7 +1083,7 @@ export default function LeadsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại (Kiểm Tra Duy Nhất) *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại Khách Hàng <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     required
@@ -1041,13 +1095,77 @@ export default function LeadsPage() {
                 </div>
               </div>
 
-              {/* Vietnam Administrative Address Picker (Post-01/07/2025 Standard) */}
-              <VietnamAddressPicker
-                value={addressData}
-                onChange={setAddressData}
-                required
-                label="Địa Chỉ Khách Hàng / Lead (Chuẩn Mới Sau 01/07/2025)"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Khách Hàng <span className="text-red-500">*</span></label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="minh.nguyen@company.com"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tên Doanh Nghiệp / Công Ty / Hộ KD <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    required
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Công ty TNHH Vận Tải SunBeauty"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    {entityType === 'ENTERPRISE' ? 'Mã Số Thuế Doanh Nghiệp (MST)' : 'Số CCCD Cá Nhân'} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={entityType === 'ENTERPRISE' ? taxCode : idCardNumber}
+                    onChange={(e) => {
+                      if (entityType === 'ENTERPRISE') setTaxCode(e.target.value);
+                      else setIdCardNumber(e.target.value);
+                    }}
+                    placeholder={entityType === 'ENTERPRISE' ? '0108928374' : '001198002345'}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Sản Phẩm / Gói Dịch Vụ Quan Tâm <span className="text-red-500">*</span></label>
+                  <select
+                    value={selectedProductId}
+                    onChange={(e) => setSelectedProductId(e.target.value)}
+                    required
+                    className="w-full p-2.5 bg-blue-50/80 border border-blue-300 rounded-xl text-xs font-bold text-blue-900 focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">-- Bắt Buộc Chọn Sản Phẩm Quan Tâm --</option>
+                    {INITIAL_PRODUCTS.map((prod) => (
+                      <option key={prod.id} value={prod.id}>
+                        📦 [{prod.sku_code}] {prod.name} ({new Intl.NumberFormat('vi-VN').format(prod.base_price)} ₫/{prod.unit})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Vietnam Administrative Address Picker (Integrated 2-Tier Standard) */}
+              <div className="pt-2 border-t border-slate-100">
+                <VietnamAddressPicker
+                  value={addressData}
+                  onChange={setAddressData}
+                  required
+                  label="Cấu Hình Địa Chỉ Hành Chính Khách Hàng (Tỉnh/Thành Phố, Phường/Xã/Quận/Huyện & Số Nhà) *"
+                />
+              </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button

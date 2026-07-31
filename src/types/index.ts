@@ -89,6 +89,9 @@ export interface Lead {
   company_name?: string;
   tax_code?: string;
   id_card_number?: string;
+  interested_product_id?: string;
+  interested_product_name?: string;
+  address?: string;
   shop_link?: string;
   source_name: LeadSource;
   pipeline_id: string;
