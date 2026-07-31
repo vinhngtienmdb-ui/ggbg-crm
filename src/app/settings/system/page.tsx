@@ -26,7 +26,8 @@ import {
   Sparkles,
   RefreshCw,
   ShoppingBag,
-  Bot
+  Bot,
+  Building2
 } from 'lucide-react';
 import { SystemConfig, getSystemConfig, saveSystemConfig } from '@/lib/systemConfigStore';
 import { useModuleToggles } from '@/context/ModuleToggleContext';
@@ -45,7 +46,17 @@ export default function SystemSettingsPage() {
   const isAdmin = Boolean(user?.is_super_admin || user?.role === 'SUPER_ADMIN' || simulatedRole === 'SUPER_ADMIN');
   const [config, setConfig] = useState<SystemConfig>(getSystemConfig());
   const [saveToast, setSaveToast] = useState('');
-  const [activeTab, setActiveTab] = useState<'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT'>('MODULE_TOGGLES');
+  const [activeTab, setActiveTab] = useState<'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT' | 'COMPANY_IDENTITY'>('MODULE_TOGGLES');
+
+  // Company Identity Form State
+  const [companyInfo, setCompanyInfo] = useState({
+    name: 'CÔNG TY CỔ PHẦN GGBG CRM ENTERPRISE',
+    tax_code: '0109887766',
+    address: 'Tầng 5, Tòa nhà Bitexco Financial Tower, Quận 1, TP. Hồ Chí Minh',
+    ceo_name: 'Nguyễn Tiến Vinh',
+    chief_accountant: 'Trần Thị Mai',
+    seal_status: '✅ Dấu Mộc Đỏ Điện Tử Đã Xác Thực',
+  });
   const { toggles, toggleModule, resetToggles } = useModuleToggles();
 
   // Secret Masking Toggles
@@ -303,6 +314,15 @@ export default function SystemSettingsPage() {
           }`}
         >
           <ShieldAlert className="w-4 h-4 text-emerald-400" /> 🛡️ Bảo Mật & Audit Logs
+        </button>
+
+        <button
+          onClick={() => setActiveTab('COMPANY_IDENTITY')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+            activeTab === 'COMPANY_IDENTITY' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Building2 className="w-4 h-4 text-emerald-400" /> 🏛️ Pháp Lý & Dấu Mộc Đỏ
         </button>
       </div>
 
@@ -1328,6 +1348,93 @@ export default function SystemSettingsPage() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== TAB 6: CORPORATE IDENTITY & SEAL STAMPS ==================== */}
+        {activeTab === 'COMPANY_IDENTITY' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6 text-xs font-bold">
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-4">
+                <Building2 className="w-5 h-5 text-emerald-600" /> Cấu Hình Thông Tin Pháp Lý Doanh Nghiệp & Con Dấu Mộc Đỏ
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Box 1: Thông tin Pháp lý */}
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                  <h4 className="font-extrabold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
+                    1. Thông Tin Pháp Lý Doanh Nghiệp (Corporate Identity)
+                  </h4>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1">Tên Doanh Nghiệp Đăng Ký *</label>
+                    <input
+                      type="text"
+                      value={companyInfo.name}
+                      onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-xl font-bold text-slate-900"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-700 mb-1">Mã Số Thuế *</label>
+                      <input
+                        type="text"
+                        value={companyInfo.tax_code}
+                        onChange={(e) => setCompanyInfo({ ...companyInfo, tax_code: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 mb-1">Đại Diện Pháp Luật (CEO) *</label>
+                      <input
+                        type="text"
+                        value={companyInfo.ceo_name}
+                        onChange={(e) => setCompanyInfo({ ...companyInfo, ceo_name: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-xl text-slate-900 font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1">Địa Chỉ Trụ Sở ĐKKD *</label>
+                    <input
+                      type="text"
+                      value={companyInfo.address}
+                      onChange={(e) => setCompanyInfo({ ...companyInfo, address: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-xl text-slate-800"
+                    />
+                  </div>
+                </div>
+
+                {/* Box 2: Dấu Mộc Đỏ & Chữ Ký */}
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                  <h4 className="font-extrabold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
+                    2. Dấu Mộc Đỏ & Mẫu Chữ Ký Điện Tử
+                  </h4>
+
+                  <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-2 text-center">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-red-50 border-2 border-red-500 flex items-center justify-center text-red-600 font-black text-xs shadow-md">
+                      MỘC ĐỎ GGBG
+                    </div>
+                    <p className="text-emerald-700 font-extrabold text-xs">{companyInfo.seal_status}</p>
+                    <p className="text-[10.5px] text-slate-500 font-normal">Tự động đóng mộc trên Hợp đồng PDF & Công văn chính thức</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1">Kế Toán Trưởng Duyệt *</label>
+                    <input
+                      type="text"
+                      value={companyInfo.chief_accountant}
+                      onChange={(e) => setCompanyInfo({ ...companyInfo, chief_accountant: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-xl text-slate-900 font-bold"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
