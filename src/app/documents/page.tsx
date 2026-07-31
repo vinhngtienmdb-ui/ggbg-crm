@@ -46,9 +46,20 @@ import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal'
 
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
-  const [activeTab, setActiveTab] = useState<DocumentCategory | 'DIRECTIVE_LOG'>('INBOUND');
+  const [activeTab, setActiveTab] = useState<DocumentCategory | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Configuration State
+  const [docConfig, setDocConfig] = useState({
+    outbound_prefix: 'QĐ-GGBG',
+    inbound_prefix: 'CV-GGBG',
+    reset_yearly: true,
+    urgent_sla_hours: 24,
+    express_sla_hours: 4,
+    cert_provider: 'VNPT-CA / Viettel-CA Enterprise Root',
+    auto_digital_seal: true,
+  });
 
   // Modals
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -255,6 +266,15 @@ export default function DocumentsPage() {
           >
             <MessageSquare className="w-4 h-4 text-amber-400" /> ✍️ 4. Nhật Ký Bút Phê & Chuyển Xử Lý
           </button>
+
+          <button
+            onClick={() => setActiveTab('DOC_CONFIG')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'DOC_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Building2 className="w-4 h-4 text-white" /> ⚙️ 5. Cấu Hình Sổ Văn Bản & Ký Số
+          </button>
         </div>
 
         {/* Filter Controls */}
@@ -276,98 +296,203 @@ export default function DocumentsPage() {
         </div>
 
         {/* Document Table */}
-        <div className="overflow-x-auto border border-slate-200 rounded-xl">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
-                <th className="p-3">Số & Ngày Công Văn</th>
-                <th className="p-3">Trích Yếu Nội Dung Văn Bản</th>
-                <th className="p-3">Cơ Quan Ban Hành / Nơi Gửi</th>
-                <th className="p-3 text-center">Độ Mật & Độ Khẩn</th>
-                <th className="p-3">Đơn Vị Chủ Trì Xử Lý</th>
-                <th className="p-3 text-center">Trạng Thái</th>
-                <th className="p-3 text-center">Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {filteredDocs.map((doc) => (
-                <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-3">
-                    <p className="font-mono font-black text-blue-700 text-xs">{doc.document_code}</p>
-                    <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {doc.received_date || doc.issued_date}</p>
-                  </td>
-
-                  <td className="p-3 max-w-md">
-                    <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-2">{doc.title}</p>
-                    {doc.directive_note && (
-                      <p className="text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded-lg border border-amber-200 mt-1 font-bold">
-                        ✍️ Bút phê: {doc.directive_note}
-                      </p>
-                    )}
-                  </td>
-
-                  <td className="p-3 text-slate-700 font-bold">
-                    {doc.issuer_org}
-                    <span className="block text-[10.5px] text-slate-500 font-normal">Ký bởi: {doc.signee_name}</span>
-                  </td>
-
-                  <td className="p-3 text-center space-y-1">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
-                      doc.security_level === 'CONFIDENTIAL' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700'
-                    }`}>
-                      🔒 {doc.security_level === 'CONFIDENTIAL' ? 'Bảo Mật' : 'Công Khai'}
-                    </span>
-
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
-                      doc.urgency_level === 'HIGHLY_URGENT' || doc.urgency_level === 'EXPRESS'
-                        ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
-                        : 'bg-slate-100 text-slate-700'
-                    }`}>
-                      ⚡ {doc.urgency_level === 'HIGHLY_URGENT' ? 'Thượng Khẩn' : doc.urgency_level === 'URGENT' ? 'Khẩn' : 'Thường'}
-                    </span>
-                  </td>
-
-                  <td className="p-3">
-                    <p className="font-bold text-slate-800">{doc.assigned_department}</p>
-                    <p className="text-[11px] text-slate-500">👤 {doc.assigned_assignee}</p>
-                  </td>
-
-                  <td className="p-3 text-center">
-                    <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
-                      doc.status === 'PENDING_DIRECTIVE' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-                      doc.status === 'IN_PROCESSING' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800'
-                    }`}>
-                      {doc.status === 'PENDING_DIRECTIVE' ? '⏳ Chờ Bút Phê' : doc.status === 'IN_PROCESSING' ? '🔵 Đang Xử Lý' : '✅ Hoàn Thành'}
-                    </span>
-                  </td>
-
-                  <td className="p-3 text-center">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <button
-                        onClick={() => {
-                          setSelectedDoc(doc);
-                          setIsViewOpen(true);
-                        }}
-                        className="p-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"
-                        title="Xem File & Bút Phê"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(doc.id)}
-                        className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
-                        title="Xóa / Lưu Trữ"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
+        {activeTab !== 'DOC_CONFIG' && (
+          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                  <th className="p-3">Số & Ngày Công Văn</th>
+                  <th className="p-3">Trích Yếu Nội Dung Văn Bản</th>
+                  <th className="p-3">Cơ Quan Ban Hành / Nơi Gửi</th>
+                  <th className="p-3 text-center">Độ Mật & Độ Khẩn</th>
+                  <th className="p-3">Đơn Vị Chủ Trì Xử Lý</th>
+                  <th className="p-3 text-center">Trạng Thái</th>
+                  <th className="p-3 text-center">Thao Tác</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {filteredDocs.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-3">
+                      <p className="font-mono font-black text-blue-700 text-xs">{doc.document_code}</p>
+                      <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {doc.received_date || doc.issued_date}</p>
+                    </td>
+
+                    <td className="p-3 max-w-md">
+                      <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-2">{doc.title}</p>
+                      {doc.directive_note && (
+                        <p className="text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded-lg border border-amber-200 mt-1 font-bold">
+                          ✍️ Bút phê: {doc.directive_note}
+                        </p>
+                      )}
+                    </td>
+
+                    <td className="p-3 text-slate-700 font-bold">
+                      {doc.issuer_org}
+                      <span className="block text-[10.5px] text-slate-500 font-normal">Ký bởi: {doc.signee_name}</span>
+                    </td>
+
+                    <td className="p-3 text-center space-y-1">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
+                        doc.security_level === 'CONFIDENTIAL' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        🔒 {doc.security_level === 'CONFIDENTIAL' ? 'Bảo Mật' : 'Công Khai'}
+                      </span>
+
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
+                        doc.urgency_level === 'HIGHLY_URGENT' || doc.urgency_level === 'EXPRESS'
+                          ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        ⚡ {doc.urgency_level === 'HIGHLY_URGENT' ? 'Thượng Khẩn' : doc.urgency_level === 'URGENT' ? 'Khẩn' : 'Thường'}
+                      </span>
+                    </td>
+
+                    <td className="p-3">
+                      <p className="font-bold text-slate-800">{doc.assigned_department}</p>
+                      <p className="text-[11px] text-slate-500">👤 {doc.assigned_assignee}</p>
+                    </td>
+
+                    <td className="p-3 text-center">
+                      <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                        doc.status === 'PENDING_DIRECTIVE' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                        doc.status === 'IN_PROCESSING' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {doc.status === 'PENDING_DIRECTIVE' ? '⏳ Chờ Bút Phê' : doc.status === 'IN_PROCESSING' ? '🔵 Đang Xử Lý' : '✅ Hoàn Thành'}
+                      </span>
+                    </td>
+
+                    <td className="p-3 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => {
+                            setSelectedDoc(doc);
+                            setIsViewOpen(true);
+                          }}
+                          className="p-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"
+                          title="Xem File & Bút Phê"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(doc.id)}
+                          className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
+                          title="Xóa / Lưu Trữ"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* TAB 5: CONFIGURATION PANEL */}
+        {activeTab === 'DOC_CONFIG' && (
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-indigo-600" /> Cấu Hình Sổ Văn Bản, Mã Ký Hiệu & Chứng Thư Số
+                </h3>
+                <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                  Thiết lập tiền tố mã ký hiệu tự động, hạn xử lý công văn khẩn SLA & thông số Chứng thư chữ ký số PKI.
+                </p>
+              </div>
+
+              <button
+                onClick={() => showToast('💾 Đã lưu thành công cấu hình sổ công văn & ký số!')}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
+              >
+                <Save className="w-4 h-4" /> Lưu Cấu Hình Văn Bản
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Box 1: Cấu hình Đánh Số Công Văn */}
+              <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
+                <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
+                  1. Cấu Hình Đánh Số Công Văn Tự Động
+                </h4>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-700 mb-1">Tiền tố Công Văn Đi *</label>
+                    <input
+                      type="text"
+                      value={docConfig.outbound_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, outbound_prefix: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1">Tiền tố Công Văn Đến *</label>
+                    <input
+                      type="text"
+                      value={docConfig.inbound_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, inbound_prefix: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t flex items-center justify-between text-slate-700">
+                  <span>Reset số công văn về 001 hàng năm:</span>
+                  <input
+                    type="checkbox"
+                    checked={docConfig.reset_yearly}
+                    onChange={(e) => setDocConfig({ ...docConfig, reset_yearly: e.target.checked })}
+                    className="w-4 h-4 accent-indigo-600 rounded"
+                  />
+                </div>
+              </div>
+
+              {/* Box 2: Cấu hình Hạn Xử Lý SLA */}
+              <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
+                <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
+                  2. Cấu Hình Thời Hạn Xử Lý SLA (Giờ)
+                </h4>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-700 mb-1">Công Văn Thượng Khẩn (Giờ) *</label>
+                    <input
+                      type="number"
+                      value={docConfig.urgent_sla_hours}
+                      onChange={(e) => setDocConfig({ ...docConfig, urgent_sla_hours: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border rounded-xl font-mono text-red-700"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1">Công Văn Hỏa Tốc (Giờ) *</label>
+                    <input
+                      type="number"
+                      value={docConfig.express_sla_hours}
+                      onChange={(e) => setDocConfig({ ...docConfig, express_sla_hours: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border rounded-xl font-mono text-red-700"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t flex items-center justify-between text-slate-700">
+                  <span>Tự động đóng Dấu Mộc Đỏ sau khi ký số:</span>
+                  <input
+                    type="checkbox"
+                    checked={docConfig.auto_digital_seal}
+                    onChange={(e) => setDocConfig({ ...docConfig, auto_digital_seal: e.target.checked })}
+                    className="w-4 h-4 accent-indigo-600 rounded"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* MODAL TIẾP NHẬN / PHÁT HÀNH CÔNG VĂN MỚI */}
