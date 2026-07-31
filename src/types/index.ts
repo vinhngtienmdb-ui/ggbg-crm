@@ -872,3 +872,58 @@ export interface OfficialDocument {
   comments?: DocumentComment[];
   created_at: string;
 }
+
+export type FieldDataType =
+  | 'TEXT_INPUT'
+  | 'TEXT_AREA'
+  | 'NUMBER_AMOUNT'
+  | 'DATE_PICKER'
+  | 'SELECT_DROPDOWN'
+  | 'FILE_UPLOAD'
+  | 'CHECKBOX_BOOLEAN';
+
+export interface ProposalFormField {
+  id: string;
+  field_name: string;
+  field_label: string;
+  data_type: FieldDataType;
+  is_required: boolean;
+  options?: string[];
+  placeholder?: string;
+  default_value?: any;
+}
+
+export interface ApprovalStep {
+  step_order: number;
+  approver_role: string;
+  approver_name?: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  approved_at?: string;
+  comment?: string;
+}
+
+export interface ProposalTemplate {
+  id: string;
+  template_code: string;
+  title: string;
+  category_name: string;
+  description: string;
+  fields: ProposalFormField[];
+  approval_steps: { step_order: number; approver_role: string }[];
+  is_active: boolean;
+}
+
+export interface ProposalSubmission {
+  id: string;
+  proposal_code: string;
+  template_id: string;
+  template_title: string;
+  applicant_name: string;
+  applicant_department: string;
+  submitted_date: string;
+  field_values: Record<string, any>;
+  approval_steps: ApprovalStep[];
+  current_step_order: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejection_reason?: string;
+}
