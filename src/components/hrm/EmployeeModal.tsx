@@ -498,6 +498,32 @@ export default function EmployeeModal({
                       className="w-full px-3 py-2 border rounded-xl"
                     />
                   </div>
+
+                  <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">🏠 Địa Chỉ Thường Trú (HKTT) *</label>
+                      <input
+                        type="text"
+                        disabled={isViewOnly}
+                        value={formData.permanent_address || ''}
+                        onChange={(e) => setFormData({ ...formData, permanent_address: e.target.value })}
+                        placeholder="Số nhà, Đường/Thôn, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố"
+                        className="w-full px-3 py-2 border rounded-xl font-medium text-slate-900"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">📍 Địa Chỉ Hiện Trú (Nơi Ở Hiện Tại) *</label>
+                      <input
+                        type="text"
+                        disabled={isViewOnly}
+                        value={formData.current_address || formData.temporary_address || ''}
+                        onChange={(e) => setFormData({ ...formData, current_address: e.target.value, temporary_address: e.target.value })}
+                        placeholder="Số nhà, Đường/Thôn, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố"
+                        className="w-full px-3 py-2 border rounded-xl font-medium text-slate-900"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

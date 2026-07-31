@@ -439,6 +439,7 @@ export interface EmployeeProfile {
   ethnicity?: string; // Dân tộc
   religion?: string; // Tôn giáo
   hometown?: string; // Nguyên quán
+  current_address?: string; // Địa chỉ hiện trú (Nơi ở hiện tại)
   health_provider?: string; // Nơi KCB ban đầu
   bhxh_start_date?: string; // Ngày tham gia BHXH
 

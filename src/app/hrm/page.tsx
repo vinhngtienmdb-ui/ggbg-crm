@@ -48,7 +48,9 @@ import {
   FileCheck,
   X,
   MessageSquare,
-  Award
+  Award,
+  Sliders,
+  Save
 } from 'lucide-react';
 import { EmployeeProfile, EmployeeApprovalStatus, Candidate, CandidateAuditLog, RecruitmentStage } from '@/types';
 import {
@@ -174,10 +176,29 @@ export default function HRMPage() {
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'DASHBOARD' | 'LABOR_BOOK' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP'>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<'PROFILE' | 'DASHBOARD' | 'LABOR_BOOK' | 'APPROVAL_PIPELINE' | 'RECRUITMENT' | 'CONTRACTS' | 'ONBOARDING' | 'ORG_CHART' | 'JOB_TITLES' | 'MAP' | 'CONFIG'>('DASHBOARD');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
+
+  // HRM Module Configuration State
+  const [hrmConfig, setHrmConfig] = useState({
+    emp_prefix: 'NV-2026-',
+    cand_prefix: 'UV-2026-',
+    probation_days: 60,
+    annual_leave_quota: 12,
+    company_bhxh_percent: 17.5,
+    company_bhyt_percent: 3.0,
+    company_bhtn_percent: 1.0,
+    user_bhxh_percent: 8.0,
+    user_bhyt_percent: 1.5,
+    user_bhtn_percent: 1.0,
+    shift_start_time: '08:00',
+    shift_end_time: '17:30',
+    work_hours_per_day: 8.0,
+    ot_weekday_rate: 1.5,
+    ot_weekend_rate: 2.0,
+  });
 
   // Sub-Tab inside Tab 7: TITLES (Chức danh chuyên môn), POSITIONS (Chức vụ quản lý), GRADES (Cấp bậc G1-G6)
   const [jobSubTab, setJobSubTab] = useState<'TITLES' | 'POSITIONS' | 'GRADES'>('TITLES');
@@ -718,6 +739,15 @@ export default function HRMPage() {
           }`}
         >
           🗺️ Bản Đồ Phân Bổ Nhân Sự
+        </button>
+
+        <button
+          onClick={() => setActiveTab('CONFIG')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'CONFIG' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
+          }`}
+        >
+          ⚙️ Cấu Hình Nhân Sự & BHXH
         </button>
       </div>
 
@@ -1297,6 +1327,213 @@ export default function HRMPage() {
       {/* TAB 8: BẢN ĐỒ PHÂN BỔ NHÂN SỰ KINH DOANH VIỆT NAM (GIS HEATMAP) */}
       {activeTab === 'MAP' && (
         <VietnamEmployeeDistributionMap employees={employees} />
+      )}
+
+      {/* TAB 9: CẤU HÌNH THAM SỐ QUẢN LÝ NHÂN SỰ & BẢO HIỂM */}
+      {activeTab === 'CONFIG' && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
+          <div className="flex items-center justify-between border-b pb-4">
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <Sliders className="w-5 h-5 text-purple-600" /> Cấu Hình Tham Số Phân Hệ Quản Lý Nhân Sự (HRM Configuration)
+              </h3>
+              <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                Thiết lập quy tắc mã số nhân viên, tỷ lệ BHXH/BHYT, quỹ phép năm & khung giờ ca kíp làm việc.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                setStatusToast('✅ Đã lưu thành công Cấu hình Phân Hệ Quản Lý Nhân Sự!');
+                setTimeout(() => setStatusToast(''), 4000);
+              }}
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all"
+            >
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Nhân Sự
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Box 1: Mã NV & Quy Tắc Thử Việc */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
+                1. Quy Tắc Định Dạng Mã & Thử Việc
+              </h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Tiền Tố Mã Nhân Viên</label>
+                  <input
+                    type="text"
+                    value={hrmConfig.emp_prefix}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, emp_prefix: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Tiền Tố Mã Ứng Viên</label>
+                  <input
+                    type="text"
+                    value={hrmConfig.cand_prefix}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, cand_prefix: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Số Ngày Thử Việc Tiêu Chuẩn</label>
+                  <input
+                    type="number"
+                    value={hrmConfig.probation_days}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, probation_days: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Quỹ Phép Năm Mặc Định (Ngày)</label>
+                  <input
+                    type="number"
+                    value={hrmConfig.annual_leave_quota}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, annual_leave_quota: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Box 2: Tỷ Lệ BHXH */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
+                2. Tỷ Lệ Trích Nộp Bảo Hiểm Xã Hội (BHXH/BHYT/BHTN)
+              </h4>
+
+              <div className="space-y-2">
+                <p className="text-[11px] text-slate-500 font-normal">Tỷ lệ Doanh Nghiệp đóng (Tổng 21.5%):</p>
+                <div className="grid grid-cols-3 gap-2 font-mono">
+                  <div>
+                    <label className="block text-[10.5px] text-slate-600 mb-0.5">BHXH (%)</label>
+                    <input
+                      type="number"
+                      step={0.5}
+                      value={hrmConfig.company_bhxh_percent}
+                      onChange={(e) => setHrmConfig({ ...hrmConfig, company_bhxh_percent: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-emerald-700 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10.5px] text-slate-600 mb-0.5">BHYT (%)</label>
+                    <input
+                      type="number"
+                      step={0.5}
+                      value={hrmConfig.company_bhyt_percent}
+                      onChange={(e) => setHrmConfig({ ...hrmConfig, company_bhyt_percent: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-emerald-700 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10.5px] text-slate-600 mb-0.5">BHTN (%)</label>
+                    <input
+                      type="number"
+                      step={0.5}
+                      value={hrmConfig.company_bhtn_percent}
+                      onChange={(e) => setHrmConfig({ ...hrmConfig, company_bhtn_percent: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-emerald-700 font-bold"
+                    />
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-500 font-normal pt-1">Tỷ lệ Người Lao Động đóng (Tổng 10.5%):</p>
+                <div className="grid grid-cols-3 gap-2 font-mono">
+                  <div>
+                    <label className="block text-[10.5px] text-slate-600 mb-0.5">BHXH (%)</label>
+                    <input
+                      type="number"
+                      step={0.5}
+                      value={hrmConfig.user_bhxh_percent}
+                      onChange={(e) => setHrmConfig({ ...hrmConfig, user_bhxh_percent: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-purple-700 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10.5px] text-slate-600 mb-0.5">BHYT (%)</label>
+                    <input
+                      type="number"
+                      step={0.5}
+                      value={hrmConfig.user_bhyt_percent}
+                      onChange={(e) => setHrmConfig({ ...hrmConfig, user_bhyt_percent: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-purple-700 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10.5px] text-slate-600 mb-0.5">BHTN (%)</label>
+                    <input
+                      type="number"
+                      step={0.5}
+                      value={hrmConfig.user_bhtn_percent}
+                      onChange={(e) => setHrmConfig({ ...hrmConfig, user_bhtn_percent: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-purple-700 font-bold"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Box 3: Khung Giờ Làm Việc & Shift Rules */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 md:col-span-2">
+              <h4 className="font-extrabold text-slate-900 text-xs text-amber-700 uppercase tracking-wider">
+                3. Khung Giờ Làm Việc Tiêu Chuẩn & Hệ Số Tăng Ca (Shift & OT Rules)
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono">
+                <div>
+                  <label className="block text-slate-700 mb-1">Giờ Vào Ca Sáng</label>
+                  <input
+                    type="time"
+                    value={hrmConfig.shift_start_time}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, shift_start_time: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Giờ Tan Ca Chiều</label>
+                  <input
+                    type="time"
+                    value={hrmConfig.shift_end_time}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, shift_end_time: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Hệ Số OT Ngày Thường</label>
+                  <input
+                    type="number"
+                    step={0.1}
+                    value={hrmConfig.ot_weekday_rate}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, ot_weekday_rate: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-bold text-amber-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Hệ Số OT Cuối Tuần</label>
+                  <input
+                    type="number"
+                    step={0.1}
+                    value={hrmConfig.ot_weekend_rate}
+                    onChange={(e) => setHrmConfig({ ...hrmConfig, ot_weekend_rate: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-bold text-amber-700"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* TAB: DASHBOARD NHÂN SỰ (Dựng từ sổ quản lý lao động) */}
