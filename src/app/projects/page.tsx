@@ -31,9 +31,17 @@ import {
 
 export default function EnterpriseProjectsPage() {
   const [projects, setProjects] = useState<EnterpriseProject[]>(() => getEnterpriseProjects());
-  const [viewMode, setViewMode] = useState<'GANTT' | 'KANBAN'>('GANTT');
+  const [viewMode, setViewMode] = useState<'GANTT' | 'KANBAN' | 'CONFIG'>('GANTT');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Project Config State
+  const [prjConfig, setPrjConfig] = useState({
+    overbudget_warning_pct: 90,
+    max_workload_pct: 120,
+    default_currency: 'VND',
+    auto_archive_days: 30,
+  });
 
   // Modals
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -169,6 +177,14 @@ export default function EnterpriseProjectsPage() {
               }`}
             >
               📋 Bảng Kanban Công Việc
+            </button>
+            <button
+              onClick={() => setViewMode('CONFIG')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                viewMode === 'CONFIG' ? 'bg-white text-purple-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              ⚙️ Cấu Hình Dự Án
             </button>
           </div>
 
@@ -349,6 +365,89 @@ export default function EnterpriseProjectsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* CONFIGURATION VIEW */}
+      {viewMode === 'CONFIG' && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <FolderKanban className="w-5 h-5 text-purple-600" /> Cấu Hình Tham Số Vận Hành Dự Án Enterprise
+              </h3>
+              <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                Thiết lập ngưỡng cảnh báo vọt ngân sách dự án, tải công việc nhân sự quá tải & lưu trữ tự động.
+              </p>
+            </div>
+
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công cấu hình tham số Quản lý Dự án!')}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all active:scale-95"
+            >
+              <FolderKanban className="w-4 h-4" /> Lưu Cấu Hình Dự Án
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
+                1. Ngưỡng Cảnh Báo Ngân Sách & Tải Công Việc
+              </h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Cảnh Báo Vọt Ngân Sách (%) *</label>
+                  <input
+                    type="number"
+                    value={prjConfig.overbudget_warning_pct}
+                    onChange={(e) => setPrjConfig({ ...prjConfig, overbudget_warning_pct: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Giới Hạn Tải Nhân Sự (%) *</label>
+                  <input
+                    type="number"
+                    value={prjConfig.max_workload_pct}
+                    onChange={(e) => setPrjConfig({ ...prjConfig, max_workload_pct: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
+                2. Quy Tắc Lưu Trữ & Đơn Vị Tiền Tệ
+              </h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Đơn Vị Tiền Tệ *</label>
+                  <select
+                    value={prjConfig.default_currency}
+                    onChange={(e) => setPrjConfig({ ...prjConfig, default_currency: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  >
+                    <option value="VND">VND (Việt Nam Đồng)</option>
+                    <option value="USD">USD (Đô La Mỹ)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Tự Động Lưu Trữ (Ngày) *</label>
+                  <input
+                    type="number"
+                    value={prjConfig.auto_archive_days}
+                    onChange={(e) => setPrjConfig({ ...prjConfig, auto_archive_days: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-slate-800"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

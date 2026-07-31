@@ -26,7 +26,8 @@ import {
   Percent,
   FileSpreadsheet,
   X,
-  CreditCard
+  CreditCard,
+  Save
 } from 'lucide-react';
 import {
   BarChart,
@@ -165,7 +166,17 @@ export default function FinancePage() {
   const [transactions, setTransactions] = useState<CashFlowTransaction[]>(INITIAL_TRANSACTIONS);
   const [budgets] = useState<DepartmentBudget[]>(INITIAL_BUDGETS);
 
-  const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST' | 'VAS_BALANCE_SHEET'>('EXECUTIVE');
+  const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST' | 'VAS_BALANCE_SHEET' | 'FINANCE_CONFIG'>('EXECUTIVE');
+
+  // Finance Config State
+  const [finConfig, setFinConfig] = useState({
+    receipt_prefix: 'PT-2026-',
+    payment_prefix: 'PC-2026-',
+    vat_rate: 10,
+    cit_rate: 20,
+    warning_debt_days: 30,
+    bad_debt_days: 90,
+  });
   const [toastMessage, setToastMessage] = useState('');
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
 
@@ -327,6 +338,15 @@ export default function FinancePage() {
           }`}
         >
           <Building2 className="w-4 h-4 text-emerald-400" /> 🏛️ 6. Bảng Cân Đối Kế Toán VAS
+        </button>
+
+        <button
+          onClick={() => setActiveTab('FINANCE_CONFIG')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'FINANCE_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Building2 className="w-4 h-4 text-white" /> ⚙️ 7. Cấu Hình Tài Chính & Kế Toán
         </button>
       </div>
 
@@ -881,6 +901,89 @@ export default function FinancePage() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 7: FINANCE MODULE CONFIGURATION PANEL */}
+      {activeTab === 'FINANCE_CONFIG' && (
+        <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-indigo-600" /> Cấu Hình Tham Số Kế Toán, Thuế & Công Nợ
+              </h3>
+              <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                Thiết lập quy tắc nhảy số chứng từ thu chi tự động, thuế suất GTGT & ngưỡng cảnh báo nợ quá hạn.
+              </p>
+            </div>
+
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công cấu hình tham số Kế toán & Tài chính!')}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
+            >
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Tài Chính
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Box 1: Quy tắc Đánh Số Chứng Từ */}
+            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
+                1. Tiền Tố Đánh Số Chứng Từ Thu / Chi
+              </h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Tiền tố Phiếu Thu *</label>
+                  <input
+                    type="text"
+                    value={finConfig.receipt_prefix}
+                    onChange={(e) => setFinConfig({ ...finConfig, receipt_prefix: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Tiền tố Phiếu Chi *</label>
+                  <input
+                    type="text"
+                    value={finConfig.payment_prefix}
+                    onChange={(e) => setFinConfig({ ...finConfig, payment_prefix: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-red-700"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Box 2: Thuế Suất & Tuổi Nợ SLA */}
+            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
+                2. Thuế Suất & Ngưỡng Nợ Xấu (Ngày)
+              </h4>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Thuế Suất GTGT VAT (%) *</label>
+                  <input
+                    type="number"
+                    value={finConfig.vat_rate}
+                    onChange={(e) => setFinConfig({ ...finConfig, vat_rate: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Cảnh Báo Nợ Quá Hạn (Ngày) *</label>
+                  <input
+                    type="number"
+                    value={finConfig.warning_debt_days}
+                    onChange={(e) => setFinConfig({ ...finConfig, warning_debt_days: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
+                  />
+                </div>
               </div>
             </div>
           </div>
