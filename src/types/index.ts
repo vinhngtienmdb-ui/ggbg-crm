@@ -783,3 +783,54 @@ export interface ChatConversation {
   last_message_at: string;
   messages: ChatMessage[];
 }
+
+export type AssetCategory = 'IT_EQUIPMENT' | 'OFFICE_FURNITURE' | 'VEHICLES' | 'ECOM_MACHINERY' | 'REAL_ESTATE';
+export type AssetStatus = 'IN_USE' | 'UNDER_MAINTENANCE' | 'DEPRECATED' | 'LIQUIDATED';
+
+export interface FixedAsset {
+  id: string;
+  asset_code: string;
+  name: string;
+  category: AssetCategory;
+  category_name: string;
+  purchase_date: string;
+  purchase_price: number;
+  depreciation_months: number;
+  monthly_depreciation: number;
+  accumulated_depreciation: number;
+  net_book_value: number;
+  department: string;
+  assigned_to: string;
+  status: AssetStatus;
+  notes?: string;
+}
+
+export type ProjectStatus = 'PLANNING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED';
+
+export interface ProjectTask {
+  id: string;
+  project_id: string;
+  title: string;
+  assignee_name: string;
+  start_date: string;
+  due_date: string;
+  progress_pct: number;
+  status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
+}
+
+export interface EnterpriseProject {
+  id: string;
+  project_code: string;
+  name: string;
+  client_name?: string;
+  department: string;
+  manager_name: string;
+  start_date: string;
+  end_date: string;
+  budget: number;
+  actual_cost: number;
+  progress_pct: number;
+  status: ProjectStatus;
+  description: string;
+  tasks: ProjectTask[];
+}

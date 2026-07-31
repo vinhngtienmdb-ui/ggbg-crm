@@ -129,6 +129,20 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'HR_MANAGER',
         ],
       },
+      {
+        name: 'Tài Sản Cố Định',
+        href: '/assets',
+        iconName: 'Truck',
+        moduleKey: 'finance',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'AUDITOR'],
+      },
+      {
+        name: 'Quản Lý Dự Án',
+        href: '/projects',
+        iconName: 'FolderKanban',
+        moduleKey: 'hrm',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'TEAM_LEADER'],
+      },
     ],
   },
   {
