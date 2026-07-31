@@ -85,9 +85,29 @@ function OrgTreeNode({
           </div>
 
           {hasChildren && (
-            <div className="mt-3 pt-2 border-t border-current/10 flex items-center justify-center gap-1 text-[11px] font-bold opacity-80">
-              {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              <span>{isExpanded ? 'Thu gọn sơ đồ' : `Mở rộng (${node.children?.length} nhánh)`}</span>
+            <div className="mt-3 pt-2 border-t border-current/10 flex items-center justify-between gap-1 text-[11px] font-bold opacity-80">
+              <span className="flex items-center gap-1">
+                {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                {isExpanded ? 'Thu gọn' : `Mở rộng (${node.children?.length})`}
+              </span>
+
+              {/* Node Action Buttons */}
+              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={() => alert(`👁️ Chi tiết phòng ban / chức danh: ${node.name} - ${node.department}`)}
+                  className="p-1 hover:bg-black/10 rounded"
+                  title="Xem Chi Tiết"
+                >
+                  👁️
+                </button>
+                <button
+                  onClick={() => alert(`✏️ Chỉnh sửa phòng ban: ${node.department}`)}
+                  className="p-1 hover:bg-black/10 rounded"
+                  title="Chỉnh Sửa"
+                >
+                  ✏️
+                </button>
+              </div>
             </div>
           )}
         </div>

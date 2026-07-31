@@ -206,6 +206,8 @@ export default function HrmSettingsPage() {
   const [jobTitles, setJobTitles] = useState<JobTitleConfig[]>(INITIAL_JOB_TITLES);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTitle, setEditingTitle] = useState<JobTitleConfig | null>(null);
+  const [viewingTitle, setViewingTitle] = useState<JobTitleConfig | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Comprehensive HR Settings State
@@ -490,9 +492,18 @@ export default function HrmSettingsPage() {
               />
             </div>
 
-            <span className="text-slate-500 font-bold">
-              Tổng số <strong className="text-slate-900">{filteredTitles.length} Chức Danh Công Việc</strong>
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-slate-500 font-bold hidden md:inline">
+                Tổng số <strong className="text-slate-900">{filteredTitles.length} Chức Danh Công Việc</strong>
+              </span>
+
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <Plus className="w-4 h-4" /> Thêm Chức Danh Mới
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -505,7 +516,7 @@ export default function HrmSettingsPage() {
                   <th className="p-3">Khung Lương Min - Max</th>
                   <th className="p-3">Định Mức Phụ Cấp</th>
                   <th className="p-3 text-center">Số Nhân Sự</th>
-                  <th className="p-3 text-center">Thao Tác</th>
+                  <th className="p-3 text-center">Thao Tác CRUD</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
@@ -538,13 +549,31 @@ export default function HrmSettingsPage() {
                     </td>
 
                     <td className="p-3 text-center">
-                      <button
-                        onClick={() => handleDeleteTitle(t.id)}
-                        className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
-                        title="Xóa Chức Danh"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => setViewingTitle(t)}
+                          className="p-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"
+                          title="Xem Chi Tiết"
+                        >
+                          👁️
+                        </button>
+
+                        <button
+                          onClick={() => setEditingTitle(t)}
+                          className="p-1.5 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-all"
+                          title="Chỉnh Sửa"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteTitle(t.id)}
+                          className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
+                          title="Xóa Chức Danh"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1457,6 +1486,214 @@ export default function HrmSettingsPage() {
                   className="px-5 py-2 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30"
                 >
                   Lưu Chức Danh
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL XEM CHI TIẾT CHỨC DANH (VIEW DETAIL) */}
+      {viewingTitle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center gap-2">
+                <Award className="w-5 h-5 text-purple-600" />
+                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Chức Danh: {viewingTitle.title_name}</h3>
+              </div>
+              <button onClick={() => setViewingTitle(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <span className="text-slate-500 font-bold block">Mã Chức Danh:</span>
+                  <span className="font-mono font-bold text-purple-700">{viewingTitle.code}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-bold block">Ngạch / Bậc Lương:</span>
+                  <span className="font-bold text-slate-900">{viewingTitle.salary_grade}</span>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-slate-500 font-bold block">Phòng Ban Trực Thuộc:</span>
+                <span className="font-extrabold text-slate-800 text-sm">{viewingTitle.department}</span>
+              </div>
+
+              <div>
+                <span className="text-slate-500 font-bold block">Dải Lương Cơ Bản (Min - Max):</span>
+                <span className="font-mono font-extrabold text-emerald-700 text-sm">
+                  {new Intl.NumberFormat('vi-VN').format(viewingTitle.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(viewingTitle.max_salary)} ₫
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
+                <div>
+                  <span className="text-slate-500 font-bold block">Phụ Cấp Ăn Trưa:</span>
+                  <span className="font-mono font-bold text-blue-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.lunch_allowance)} ₫</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-bold block">Phụ Cấp Đi Lại:</span>
+                  <span className="font-mono font-bold text-amber-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.travel_allowance)} ₫</span>
+                </div>
+              </div>
+
+              {viewingTitle.description && (
+                <div className="pt-2 border-t border-slate-200">
+                  <span className="text-slate-500 font-bold block mb-1">Mô Tả Công Việc (JD):</span>
+                  <p className="text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 font-normal leading-relaxed">
+                    {viewingTitle.description}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end pt-2">
+              <button
+                onClick={() => setViewingTitle(null)}
+                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CHỈNH SỬA CHỨC DANH (EDIT) */}
+      {editingTitle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
+            <div className="flex items-center justify-between border-b pb-3">
+              <h3 className="font-extrabold text-sm text-slate-900">Chỉnh Sửa Chức Danh: {editingTitle.code}</h3>
+              <button onClick={() => setEditingTitle(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setJobTitles(jobTitles.map(j => j.id === editingTitle.id ? editingTitle : j));
+                setEditingTitle(null);
+                showToast(`✅ Đã cập nhật thông tin chức danh: ${editingTitle.title_name}`);
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-slate-700 mb-1">Tên Chức Danh *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingTitle.title_name}
+                  onChange={(e) => setEditingTitle({ ...editingTitle, title_name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Phòng Ban *</label>
+                  <select
+                    value={editingTitle.department}
+                    onChange={(e) => setEditingTitle({ ...editingTitle, department: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  >
+                    <option value="Ban Giám Đốc">Ban Giám Đốc</option>
+                    <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
+                    <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
+                    <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
+                    <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Ngạch Lương *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingTitle.salary_grade}
+                    onChange={(e) => setEditingTitle({ ...editingTitle, salary_grade: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Lương Tối Thiểu (VND)</label>
+                  <input
+                    type="number"
+                    step={1000000}
+                    value={editingTitle.min_salary}
+                    onChange={(e) => setEditingTitle({ ...editingTitle, min_salary: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Lương Tối Đa (VND)</label>
+                  <input
+                    type="number"
+                    step={1000000}
+                    value={editingTitle.max_salary}
+                    onChange={(e) => setEditingTitle({ ...editingTitle, max_salary: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Phụ Cấp Ăn Trưa (VND)</label>
+                  <input
+                    type="number"
+                    step={50000}
+                    value={editingTitle.lunch_allowance}
+                    onChange={(e) => setEditingTitle({ ...editingTitle, lunch_allowance: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Phụ Cấp Đi Lại (VND)</label>
+                  <input
+                    type="number"
+                    step={50000}
+                    value={editingTitle.travel_allowance}
+                    onChange={(e) => setEditingTitle({ ...editingTitle, travel_allowance: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1">Mô Tả Nhiệm Vụ (JD)</label>
+                <textarea
+                  rows={2}
+                  value={editingTitle.description}
+                  onChange={(e) => setEditingTitle({ ...editingTitle, description: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setEditingTitle(null)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-lg shadow-amber-600/30"
+                >
+                  Cập Nhật Chức Danh
                 </button>
               </div>
             </form>
