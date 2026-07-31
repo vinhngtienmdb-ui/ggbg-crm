@@ -139,7 +139,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
     ],
   },
   {
-    groupName: 'Vận Hành & Dự Án Enterprise',
+    groupName: 'Bàn Làm Việc',
     groupKey: 'operations_projects',
     items: [
       {
