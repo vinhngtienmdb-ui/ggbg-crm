@@ -165,7 +165,7 @@ export default function FinancePage() {
   const [transactions, setTransactions] = useState<CashFlowTransaction[]>(INITIAL_TRANSACTIONS);
   const [budgets] = useState<DepartmentBudget[]>(INITIAL_BUDGETS);
 
-  const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST'>('EXECUTIVE');
+  const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST' | 'VAS_BALANCE_SHEET'>('EXECUTIVE');
   const [toastMessage, setToastMessage] = useState('');
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
 
@@ -318,6 +318,15 @@ export default function FinancePage() {
           }`}
         >
           <DollarSign className="w-4 h-4 text-indigo-400" /> 🎯 5. Ngân Sách & Dự Báo Tài Chính
+        </button>
+
+        <button
+          onClick={() => setActiveTab('VAS_BALANCE_SHEET')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            activeTab === 'VAS_BALANCE_SHEET' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Building2 className="w-4 h-4 text-emerald-400" /> 🏛️ 6. Bảng Cân Đối Kế Toán VAS
         </button>
       </div>
 
@@ -703,6 +712,176 @@ export default function FinancePage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: VAS BALANCE SHEET & DOUBLE-ENTRY GENERAL LEDGER */}
+      {activeTab === 'VAS_BALANCE_SHEET' && (
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-4">
+              <div>
+                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-emerald-600" /> Bảng Cân Đối Kế Toán Chuẩn VAS (Thông tư 200/2014/TT-BTC)
+                </h3>
+                <p className="text-xs text-slate-500 font-normal mt-0.5">
+                  Báo cáo cân đối Tổng Tài Sản = Tổng Nguồn Vốn (Tiền mặt, Hàng tồn kho, Tài sản cố định, Công nợ & Vốn chủ sở hữu).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full font-mono text-xs border border-emerald-200">
+                  ⚖️ Trạng Thái: Cân Bằng (0 ₫ chênh lệch)
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* CỘT TÀI SẢN (ASSETS) */}
+              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="font-extrabold text-slate-900 text-sm">A. TỔNG TÀI SẢN (ASSETS)</h4>
+                  <span className="font-mono text-emerald-700 text-sm font-black">4.412.300.000 ₫</span>
+                </div>
+
+                <div className="space-y-3 font-medium">
+                  <div>
+                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
+                      <span>I. TÀI SẢN NGẮN HẠN</span>
+                      <span className="font-mono text-slate-900">4.055.000.000 ₫</span>
+                    </div>
+                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
+                      <li className="flex justify-between">
+                        <span>1. Tiền & các khoản tương đương tiền (TK 111, 112)</span>
+                        <span className="font-mono font-bold text-slate-900">3.450.000.000 ₫</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>2. Phải thu ngắn hạn khách hàng (TK 131)</span>
+                        <span className="font-mono font-bold text-slate-900">485.000.000 ₫</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>3. Hàng tồn kho kho vận (TK 156)</span>
+                        <span className="font-mono font-bold text-slate-900">120.000.000 ₫</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
+                      <span>II. TÀI SẢN DÀI HẠN</span>
+                      <span className="font-mono text-slate-900">357.300.000 ₫</span>
+                    </div>
+                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
+                      <li className="flex justify-between">
+                        <span>1. Nguyên giá Tài sản cố định hữu hình (TK 211)</span>
+                        <span className="font-mono font-bold text-slate-900">398.500.000 ₫</span>
+                      </li>
+                      <li className="flex justify-between text-purple-700">
+                        <span>2. Giá trị hao mòn lũy kế (TK 214)</span>
+                        <span className="font-mono font-bold">-41.200.000 ₫</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* CỘT NGUỒN VỐN (LIABILITIES & EQUITY) */}
+              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="font-extrabold text-slate-900 text-sm">B. TỔNG NGUỒN VỐN (EQUITY & LIABILITIES)</h4>
+                  <span className="font-mono text-blue-700 text-sm font-black">4.412.300.000 ₫</span>
+                </div>
+
+                <div className="space-y-3 font-medium">
+                  <div>
+                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
+                      <span>I. NỢ PHẢI TRẢ (LIABILITIES)</span>
+                      <span className="font-mono text-slate-900">498.000.000 ₫</span>
+                    </div>
+                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
+                      <li className="flex justify-between">
+                        <span>1. Phải trả người bán ngắn hạn (TK 331)</span>
+                        <span className="font-mono font-bold text-slate-900">245.000.000 ₫</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>2. Thuế & các khoản phải nộp Nhà nước (TK 333)</span>
+                        <span className="font-mono font-bold text-slate-900">68.000.000 ₫</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>3. Phải trả người lao động Lương 3P (TK 334)</span>
+                        <span className="font-mono font-bold text-slate-900">185.000.000 ₫</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
+                      <span>II. VỐN CHỦ SỞ HỮU (OWNER'S EQUITY)</span>
+                      <span className="font-mono text-slate-900">3.914.300.000 ₫</span>
+                    </div>
+                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
+                      <li className="flex justify-between">
+                        <span>1. Vốn góp của chủ sở hữu (TK 411)</span>
+                        <span className="font-mono font-bold text-slate-900">3.500.000.000 ₫</span>
+                      </li>
+                      <li className="flex justify-between text-emerald-700">
+                        <span>2. Lợi nhuận sau thuế chưa phân phối (TK 421)</span>
+                        <span className="font-mono font-bold">414.300.000 ₫</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SỔ CÁI BÚT TOÁN ĐỊNH KHOẢN ĐÚP */}
+            <div className="pt-4 border-t space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                <FileSpreadsheet className="w-4 h-4 text-purple-600" /> Sổ Nhật Ký Bút Toán Định Khoản Đúp (General Ledger Entries)
+              </h4>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-100 border-b font-extrabold uppercase text-[10.5px]">
+                      <th className="p-2.5">Ngày Bút Toán</th>
+                      <th className="p-2.5">Mã Chứng Từ</th>
+                      <th className="p-2.5">Diễn Giải Nghiệp Vụ</th>
+                      <th className="p-2.5 font-mono text-center">Nợ (Debit TK)</th>
+                      <th className="p-2.5 font-mono text-center">Có (Credit TK)</th>
+                      <th className="p-2.5 font-mono text-right">Số Tiền (VND)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    <tr className="hover:bg-slate-50">
+                      <td className="p-2.5 font-mono">2026-07-28</td>
+                      <td className="p-2.5 font-mono font-bold text-blue-700">PT-2026-0701</td>
+                      <td className="p-2.5">Thu tiền dịch vụ hợp đồng Agency Hồng Lực</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-emerald-700">TK 112 (TGNH)</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-blue-700">TK 511 (Doanh Thu)</td>
+                      <td className="p-2.5 text-right font-mono font-black text-slate-900">38.250.000 ₫</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50">
+                      <td className="p-2.5 font-mono">2026-07-25</td>
+                      <td className="p-2.5 font-mono font-bold text-red-700">PC-2026-0702</td>
+                      <td className="p-2.5">Thanh toán lương 3P tháng 7 cho nhân sự</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-purple-700">TK 334 (Phải Trả Lương)</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-emerald-700">TK 112 (TGNH)</td>
+                      <td className="p-2.5 text-right font-mono font-black text-slate-900">145.000.000 ₫</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50">
+                      <td className="p-2.5 font-mono">2026-07-01</td>
+                      <td className="p-2.5 font-mono font-bold text-purple-700">KH-2026-0701</td>
+                      <td className="p-2.5">Trích khấu hao tài sản cố định máy tính Server</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-slate-700">TK 642 (Chi Phí QLDN)</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-purple-700">TK 214 (Hao Mòn TSCD)</td>
+                      <td className="p-2.5 text-right font-mono font-black text-slate-900">1.250.000 ₫</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
