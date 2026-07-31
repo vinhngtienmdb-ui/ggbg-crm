@@ -1,0 +1,615 @@
+'use client';
+
+import React, { useState } from 'react';
+import {
+  FileText,
+  Plus,
+  Search,
+  Filter,
+  Inbox,
+  Send,
+  BookOpen,
+  Sparkles,
+  CheckCircle2,
+  AlertCircle,
+  Trash2,
+  Edit,
+  Eye,
+  Paperclip,
+  Building2,
+  User,
+  Calendar,
+  ShieldCheck,
+  ShieldAlert,
+  Clock,
+  ChevronRight,
+  MessageSquare,
+  Save,
+  X,
+  FileCheck,
+  Download
+} from 'lucide-react';
+import {
+  OfficialDocument,
+  DocumentCategory,
+  SecurityLevel,
+  UrgencyLevel,
+  DocProcessStatus
+} from '@/types';
+import {
+  getOfficialDocuments,
+  addOfficialDocument,
+  updateOfficialDocument,
+  deleteOfficialDocument
+} from '@/lib/documentStore';
+
+export default function DocumentsPage() {
+  const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
+  const [activeTab, setActiveTab] = useState<DocumentCategory | 'DIRECTIVE_LOG'>('INBOUND');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Modals
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<OfficialDocument | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [directiveInput, setDirectiveInput] = useState('');
+
+  const [newDoc, setNewDoc] = useState({
+    title: '',
+    category: 'INBOUND' as DocumentCategory,
+    document_code: '',
+    issuer_org: 'Bộ Công Thương - Cục TMĐT',
+    recipient_org: 'Ban Giám Đốc GGBG CRM',
+    issued_date: '2026-07-28',
+    received_date: '2026-07-29',
+    signee_name: 'Thứ Trưởng Trần Quốc Khánh',
+    security_level: 'NORMAL' as SecurityLevel,
+    urgency_level: 'URGENT' as UrgencyLevel,
+    assigned_department: 'Khối Kinh Doanh & TMĐT',
+    assigned_assignee: 'Đặng Tuấn Tú',
+    directive_note: '',
+  });
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
+
+  const handleCreateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const docCode = newDoc.document_code || `${documents.length + 101}/CV-GGBG`;
+
+    const doc: OfficialDocument = {
+      id: `doc_${Date.now()}`,
+      document_code: docCode,
+      title: newDoc.title,
+      category: newDoc.category,
+      issuer_org: newDoc.issuer_org,
+      recipient_org: newDoc.recipient_org,
+      issued_date: newDoc.issued_date,
+      received_date: newDoc.received_date,
+      signee_name: newDoc.signee_name,
+      security_level: newDoc.security_level,
+      urgency_level: newDoc.urgency_level,
+      status: 'PENDING_DIRECTIVE',
+      assigned_department: newDoc.assigned_department,
+      assigned_assignee: newDoc.assigned_assignee,
+      directive_note: newDoc.directive_note,
+      file_name: `Van-Ban-${docCode.replace(/\//g, '-')}.pdf`,
+      file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      file_size: '2.1 MB',
+      comments: [],
+      created_at: new Date().toISOString().slice(0, 10),
+    };
+
+    const updated = addOfficialDocument(doc);
+    setDocuments([...updated]);
+    setIsCreateOpen(false);
+    showToast(`✅ Đã vào sổ công văn mới thành công: Số ${doc.document_code}`);
+  };
+
+  const handleAddDirectiveNote = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDoc || !directiveInput) return;
+
+    const updatedDoc: OfficialDocument = {
+      ...selectedDoc,
+      directive_note: directiveInput,
+      status: 'IN_PROCESSING',
+      comments: [
+        ...(selectedDoc.comments || []),
+        {
+          id: `c_${Date.now()}`,
+          author_name: 'Nguyễn Tiến Vinh',
+          author_role: 'CEO / Ban Giám Đốc',
+          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput}`,
+          created_at: new Date().toLocaleString('vi-VN'),
+        },
+      ],
+    };
+
+    const updated = updateOfficialDocument(updatedDoc);
+    setDocuments([...updated]);
+    setSelectedDoc(updatedDoc);
+    setDirectiveInput('');
+    showToast(`✍️ Đã cập nhật bút phê chỉ đạo của Ban Giám Đốc cho công văn ${selectedDoc.document_code}`);
+  };
+
+  const handleDelete = (id: string) => {
+    const updated = deleteOfficialDocument(id);
+    setDocuments([...updated]);
+    showToast('🗑️ Đã lưu trữ / xóa công văn khỏi sổ');
+  };
+
+  const filteredDocs = documents.filter((d) => {
+    const q = searchTerm.toLowerCase();
+    const matchesSearch = !q || d.title.toLowerCase().includes(q) || d.document_code.toLowerCase().includes(q) || d.issuer_org.toLowerCase().includes(q);
+    const matchesTab = activeTab === 'DIRECTIVE_LOG' || d.category === activeTab;
+    return matchesSearch && matchesTab;
+  });
+
+  const totalInbound = documents.filter((d) => d.category === 'INBOUND').length;
+  const totalOutbound = documents.filter((d) => d.category === 'OUTBOUND').length;
+  const totalInternal = documents.filter((d) => d.category === 'INTERNAL_SOP').length;
+  const totalPendingDirective = documents.filter((d) => d.status === 'PENDING_DIRECTIVE').length;
+
+  return (
+    <div className="space-y-6">
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-blue-500/40 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200">
+          <Sparkles className="w-4 h-4 text-blue-400" />
+          {toastMsg}
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+        <div>
+          <div className="flex items-center gap-2">
+            <FileText className="w-6 h-6 text-blue-600" />
+            <h1 className="text-xl font-bold text-slate-900">Quản Lý Văn Bản & Công Văn Điện Tử (EDMS)</h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+              Chuẩn Văn Thư Doanh Nghiệp
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Quản lý Sổ Công văn Đến / Sổ Công văn Đi, phân loại mức độ Mật/Khẩn, quy trình 3 cấp & Bút phê chỉ đạo của Ban Giám Đốc.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+        >
+          <Plus className="w-4 h-4" /> Tiếp Nhận / Phát Hành Văn Bản
+        </button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-bold">
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
+          <span className="text-slate-500 uppercase text-[10.5px]">Công Văn Đến (Inbound)</span>
+          <p className="text-xl font-black text-blue-700">{totalInbound} Văn Bản</p>
+          <p className="text-amber-600 font-semibold text-[11px]">📩 {totalPendingDirective} công văn chờ Ban Giám Đốc bút phê</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
+          <span className="text-slate-500 uppercase text-[10.5px]">Công Văn Đi (Outbound)</span>
+          <p className="text-xl font-black text-purple-700">{totalOutbound} Quyết Định / Thông Báo</p>
+          <p className="text-purple-600 font-semibold text-[11px]">📤 Đã phát hành chính thức</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
+          <span className="text-slate-500 uppercase text-[10.5px]">Văn Bản Nội Bộ (Internal SOP)</span>
+          <p className="text-xl font-black text-emerald-700">{totalInternal} Quy Trình SOP</p>
+          <p className="text-emerald-600 font-semibold text-[11px]">📑 Quy chế vận hành doanh nghiệp</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
+          <span className="text-slate-500 uppercase text-[10.5px]">Mức Độ Khẩn & Tối Mật</span>
+          <p className="text-xl font-black text-red-600">2 Văn Bản Khẩn</p>
+          <p className="text-red-500 font-semibold text-[11px]">⚡ Cần xử lý ưu tiên trong ngày</p>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 text-xs font-bold">
+        {/* Navigation Tabs */}
+        <div className="flex items-center gap-2 border-b pb-3 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('INBOUND')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'INBOUND' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Inbox className="w-4 h-4" /> 📥 1. Sổ Công Văn Đến ({totalInbound})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('OUTBOUND')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'OUTBOUND' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Send className="w-4 h-4" /> 📤 2. Sổ Công Văn Đi ({totalOutbound})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('INTERNAL_SOP')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'INTERNAL_SOP' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" /> 📑 3. Quy Trình SOP Nội Bộ ({totalInternal})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('DIRECTIVE_LOG')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'DIRECTIVE_LOG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4 text-amber-400" /> ✍️ 4. Nhật Ký Bút Phê & Chuyển Xử Lý
+          </button>
+        </div>
+
+        {/* Filter Controls */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm số công văn, trích yếu nội dung, nơi gửi..."
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
+            />
+          </div>
+
+          <span className="text-slate-500 font-bold">
+            Hiển thị <strong className="text-slate-900">{filteredDocs.length}</strong> văn bản
+          </span>
+        </div>
+
+        {/* Document Table */}
+        <div className="overflow-x-auto border border-slate-200 rounded-xl">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                <th className="p-3">Số & Ngày Công Văn</th>
+                <th className="p-3">Trích Yếu Nội Dung Văn Bản</th>
+                <th className="p-3">Cơ Quan Ban Hành / Nơi Gửi</th>
+                <th className="p-3 text-center">Độ Mật & Độ Khẩn</th>
+                <th className="p-3">Đơn Vị Chủ Trì Xử Lý</th>
+                <th className="p-3 text-center">Trạng Thái</th>
+                <th className="p-3 text-center">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-medium">
+              {filteredDocs.map((doc) => (
+                <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="p-3">
+                    <p className="font-mono font-black text-blue-700 text-xs">{doc.document_code}</p>
+                    <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {doc.received_date || doc.issued_date}</p>
+                  </td>
+
+                  <td className="p-3 max-w-md">
+                    <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-2">{doc.title}</p>
+                    {doc.directive_note && (
+                      <p className="text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded-lg border border-amber-200 mt-1 font-bold">
+                        ✍️ Bút phê: {doc.directive_note}
+                      </p>
+                    )}
+                  </td>
+
+                  <td className="p-3 text-slate-700 font-bold">
+                    {doc.issuer_org}
+                    <span className="block text-[10.5px] text-slate-500 font-normal">Ký bởi: {doc.signee_name}</span>
+                  </td>
+
+                  <td className="p-3 text-center space-y-1">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
+                      doc.security_level === 'CONFIDENTIAL' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700'
+                    }`}>
+                      🔒 {doc.security_level === 'CONFIDENTIAL' ? 'Bảo Mật' : 'Công Khai'}
+                    </span>
+
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
+                      doc.urgency_level === 'HIGHLY_URGENT' || doc.urgency_level === 'EXPRESS'
+                        ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
+                        : 'bg-slate-100 text-slate-700'
+                    }`}>
+                      ⚡ {doc.urgency_level === 'HIGHLY_URGENT' ? 'Thượng Khẩn' : doc.urgency_level === 'URGENT' ? 'Khẩn' : 'Thường'}
+                    </span>
+                  </td>
+
+                  <td className="p-3">
+                    <p className="font-bold text-slate-800">{doc.assigned_department}</p>
+                    <p className="text-[11px] text-slate-500">👤 {doc.assigned_assignee}</p>
+                  </td>
+
+                  <td className="p-3 text-center">
+                    <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                      doc.status === 'PENDING_DIRECTIVE' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                      doc.status === 'IN_PROCESSING' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {doc.status === 'PENDING_DIRECTIVE' ? '⏳ Chờ Bút Phê' : doc.status === 'IN_PROCESSING' ? '🔵 Đang Xử Lý' : '✅ Hoàn Thành'}
+                    </span>
+                  </td>
+
+                  <td className="p-3 text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => {
+                          setSelectedDoc(doc);
+                          setIsViewOpen(true);
+                        }}
+                        className="p-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"
+                        title="Xem File & Bút Phê"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(doc.id)}
+                        className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
+                        title="Xóa / Lưu Trữ"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* MODAL TIẾP NHẬN / PHÁT HÀNH CÔNG VĂN MỚI */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+            <div className="flex items-center justify-between border-b pb-3">
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" /> Tiếp Nhận / Phát Hành Văn Bản Mới
+              </h3>
+              <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSubmit} className="space-y-3">
+              <div>
+                <label className="block text-slate-700 mb-1">Loại Công Văn *</label>
+                <select
+                  value={newDoc.category}
+                  onChange={(e) => setNewDoc({ ...newDoc, category: e.target.value as DocumentCategory })}
+                  className="w-full px-3 py-2 border rounded-xl"
+                >
+                  <option value="INBOUND">📥 Công Văn Đến (Gửi từ Cơ quan / Đối tác bên ngoài)</option>
+                  <option value="OUTBOUND">📤 Công Văn Đi (GGBG CRM phát hành ra bên ngoài)</option>
+                  <option value="INTERNAL_SOP">📑 Văn Bản Nội Bộ (Quy chế, Quy trình SOP)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1">Số / Mã Ký Hiệu Công Văn *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: 142/CV-BCT hoặc 88/QĐ-GGBG..."
+                  value={newDoc.document_code}
+                  onChange={(e) => setNewDoc({ ...newDoc, document_code: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1">Trích Yếu Nội Dung Văn Bản *</label>
+                <textarea
+                  rows={2}
+                  required
+                  placeholder="Nhập nội dung trích yếu của công văn..."
+                  value={newDoc.title}
+                  onChange={(e) => setNewDoc({ ...newDoc, title: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Cơ Quan / Nơi Ban Hành *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newDoc.issuer_org}
+                    onChange={(e) => setNewDoc({ ...newDoc, issuer_org: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Người Ký Văn Bản *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newDoc.signee_name}
+                    onChange={(e) => setNewDoc({ ...newDoc, signee_name: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Mức Độ Bảo Mật</label>
+                  <select
+                    value={newDoc.security_level}
+                    onChange={(e) => setNewDoc({ ...newDoc, security_level: e.target.value as SecurityLevel })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  >
+                    <option value="NORMAL">Thường (Công khai)</option>
+                    <option value="CONFIDENTIAL">🔒 Bảo Mật Nội Bộ</option>
+                    <option value="SECRET">🔒 Mật</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Mức Độ Ưu Tiên / Khẩn</label>
+                  <select
+                    value={newDoc.urgency_level}
+                    onChange={(e) => setNewDoc({ ...newDoc, urgency_level: e.target.value as UrgencyLevel })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  >
+                    <option value="NORMAL">Thường</option>
+                    <option value="URGENT">Khẩn</option>
+                    <option value="HIGHLY_URGENT">⚡ Thượng Khẩn (Trong ngày)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Phòng Ban Phụ Trách *</label>
+                  <select
+                    value={newDoc.assigned_department}
+                    onChange={(e) => setNewDoc({ ...newDoc, assigned_department: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  >
+                    <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
+                    <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
+                    <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
+                    <option value="Ban Giám Đốc">Ban Giám Đốc</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Cán Bộ Chủ Trì *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newDoc.assigned_assignee}
+                    onChange={(e) => setNewDoc({ ...newDoc, assigned_assignee: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30"
+                >
+                  Vào Sổ Văn Bản
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL XEM VĂN BẢN, PDF VIEWER & BÚT PHÊ GIÁM ĐỐC */}
+      {isViewOpen && selectedDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <span className="font-mono text-xs font-black text-blue-700">{selectedDoc.document_code}</span>
+                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3>
+              </div>
+              <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <h4 className="font-extrabold text-slate-900 text-sm leading-snug">{selectedDoc.title}</h4>
+              <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
+                <p>Nơi ban hành: <strong className="text-slate-900">{selectedDoc.issuer_org}</strong></p>
+                <p>Người ký: <strong className="text-slate-900">{selectedDoc.signee_name}</strong></p>
+                <p>Đơn vị xử lý: <strong className="text-slate-900">{selectedDoc.assigned_department}</strong></p>
+                <p>Cán bộ chủ trì: <strong className="text-blue-700 font-extrabold">{selectedDoc.assigned_assignee}</strong></p>
+              </div>
+            </div>
+
+            {/* Direct File Attachment Viewer Card */}
+            <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
+                  <Paperclip className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-extrabold text-slate-900">{selectedDoc.file_name || 'Văn-Bản-Dinh-Kem.pdf'}</p>
+                  <p className="text-[11px] text-slate-500 font-normal">Dung lượng: {selectedDoc.file_size || '2.1 MB'} • Định dạng tệp PDF</p>
+                </div>
+              </div>
+
+              <a
+                href={selectedDoc.file_url || '#'}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-extrabold text-[11px] flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95"
+              >
+                <Download className="w-3.5 h-3.5" /> Xem / Tải File PDF
+              </a>
+            </div>
+
+            {/* Bút Phê Chỉ Đạo Section */}
+            <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-2xl space-y-3">
+              <h4 className="font-extrabold text-amber-900 text-xs flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-amber-600" /> Bút Phê Chỉ Đạo Của Ban Giám Đốc
+              </h4>
+
+              {selectedDoc.directive_note ? (
+                <p className="p-3 bg-white border border-amber-200 rounded-xl font-extrabold text-amber-900 leading-relaxed text-xs">
+                  ✍️ {selectedDoc.directive_note}
+                </p>
+              ) : (
+                <p className="text-slate-500 font-normal text-[11px]">Chưa có bút phê chỉ đạo cho công văn này.</p>
+              )}
+
+              <form onSubmit={handleAddDirectiveNote} className="space-y-2 pt-2">
+                <label className="block text-slate-700 font-bold">Cập Nhật Bút Phê Chỉ Đạo Mới (CEO / Director):</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nhập nội dung chỉ đạo phòng ban thực hiện..."
+                    value={directiveInput}
+                    onChange={(e) => setDirectiveInput(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-white border border-amber-300 rounded-xl"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-md shrink-0"
+                  >
+                    Lưu Bút Phê
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="flex items-center justify-end pt-2">
+              <button
+                onClick={() => setIsViewOpen(false)}
+                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

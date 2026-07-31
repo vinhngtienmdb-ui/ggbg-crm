@@ -207,6 +207,23 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'HR_MANAGER',
         ],
       },
+      {
+        name: 'Quản Lý Văn Bản',
+        href: '/documents',
+        iconName: 'FileText',
+        moduleKey: 'hrm',
+        allowedRoles: [
+          'SUPER_ADMIN',
+          'DIRECTOR',
+          'SALES_MANAGER',
+          'SALES_REP',
+          'SALE_EXEC',
+          'TEAM_LEADER',
+          'CSKH',
+          'AUDITOR',
+          'HR_MANAGER',
+        ],
+      },
     ],
   },
   {

@@ -834,3 +834,39 @@ export interface EnterpriseProject {
   description: string;
   tasks: ProjectTask[];
 }
+
+export type DocumentCategory = 'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP';
+export type SecurityLevel = 'NORMAL' | 'CONFIDENTIAL' | 'SECRET' | 'TOP_SECRET';
+export type UrgencyLevel = 'NORMAL' | 'URGENT' | 'HIGHLY_URGENT' | 'EXPRESS';
+export type DocProcessStatus = 'PENDING_DIRECTIVE' | 'IN_PROCESSING' | 'COMPLETED' | 'ARCHIVED';
+
+export interface DocumentComment {
+  id: string;
+  author_name: string;
+  author_role: string;
+  comment: string;
+  created_at: string;
+}
+
+export interface OfficialDocument {
+  id: string;
+  document_code: string;
+  title: string;
+  category: DocumentCategory;
+  issuer_org: string;
+  recipient_org: string;
+  issued_date: string;
+  received_date: string;
+  signee_name: string;
+  security_level: SecurityLevel;
+  urgency_level: UrgencyLevel;
+  status: DocProcessStatus;
+  assigned_department: string;
+  assigned_assignee: string;
+  directive_note?: string;
+  file_name?: string;
+  file_url?: string;
+  file_size?: string;
+  comments?: DocumentComment[];
+  created_at: string;
+}
