@@ -209,6 +209,20 @@ export default function HrmSettingsPage() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Comprehensive HR Settings State
+  const [shiftsList, setShiftsList] = useState([
+    { id: 's1', name: 'Ca Hành Chính Standard', start: '08:00', end: '17:30', lunch: '12:00-13:30', hours: 8.0, active: true },
+    { id: 's2', name: 'Ca Sáng (Morning Shift)', start: '06:00', end: '14:00', lunch: 'Nghỉ 30p', hours: 8.0, active: true },
+    { id: 's3', name: 'Ca Chiều / Tối (Evening Shift)', start: '14:00', end: '22:00', lunch: 'Nghỉ 30p', hours: 8.0, active: true },
+    { id: 's4', name: 'Ca Đêm (Overnight +30%)', start: '22:00', end: '06:00', lunch: 'Nghỉ 30p', hours: 8.0, active: true },
+    { id: 's5', name: 'Ca Part-Time Linh Hoạt', start: '08:00', end: '12:00', lunch: 'Không', hours: 4.0, active: true },
+  ]);
+
+  const [locationsList, setLocationsList] = useState([
+    { id: 'loc1', name: 'Trụ Sở Chính Hà Nội', address: 'Tòa nhà Leadvisors, 188 Nguyễn Trãi, Cầu Giấy', lat: 21.028511, long: 105.782345, radius: 200, active: true },
+    { id: 'loc2', name: 'Chi Nhánh TP. Hồ Chí Minh', address: 'Tòa nhà Landmark 81, Bình Thạnh, TP.HCM', lat: 10.795000, long: 106.721800, radius: 250, active: true },
+    { id: 'loc3', name: 'Kho Vận TMĐT Bắc Ninh', address: 'KCN VSIP, Thị xã Từ Sơn, Bắc Ninh', lat: 21.145000, long: 106.078000, radius: 300, active: true },
+  ]);
+
   const [timekeepingCfg, setTimekeepingCfg] = useState({
     shift_name: 'Ca Hành Chính Standard',
     start_time: '08:00',
@@ -322,6 +336,28 @@ export default function HrmSettingsPage() {
   const handleDeleteTitle = (id: string) => {
     setJobTitles(jobTitles.filter((j) => j.id !== id));
     showToast(`🗑️ Đã xóa chức danh khỏi hệ thống`);
+  };
+
+  const handleFetchCurrentLocation = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = Math.round(pos.coords.latitude * 1000000) / 1000000;
+          const long = Math.round(pos.coords.longitude * 1000000) / 1000000;
+          setTimekeepingCfg((prev) => ({
+            ...prev,
+            office_lat: lat,
+            office_long: long,
+          }));
+          showToast(`📍 Đã tự động cập nhật tọa độ GPS thực tế: ${lat}, ${long}`);
+        },
+        () => {
+          showToast('⚠️ Không thể lấy tọa độ GPS từ trình duyệt. Vui lòng cho phép quyền truy cập vị trí!');
+        }
+      );
+    } else {
+      showToast('⚠️ Trình duyệt của bạn không hỗ trợ Geolocation API!');
+    }
   };
 
   const filteredTitles = jobTitles.filter((j) => {
@@ -518,103 +554,266 @@ export default function HrmSettingsPage() {
         </div>
       )}
 
-      {/* TAB 3: CA LÀM VIỆC, CHẤM CÔNG & GPS */}
+      {/* TAB 3: CA LÀM VIỆC, CHẤM CÔNG & GPS (MULTI-SHIFT & GEOLOCATION ENHANCED) */}
       {activeTab === 'TIMEKEEPING_CFG' && (
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
-            <Clock className="w-4 h-4 text-emerald-600" /> Cấu Hình Ca Làm Việc, Đi Muộn & Bán Kính Chấm Công GPS
-          </h3>
+          <div className="flex items-center justify-between border-b pb-4">
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-emerald-600" /> Hệ Thống Cấu Hình Ca Làm Việc Đa Ca, Đi Muộn & Bán Kính Chấm Công GPS
+              </h3>
+              <p className="text-xs text-slate-500 font-normal mt-0.5">
+                Cấu hình định mức ca làm việc, thời gian linh hoạt, bán kính Geofencing GPS đa trụ sở & tỷ lệ tính tăng ca OT.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11px] flex items-center gap-1.5">
-                <Clock className="w-4 h-4" /> 1. Định Mức Thời Gian Ca Làm Việc
+            <button
+              onClick={() => showToast('💾 Đã lưu thành công cấu hình ca làm việc đa ca & bán kính GPS!')}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all active:scale-95"
+            >
+              <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công
+            </button>
+          </div>
+
+          {/* SECTION 1: DANH SÁCH CÁC CA LÀM VIỆC ĐA DẠNG (MULTI-SHIFT CONFIGURATION) */}
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+                <Clock className="w-4 h-4 text-emerald-600" /> 1. Quản Lý Danh Sách Các Ca Làm Việc Doanh Nghiệp (Multi-Shift)
               </h4>
+              <button
+                onClick={() => {
+                  const newShift = {
+                    id: `s_${Date.now()}`,
+                    name: `Ca Mới ${shiftsList.length + 1}`,
+                    start: '09:00',
+                    end: '18:00',
+                    lunch: '12:00-13:00',
+                    hours: 8.0,
+                    active: true,
+                  };
+                  setShiftsList([...shiftsList, newShift]);
+                  showToast(`⚡ Đã bổ sung ca làm việc mới: ${newShift.name}`);
+                }}
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 transition-all"
+              >
+                <Plus className="w-3.5 h-3.5" /> Thêm Ca Làm Việc
+              </button>
+            </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Giờ Bắt Đầu Ca *</label>
-                  <input
-                    type="time"
-                    value={timekeepingCfg.start_time}
-                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, start_time: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-slate-900"
-                  />
-                </div>
+            <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold">
+                    <th className="p-3">Tên Ca Làm Việc</th>
+                    <th className="p-3">Giờ Bắt Đầu</th>
+                    <th className="p-3">Giờ Kết Thúc</th>
+                    <th className="p-3">Thời Gian Nghỉ Trưa</th>
+                    <th className="p-3 text-center">Số Giờ Công</th>
+                    <th className="p-3 text-center">Trạng Thái</th>
+                    <th className="p-3 text-center">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {shiftsList.map((shift) => (
+                    <tr key={shift.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-3 font-extrabold text-slate-900 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        {shift.name}
+                      </td>
+                      <td className="p-3 font-mono font-bold text-blue-700">{shift.start}</td>
+                      <td className="p-3 font-mono font-bold text-blue-700">{shift.end}</td>
+                      <td className="p-3 text-slate-600">{shift.lunch}</td>
+                      <td className="p-3 text-center font-mono font-black text-emerald-700">{shift.hours}h</td>
+                      <td className="p-3 text-center">
+                        <button
+                          onClick={() => {
+                            setShiftsList(shiftsList.map(s => s.id === shift.id ? { ...s, active: !s.active } : s));
+                            showToast(`⚙️ Đã cập nhật trạng thái ca: ${shift.name}`);
+                          }}
+                          className={`px-2.5 py-0.5 rounded-full font-extrabold text-[10px] ${
+                            shift.active ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                          }`}
+                        >
+                          {shift.active ? '🟢 Đang Áp Dụng' : '⚪ Tạm Dừng'}
+                        </button>
+                      </td>
+                      <td className="p-3 text-center">
+                        <button
+                          onClick={() => {
+                            setShiftsList(shiftsList.filter(s => s.id !== shift.id));
+                            showToast(`🗑️ Đã xóa ca làm việc`);
+                          }}
+                          className="p-1 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all"
+                          title="Xóa Ca"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                <div>
-                  <label className="block text-slate-700 mb-1">Giờ Kết Thúc Ca *</label>
-                  <input
-                    type="time"
-                    value={timekeepingCfg.end_time}
-                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, end_time: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-slate-900"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Phút Cho Phép Đi Muộn Không Trừ Công (Grace Period)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Số Phút Cho Phép Đi Muộn Không Trừ Công (Grace Period)</label>
                 <input
                   type="number"
                   value={timekeepingCfg.grace_period_minutes}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, grace_period_minutes: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-bold"
                 />
-                <p className="text-[11px] text-slate-500 font-normal">Đi muộn dưới {timekeepingCfg.grace_period_minutes} phút được tính đầy đủ 1 ngày công.</p>
+                <p className="text-[10.5px] text-slate-500 font-normal">Đi muộn dưới {timekeepingCfg.grace_period_minutes} phút được tính đầy đủ 1 ngày công.</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                <label className="block text-slate-700 font-extrabold">Giới Hạn Tăng Ca OT Tối Đa (Giờ / Tháng)</label>
+                <input
+                  type="number"
+                  value={timekeepingCfg.max_ot_monthly_hours}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, max_ot_monthly_hours: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Theo Luật Lao động Việt Nam (Tối đa 40 giờ OT/tháng).</p>
               </div>
             </div>
+          </div>
 
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-blue-700 uppercase font-black tracking-wider text-[11px] flex items-center gap-1.5">
-                <MapPin className="w-4 h-4" /> 2. Vị Trí Vẫn Hành & Bán Kính GPS Check-in
-              </h4>
+          {/* SECTION 2: QUẢN LÝ ĐỊA ĐIỂM VĂN PHÒNG & BÁN KÍNH GPS CHECK-IN (MULTI-LOCATION GEOFENCING) */}
+          <div className="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-blue-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-600" /> 2. Danh Sách Địa Điểm Văn Phòng & Bán Kính Chấm Công GPS Geofencing
+                </h4>
+                <p className="text-[11px] text-slate-500 font-normal">Cho phép nhân sự check-in đúng tọa độ GPS của trụ sở được phân công.</p>
+              </div>
 
-              <div className="space-y-2">
-                <label className="block text-slate-700">Bán Kính Check-in Hợp Lệ (Meters)</label>
+              <button
+                onClick={handleFetchCurrentLocation}
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95 shrink-0"
+              >
+                <MapPin className="w-4 h-4" /> 📍 Lấy Tọa Độ GPS Hiện Tại (Browser)
+              </button>
+            </div>
+
+            <div className="overflow-x-auto border border-blue-200 rounded-xl bg-white">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-blue-100/60 border-b border-blue-200 text-blue-900 font-extrabold">
+                    <th className="p-3">Tên Trụ Sở / Chi Nhánh</th>
+                    <th className="p-3">Địa Chỉ Chi Tiết</th>
+                    <th className="p-3 font-mono">Tọa Độ GPS (Lat, Long)</th>
+                    <th className="p-3 text-center">Bán Kính Check-in</th>
+                    <th className="p-3 text-center">Trạng Thái</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {locationsList.map((loc) => (
+                    <tr key={loc.id} className="hover:bg-blue-50/40 transition-colors">
+                      <td className="p-3 font-extrabold text-slate-900 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+                        {loc.name}
+                      </td>
+                      <td className="p-3 text-slate-600">{loc.address}</td>
+                      <td className="p-3 font-mono text-[11px] font-bold text-slate-800">
+                        {loc.lat}, {loc.long}
+                      </td>
+                      <td className="p-3 text-center font-mono font-black text-blue-700">
+                        {loc.radius}m
+                      </td>
+                      <td className="p-3 text-center">
+                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-extrabold text-[10px]">
+                          🟢 Đang Hoạt Động
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white rounded-xl border border-blue-100">
+              <div>
+                <label className="block text-slate-700 mb-1 font-bold">Vĩ Độ Văn Phòng Hiện Tại (Latitude)</label>
+                <input
+                  type="number"
+                  step={0.000001}
+                  value={timekeepingCfg.office_lat}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_lat: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-[11px] font-bold text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1 font-bold">Kinh Độ Văn Phòng Hiện Tại (Longitude)</label>
+                <input
+                  type="number"
+                  step={0.000001}
+                  value={timekeepingCfg.office_long}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_long: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-[11px] font-bold text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1 font-bold">Bán Kính Geofencing Hợp Lệ (Meters)</label>
                 <input
                   type="number"
                   step={50}
                   value={timekeepingCfg.gps_radius_meters}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, gps_radius_meters: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono font-bold text-blue-700"
                 />
-                <p className="text-[11px] text-slate-500 font-normal">Khoảng cách tối đa từ vị trí điện thoại tới Tòa nhà trụ sở (Mặc định: {timekeepingCfg.gps_radius_meters}m).</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Vĩ Độ Office (Latitude)</label>
-                  <input
-                    type="number"
-                    step={0.000001}
-                    value={timekeepingCfg.office_lat}
-                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_lat: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-[11px]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Kinh Độ Office (Longitude)</label>
-                  <input
-                    type="number"
-                    step={0.000001}
-                    value={timekeepingCfg.office_long}
-                    onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_long: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-[11px]"
-                  />
-                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end">
-            <button
-              onClick={() => showToast('💾 Đã lưu thành công cấu hình ca làm việc & bán kính GPS!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công
-            </button>
+          {/* SECTION 3: HỆ SỐ TÍNH TĂNG CA OT (OVERTIME MULTIPLIER CONFIG) */}
+          <div className="p-5 bg-purple-50/40 border border-purple-200/80 rounded-2xl space-y-4">
+            <h4 className="text-purple-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-purple-600" /> 3. Quy Tắc Hệ Số Tính Lương Làm Thêm Giờ (Overtime Multipliers)
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">OT Ngày Thường (Weekday OT Rate)</label>
+                <input
+                  type="number"
+                  step={0.1}
+                  value={timekeepingCfg.ot_weekday_mult}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekday_mult: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho giờ làm ngoài giờ từ Thứ 2 đến Thứ 6 (x1.5).</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">OT Cuối Tuần (Weekend OT Rate)</label>
+                <input
+                  type="number"
+                  step={0.1}
+                  value={timekeepingCfg.ot_weekend_mult}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekend_mult: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho ngày nghỉ hằng tuần Thứ 7 & Chủ Nhật (x2.0).</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
+                <label className="block text-slate-700 font-extrabold">OT Ngày Lễ Tết (Holiday OT Rate)</label>
+                <input
+                  type="number"
+                  step={0.1}
+                  value={timekeepingCfg.ot_holiday_mult}
+                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_holiday_mult: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                />
+                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho các ngày Lễ Tết quốc gia được hưởng nguyên lương (x3.0).</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
