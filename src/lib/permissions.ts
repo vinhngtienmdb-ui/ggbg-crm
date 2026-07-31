@@ -19,8 +19,8 @@ export interface MenuGroupDefinition {
 
 export const MENU_CLUSTERS: MenuGroupDefinition[] = [
   {
-    groupName: 'Tổng Quan & Báo Cáo',
-    groupKey: 'overview_reports',
+    groupName: 'Tổng Quan & Tài Chính',
+    groupKey: 'overview_finance',
     items: [
       {
         name: 'Tổng Quan',
@@ -44,6 +44,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         iconName: 'PieChart',
         moduleKey: 'finance',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'AUDITOR'],
+      },
+      {
+        name: 'Tài Sản Cố Định',
+        href: '/assets',
+        iconName: 'Truck',
+        moduleKey: 'finance',
+        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'AUDITOR'],
       },
     ],
   },
@@ -129,19 +136,35 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'HR_MANAGER',
         ],
       },
-      {
-        name: 'Tài Sản Cố Định',
-        href: '/assets',
-        iconName: 'Truck',
-        moduleKey: 'finance',
-        allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'AUDITOR'],
-      },
+    ],
+  },
+  {
+    groupName: 'Vận Hành & Dự Án Enterprise',
+    groupKey: 'operations_projects',
+    items: [
       {
         name: 'Quản Lý Dự Án',
         href: '/projects',
         iconName: 'FolderKanban',
         moduleKey: 'hrm',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'SALES_MANAGER', 'TEAM_LEADER'],
+      },
+      {
+        name: 'Quản Lý Văn Bản',
+        href: '/documents',
+        iconName: 'FileText',
+        moduleKey: 'hrm',
+        allowedRoles: [
+          'SUPER_ADMIN',
+          'DIRECTOR',
+          'SALES_MANAGER',
+          'SALES_REP',
+          'SALE_EXEC',
+          'TEAM_LEADER',
+          'CSKH',
+          'AUDITOR',
+          'HR_MANAGER',
+        ],
       },
     ],
   },
@@ -204,23 +227,6 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'SALE_EXEC',
           'TEAM_LEADER',
           'CSKH',
-          'HR_MANAGER',
-        ],
-      },
-      {
-        name: 'Quản Lý Văn Bản',
-        href: '/documents',
-        iconName: 'FileText',
-        moduleKey: 'hrm',
-        allowedRoles: [
-          'SUPER_ADMIN',
-          'DIRECTOR',
-          'SALES_MANAGER',
-          'SALES_REP',
-          'SALE_EXEC',
-          'TEAM_LEADER',
-          'CSKH',
-          'AUDITOR',
           'HR_MANAGER',
         ],
       },
