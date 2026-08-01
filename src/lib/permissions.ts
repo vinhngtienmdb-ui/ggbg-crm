@@ -181,7 +181,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         ],
       },
       {
-        name: 'Tờ Trình & Đề Xuất',
+        name: 'Quản Lý Phê Duyệt',
         href: '/proposals',
         iconName: 'FileCheck',
         moduleKey: 'hrm',

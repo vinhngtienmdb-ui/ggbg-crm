@@ -27,7 +27,11 @@ import {
   PlusCircle,
   Copy,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Edit,
+  Sliders,
+  Check,
+  FolderTree
 } from 'lucide-react';
 import {
   ProposalTemplate,
@@ -38,9 +42,11 @@ import {
 import {
   getProposalTemplates,
   addProposalTemplate,
+  updateProposalTemplate,
   getProposalSubmissions,
   addProposalSubmission,
   updateProposalSubmission,
+  deleteProposalSubmission,
   toggleProposalTemplateActive,
   duplicateProposalTemplate,
   deleteProposalTemplate
@@ -48,31 +54,50 @@ import {
 import { createLeaveRequest } from '@/lib/payrollStore';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters';
 
+const CATEGORIES = [
+  'Tất Cả Danh Mục',
+  'Hành Chính & Nhân Sự',
+  'Tài Chính & Kế Toán',
+  'Mua Sắm & Quản Lý Tài Sản',
+  'Dự Án, Kinh Doanh & Vận Hành'
+];
+
 export default function ProposalsPage() {
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
   const [submissions, setSubmissions] = useState<ProposalSubmission[]>(() => getProposalSubmissions());
-  const [activeTab, setActiveTab] = useState<'SUBMISSIONS' | 'CREATE_NEW' | 'BUILDER_CONFIG'>('SUBMISSIONS');
+  const [activeTab, setActiveTab] = useState<'SUBMISSIONS' | 'CREATE_NEW' | 'TEMPLATE_CONFIG'>('SUBMISSIONS');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('Tất Cả Danh Mục');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
+  const [submissionStatusFilter, setSubmissionStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Form Submission State
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(templates[0]?.id || '');
   const [formDataValues, setFormDataValues] = useState<Record<string, any>>({});
 
-  // View & Approval Modal State
+  // View Submission & Approval Modal State
   const [selectedSub, setSelectedSub] = useState<ProposalSubmission | null>(null);
-  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isViewSubOpen, setIsViewSubOpen] = useState(false);
   const [approvalComment, setApprovalComment] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
 
-  // Form Builder Admin State
-  const [builderTitle, setBuilderTitle] = useState('');
-  const [builderCategory, setBuilderCategory] = useState('Đề Xuất Tài Chính & Mua Sắm');
-  const [builderDesc, setBuilderDesc] = useState('');
-  const [builderFields, setBuilderFields] = useState<ProposalFormField[]>([
-    { id: 'f_new_1', field_name: 'title', field_label: 'Tiêu Đề Đề Xuất', data_type: 'TEXT_INPUT', is_required: true, placeholder: 'Nhập tiêu đề...' },
-    { id: 'f_new_2', field_name: 'amount', field_label: 'Số Tiền Đề Xuất (VND)', data_type: 'NUMBER_AMOUNT', is_required: true, placeholder: '0' },
-  ]);
+  // View Template Schema Modal State
+  const [previewTemplate, setPreviewTemplate] = useState<ProposalTemplate | null>(null);
+  const [isPreviewTmplOpen, setIsPreviewTmplOpen] = useState(false);
+
+  // Edit / Create Template Modal State
+  const [editingTemplate, setEditingTemplate] = useState<ProposalTemplate | null>(null);
+  const [isEditTmplOpen, setIsEditTmplOpen] = useState(false);
+  const [isCreatingNewTmpl, setIsCreatingNewTmpl] = useState(false);
+
+  // Form Builder Fields & Steps state inside Edit Modal
+  const [editTmplTitle, setEditTmplTitle] = useState('');
+  const [editTmplCode, setEditTmplCode] = useState('');
+  const [editTmplCategory, setEditTmplCategory] = useState('Hành Chính & Nhân Sự');
+  const [editTmplDesc, setEditTmplDesc] = useState('');
+  const [editTmplFields, setEditTmplFields] = useState<ProposalFormField[]>([]);
+  const [editTmplSteps, setEditTmplSteps] = useState<{ step_order: number; approver_role: string }[]>([]);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -85,11 +110,12 @@ export default function ProposalsPage() {
     setFormDataValues((prev) => ({ ...prev, [fieldName]: value }));
   };
 
+  // Submit new Approval request
   const handleCreateSubmissionSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentTemplate) return;
 
-    const subCode = `TT-2026-${String(submissions.length + 101).padStart(4, '0')}`;
+    const subCode = `PD-2026-${String(submissions.length + 101).padStart(4, '0')}`;
     const approvalSteps = currentTemplate.approval_steps.map((st) => ({
       step_order: st.step_order,
       approver_role: st.approver_role,
@@ -114,9 +140,10 @@ export default function ProposalsPage() {
     setSubmissions([...updated]);
     setFormDataValues({});
     setActiveTab('SUBMISSIONS');
-    showToast(`✅ Đã gửi Tờ trình đề xuất mới thành công: Mã số ${subCode}`);
+    showToast(`✅ Đã nộp phiếu phê duyệt mới thành công: Mã phiếu ${subCode}`);
   };
 
+  // Approve current step
   const handleApproveCurrentStep = () => {
     if (!selectedSub) return;
     const steps = [...selectedSub.approval_steps];
@@ -128,7 +155,7 @@ export default function ProposalsPage() {
         status: 'APPROVED',
         approver_name: 'Nguyễn Tiến Vinh (CEO)',
         approved_at: new Date().toLocaleString('vi-VN'),
-        comment: approvalComment || 'Đã kiểm tra nội dung form và phê duyệt.',
+        comment: approvalComment || 'Đã kiểm tra nội dung và phê duyệt.',
       };
     }
 
@@ -143,10 +170,9 @@ export default function ProposalsPage() {
     };
 
     if (isFullyApproved) {
-      // Sync with HRM & Attendance if Leave/Resignation Proposal
-      if (selectedSub.template_id === 'tmpl_2' || selectedSub.template_title.includes('Nghỉ Phép')) {
+      // Sync with HRM if leave request
+      if (selectedSub.template_id === 'tmpl_1' || selectedSub.template_title.includes('Nghỉ Phép')) {
         const leaveMode = selectedSub.field_values['duration_mode'] || 'Cả Ngày';
-        const specificTime = selectedSub.field_values['specific_time_range'] ? ` (${selectedSub.field_values['specific_time_range']})` : '';
         const totalDays = leaveMode.includes('1/2') ? 0.5 : 1.0;
 
         createLeaveRequest({
@@ -158,8 +184,8 @@ export default function ProposalsPage() {
           start_date: selectedSub.field_values['start_date'] || selectedSub.submitted_date,
           end_date: selectedSub.field_values['end_date'] || selectedSub.submitted_date,
           total_days: totalDays,
-          reason: `[Tờ trình ${selectedSub.proposal_code}] ${leaveMode}${specificTime} - ${selectedSub.field_values['leave_type'] || 'Phép năm'}`,
-          approver_note: 'Đã tự động đồng bộ từ Phân Hệ Tờ Trình Đề Xuất Phê Duyệt',
+          reason: `[Phiếu Phê Duyệt ${selectedSub.proposal_code}] ${selectedSub.field_values['reason'] || 'Nghỉ phép năm'}`,
+          approver_note: 'Đã tự động đồng bộ từ Module Phê Duyệt',
         });
       }
     }
@@ -170,7 +196,7 @@ export default function ProposalsPage() {
     setApprovalComment('');
     showToast(
       isFullyApproved
-        ? `🎉 Tờ trình ${selectedSub.proposal_code} đã được PHÊ DUYỆT & ĐỒNG BỘ HRM THÀNH CÔNG!`
+        ? `🎉 Phiếu phê duyệt ${selectedSub.proposal_code} đã được PHÊ DUYỆT HOÀN TẤT & ĐỒNG BỘ NỘI BỘ!`
         : `✅ Đã phê duyệt Bước ${selectedSub.current_step_order}. Chuyển duyệt cấp tiếp theo.`
     );
   };
@@ -188,72 +214,132 @@ export default function ProposalsPage() {
     setSubmissions([...updated]);
     setSelectedSub(updatedSub);
     setRejectionReason('');
-    showToast(`❌ Đã từ chối Tờ trình ${selectedSub.proposal_code}`);
+    showToast(`❌ Đã từ chối phiếu phê duyệt ${selectedSub.proposal_code}`);
   };
 
-  // Form Builder Handlers
-  const handleAddFieldToBuilder = () => {
-    const newF: ProposalFormField = {
-      id: `f_${Date.now()}`,
-      field_name: `custom_field_${builderFields.length + 1}`,
-      field_label: `Trường Thông Tin ${builderFields.length + 1}`,
-      data_type: 'TEXT_INPUT',
-      is_required: true,
-      placeholder: 'Nhập thông tin...',
-    };
-    setBuilderFields([...builderFields, newF]);
+  // Open Modal to Create New Template
+  const handleOpenCreateTemplateModal = () => {
+    setIsCreatingNewTmpl(true);
+    setEditingTemplate(null);
+    setEditTmplTitle('');
+    setEditTmplCode(`BM-PD-${String(templates.length + 1).padStart(3, '0')}`);
+    setEditTmplCategory('Hành Chính & Nhân Sự');
+    setEditTmplDesc('');
+    setEditTmplFields([
+      { id: 'f_init_1', field_name: 'title', field_label: 'Tiêu Đề Trích Yếu', data_type: 'TEXT_INPUT', is_required: true, placeholder: 'Nhập nội dung trích yếu...' },
+      { id: 'f_init_2', field_name: 'amount', field_label: 'Số Tiền / Giá Trị Đề Xuất (VND)', data_type: 'NUMBER_AMOUNT', is_required: true, placeholder: '0' },
+      { id: 'f_init_3', field_name: 'reason', field_label: 'Diễn Giải Chi Tiết', data_type: 'TEXT_AREA', is_required: true, placeholder: 'Mô tả chi tiết...' },
+    ]);
+    setEditTmplSteps([
+      { step_order: 1, approver_role: 'Trưởng Phòng Ban' },
+      { step_order: 2, approver_role: 'Tổng Giám Đốc (CEO)' },
+    ]);
+    setIsEditTmplOpen(true);
   };
 
-  const handleSaveNewTemplate = (e: React.FormEvent) => {
+  // Open Modal to Edit Template
+  const handleOpenEditTemplateModal = (tmpl: ProposalTemplate) => {
+    setIsCreatingNewTmpl(false);
+    setEditingTemplate(tmpl);
+    setEditTmplTitle(tmpl.title);
+    setEditTmplCode(tmpl.template_code);
+    setEditTmplCategory(tmpl.category_name);
+    setEditTmplDesc(tmpl.description);
+    setEditTmplFields([...tmpl.fields]);
+    setEditTmplSteps([...tmpl.approval_steps]);
+    setIsEditTmplOpen(true);
+  };
+
+  // Save Template (Create or Update)
+  const handleSaveTemplateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!builderTitle) return;
+    if (!editTmplTitle || !editTmplCode) return;
 
-    const newTmpl: ProposalTemplate = {
-      id: `tmpl_${Date.now()}`,
-      template_code: `BM-DX-${String(templates.length + 1).padStart(3, '0')}`,
-      title: builderTitle,
-      category_name: builderCategory,
-      description: builderDesc || 'Biểu mẫu đề xuất tùy chỉnh mới được khởi tạo bởi Admin.',
-      is_active: true,
-      approval_steps: [
-        { step_order: 1, approver_role: 'Trưởng Phòng Ban' },
-        { step_order: 2, approver_role: 'Tổng Giám Đốc (CEO)' },
-      ],
-      fields: builderFields,
-    };
+    if (isCreatingNewTmpl) {
+      const newTmpl: ProposalTemplate = {
+        id: `tmpl_${Date.now()}`,
+        template_code: editTmplCode,
+        title: editTmplTitle,
+        category_name: editTmplCategory,
+        description: editTmplDesc || 'Mẫu phiếu phê duyệt mới khởi tạo.',
+        is_active: true,
+        approval_steps: editTmplSteps,
+        fields: editTmplFields,
+      };
+      const updated = addProposalTemplate(newTmpl);
+      setTemplates([...updated]);
+      showToast(`⚙️ Đã tạo mới Mẫu Phiếu Phê Duyệt: ${newTmpl.title}`);
+    } else if (editingTemplate) {
+      const updatedTmpl: ProposalTemplate = {
+        ...editingTemplate,
+        template_code: editTmplCode,
+        title: editTmplTitle,
+        category_name: editTmplCategory,
+        description: editTmplDesc,
+        approval_steps: editTmplSteps,
+        fields: editTmplFields,
+      };
+      const updated = updateProposalTemplate(updatedTmpl);
+      setTemplates([...updated]);
+      showToast(`✏️ Đã cập nhật cấu hình Mẫu Phiếu: ${updatedTmpl.title}`);
+    }
 
-    const updated = addProposalTemplate(newTmpl);
-    setTemplates([...updated]);
-    setBuilderTitle('');
-    setBuilderDesc('');
-    setActiveTab('CREATE_NEW');
-    showToast(`⚙️ Đã thiết kế & lưu Mẫu Form Đề Xuất mới thành công: ${newTmpl.title}`);
+    setIsEditTmplOpen(false);
   };
 
-  // Multi-Template Management Handlers
+  // Template Management Handlers
   const handleToggleTemplateActive = (id: string) => {
     const updated = toggleProposalTemplateActive(id);
     setTemplates([...updated]);
-    showToast('⚙️ Đã cập nhật trạng thái Bật / Tắt của Mẫu Form Đề Xuất!');
+    showToast('⚙️ Đã cập nhật trạng thái Bật / Tắt của Mẫu Phiếu!');
   };
 
   const handleDuplicateTemplate = (id: string) => {
     const updated = duplicateProposalTemplate(id);
     setTemplates([...updated]);
-    showToast('📋 Đã nhân bản 1-Click Mẫu Form Đề Xuất mới thành công!');
+    showToast('📋 Đã nhân bản 1-Click Mẫu Phiếu Phê Duyệt mới thành công!');
   };
 
   const handleDeleteTemplate = (id: string) => {
-    if (confirm('Bạn có chắc chắn muốn xóa mẫu biểu đề xuất này?')) {
+    if (confirm('Bạn có chắc chắn muốn xóa loại phiếu phê duyệt này khỏi hệ thống?')) {
       const updated = deleteProposalTemplate(id);
       setTemplates([...updated]);
-      showToast('🗑️ Đã xóa Mẫu Form Đề Xuất khỏi hệ thống!');
+      showToast('🗑️ Đã xóa Mẫu Phiếu Phê Duyệt khỏi hệ thống!');
     }
   };
 
+  // Field manipulation in Edit Modal
+  const handleAddFieldInEditModal = () => {
+    const newF: ProposalFormField = {
+      id: `f_${Date.now()}`,
+      field_name: `field_${editTmplFields.length + 1}`,
+      field_label: `Trường Thông Tin ${editTmplFields.length + 1}`,
+      data_type: 'TEXT_INPUT',
+      is_required: true,
+      placeholder: 'Nhập thông tin...',
+    };
+    setEditTmplFields([...editTmplFields, newF]);
+  };
+
+  const handleAddStepInEditModal = () => {
+    const nextOrder = editTmplSteps.length + 1;
+    setEditTmplSteps([...editTmplSteps, { step_order: nextOrder, approver_role: `Duyệt Cấp ${nextOrder}` }]);
+  };
+
+  // Filters
   const filteredSubmissions = submissions.filter((s) => {
     const q = searchTerm.toLowerCase();
-    return !q || s.proposal_code.toLowerCase().includes(q) || s.template_title.toLowerCase().includes(q) || s.applicant_name.toLowerCase().includes(q);
+    const matchesSearch = !q || s.proposal_code.toLowerCase().includes(q) || s.template_title.toLowerCase().includes(q) || s.applicant_name.toLowerCase().includes(q);
+    const matchesStatus = submissionStatusFilter === 'ALL' || s.status === submissionStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredTemplates = templates.filter((t) => {
+    const q = searchTerm.toLowerCase();
+    const matchesSearch = !q || t.title.toLowerCase().includes(q) || t.template_code.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
+    const matchesCategory = selectedCategoryFilter === 'Tất Cả Danh Mục' || t.category_name === selectedCategoryFilter;
+    const matchesStatus = selectedStatusFilter === 'ALL' ? true : selectedStatusFilter === 'ACTIVE' ? t.is_active : !t.is_active;
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   return (
@@ -270,23 +356,25 @@ export default function ProposalsPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <FileCheck className="w-6 h-6 text-purple-600" />
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý Tờ Trình & Đề Xuất Phê Duyệt (Approvals)</h1>
+            <ShieldCheck className="w-6 h-6 text-purple-600" />
+            <h1 className="text-xl font-bold text-slate-900">Quản Lý Phê Duyệt (Approval Management Engine)</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
-              Dynamic Proposal Builder
+              Lark Approval Standards (22 Mẫu Phiếu)
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Quản lý tờ trình đề xuất mua sắm, kinh phí, nghỉ phép, cấp phát thiết bị với Trình thiết kế Form linh hoạt & Luồng phê duyệt đa cấp.
+            Hệ thống quản lý quy trình phê duyệt đa cấp chuẩn doanh nghiệp. Tích hợp 22 loại phiếu chuẩn & Trình cấu hình mẫu phiếu (Xem, Sửa, Xóa, Bật/Tắt).
           </p>
         </div>
 
-        <button
-          onClick={() => setActiveTab('CREATE_NEW')}
-          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
-        >
-          <Plus className="w-4 h-4" /> Gửi Đề Xuất Mới
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab('CREATE_NEW')}
+            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          >
+            <Plus className="w-4 h-4" /> Nộp Phiếu Phê Duyệt Mới
+          </button>
+        </div>
       </div>
 
       {/* Main Content Card */}
@@ -299,7 +387,7 @@ export default function ProposalsPage() {
               activeTab === 'SUBMISSIONS' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <FileCheck className="w-4 h-4" /> 📋 1. Sổ Tờ Trình Đề Xuất ({submissions.length})
+            <FileCheck className="w-4 h-4" /> 📋 1. Sổ Phiếu Phê Duyệt ({submissions.length})
           </button>
 
           <button
@@ -308,16 +396,16 @@ export default function ProposalsPage() {
               activeTab === 'CREATE_NEW' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <PlusCircle className="w-4 h-4" /> ✍️ 2. Gửi Đề Xuất Mới (Form Renderer)
+            <PlusCircle className="w-4 h-4" /> ✍️ 2. Nộp Phiếu Mới (Form Renderer)
           </button>
 
           <button
-            onClick={() => setActiveTab('BUILDER_CONFIG')}
+            onClick={() => setActiveTab('TEMPLATE_CONFIG')}
             className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'BUILDER_CONFIG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              activeTab === 'TEMPLATE_CONFIG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Settings className="w-4 h-4 text-amber-400" /> ⚙️ 3. Thiết Kế Mẫu Form & Luồng Duyệt (Admin Builder)
+            <Settings className="w-4 h-4 text-amber-400" /> ⚙️ 3. Cấu Hình Loại Phiếu (Template Manager - 22 Mẫu)
           </button>
         </div>
 
@@ -325,19 +413,32 @@ export default function ProposalsPage() {
         {activeTab === 'SUBMISSIONS' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="relative w-full sm:w-80">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Tìm mã tờ trình, tên đề xuất, người gửi..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
-                />
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Tìm mã phiếu, tên đơn, người nộp..."
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
+                  />
+                </div>
+
+                <select
+                  value={submissionStatusFilter}
+                  onChange={(e) => setSubmissionStatusFilter(e.target.value as any)}
+                  className="px-3 py-2 bg-slate-50 border rounded-xl font-bold text-slate-700"
+                >
+                  <option value="ALL">Tất Cả Trạng Thái</option>
+                  <option value="PENDING">⏳ Đang Trình Duyệt</option>
+                  <option value="APPROVED">✅ Đã Phê Duyệt</option>
+                  <option value="REJECTED">❌ Từ Chối</option>
+                </select>
               </div>
 
               <span className="text-slate-500">
-                Hiển thị <strong className="text-slate-900">{filteredSubmissions.length}</strong> tờ trình đề xuất
+                Hiển thị <strong className="text-slate-900">{filteredSubmissions.length}</strong> phiếu phê duyệt
               </span>
             </div>
 
@@ -345,10 +446,10 @@ export default function ProposalsPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
-                    <th className="p-3">Mã & Tên Tờ Trình</th>
-                    <th className="p-3">Người Gửi & Phòng Ban</th>
+                    <th className="p-3">Mã & Loại Phiếu Phê Duyệt</th>
+                    <th className="p-3">Người Nộp & Phòng Ban</th>
                     <th className="p-3">Ngày Trình Ký</th>
-                    <th className="p-3 text-center">Tiến Độ Phê Duyệt</th>
+                    <th className="p-3 text-center">Tiến Độ Các Bước Duyệt</th>
                     <th className="p-3 text-center">Trạng Thái</th>
                     <th className="p-3 text-center">Thao Tác</th>
                   </tr>
@@ -401,7 +502,7 @@ export default function ProposalsPage() {
                         <button
                           onClick={() => {
                             setSelectedSub(sub);
-                            setIsViewOpen(true);
+                            setIsViewSubOpen(true);
                           }}
                           className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-extrabold flex items-center gap-1 mx-auto transition-all"
                         >
@@ -416,19 +517,19 @@ export default function ProposalsPage() {
           </div>
         )}
 
-        {/* TAB 2: DYNAMIC FORM RENDERER FOR CREATING NEW SUBMISSION */}
+        {/* TAB 2: DYNAMIC FORM RENDERER FOR CREATING NEW APPROVAL */}
         {activeTab === 'CREATE_NEW' && (
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <h3 className="font-extrabold text-sm text-slate-900">Gửi Tờ Trình Đề Xuất Mới (Form Renderer)</h3>
-                <p className="text-[11px] text-slate-500 font-normal mt-0.5">Chọn mẫu biểu đề xuất và điền thông tin chi tiết.</p>
+                <h3 className="font-extrabold text-sm text-slate-900">Nộp Phiếu Phê Duyệt Mới (Form Renderer)</h3>
+                <p className="text-[11px] text-slate-500 font-normal mt-0.5">Vui lòng chọn loại phiếu phù hợp và điền các trường dữ liệu bắt buộc.</p>
               </div>
             </div>
 
-            <form onSubmit={handleCreateSubmissionSubmit} className="space-y-4 max-w-xl mx-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <form onSubmit={handleCreateSubmissionSubmit} className="space-y-4 max-w-2xl mx-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <div>
-                <label className="block text-slate-700 mb-1">Chọn Mẫu Biểu Đề Xuất *</label>
+                <label className="block text-slate-700 mb-1">Chọn Loại Phiếu Phê Duyệt (Trong bộ 22 mẫu active) *</label>
                 <select
                   value={selectedTemplateId}
                   onChange={(e) => {
@@ -437,116 +538,123 @@ export default function ProposalsPage() {
                   }}
                   className="w-full px-3 py-2 border rounded-xl font-bold text-slate-900 bg-slate-50"
                 >
-                  {templates.map((t) => (
+                  {templates.filter(t => t.is_active).map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.template_code} - {t.title}
+                      [{t.template_code}] - {t.title} ({t.category_name})
                     </option>
                   ))}
                 </select>
               </div>
 
               {currentTemplate && (
-                <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1">
-                  <p className="text-purple-900 font-extrabold">{currentTemplate.category_name}</p>
-                  <p className="text-purple-700 font-normal text-[11px]">{currentTemplate.description}</p>
-                  <p className="text-purple-900 font-bold text-[11px] pt-1">
-                    Luồng duyệt ({currentTemplate.approval_steps.length} cấp): {currentTemplate.approval_steps.map((st) => `Cấp ${st.step_order}: ${st.approver_role}`).join(' ➔ ')}
-                  </p>
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-purple-900 font-extrabold text-xs">{currentTemplate.category_name}</p>
+                    <span className="px-2 py-0.5 rounded bg-purple-200 text-purple-900 font-mono text-[10px]">{currentTemplate.template_code}</span>
+                  </div>
+                  <p className="text-purple-800 font-medium text-[11.5px]">{currentTemplate.description}</p>
+                  <div className="text-purple-900 font-bold text-[11px] pt-1.5 border-t border-purple-200/80 flex items-center gap-1">
+                    <span>Luồng duyệt ({currentTemplate.approval_steps.length} cấp):</span>
+                    <span className="font-mono text-purple-700">{currentTemplate.approval_steps.map((st) => `Cấp ${st.step_order}: ${st.approver_role}`).join(' ➔ ')}</span>
+                  </div>
                 </div>
               )}
 
-              {/* RENDER DYNAMIC FIELDS BASED ON DATA TYPE */}
-              {currentTemplate?.fields.map((f) => (
-                <div key={f.id} className="space-y-1">
-                  <label className="block text-slate-800 font-bold">
-                    {f.field_label} {f.is_required && <span className="text-red-500">*</span>}
-                    <span className="text-[10px] text-slate-400 font-mono ml-2 font-normal">[{f.data_type}]</span>
-                  </label>
+              {/* DYNAMIC FORM FIELDS */}
+              <div className="space-y-4 pt-2">
+                {currentTemplate?.fields.map((f) => (
+                  <div key={f.id} className="space-y-1 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                    <label className="block text-slate-800 font-bold">
+                      {f.field_label} {f.is_required && <span className="text-red-500">*</span>}
+                      <span className="text-[10px] text-purple-600 font-mono ml-2 font-semibold">[{f.data_type}]</span>
+                    </label>
 
-                  {f.data_type === 'TEXT_INPUT' && (
-                    <input
-                      type="text"
-                      required={f.is_required}
-                      placeholder={f.placeholder}
-                      value={formDataValues[f.field_name] || ''}
-                      onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                      className="w-full px-3 py-2 border rounded-xl"
-                    />
-                  )}
-
-                  {f.data_type === 'TEXT_AREA' && (
-                    <textarea
-                      rows={3}
-                      required={f.is_required}
-                      placeholder={f.placeholder}
-                      value={formDataValues[f.field_name] || ''}
-                      onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                      className="w-full px-3 py-2 border rounded-xl"
-                    />
-                  )}
-
-                  {f.data_type === 'NUMBER_AMOUNT' && (
-                    <input
-                      type="number"
-                      required={f.is_required}
-                      placeholder={f.placeholder}
-                      value={formDataValues[f.field_name] || ''}
-                      onChange={(e) => handleFieldInputChange(f.field_name, Number(e.target.value))}
-                      className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700 font-bold"
-                    />
-                  )}
-
-                  {f.data_type === 'DATE_PICKER' && (
-                    <input
-                      type="date"
-                      required={f.is_required}
-                      value={formDataValues[f.field_name] || ''}
-                      onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                      className="w-full px-3 py-2 border rounded-xl font-mono"
-                    />
-                  )}
-
-                  {f.data_type === 'SELECT_DROPDOWN' && (
-                    <select
-                      required={f.is_required}
-                      value={formDataValues[f.field_name] || f.options?.[0] || ''}
-                      onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                      className="w-full px-3 py-2 border rounded-xl"
-                    >
-                      {f.options?.map((opt, idx) => (
-                        <option key={idx} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                  )}
-
-                  {f.data_type === 'FILE_UPLOAD' && (
-                    <input
-                      type="file"
-                      required={f.is_required}
-                      onChange={(e) => handleFieldInputChange(f.field_name, e.target.files?.[0]?.name || 'Tep-Dinh-Kem-Chung-Tu.pdf')}
-                      className="w-full p-2 border rounded-xl bg-slate-50 text-[11px]"
-                    />
-                  )}
-
-                  {f.data_type === 'CHECKBOX_BOOLEAN' && (
-                    <div className="flex items-center gap-2 pt-1">
+                    {f.data_type === 'TEXT_INPUT' && (
                       <input
-                        type="checkbox"
-                        checked={!!formDataValues[f.field_name]}
-                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.checked)}
-                        className="w-4 h-4 accent-purple-600 rounded"
+                        type="text"
+                        required={f.is_required}
+                        placeholder={f.placeholder || 'Nhập văn bản...'}
+                        value={formDataValues[f.field_name] || ''}
+                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                        className="w-full px-3 py-2 bg-white border rounded-xl font-medium"
                       />
-                      <span className="text-slate-700 font-medium">Xác nhận checkbox tùy chọn</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+
+                    {f.data_type === 'TEXT_AREA' && (
+                      <textarea
+                        rows={3}
+                        required={f.is_required}
+                        placeholder={f.placeholder || 'Nhập nội dung diễn giải chi tiết...'}
+                        value={formDataValues[f.field_name] || ''}
+                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                        className="w-full px-3 py-2 bg-white border rounded-xl font-medium"
+                      />
+                    )}
+
+                    {f.data_type === 'NUMBER_AMOUNT' && (
+                      <input
+                        type="number"
+                        required={f.is_required}
+                        placeholder={f.placeholder || '0'}
+                        value={formDataValues[f.field_name] || ''}
+                        onChange={(e) => handleFieldInputChange(f.field_name, Number(e.target.value))}
+                        className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700 font-bold text-sm"
+                      />
+                    )}
+
+                    {f.data_type === 'DATE_PICKER' && (
+                      <input
+                        type="date"
+                        required={f.is_required}
+                        value={formDataValues[f.field_name] || ''}
+                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                        className="w-full px-3 py-2 bg-white border rounded-xl font-mono"
+                      />
+                    )}
+
+                    {f.data_type === 'SELECT_DROPDOWN' && (
+                      <select
+                        required={f.is_required}
+                        value={formDataValues[f.field_name] || f.options?.[0] || ''}
+                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                        className="w-full px-3 py-2 bg-white border rounded-xl font-bold text-slate-800"
+                      >
+                        <option value="">-- Chọn tùy chọn --</option>
+                        {f.options?.map((opt, idx) => (
+                          <option key={idx} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    )}
+
+                    {f.data_type === 'FILE_UPLOAD' && (
+                      <input
+                        type="file"
+                        required={f.is_required}
+                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.files?.[0]?.name || 'Tep-Dinh-Kem-Chung-Tu.pdf')}
+                        className="w-full p-2 border rounded-xl bg-white text-[11px]"
+                      />
+                    )}
+
+                    {f.data_type === 'CHECKBOX_BOOLEAN' && (
+                      <div className="flex items-center gap-2 pt-1">
+                        <input
+                          type="checkbox"
+                          checked={!!formDataValues[f.field_name]}
+                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.checked)}
+                          className="w-4 h-4 accent-purple-600 rounded"
+                        />
+                        <span className="text-slate-700 font-medium">Đồng ý & Xác nhận điều khoản</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t">
                 <button
                   type="button"
                   onClick={() => setActiveTab('SUBMISSIONS')}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold"
                 >
                   Hủy
                 </button>
@@ -554,223 +662,378 @@ export default function ProposalsPage() {
                   type="submit"
                   className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-1.5"
                 >
-                  <FileCheck className="w-4 h-4" /> Gửi Tờ Trình Đề Xuất
+                  <FileCheck className="w-4 h-4" /> Gửi Phiếu Phê Duyệt
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* TAB 3: ADMIN FORM BUILDER CONFIGURATION */}
-        {activeTab === 'BUILDER_CONFIG' && (
+        {/* TAB 3: ADMIN TEMPLATE CONFIGURATOR (XEM, SỬA, XÓA, BẬT/TẮT CÁC LOẠI PHIẾU) */}
+        {activeTab === 'TEMPLATE_CONFIG' && (
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
-            <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-3">
               <div>
                 <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-amber-600" /> Trình Thiết Kế Form Mẫu & Loại Dữ Liệu Trường (Form Builder)
+                  <Settings className="w-5 h-5 text-amber-600" /> Trình Cấu Hình Loại Phiếu Phê Duyệt (Template Manager)
                 </h3>
                 <p className="text-[11px] text-slate-500 font-normal mt-0.5">
-                  Tự do thiết kế Biểu mẫu Tờ trình mới, cấu hình từng loại dữ liệu trường thông tin (Text, Number, Date, Select, File) & Cấu hình luồng duyệt.
+                  Quản lý 22 mẫu phiếu phê duyệt chuẩn Lark Approval. Hỗ trợ Admin: <strong>Xem cấu hình</strong>, <strong>Chỉnh sửa trường & luồng duyệt</strong>, <strong>Xóa</strong>, <strong>Bật/Tắt active</strong> và <strong>Tạo mẫu phiếu mới</strong>.
                 </p>
               </div>
+
+              <button
+                onClick={handleOpenCreateTemplateModal}
+                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold shadow-md flex items-center gap-1.5 shrink-0"
+              >
+                <Plus className="w-4 h-4 text-amber-400" /> ➕ Tạo Mẫu Phiếu Mới
+              </button>
             </div>
 
-            {/* MULTI-TEMPLATE CATALOG TABLE */}
-            <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-              <h4 className="font-extrabold text-slate-900 text-xs text-amber-600 uppercase tracking-wider">
-                1. Danh Sách Các Loại Mẫu Form Tờ Trình Đề Xuất ({templates.length} Mẫu Form)
-              </h4>
-
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
-                      <th className="p-3">Mã & Tên Mẫu Form</th>
-                      <th className="p-3">Nhóm Danh Mục</th>
-                      <th className="p-3 text-center">Số Trường Form</th>
-                      <th className="p-3 text-center">Các Bước Duyệt</th>
-                      <th className="p-3 text-center">Trạng Thái</th>
-                      <th className="p-3 text-center">Thao Tác Admin</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
-                    {templates.map((t) => (
-                      <tr key={t.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-3">
-                          <p className="font-extrabold text-slate-900 text-xs leading-snug">{t.title}</p>
-                          <p className="font-mono text-purple-700 text-[11px] font-bold">Mã biểu mẫu: {t.template_code}</p>
-                        </td>
-
-                        <td className="p-3">
-                          <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full font-bold text-[10.5px]">
-                            {t.category_name}
-                          </span>
-                        </td>
-
-                        <td className="p-3 text-center font-mono font-bold text-slate-700">
-                          {t.fields.length} Trường Dữ Liệu
-                        </td>
-
-                        <td className="p-3 text-center font-mono text-[10.5px] text-purple-700 font-bold">
-                          {t.approval_steps.length} Cấp Duyệt
-                        </td>
-
-                        <td className="p-3 text-center">
-                          <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
-                            t.is_active ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500'
-                          }`}>
-                            {t.is_active ? '🟢 Bật (Active)' : '⚪ Tắt (Inactive)'}
-                          </span>
-                        </td>
-
-                        <td className="p-3 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <button
-                              onClick={() => handleToggleTemplateActive(t.id)}
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl"
-                              title={t.is_active ? 'Tắt Form Mẫu' : 'Bật Form Mẫu'}
-                            >
-                              {t.is_active ? <ToggleRight className="w-4 h-4 text-emerald-600" /> : <ToggleLeft className="w-4 h-4 text-slate-400" />}
-                            </button>
-
-                            <button
-                              onClick={() => handleDuplicateTemplate(t.id)}
-                              className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl"
-                              title="Nhân bản Mẫu Form 1-Click"
-                            >
-                              <Copy className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => handleDeleteTemplate(t.id)}
-                              className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl"
-                              title="Xóa Mẫu Form"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <form onSubmit={handleSaveNewTemplate} className="space-y-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-700 mb-1">Tên Mẫu Biểu Đề Xuất Mới *</label>
+            {/* FILTER BAR FOR TEMPLATES */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative w-full sm:w-72">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
-                    required
-                    placeholder="Ví dụ: Đề xuất kinh phí tổ chức Event Mega Sale..."
-                    value={builderTitle}
-                    onChange={(e) => setBuilderTitle(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Tìm tên mẫu, mã BM-PD-xxx..."
+                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border rounded-xl text-xs"
                   />
                 </div>
 
+                <select
+                  value={selectedCategoryFilter}
+                  onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-50 border rounded-xl font-bold text-slate-700 text-xs"
+                >
+                  {CATEGORIES.map((cat, idx) => (
+                    <option key={idx} value={cat}>{cat}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedStatusFilter}
+                  onChange={(e) => setSelectedStatusFilter(e.target.value as any)}
+                  className="px-3 py-1.5 bg-slate-50 border rounded-xl font-bold text-slate-700 text-xs"
+                >
+                  <option value="ALL">Tất Cả Trạng Thái</option>
+                  <option value="ACTIVE">🟢 Đang Bật (Active)</option>
+                  <option value="INACTIVE">⚪ Đang Tắt (Inactive)</option>
+                </select>
+              </div>
+
+              <span className="text-slate-500 font-semibold shrink-0">
+                Hiển thị <strong className="text-purple-700">{filteredTemplates.length}</strong> / 22 Mẫu Phiếu
+              </span>
+            </div>
+
+            {/* TEMPLATES TABLE WITH FULL ACTION BUTTONS (XEM, SỬA, XÓA, BẬT/TẮT) */}
+            <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white shadow-sm">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                    <th className="p-3">Mã & Tên Mẫu Phiếu</th>
+                    <th className="p-3">Nhóm Danh Mục</th>
+                    <th className="p-3 text-center">Số Trường Form</th>
+                    <th className="p-3 text-center">Số Cấp Duyệt</th>
+                    <th className="p-3 text-center">Trạng Thái (Bật/Tắt)</th>
+                    <th className="p-3 text-center">Thao Tác Cấu Hình</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {filteredTemplates.map((t) => (
+                    <tr key={t.id} className={`hover:bg-slate-50 transition-colors ${!t.is_active ? 'opacity-60 bg-slate-50/50' : ''}`}>
+                      <td className="p-3">
+                        <p className="font-extrabold text-slate-900 text-xs leading-snug">{t.title}</p>
+                        <p className="font-mono text-purple-700 text-[11px] font-bold">Mã phiếu: {t.template_code}</p>
+                        <p className="text-[11px] text-slate-500 truncate max-w-xs">{t.description}</p>
+                      </td>
+
+                      <td className="p-3">
+                        <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full font-bold text-[10.5px] inline-block">
+                          {t.category_name}
+                        </span>
+                      </td>
+
+                      <td className="p-3 text-center font-mono font-bold text-slate-700">
+                        {t.fields.length} Trường
+                      </td>
+
+                      <td className="p-3 text-center font-mono text-[10.5px] text-purple-700 font-bold">
+                        {t.approval_steps.length} Cấp Duyệt
+                      </td>
+
+                      <td className="p-3 text-center">
+                        <button
+                          onClick={() => handleToggleTemplateActive(t.id)}
+                          className={`px-3 py-1 rounded-full font-extrabold text-[10.5px] border transition-all flex items-center gap-1.5 mx-auto ${
+                            t.is_active ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-slate-100 text-slate-500 border-slate-300'
+                          }`}
+                        >
+                          {t.is_active ? <ToggleRight className="w-4 h-4 text-emerald-600" /> : <ToggleLeft className="w-4 h-4 text-slate-400" />}
+                          {t.is_active ? '🟢 Đang Bật' : '⚪ Đang Tắt'}
+                        </button>
+                      </td>
+
+                      <td className="p-3 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          {/* VIEW PREVIEW SCHEMA */}
+                          <button
+                            onClick={() => {
+                              setPreviewTemplate(t);
+                              setIsPreviewTmplOpen(true);
+                            }}
+                            className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-[11px] font-bold flex items-center gap-1"
+                            title="Xem Cấu Hình Mẫu Form & Luồng Duyệt"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> Xem
+                          </button>
+
+                          {/* EDIT TEMPLATE */}
+                          <button
+                            onClick={() => handleOpenEditTemplateModal(t)}
+                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[11px] font-bold flex items-center gap-1"
+                            title="Sửa Mẫu Phiếu, Trường & Luồng Duyệt"
+                          >
+                            <Edit className="w-3.5 h-3.5" /> Sửa
+                          </button>
+
+                          {/* DUPLICATE */}
+                          <button
+                            onClick={() => handleDuplicateTemplate(t.id)}
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg"
+                            title="Nhân bản Mẫu Form 1-Click"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* DELETE */}
+                          <button
+                            onClick={() => handleDeleteTemplate(t.id)}
+                            className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg"
+                            title="Xóa Mẫu Phiếu"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* MODAL 1: XEM CHI TIẾT CẤU HÌNH LOẠI PHIẾU (SCHEMA PREVIEW) */}
+      {isPreviewTmplOpen && previewTemplate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-mono text-[10.5px] font-black">{previewTemplate.template_code}</span>
+                <h3 className="font-extrabold text-sm text-slate-900 mt-1">{previewTemplate.title}</h3>
+              </div>
+              <button onClick={() => setIsPreviewTmplOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1">
+              <p className="text-purple-900 font-extrabold">{previewTemplate.category_name}</p>
+              <p className="text-purple-800 font-normal text-[11.5px]">{previewTemplate.description}</p>
+            </div>
+
+            {/* FIELDS SCHEMA LIST */}
+            <div className="space-y-2 pt-2">
+              <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-purple-700">
+                📄 Danh Sách {previewTemplate.fields.length} Trường Dữ Liệu Form:
+              </h4>
+
+              <div className="space-y-2">
+                {previewTemplate.fields.map((f, idx) => (
+                  <div key={f.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                    <div>
+                      <span className="font-extrabold text-slate-900">{idx + 1}. {f.field_label}</span>
+                      {f.is_required && <span className="text-red-500 ml-1">* (Bắt buộc)</span>}
+                      {f.options && (
+                        <p className="text-[10.5px] text-slate-500 mt-0.5">Options: {f.options.join(', ')}</p>
+                      )}
+                    </div>
+                    <span className="px-2.5 py-1 bg-purple-100 text-purple-800 font-mono text-[10.5px] rounded-full font-bold">
+                      {f.data_type}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* APPROVAL STEPS */}
+            <div className="space-y-2 pt-2">
+              <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-amber-700">
+                🔄 Cấu Hình Luồng Duyệt ({previewTemplate.approval_steps.length} Cấp):
+              </h4>
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl font-mono text-purple-900">
+                {previewTemplate.approval_steps.map((st) => `Bước ${st.step_order}: ${st.approver_role}`).join(' ➔ ')}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end pt-3 border-t">
+              <button
+                onClick={() => setIsPreviewTmplOpen(false)}
+                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: EDIT / CREATE TEMPLATE MODAL (SỬA VÀ THÊM MỚI LOẠI PHIẾU) */}
+      {isEditTmplOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <Edit className="w-4 h-4 text-purple-600" />
+                  {isCreatingNewTmpl ? 'Tạo Mới Loại Phiếu Phê Duyệt' : `Chỉnh Sửa Mẫu Phiếu: ${editTmplTitle}`}
+                </h3>
+              </div>
+              <button onClick={() => setIsEditTmplOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveTemplateSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Nhóm Danh Mục *</label>
-                  <select
-                    value={builderCategory}
-                    onChange={(e) => setBuilderCategory(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl"
-                  >
-                    <option value="Đề Xuất Tài Chính & Mua Sắm">Đề Xuất Tài Chính & Mua Sắm</option>
-                    <option value="Đề Xuất Nhân Sự & Phép">Đề Xuất Nhân Sự & Phép</option>
-                    <option value="Đề Xuất Tài Sản & IT">Đề Xuất Tài Sản & IT</option>
-                    <option value="Đề Xuất Nghiệp Vụ Khác">Đề Xuất Nghiệp Vụ Khác</option>
-                  </select>
+                  <label className="block text-slate-700 mb-1">Mã Mẫu Biểu *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editTmplCode}
+                    onChange={(e) => setEditTmplCode(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700 font-bold"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-700 mb-1">Tên Mẫu Biểu Phê Duyệt *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editTmplTitle}
+                    onChange={(e) => setEditTmplTitle(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl font-extrabold"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 mb-1">Mô Tả Quy Định Mẫu Biểu</label>
-                <input
-                  type="text"
-                  placeholder="Nhập ghi chú hướng dẫn nhân sự..."
-                  value={builderDesc}
-                  onChange={(e) => setBuilderDesc(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Nhóm Danh Mục *</label>
+                  <select
+                    value={editTmplCategory}
+                    onChange={(e) => setEditTmplCategory(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl font-bold"
+                  >
+                    {CATEGORIES.filter(c => c !== 'Tất Cả Danh Mục').map((cat, idx) => (
+                      <option key={idx} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Mô Tả Quy Định Mẫu Biểu</label>
+                  <input
+                    type="text"
+                    value={editTmplDesc}
+                    onChange={(e) => setEditTmplDesc(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl"
+                  />
+                </div>
               </div>
 
-              {/* Dynamic Fields Configuration List */}
+              {/* DYNAMIC FIELDS EDITOR */}
               <div className="pt-3 border-t space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
-                    Danh Sách Trường Thông Tin Điền Dữ Liệu ({builderFields.length} Trường)
+                  <h4 className="font-extrabold text-purple-700 text-xs uppercase tracking-wider">
+                    📄 Cấu Hình Danh Sách Trường Thông Tin ({editTmplFields.length} Trường)
                   </h4>
                   <button
                     type="button"
-                    onClick={handleAddFieldToBuilder}
+                    onClick={handleAddFieldInEditModal}
                     className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-extrabold flex items-center gap-1 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" /> Thêm Trường Mới
                   </button>
                 </div>
 
-                <div className="space-y-2">
-                  {builderFields.map((f, idx) => (
-                    <div key={f.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  {editTmplFields.map((f, idx) => (
+                    <div key={f.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-2 items-center">
                       <div>
-                        <label className="text-[10.5px] text-slate-500 block">Tên Nhãn Trường #{idx + 1}</label>
+                        <label className="text-[10px] text-slate-500 block">Tên Nhãn Trường #{idx + 1}</label>
                         <input
                           type="text"
                           value={f.field_label}
                           onChange={(e) => {
-                            const updated = [...builderFields];
+                            const updated = [...editTmplFields];
                             updated[idx].field_label = e.target.value;
-                            setBuilderFields(updated);
+                            setEditTmplFields(updated);
                           }}
-                          className="w-full px-2.5 py-1.5 border rounded-lg bg-white"
+                          className="w-full px-2 py-1 border rounded bg-white font-bold"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[10.5px] text-slate-500 block">Cấu Hình Loại Dữ Liệu Trường *</label>
+                        <label className="text-[10px] text-slate-500 block">Kiểu Dữ Liệu Trường *</label>
                         <select
                           value={f.data_type}
                           onChange={(e) => {
-                            const updated = [...builderFields];
+                            const updated = [...editTmplFields];
                             updated[idx].data_type = e.target.value as FieldDataType;
-                            setBuilderFields(updated);
+                            setEditTmplFields(updated);
                           }}
-                          className="w-full px-2.5 py-1.5 border rounded-lg bg-white font-mono text-[11px] text-purple-700"
+                          className="w-full px-2 py-1 border rounded bg-white font-mono text-[10.5px] text-purple-700"
                         >
-                          <option value="TEXT_INPUT">🔤 TEXT_INPUT (Văn bản ngắn)</option>
-                          <option value="TEXT_AREA">📝 TEXT_AREA (Văn bản dài)</option>
-                          <option value="NUMBER_AMOUNT">🔢 NUMBER_AMOUNT (Số tiền/Số lượng)</option>
-                          <option value="DATE_PICKER">📅 DATE_PICKER (Chọn Ngày)</option>
-                          <option value="SELECT_DROPDOWN">📋 SELECT_DROPDOWN (Danh sách chọn)</option>
-                          <option value="FILE_UPLOAD">📎 FILE_UPLOAD (File đính kèm)</option>
-                          <option value="CHECKBOX_BOOLEAN">☑️ CHECKBOX_BOOLEAN (Hộp chọn)</option>
+                          <option value="TEXT_INPUT">TEXT_INPUT (Chữ ngắn)</option>
+                          <option value="TEXT_AREA">TEXT_AREA (Diễn giải)</option>
+                          <option value="NUMBER_AMOUNT">NUMBER_AMOUNT (Số tiền/Số)</option>
+                          <option value="DATE_PICKER">DATE_PICKER (Chọn ngày)</option>
+                          <option value="SELECT_DROPDOWN">SELECT_DROPDOWN (Danh sách)</option>
+                          <option value="FILE_UPLOAD">FILE_UPLOAD (Tệp đính kèm)</option>
+                          <option value="CHECKBOX_BOOLEAN">CHECKBOX_BOOLEAN (Hộp chọn)</option>
                         </select>
                       </div>
 
-                      <div className="flex items-center gap-2 pt-4">
+                      <div className="flex items-center gap-2 pt-3">
                         <input
                           type="checkbox"
                           checked={f.is_required}
                           onChange={(e) => {
-                            const updated = [...builderFields];
+                            const updated = [...editTmplFields];
                             updated[idx].is_required = e.target.checked;
-                            setBuilderFields(updated);
+                            setEditTmplFields(updated);
                           }}
                           className="w-4 h-4 accent-purple-600 rounded"
                         />
-                        <span className="text-slate-700 font-bold text-[11px]">Bắt buộc nhập</span>
+                        <span className="text-slate-700 font-bold text-[11px]">Bắt buộc</span>
                       </div>
 
-                      <div className="text-right pt-4">
+                      <div className="text-right pt-3">
                         <button
                           type="button"
-                          onClick={() => setBuilderFields(builderFields.filter((_, i) => i !== idx))}
-                          className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                          onClick={() => setEditTmplFields(editTmplFields.filter((_, i) => i !== idx))}
+                          className="p-1 bg-red-50 text-red-600 rounded hover:bg-red-100"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -778,29 +1041,78 @@ export default function ProposalsPage() {
                 </div>
               </div>
 
+              {/* APPROVAL STEPS EDITOR */}
+              <div className="pt-3 border-t space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-amber-700 text-xs uppercase tracking-wider">
+                    🔄 Cấu Hình Luồng Duyệt Đa Cấp ({editTmplSteps.length} Cấp)
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={handleAddStepInEditModal}
+                    className="px-3 py-1.5 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-xl font-extrabold flex items-center gap-1 transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Thêm Cấp Duyệt
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {editTmplSteps.map((st, idx) => (
+                    <div key={idx} className="p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl flex items-center gap-3">
+                      <span className="font-mono font-bold text-amber-900">Bước {idx + 1}:</span>
+                      <input
+                        type="text"
+                        value={st.approver_role}
+                        onChange={(e) => {
+                          const updated = [...editTmplSteps];
+                          updated[idx].approver_role = e.target.value;
+                          setEditTmplSteps(updated);
+                        }}
+                        className="flex-1 px-3 py-1 border rounded-lg bg-white font-bold"
+                        placeholder="Vai trò duyệt (Ví dụ: Kế Toán Trưởng)..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setEditTmplSteps(editTmplSteps.filter((_, i) => i !== idx))}
+                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setIsEditTmplOpen(false)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold"
+                >
+                  Hủy
+                </button>
                 <button
                   type="submit"
                   className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl shadow-lg flex items-center gap-1.5"
                 >
-                  <Save className="w-4 h-4" /> Lưu Mẫu Form Vừa Thiết Kế
+                  <Save className="w-4 h-4 text-amber-400" /> Lưu Cấu Hình Mẫu Phiếu
                 </button>
               </div>
             </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* MODAL XEM CHI TIẾT FORM & THAO TÁC PHÊ DUYỆT / TỪ CHỐI */}
-      {isViewOpen && selectedSub && (
+      {/* MODAL 3: XEM CHI TIẾT PHIẾU ĐÃ NỘP & THAO TÁC PHÊ DUYỆT */}
+      {isViewSubOpen && selectedSub && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <span className="font-mono text-xs font-black text-purple-700">{selectedSub.proposal_code}</span>
-                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Form Mẫu Tờ Trình & Phê Duyệt</h3>
+                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Phiếu Phê Duyệt & Ký Duyệt</h3>
               </div>
-              <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+              <button onClick={() => setIsViewSubOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -810,7 +1122,7 @@ export default function ProposalsPage() {
               <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
                 <p>Người làm đơn: <strong className="text-slate-900">{selectedSub.applicant_name}</strong></p>
                 <p>Đơn vị / Phòng ban: <strong className="text-slate-900">{selectedSub.applicant_department}</strong></p>
-                <p>Ngày nộp tờ trình: <strong className="text-slate-900 font-mono">{selectedSub.submitted_date}</strong></p>
+                <p>Ngày nộp phiếu: <strong className="text-slate-900 font-mono">{selectedSub.submitted_date}</strong></p>
                 <p>Trạng thái: <strong className="text-purple-700">{selectedSub.status}</strong></p>
               </div>
             </div>
@@ -818,7 +1130,7 @@ export default function ProposalsPage() {
             {/* DISPLAY ALL FILLED FORM DATA FIELDS */}
             <div className="p-4 bg-purple-50/60 border border-purple-200 rounded-2xl space-y-3">
               <h4 className="font-extrabold text-purple-900 text-xs uppercase tracking-wider">
-                📄 Dữ Liệu Chi Tiết Đã Điền Trong Form Đề Xuất:
+                📄 Dữ Liệu Chi Tiết Đã Điền Trong Form Phiếu Phê Duyệt:
               </h4>
 
               <div className="space-y-2 bg-white p-4 rounded-xl border border-purple-100 font-medium">
@@ -862,12 +1174,12 @@ export default function ProposalsPage() {
             {/* ACTION SECTION FOR APPROVER */}
             {selectedSub.status === 'PENDING' && (
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
-                <h4 className="font-extrabold text-amber-900 text-xs">✍️ Phê Duyệt Hoặc Từ Chối Tờ Trình:</h4>
+                <h4 className="font-extrabold text-amber-900 text-xs">✍️ Ký Phê Duyệt Hoặc Từ Chối Phiếu:</h4>
 
                 <div className="space-y-2">
                   <input
                     type="text"
-                    placeholder="Nhập ghi chú ý kiến chỉ đạo phê duyệt..."
+                    placeholder="Nhập ghi chú ý kiến chỉ đạo..."
                     value={approvalComment}
                     onChange={(e) => setApprovalComment(e.target.value)}
                     className="w-full px-3 py-2 bg-white border rounded-xl"
@@ -891,7 +1203,7 @@ export default function ProposalsPage() {
 
                   <input
                     type="text"
-                    placeholder="Bắt buộc nhập lý do nếu nhấn Từ chối..."
+                    placeholder="Nhập lý do nếu nhấn Từ chối..."
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
                     className="w-full px-3 py-1.5 bg-white border border-red-200 rounded-xl text-[11px]"
@@ -902,7 +1214,7 @@ export default function ProposalsPage() {
 
             <div className="flex items-center justify-end pt-2">
               <button
-                onClick={() => setIsViewOpen(false)}
+                onClick={() => setIsViewSubOpen(false)}
                 className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
               >
                 Đóng
