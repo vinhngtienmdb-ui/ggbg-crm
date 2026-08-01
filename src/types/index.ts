@@ -881,7 +881,8 @@ export type FieldDataType =
   | 'DATE_PICKER'
   | 'SELECT_DROPDOWN'
   | 'FILE_UPLOAD'
-  | 'CHECKBOX_BOOLEAN';
+  | 'CHECKBOX_BOOLEAN'
+  | 'EMPLOYEE_SELECT';
 
 export interface ProposalFormField {
   id: string;

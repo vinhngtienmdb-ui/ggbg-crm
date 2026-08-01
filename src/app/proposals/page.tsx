@@ -31,7 +31,12 @@ import {
   Edit,
   Sliders,
   Check,
-  FolderTree
+  FolderTree,
+  Users,
+  UserCheck,
+  Briefcase,
+  Coins,
+  ArrowRight
 } from 'lucide-react';
 import {
   ProposalTemplate,
@@ -51,6 +56,7 @@ import {
   duplicateProposalTemplate,
   deleteProposalTemplate
 } from '@/lib/proposalStore';
+import { getEmployees } from '@/lib/hrmStore';
 import { createLeaveRequest } from '@/lib/payrollStore';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters';
 
@@ -62,12 +68,142 @@ const CATEGORIES = [
   'Dự Án, Kinh Doanh & Vận Hành'
 ];
 
+// Smart HRM Employee Picker Component
+function EmployeePickerSelect({
+  value,
+  onChange,
+  isRequired,
+  placeholder,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  isRequired?: boolean;
+  placeholder?: string;
+}) {
+  const employees = getEmployees();
+  // Current user context mock: Trần Văn Hoàng (NV-00101) - Phòng Kinh Doanh 1 - Trưởng Nhóm Sale
+  const currentUser = employees[0] || {
+    department: 'Phòng Kinh Doanh 1',
+    position: 'Trưởng Nhóm Sale',
+    direct_manager_name: 'Phạm Minh Đức (Giám Đốc Kinh Doanh)',
+  };
+
+  const [filterMode, setFilterMode] = useState<'ALL' | 'SAME_DEPT' | 'SAME_POS' | 'DIRECT_MANAGER'>('ALL');
+  const [empSearch, setEmpSearch] = useState('');
+
+  const filteredEmployees = employees.filter((emp) => {
+    const q = empSearch.toLowerCase();
+    const matchesSearch =
+      !q ||
+      emp.full_name.toLowerCase().includes(q) ||
+      emp.employee_code.toLowerCase().includes(q) ||
+      emp.department.toLowerCase().includes(q) ||
+      emp.position.toLowerCase().includes(q);
+
+    if (!matchesSearch) return false;
+
+    if (filterMode === 'SAME_DEPT') {
+      return emp.department === currentUser.department;
+    }
+    if (filterMode === 'SAME_POS') {
+      return emp.position === currentUser.position;
+    }
+    if (filterMode === 'DIRECT_MANAGER') {
+      return (
+        emp.full_name.includes('Phạm Minh Đức') ||
+        emp.position.includes('Giám Đốc') ||
+        emp.position.includes('Trưởng Phòng') ||
+        emp.position.includes('Manager') ||
+        (currentUser.direct_manager_name && currentUser.direct_manager_name.includes(emp.full_name))
+      );
+    }
+    return true;
+  });
+
+  return (
+    <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      {/* Criteria Filter Buttons */}
+      <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold pb-2 border-b">
+        <span className="text-slate-500 font-semibold mr-1">🎯 Tiêu chí chọn NV từ HRM:</span>
+        <button
+          type="button"
+          onClick={() => setFilterMode('ALL')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            filterMode === 'ALL' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          🌐 Tất Cả ({employees.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterMode('SAME_DEPT')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            filterMode === 'SAME_DEPT' ? 'bg-blue-600 text-white shadow-xs' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+          }`}
+        >
+          🏢 Cùng Bộ Phận
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterMode('SAME_POS')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            filterMode === 'SAME_POS' ? 'bg-purple-600 text-white shadow-xs' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+          }`}
+        >
+          💼 Cùng Chức Danh
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterMode('DIRECT_MANAGER')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            filterMode === 'DIRECT_MANAGER' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
+          }`}
+        >
+          👔 Cấp Trên Trực Tiếp
+        </button>
+      </div>
+
+      {/* Search & Select Dropdown */}
+      <div className="flex flex-col sm:flex-row items-center gap-2">
+        <input
+          type="text"
+          value={empSearch}
+          onChange={(e) => setEmpSearch(e.target.value)}
+          placeholder="Lọc tên, mã NV..."
+          className="w-full sm:w-1/3 px-2.5 py-1.5 bg-slate-50 border rounded-lg text-xs"
+        />
+
+        <select
+          required={isRequired}
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full sm:w-2/3 px-3 py-1.5 bg-white border rounded-lg font-bold text-slate-900 text-xs"
+        >
+          <option value="">-- {placeholder || 'Chọn nhân sự từ hệ thống HRM'} --</option>
+          {filteredEmployees.map((emp) => (
+            <option key={emp.id} value={`${emp.full_name} (${emp.employee_code} - ${emp.position})`}>
+              [{emp.employee_code}] {emp.full_name} - {emp.position} ({emp.department})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {value && (
+        <div className="text-[11px] text-purple-700 font-bold bg-purple-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-purple-200">
+          <UserCheck className="w-3.5 h-3.5 text-purple-600" /> Đã chọn nhân sự: <strong className="text-slate-900">{value}</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProposalsPage() {
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
   const [submissions, setSubmissions] = useState<ProposalSubmission[]>(() => getProposalSubmissions());
   const [activeTab, setActiveTab] = useState<'SUBMISSIONS' | 'CREATE_NEW' | 'TEMPLATE_CONFIG'>('SUBMISSIONS');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('Tất Cả Danh Mục');
+  const [selectedCategoryGroupTab, setSelectedCategoryGroupTab] = useState<string>('Hành Chính & Nhân Sự');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
   const [submissionStatusFilter, setSubmissionStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -227,8 +363,9 @@ export default function ProposalsPage() {
     setEditTmplDesc('');
     setEditTmplFields([
       { id: 'f_init_1', field_name: 'title', field_label: 'Tiêu Đề Trích Yếu', data_type: 'TEXT_INPUT', is_required: true, placeholder: 'Nhập nội dung trích yếu...' },
-      { id: 'f_init_2', field_name: 'amount', field_label: 'Số Tiền / Giá Trị Đề Xuất (VND)', data_type: 'NUMBER_AMOUNT', is_required: true, placeholder: '0' },
-      { id: 'f_init_3', field_name: 'reason', field_label: 'Diễn Giải Chi Tiết', data_type: 'TEXT_AREA', is_required: true, placeholder: 'Mô tả chi tiết...' },
+      { id: 'f_init_2', field_name: 'handover_person', field_label: 'Nhân Sự Liên Quan / Bàn Giao', data_type: 'EMPLOYEE_SELECT', is_required: true, placeholder: 'Chọn nhân sự...' },
+      { id: 'f_init_3', field_name: 'amount', field_label: 'Số Tiền / Giá Trị Đề Xuất (VND)', data_type: 'NUMBER_AMOUNT', is_required: true, placeholder: '0' },
+      { id: 'f_init_4', field_name: 'reason', field_label: 'Diễn Giải Chi Tiết', data_type: 'TEXT_AREA', is_required: true, placeholder: 'Mô tả chi tiết...' },
     ]);
     setEditTmplSteps([
       { step_order: 1, approver_role: 'Trưởng Phòng Ban' },
@@ -342,6 +479,12 @@ export default function ProposalsPage() {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
+  // Grouped active templates for Tab 2 Card Selector
+  const groupedActiveTemplates = CATEGORIES.filter(c => c !== 'Tất Cả Danh Mục').map((cat) => ({
+    category: cat,
+    templates: templates.filter((t) => t.is_active && t.category_name === cat),
+  }));
+
   return (
     <div className="space-y-6">
       {/* Toast Notification */}
@@ -363,7 +506,7 @@ export default function ProposalsPage() {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Hệ thống quản lý quy trình phê duyệt đa cấp chuẩn doanh nghiệp. Tích hợp 22 loại phiếu chuẩn & Trình cấu hình mẫu phiếu (Xem, Sửa, Xóa, Bật/Tắt).
+            Hệ thống quản lý quy trình phê duyệt đa cấp chuẩn doanh nghiệp. Tích hợp 22 loại phiếu phân nhóm trực quan & Chọn Nhân viên HRM (Cùng bộ phận, Cùng chức danh, Cấp trên).
           </p>
         </div>
 
@@ -396,7 +539,7 @@ export default function ProposalsPage() {
               activeTab === 'CREATE_NEW' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <PlusCircle className="w-4 h-4" /> ✍️ 2. Nộp Phiếu Mới (Form Renderer)
+            <PlusCircle className="w-4 h-4" /> ✍️ 2. Nộp Phiếu Mới (Theo Nhóm Danh Mục)
           </button>
 
           <button
@@ -517,155 +660,220 @@ export default function ProposalsPage() {
           </div>
         )}
 
-        {/* TAB 2: DYNAMIC FORM RENDERER FOR CREATING NEW APPROVAL */}
+        {/* TAB 2: CATEGORIZED TEMPLATE SELECTION & DYNAMIC FORM RENDERER */}
         {activeTab === 'CREATE_NEW' && (
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div>
-                <h3 className="font-extrabold text-sm text-slate-900">Nộp Phiếu Phê Duyệt Mới (Form Renderer)</h3>
-                <p className="text-[11px] text-slate-500 font-normal mt-0.5">Vui lòng chọn loại phiếu phù hợp và điền các trường dữ liệu bắt buộc.</p>
+            <div className="border-b pb-3">
+              <h3 className="font-extrabold text-sm text-slate-900">Nộp Phiếu Phê Duyệt Mới</h3>
+              <p className="text-[11px] text-slate-500 font-normal mt-0.5">Chọn nhóm danh mục để hiển thị các loại phiếu tương ứng, sau đó hoàn tất thông tin điền phiếu.</p>
+            </div>
+
+            {/* CATEGORY GROUP TABS */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {groupedActiveTemplates.map((grp) => (
+                <button
+                  key={grp.category}
+                  type="button"
+                  onClick={() => setSelectedCategoryGroupTab(grp.category)}
+                  className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs flex items-center gap-2 transition-all shrink-0 border ${
+                    selectedCategoryGroupTab === grp.category
+                      ? 'bg-purple-600 text-white border-purple-600 shadow-md scale-102'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-purple-50'
+                  }`}
+                >
+                  {grp.category === 'Hành Chính & Nhân Sự' && <Users className="w-4 h-4 text-blue-300" />}
+                  {grp.category === 'Tài Chính & Kế Toán' && <Coins className="w-4 h-4 text-emerald-300" />}
+                  {grp.category === 'Mua Sắm & Quản Lý Tài Sản' && <Building2 className="w-4 h-4 text-amber-300" />}
+                  {grp.category === 'Dự Án, Kinh Doanh & Vận Hành' && <Sparkles className="w-4 h-4 text-pink-300" />}
+                  {grp.category} ({grp.templates.length})
+                </button>
+              ))}
+            </div>
+
+            {/* CARD GRID OF TEMPLATES IN SELECTED CATEGORY GROUP */}
+            <div className="space-y-3">
+              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider flex items-center gap-1.5">
+                <FolderTree className="w-4 h-4" /> Danh Sách Các Loại Phiếu Thuộc Nhóm: {selectedCategoryGroupTab}
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {groupedActiveTemplates
+                  .find((g) => g.category === selectedCategoryGroupTab)
+                  ?.templates.map((tmpl) => (
+                    <div
+                      key={tmpl.id}
+                      onClick={() => {
+                        setSelectedTemplateId(tmpl.id);
+                        setFormDataValues({});
+                      }}
+                      className={`p-4 rounded-2xl border cursor-pointer transition-all space-y-2 relative ${
+                        selectedTemplateId === tmpl.id
+                          ? 'bg-purple-50 border-purple-600 shadow-lg ring-2 ring-purple-600/30'
+                          : 'bg-white border-slate-200 hover:border-purple-300 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-purple-700 font-mono text-[10.5px] font-black">
+                          {tmpl.template_code}
+                        </span>
+                        {selectedTemplateId === tmpl.id && (
+                          <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">
+                            ✓
+                          </span>
+                        )}
+                      </div>
+
+                      <h5 className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-2">{tmpl.title}</h5>
+                      <p className="text-[10.5px] text-slate-500 font-normal line-clamp-2 leading-relaxed">{tmpl.description}</p>
+
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-600 font-mono font-bold">
+                        <span>{tmpl.fields.length} Trường</span>
+                        <span className="text-purple-700">{tmpl.approval_steps.length} Cấp duyệt</span>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
 
-            <form onSubmit={handleCreateSubmissionSubmit} className="space-y-4 max-w-2xl mx-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <div>
-                <label className="block text-slate-700 mb-1">Chọn Loại Phiếu Phê Duyệt (Trong bộ 22 mẫu active) *</label>
-                <select
-                  value={selectedTemplateId}
-                  onChange={(e) => {
-                    setSelectedTemplateId(e.target.value);
-                    setFormDataValues({});
-                  }}
-                  className="w-full px-3 py-2 border rounded-xl font-bold text-slate-900 bg-slate-50"
-                >
-                  {templates.filter(t => t.is_active).map((t) => (
-                    <option key={t.id} value={t.id}>
-                      [{t.template_code}] - {t.title} ({t.category_name})
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* DYNAMIC FORM RENDERER */}
+            {currentTemplate && (
+              <form onSubmit={handleCreateSubmissionSubmit} className="space-y-4 max-w-3xl mx-auto bg-white p-6 rounded-2xl border border-purple-200 shadow-lg animate-in fade-in duration-200">
+                <div className="border-b border-purple-100 pb-3 flex items-center justify-between">
+                  <div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-900 font-mono text-[10.5px] font-black">
+                      {currentTemplate.template_code}
+                    </span>
+                    <h3 className="font-extrabold text-base text-slate-900 mt-1">{currentTemplate.title}</h3>
+                    <p className="text-xs text-slate-500 font-medium">{currentTemplate.description}</p>
+                  </div>
 
-              {currentTemplate && (
-                <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <p className="text-purple-900 font-extrabold text-xs">{currentTemplate.category_name}</p>
-                    <span className="px-2 py-0.5 rounded bg-purple-200 text-purple-900 font-mono text-[10px]">{currentTemplate.template_code}</span>
-                  </div>
-                  <p className="text-purple-800 font-medium text-[11.5px]">{currentTemplate.description}</p>
-                  <div className="text-purple-900 font-bold text-[11px] pt-1.5 border-t border-purple-200/80 flex items-center gap-1">
-                    <span>Luồng duyệt ({currentTemplate.approval_steps.length} cấp):</span>
-                    <span className="font-mono text-purple-700">{currentTemplate.approval_steps.map((st) => `Cấp ${st.step_order}: ${st.approver_role}`).join(' ➔ ')}</span>
-                  </div>
+                  <span className="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-200 rounded-full font-bold text-[11px] shrink-0">
+                    {currentTemplate.category_name}
+                  </span>
                 </div>
-              )}
 
-              {/* DYNAMIC FORM FIELDS */}
-              <div className="space-y-4 pt-2">
-                {currentTemplate?.fields.map((f) => (
-                  <div key={f.id} className="space-y-1 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
-                    <label className="block text-slate-800 font-bold">
-                      {f.field_label} {f.is_required && <span className="text-red-500">*</span>}
-                      <span className="text-[10px] text-purple-600 font-mono ml-2 font-semibold">[{f.data_type}]</span>
-                    </label>
+                <div className="p-3 bg-purple-50/70 border border-purple-200/80 rounded-xl text-purple-900 font-bold text-xs flex items-center gap-2">
+                  <span>🔄 Quy Trình Luồng Duyệt ({currentTemplate.approval_steps.length} cấp):</span>
+                  <span className="font-mono text-purple-800">{currentTemplate.approval_steps.map((st) => `Cấp ${st.step_order}: ${st.approver_role}`).join(' ➔ ')}</span>
+                </div>
 
-                    {f.data_type === 'TEXT_INPUT' && (
-                      <input
-                        type="text"
-                        required={f.is_required}
-                        placeholder={f.placeholder || 'Nhập văn bản...'}
-                        value={formDataValues[f.field_name] || ''}
-                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                        className="w-full px-3 py-2 bg-white border rounded-xl font-medium"
-                      />
-                    )}
+                {/* RENDER FORM FIELDS WITH EMPLOYEE_SELECT INTEGRATION */}
+                <div className="space-y-4 pt-2">
+                  {currentTemplate.fields.map((f) => (
+                    <div key={f.id} className="space-y-1 bg-slate-50/70 p-3.5 rounded-xl border border-slate-200">
+                      <label className="block text-slate-800 font-bold text-xs">
+                        {f.field_label} {f.is_required && <span className="text-red-500">*</span>}
+                        <span className="text-[10px] text-purple-600 font-mono ml-2 font-semibold">[{f.data_type}]</span>
+                      </label>
 
-                    {f.data_type === 'TEXT_AREA' && (
-                      <textarea
-                        rows={3}
-                        required={f.is_required}
-                        placeholder={f.placeholder || 'Nhập nội dung diễn giải chi tiết...'}
-                        value={formDataValues[f.field_name] || ''}
-                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                        className="w-full px-3 py-2 bg-white border rounded-xl font-medium"
-                      />
-                    )}
-
-                    {f.data_type === 'NUMBER_AMOUNT' && (
-                      <input
-                        type="number"
-                        required={f.is_required}
-                        placeholder={f.placeholder || '0'}
-                        value={formDataValues[f.field_name] || ''}
-                        onChange={(e) => handleFieldInputChange(f.field_name, Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700 font-bold text-sm"
-                      />
-                    )}
-
-                    {f.data_type === 'DATE_PICKER' && (
-                      <input
-                        type="date"
-                        required={f.is_required}
-                        value={formDataValues[f.field_name] || ''}
-                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                        className="w-full px-3 py-2 bg-white border rounded-xl font-mono"
-                      />
-                    )}
-
-                    {f.data_type === 'SELECT_DROPDOWN' && (
-                      <select
-                        required={f.is_required}
-                        value={formDataValues[f.field_name] || f.options?.[0] || ''}
-                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                        className="w-full px-3 py-2 bg-white border rounded-xl font-bold text-slate-800"
-                      >
-                        <option value="">-- Chọn tùy chọn --</option>
-                        {f.options?.map((opt, idx) => (
-                          <option key={idx} value={opt}>{opt}</option>
-                        ))}
-                      </select>
-                    )}
-
-                    {f.data_type === 'FILE_UPLOAD' && (
-                      <input
-                        type="file"
-                        required={f.is_required}
-                        onChange={(e) => handleFieldInputChange(f.field_name, e.target.files?.[0]?.name || 'Tep-Dinh-Kem-Chung-Tu.pdf')}
-                        className="w-full p-2 border rounded-xl bg-white text-[11px]"
-                      />
-                    )}
-
-                    {f.data_type === 'CHECKBOX_BOOLEAN' && (
-                      <div className="flex items-center gap-2 pt-1">
-                        <input
-                          type="checkbox"
-                          checked={!!formDataValues[f.field_name]}
-                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.checked)}
-                          className="w-4 h-4 accent-purple-600 rounded"
+                      {/* EMPLOYEE SELECT COMPONENT */}
+                      {f.data_type === 'EMPLOYEE_SELECT' && (
+                        <EmployeePickerSelect
+                          value={formDataValues[f.field_name] || ''}
+                          onChange={(val) => handleFieldInputChange(f.field_name, val)}
+                          isRequired={f.is_required}
+                          placeholder={f.placeholder}
                         />
-                        <span className="text-slate-700 font-medium">Đồng ý & Xác nhận điều khoản</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      )}
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('SUBMISSIONS')}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-1.5"
-                >
-                  <FileCheck className="w-4 h-4" /> Gửi Phiếu Phê Duyệt
-                </button>
-              </div>
-            </form>
+                      {f.data_type === 'TEXT_INPUT' && (
+                        <input
+                          type="text"
+                          required={f.is_required}
+                          placeholder={f.placeholder || 'Nhập văn bản...'}
+                          value={formDataValues[f.field_name] || ''}
+                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                          className="w-full px-3 py-2 bg-white border rounded-xl font-medium text-xs"
+                        />
+                      )}
+
+                      {f.data_type === 'TEXT_AREA' && (
+                        <textarea
+                          rows={3}
+                          required={f.is_required}
+                          placeholder={f.placeholder || 'Nhập nội dung diễn giải chi tiết...'}
+                          value={formDataValues[f.field_name] || ''}
+                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                          className="w-full px-3 py-2 bg-white border rounded-xl font-medium text-xs"
+                        />
+                      )}
+
+                      {f.data_type === 'NUMBER_AMOUNT' && (
+                        <input
+                          type="number"
+                          required={f.is_required}
+                          placeholder={f.placeholder || '0'}
+                          value={formDataValues[f.field_name] || ''}
+                          onChange={(e) => handleFieldInputChange(f.field_name, Number(e.target.value))}
+                          className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700 font-bold text-sm"
+                        />
+                      )}
+
+                      {f.data_type === 'DATE_PICKER' && (
+                        <input
+                          type="date"
+                          required={f.is_required}
+                          value={formDataValues[f.field_name] || ''}
+                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                          className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-xs"
+                        />
+                      )}
+
+                      {f.data_type === 'SELECT_DROPDOWN' && (
+                        <select
+                          required={f.is_required}
+                          value={formDataValues[f.field_name] || f.options?.[0] || ''}
+                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
+                          className="w-full px-3 py-2 bg-white border rounded-xl font-bold text-slate-800 text-xs"
+                        >
+                          <option value="">-- Chọn tùy chọn --</option>
+                          {f.options?.map((opt, idx) => (
+                            <option key={idx} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      )}
+
+                      {f.data_type === 'FILE_UPLOAD' && (
+                        <input
+                          type="file"
+                          required={f.is_required}
+                          onChange={(e) => handleFieldInputChange(f.field_name, e.target.files?.[0]?.name || 'Tep-Dinh-Kem-Chung-Tu.pdf')}
+                          className="w-full p-2 border rounded-xl bg-white text-[11px]"
+                        />
+                      )}
+
+                      {f.data_type === 'CHECKBOX_BOOLEAN' && (
+                        <div className="flex items-center gap-2 pt-1">
+                          <input
+                            type="checkbox"
+                            checked={!!formDataValues[f.field_name]}
+                            onChange={(e) => handleFieldInputChange(f.field_name, e.target.checked)}
+                            className="w-4 h-4 accent-purple-600 rounded"
+                          />
+                          <span className="text-slate-700 font-medium text-xs">Đồng ý & Xác nhận điều khoản</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-purple-100">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('SUBMISSIONS')}
+                    className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-1.5 text-xs"
+                  >
+                    <FileCheck className="w-4 h-4" /> Nộp Phiếu Phê Duyệt Này
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
@@ -1010,6 +1218,7 @@ export default function ProposalsPage() {
                           <option value="SELECT_DROPDOWN">SELECT_DROPDOWN (Danh sách)</option>
                           <option value="FILE_UPLOAD">FILE_UPLOAD (Tệp đính kèm)</option>
                           <option value="CHECKBOX_BOOLEAN">CHECKBOX_BOOLEAN (Hộp chọn)</option>
+                          <option value="EMPLOYEE_SELECT">👤 EMPLOYEE_SELECT (Chọn Nhân Viên HRM)</option>
                         </select>
                       </div>
 

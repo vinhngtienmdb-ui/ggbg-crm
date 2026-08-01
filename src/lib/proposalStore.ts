@@ -48,9 +48,9 @@ export const INITIAL_PROPOSAL_TEMPLATES: ProposalTemplate[] = [
         id: 'f_handover_person',
         field_name: 'handover_person',
         field_label: 'Nhân Sự Nhận Bàn Giao Công Việc',
-        data_type: 'TEXT_INPUT',
+        data_type: 'EMPLOYEE_SELECT',
         is_required: true,
-        placeholder: 'Họ tên đồng nghiệp hỗ trợ xử lý công việc...',
+        placeholder: 'Chọn nhân sự hỗ trợ bàn giao công việc...',
       },
       {
         id: 'f_reason',
@@ -334,7 +334,7 @@ export const INITIAL_PROPOSAL_TEMPLATES: ProposalTemplate[] = [
       { step_order: 3, approver_role: 'Tổng Giám Đốc (CEO)' },
     ],
     fields: [
-      { id: 'f_staff_name', field_name: 'staff_name', field_label: 'Tên Nhân Sự Được Cấp Phát', data_type: 'TEXT_INPUT', is_required: true, placeholder: 'Nguyễn Tiến Vinh - Thiết Kế Đồ Họa' },
+      { id: 'f_staff_name', field_name: 'staff_name', field_label: 'Tên Nhân Sự Được Cấp Phát', data_type: 'EMPLOYEE_SELECT', is_required: true, placeholder: 'Chọn nhân sự được cấp phát thiết bị...' },
       { id: 'f_device_type', field_name: 'device_type', field_label: 'Loại Thiết Bị Đề Xuất', data_type: 'SELECT_DROPDOWN', is_required: true, options: ['Laptop Windows (Core i7 / RAM 16GB)', 'Macbook Pro M3 (Dành cho Media/Design)', 'Màn Hình Mở Rộng 27 inch', 'Máy In Tem Vận Đơn Kho Hàng'] },
       { id: 'f_is_new_hire', field_name: 'is_new_hire', field_label: 'Dành Cho Nhân Sự Mới Onboard', data_type: 'CHECKBOX_BOOLEAN', is_required: false },
       { id: 'f_spec_req', field_name: 'spec_requirements', field_label: 'Yêu Cầu Cấu Hình Chi Tiết', data_type: 'TEXT_AREA', is_required: true, placeholder: 'SSD 512GB, Card đồ họa RTX 4060...' },
