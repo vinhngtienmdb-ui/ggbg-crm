@@ -21,13 +21,12 @@ import {
   FileCheck,
   KeyRound,
   Sparkles,
-  QrCode
+  User
 } from 'lucide-react';
 import { UserRole } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 import CommandPaletteModal from './CommandPaletteModal';
-import ChangePasswordModal from './ChangePasswordModal';
-import GoogleAuthModal from './GoogleAuthModal';
+import UserProfileModal from './UserProfileModal';
 
 interface HeaderProps {
   onOpenPhoneModal?: () => void;
@@ -48,8 +47,7 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
   const { themeMode, toggleTheme, densityMode, toggleDensity } = useTheme();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [isGoogleAuthOpen, setIsGoogleAuthOpen] = useState(false);
+  const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const activeRoleObj = ROLE_OPTIONS.find(r => r.id === simulatedRole) || ROLE_OPTIONS[0];
@@ -200,40 +198,28 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
 
           <div className="h-5 w-[1px] bg-slate-200 dark:bg-slate-800 mx-0.5"></div>
 
-          {/* QUICK SECURITY BUTTONS: 2FA & CHANGE PASSWORD */}
-          <button
-            onClick={() => setIsGoogleAuthOpen(true)}
-            className="p-1.5 rounded-xl text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 border border-purple-200 dark:border-purple-800 transition-all btn-spring flex items-center gap-1 text-xs font-bold"
-            title="Quản lý Bảo mật 2 Lớp Google Authenticator (2FA)"
-          >
-            <ShieldCheck className="w-4 h-4 text-purple-600" />
-            <span className="hidden xl:inline-block">2FA</span>
-          </button>
-
-          <button
-            onClick={() => setIsChangePasswordOpen(true)}
-            className="p-1.5 rounded-xl text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 border border-slate-200 dark:border-slate-700 transition-all btn-spring flex items-center gap-1 text-xs font-bold"
-            title="Tự đổi mật khẩu cá nhân"
-          >
-            <KeyRound className="w-4 h-4 text-amber-500" />
-            <span className="hidden xl:inline-block">Mật Khẩu</span>
-          </button>
-
-          {/* User Profile & Logout */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 p-1">
+          {/* USER PROFILE & SECURITY CENTER TRIGGER */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setIsUserProfileOpen(true)}
+              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all btn-spring group"
+              title="Mở Khu Vực Thông Tin Cá Nhân & Bảo Mật 2FA / Mật Khẩu"
+            >
               <div className={`w-7 h-7 rounded-lg font-extrabold flex items-center justify-center text-[11px] ${activeRoleObj.badgeColor}`}>
                 {user ? user.username.substring(0, 2).toUpperCase() : 'SA'}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight">
+                <p className="text-xs font-extrabold text-slate-800 dark:text-slate-100 leading-tight group-hover:text-purple-600 transition-colors">
                   {user ? user.name : 'Vũ Quốc Anh'}
                 </p>
-                <p className="text-[10px] text-slate-400 font-medium">
-                  {activeRoleObj.label}
+                <p className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
+                  <span>{activeRoleObj.label}</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-extrabold text-[9.5px]">
+                    (Hồ sơ & Bảo mật)
+                  </span>
                 </p>
               </div>
-            </div>
+            </button>
 
             <button
               onClick={logout}
@@ -253,18 +239,11 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
         onOpenVoIP={onOpenPhoneModal}
       />
 
-      {/* Self Change Password Modal */}
-      <ChangePasswordModal
-        isOpen={isChangePasswordOpen}
-        onClose={() => setIsChangePasswordOpen(false)}
-        onSuccess={(msg) => showToast(msg)}
-      />
-
-      {/* Google Authenticator 2FA Modal */}
-      <GoogleAuthModal
-        isOpen={isGoogleAuthOpen}
-        onClose={() => setIsGoogleAuthOpen(false)}
-        onSuccess={(msg) => showToast(msg)}
+      {/* Unified User Profile & Security Center Modal */}
+      <UserProfileModal
+        isOpen={isUserProfileOpen}
+        onClose={() => setIsUserProfileOpen(false)}
+        onSuccessToast={(msg) => showToast(msg)}
       />
     </>
   );
