@@ -18,11 +18,16 @@ import {
   Crown,
   Briefcase,
   Headphones,
-  FileCheck
+  FileCheck,
+  KeyRound,
+  Sparkles,
+  QrCode
 } from 'lucide-react';
 import { UserRole } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 import CommandPaletteModal from './CommandPaletteModal';
+import ChangePasswordModal from './ChangePasswordModal';
+import GoogleAuthModal from './GoogleAuthModal';
 
 interface HeaderProps {
   onOpenPhoneModal?: () => void;
@@ -43,11 +48,27 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
   const { themeMode, toggleTheme, densityMode, toggleDensity } = useTheme();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isGoogleAuthOpen, setIsGoogleAuthOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const activeRoleObj = ROLE_OPTIONS.find(r => r.id === simulatedRole) || ROLE_OPTIONS[0];
 
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
+
   return (
     <>
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-purple-500/40 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200">
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          {toastMsg}
+        </div>
+      )}
+
       <header className="h-14 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs gap-2 transition-colors">
         {/* Mobile Sidebar Hamburger Toggle & Search */}
         <div className="flex items-center gap-2 flex-1 max-w-md">
@@ -179,6 +200,25 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
 
           <div className="h-5 w-[1px] bg-slate-200 dark:bg-slate-800 mx-0.5"></div>
 
+          {/* QUICK SECURITY BUTTONS: 2FA & CHANGE PASSWORD */}
+          <button
+            onClick={() => setIsGoogleAuthOpen(true)}
+            className="p-1.5 rounded-xl text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 border border-purple-200 dark:border-purple-800 transition-all btn-spring flex items-center gap-1 text-xs font-bold"
+            title="Quản lý Bảo mật 2 Lớp Google Authenticator (2FA)"
+          >
+            <ShieldCheck className="w-4 h-4 text-purple-600" />
+            <span className="hidden xl:inline-block">2FA</span>
+          </button>
+
+          <button
+            onClick={() => setIsChangePasswordOpen(true)}
+            className="p-1.5 rounded-xl text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 border border-slate-200 dark:border-slate-700 transition-all btn-spring flex items-center gap-1 text-xs font-bold"
+            title="Tự đổi mật khẩu cá nhân"
+          >
+            <KeyRound className="w-4 h-4 text-amber-500" />
+            <span className="hidden xl:inline-block">Mật Khẩu</span>
+          </button>
+
           {/* User Profile & Logout */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 p-1">
@@ -211,6 +251,20 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
         isOpen={isCmdPaletteOpen}
         onClose={() => setIsCmdPaletteOpen(false)}
         onOpenVoIP={onOpenPhoneModal}
+      />
+
+      {/* Self Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        onSuccess={(msg) => showToast(msg)}
+      />
+
+      {/* Google Authenticator 2FA Modal */}
+      <GoogleAuthModal
+        isOpen={isGoogleAuthOpen}
+        onClose={() => setIsGoogleAuthOpen(false)}
+        onSuccess={(msg) => showToast(msg)}
       />
     </>
   );

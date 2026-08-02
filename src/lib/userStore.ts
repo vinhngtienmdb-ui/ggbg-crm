@@ -198,6 +198,105 @@ export function createUserAccount(newUser: Omit<UserAccount, 'id' | 'created_at'
   return created;
 }
 
+export function updateUserAccount(id: string, updates: Partial<UserAccountWithAuth>) {
+  userAccounts = userAccounts.map(u => {
+    if (u.id === id) {
+      return { ...u, ...updates };
+    }
+    return u;
+  });
+  const updated = userAccounts.find(u => u.id === id);
+  if (updated) {
+    addAuditLog({
+      user_name: 'Super Admin GGBingo',
+      action: 'Cập Nhật Thông Tin Tài Khoản',
+      target: `User ${updated.username} (${updated.employee_name})`,
+      ip: '127.0.0.1',
+    });
+  }
+  return userAccounts;
+}
+
+export function deleteUserAccount(id: string) {
+  const target = userAccounts.find(u => u.id === id);
+  if (target?.is_super_admin || target?.username === 'admin') {
+    throw new Error('Không thể xóa tài khoản Super Admin chính hệ thống!');
+  }
+  userAccounts = userAccounts.filter(u => u.id !== id);
+  if (target) {
+    addAuditLog({
+      user_name: 'Super Admin GGBingo',
+      action: 'Xóa Tài Khoản System',
+      target: `User ${target.username} (${target.employee_name})`,
+      ip: '127.0.0.1',
+    });
+  }
+  return userAccounts;
+}
+
+export function resetUserPassword(id: string, password_hash: string) {
+  userAccounts = userAccounts.map(u => {
+    if (u.id === id) {
+      return { ...u, password_hash, must_change_password: true };
+    }
+    return u;
+  });
+  const updated = userAccounts.find(u => u.id === id);
+  if (updated) {
+    addAuditLog({
+      user_name: 'Super Admin GGBingo',
+      action: 'Admin Reset Mật Khẩu User',
+      target: `User ${updated.username} (${updated.employee_name})`,
+      ip: '127.0.0.1',
+    });
+  }
+  return userAccounts;
+}
+
+export function setUserPasswordByUsername(username: string, password_hash: string) {
+  const clean = username.trim().toLowerCase();
+  userAccounts = userAccounts.map(u => {
+    if (u.username.toLowerCase() === clean) {
+      return { ...u, password_hash, must_change_password: false };
+    }
+    return u;
+  });
+  const updated = userAccounts.find(u => u.username.toLowerCase() === clean);
+  if (updated) {
+    addAuditLog({
+      user_name: updated.employee_name,
+      action: 'Tự Đổi Mật Khẩu Cá Nhân Thành Công',
+      target: `User ${updated.username}`,
+      ip: '127.0.0.1',
+    });
+  }
+  return updated;
+}
+
+export function setUser2FAStatus(username: string, is_2fa_enabled: boolean, totp_secret?: string) {
+  const clean = username.trim().toLowerCase();
+  userAccounts = userAccounts.map(u => {
+    if (u.username.toLowerCase() === clean) {
+      return {
+        ...u,
+        is_2fa_enabled,
+        totp_secret: is_2fa_enabled ? (totp_secret || u.totp_secret) : undefined,
+      };
+    }
+    return u;
+  });
+  const updated = userAccounts.find(u => u.username.toLowerCase() === clean);
+  if (updated) {
+    addAuditLog({
+      user_name: updated.employee_name,
+      action: is_2fa_enabled ? 'Kích Hoạt Google Authenticator (2FA)' : 'Tắt Xác Thực Google Authenticator (2FA)',
+      target: `User ${updated.username}`,
+      ip: '127.0.0.1',
+    });
+  }
+  return updated;
+}
+
 export function getRolePermissionsMatrix() {
   return rolePermissionsMatrix;
 }

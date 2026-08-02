@@ -12,6 +12,8 @@ export interface UserAccount {
   account_status: 'Active' | 'Locked' | 'Inactive';
   is_super_admin: boolean;
   must_change_password?: boolean;
+  is_2fa_enabled?: boolean;
+  totp_secret?: string;
   last_login_at?: string;
   created_at: string;
   permissions?: string[];

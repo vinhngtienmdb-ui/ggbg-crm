@@ -14,6 +14,7 @@ export interface UserSession {
   is_super_admin: boolean;
   employee_code: string;
   account_status?: string;
+  is_2fa_enabled?: boolean;
   roles?: string[];
   permissions?: string[];
   login_at: string;
@@ -24,29 +25,17 @@ interface AuthContextType {
   simulatedRole: UserRole;
   setSimulatedRole: (role: UserRole) => void;
   isLoading: boolean;
-  login: (u: string, p: string) => Promise<{ success: boolean; message: string }>;
+  login: (u: string, p: string, totpCode?: string) => Promise<{ success: boolean; require_2fa?: boolean; message: string }>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
 }
 
-const DEFAULT_SUPER_ADMIN_SESSION: UserSession = {
-  id: 'usr_admin_001',
-  username: 'admin',
-  email: 'admin@ggbingo.vn',
-  name: 'Super Admin',
-  role: 'SUPER_ADMIN',
-  role_name: 'Quản Trị Viên Cao Cấp System',
-  is_super_admin: true,
-  employee_code: 'GGBG-ADMIN-01',
-  login_at: new Date().toLocaleString('vi-VN'),
-};
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserSession | null>(DEFAULT_SUPER_ADMIN_SESSION);
+  const [user, setUser] = useState<UserSession | null>(null);
   const [simulatedRole, setSimulatedRole] = useState<UserRole>('SUPER_ADMIN');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -89,15 +78,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchSession();
   }, []);
 
-  const login = async (usernameInput: string, passwordInput: string) => {
+  const login = async (usernameInput: string, passwordInput: string, totpCode?: string) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: usernameInput, password: passwordInput }),
+        body: JSON.stringify({ username: usernameInput, password: passwordInput, totp_code: totpCode }),
       });
 
       const data = await res.json();
+      if (data.require_2fa) {
+        return { success: false, require_2fa: true, message: data.message };
+      }
+
       if (data.success && data.user) {
         setUser(data.user);
         setSimulatedRole(data.user.role || 'SUPER_ADMIN');
@@ -118,29 +111,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      localStorage.removeItem('ggbg_crm_user');
-      router.push('/login');
     } catch {
+      // ignore
+    } finally {
       setUser(null);
-      localStorage.removeItem('ggbg_crm_user');
+      try {
+        localStorage.removeItem('ggbg_crm_user');
+      } catch {
+        // ignore
+      }
       router.push('/login');
     }
   };
 
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50 flex flex-col items-center justify-center font-sans">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-extrabold text-sm shadow-lg mb-4">
-          GG
-        </div>
-        <div className="w-7 h-7 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p className="text-xs font-semibold text-slate-500 tracking-wide">
-          Đang tải GGBingo CRM...
-        </p>
-      </div>
-    );
-  }
+  const refreshSession = async () => {
+    await fetchSession();
+  };
 
   return (
     <AuthContext.Provider
@@ -151,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         logout,
-        refreshSession: fetchSession,
+        refreshSession,
       }}
     >
       {children}

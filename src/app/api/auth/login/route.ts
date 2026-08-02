@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { findUserForAuth } from '@/lib/authRepo';
 import { verifyPassword } from '@/lib/password';
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE } from '@/lib/session';
+import { verifyTOTPCode } from '@/lib/totp';
 
 // Chống brute-force: giới hạn số lần thử theo định danh (best-effort, in-memory).
 const MAX_ATTEMPTS = 5;
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const username = typeof body?.username === 'string' ? body.username : '';
     const password = typeof body?.password === 'string' ? body.password : '';
+    const totp_code = typeof body?.totp_code === 'string' ? body.totp_code : '';
 
     if (!username || !password) {
       return NextResponse.json(
@@ -84,6 +86,26 @@ export async function POST(request: Request) {
       );
     }
 
+    // 2FA Verification Check
+    if (user.is_2fa_enabled && user.totp_secret) {
+      if (!totp_code) {
+        return NextResponse.json({
+          success: true,
+          require_2fa: true,
+          message: '🔑 Tài khoản đã bật 2FA Google Authenticator. Vui lòng nhập mã 6 số từ điện thoại.',
+        });
+      }
+
+      const is2FaValid = verifyTOTPCode(user.totp_secret, totp_code);
+      if (!is2FaValid) {
+        registerFailure(key);
+        return NextResponse.json(
+          { success: false, message: '❌ Mã xác thực 2FA 6 chữ số không chính xác hoặc đã hết hạn.' },
+          { status: 401 }
+        );
+      }
+    }
+
     // Đăng nhập thành công → xóa bộ đếm thất bại
     attempts.delete(key);
 
@@ -97,6 +119,7 @@ export async function POST(request: Request) {
       is_super_admin: user.is_super_admin,
       employee_code: user.employee_code,
       account_status: user.account_status,
+      is_2fa_enabled: user.is_2fa_enabled,
       permissions: user.permissions || (user.is_super_admin ? ['*'] : []),
       login_at: new Date().toISOString(),
     };
