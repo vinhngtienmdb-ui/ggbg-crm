@@ -187,46 +187,46 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-2xl overflow-hidden text-xs font-bold max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-xl w-full max-w-2xl overflow-hidden text-xs font-medium max-h-[90vh] flex flex-col">
         {/* Header Profile Hero Bar */}
-        <div className="p-6 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white relative flex items-center justify-between shrink-0">
+        <div className="p-5 bg-slate-900 text-white relative flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-600 border-2 border-white/30 text-white font-black text-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-lg bg-indigo-600 border border-white/20 text-white font-bold text-lg flex items-center justify-center shadow-xs">
               {user.username.substring(0, 2).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
                 {user.name} <BadgeCheck className="w-4 h-4 text-emerald-400" />
               </h2>
-              <p className="text-xs text-purple-200 font-medium mt-0.5">
+              <p className="text-xs text-slate-300 font-medium mt-0.5">
                 [{user.employee_code}] • {user.role_name}
               </p>
-              <p className="text-[11px] text-slate-300 font-mono mt-0.5">@{user.username} ({user.email})</p>
+              <p className="text-[11px] text-slate-400 font-mono mt-0.5">@{user.username} ({user.email})</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 px-6 pt-3 bg-slate-50 dark:bg-slate-850 shrink-0">
+        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 px-5 pt-3 bg-slate-50 dark:bg-slate-850 shrink-0">
           <button
             onClick={() => {
               setActiveTab('PROFILE');
               setErrorMsg(null);
             }}
-            className={`px-4 py-2.5 rounded-t-xl font-extrabold flex items-center gap-2 border-b-2 transition-all ${
+            className={`px-3.5 py-2 rounded-t-md font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'PROFILE'
-                ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-900'
+                ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            <User className="w-4 h-4" /> 📋 Thông Tin Hồ Sơ
+            <User className="w-4 h-4" /> Thông Tin Hồ Sơ
           </button>
 
           <button
@@ -234,13 +234,13 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
               setActiveTab('PASSWORD');
               setErrorMsg(null);
             }}
-            className={`px-4 py-2.5 rounded-t-xl font-extrabold flex items-center gap-2 border-b-2 transition-all ${
+            className={`px-3.5 py-2 rounded-t-md font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'PASSWORD'
-                ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-900'
+                ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            <KeyRound className="w-4 h-4 text-amber-500" /> 🔑 Đổi Mật Khẩu
+            <KeyRound className="w-4 h-4 text-amber-500" /> Đổi Mật Khẩu
           </button>
 
           <button
@@ -248,13 +248,13 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
               setActiveTab('2FA');
               setErrorMsg(null);
             }}
-            className={`px-4 py-2.5 rounded-t-xl font-extrabold flex items-center gap-2 border-b-2 transition-all ${
+            className={`px-3.5 py-2 rounded-t-md font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === '2FA'
-                ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-900'
+                ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            <ShieldCheck className="w-4 h-4 text-purple-600" /> 🛡️ Google Authenticator 2FA
+            <ShieldCheck className="w-4 h-4 text-indigo-600" /> Google Authenticator 2FA
           </button>
         </div>
 

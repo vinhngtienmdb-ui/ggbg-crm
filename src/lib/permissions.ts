@@ -19,8 +19,8 @@ export interface MenuGroupDefinition {
 
 export const MENU_CLUSTERS: MenuGroupDefinition[] = [
   {
-    groupName: 'Tổng Quan & Tài Chính',
-    groupKey: 'overview_finance',
+    groupName: 'Tổng Quan',
+    groupKey: 'overview',
     items: [
       {
         name: 'Tổng Quan',
@@ -38,6 +38,12 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'HR_MANAGER',
         ],
       },
+    ],
+  },
+  {
+    groupName: 'Tài Chính',
+    groupKey: 'finance',
+    items: [
       {
         name: 'Báo Cáo Tài Chính',
         href: '/finance',

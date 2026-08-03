@@ -793,7 +793,7 @@ export default function LeadsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                   <th className="p-4">Mã Lead & Thể Nhân</th>
                   <th className="p-4">Họ và Tên Lead</th>
                   <th className="p-4">Doanh Nghiệp / MST</th>

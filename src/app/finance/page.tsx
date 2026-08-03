@@ -460,7 +460,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                   <th className="p-3">Mã Hợp Đồng & Khách Hàng</th>
                   <th className="p-3">Sàn TMĐT</th>
                   <th className="p-3">GMV Hàng Tháng</th>
@@ -531,7 +531,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                   <th className="p-3">Mã Hóa Đơn & Khách Hàng</th>
                   <th className="p-3">Kỳ Thu Phí & Hợp Đồng</th>
                   <th className="p-3">Số Tiền Phải Thu</th>
@@ -632,7 +632,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                   <th className="p-3">Mã Phiếu & Ngày</th>
                   <th className="p-3">Loại Giao Dịch</th>
                   <th className="p-3">Danh Mục Thu / Chi</th>
@@ -865,7 +865,7 @@ export default function FinancePage() {
               <div className="overflow-x-auto border border-slate-200 rounded-xl">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100 border-b font-extrabold uppercase text-[10.5px]">
+                    <tr className="bg-slate-100 border-b font-semibold uppercase tracking-wider text-[10.5px]">
                       <th className="p-2.5">Ngày Bút Toán</th>
                       <th className="p-2.5">Mã Chứng Từ</th>
                       <th className="p-2.5">Diễn Giải Nghiệp Vụ</th>

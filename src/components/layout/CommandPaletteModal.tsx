@@ -118,21 +118,21 @@ export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: Com
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl overflow-hidden space-y-0 text-xs font-bold">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-xl w-full max-w-xl overflow-hidden space-y-0 text-xs font-medium">
         {/* Search Input Bar */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-850">
-          <Search className="w-5 h-5 text-purple-600 shrink-0" />
+        <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-850">
+          <Search className="w-4 h-4 text-indigo-600 shrink-0" />
           <input
             type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Gõ tên trang, tính năng hoặc thao tác (ví dụ: Lead, Phê duyệt, Khách hàng)..."
-            className="w-full bg-transparent border-none focus:outline-none text-slate-900 dark:text-slate-100 font-extrabold text-sm placeholder-slate-400"
+            className="w-full bg-transparent border-none focus:outline-none text-slate-900 dark:text-slate-100 font-semibold text-xs placeholder-slate-400"
           />
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-md">
+            <X className="w-4 h-4" />
           </button>
         </div>
 

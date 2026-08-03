@@ -388,7 +388,7 @@ export default function UnifiedKpisPerformancePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                  <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                     <th className="p-3">Mục Tiêu & Chỉ Tiêu KPI</th>
                     <th className="p-3">Cấp Độ & Đối Tượng</th>
                     <th className="p-3">Chỉ Số Định Mức (Target)</th>
@@ -524,7 +524,7 @@ export default function UnifiedKpisPerformancePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                  <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                     <th className="p-3">Nhân Sự & Phòng Ban</th>
                     <th className="p-3 text-center">Điểm KPIs (P3)</th>
                     <th className="p-3 text-center">Điểm Tuân Thủ</th>
@@ -629,7 +629,7 @@ export default function UnifiedKpisPerformancePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                   <th className="p-3">Nhân Sự & Mã NV</th>
                   <th className="p-3">Phòng Ban</th>
                   <th className="p-3 text-center">Tỷ Lệ Hoàn Thành KPIs (%)</th>

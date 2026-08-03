@@ -69,31 +69,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 p-4">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full animate-in fade-in duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full animate-in fade-in duration-300">
 
         {/* Brand Logo */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-lg shadow-purple-600/30">
+          <div className="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-xs">
             GG
           </div>
           <div>
-            <h2 className="text-base font-black text-purple-700 dark:text-purple-400 tracking-tight leading-none">GGBingo CRM</h2>
-            <p className="text-purple-600 uppercase text-[10px] tracking-wide font-extrabold mt-1">Enterprise Platform</p>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight leading-none">GGBingo CRM</h2>
+            <p className="text-slate-500 uppercase text-[10px] tracking-wide font-medium mt-1">Enterprise Platform</p>
           </div>
         </div>
 
         {/* Greeting Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+            <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {step === 'LOGIN' ? 'Đăng Nhập CRM' : 'Xác Thực 2 Lớp (2FA)'}
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-extrabold text-[10px]">
+            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[10px]">
               {step === 'LOGIN' ? 'Bước 1 / 2' : 'Bước 2 / 2'}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
             {step === 'LOGIN'
               ? 'Vui lòng nhập tài khoản được cấp để truy cập hệ thống'
               : `Mở ứng dụng Google Authenticator trên điện thoại để lấy mã 6 số cho tài khoản [${username}]`}
@@ -103,13 +103,13 @@ export default function LoginPage() {
         {/* Real Submission Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMsg && (
-            <div className="p-3.5 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-bold text-center animate-in fade-in duration-150">
+            <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-semibold text-center animate-in fade-in duration-150">
               ⚠️ {errorMsg}
             </div>
           )}
 
           {isSuccess && (
-            <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-in fade-in duration-150">
+            <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold text-center flex items-center justify-center gap-2 animate-in fade-in duration-150">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               Xác thực tài khoản thành công! Đang vào Dashboard...
             </div>
@@ -119,25 +119,25 @@ export default function LoginPage() {
             <>
               {/* Username Input Field */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
                   Tên Đăng Nhập / Email
                 </label>
                 <div className="relative">
-                  <User className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Nhập tên đăng nhập hoặc email..."
                     disabled={isSubmitting}
-                    className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all disabled:opacity-50"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-normal text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
 
               {/* Password Input Field */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
                   Mật Khẩu Access
                 </label>
                 <div className="relative">

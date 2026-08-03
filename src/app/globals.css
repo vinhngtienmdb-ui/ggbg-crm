@@ -8,28 +8,28 @@
   --background: #F8FAFC;
   --foreground: #0F172A;
   --card-bg: #FFFFFF;
-  --card-border: rgba(226, 232, 240, 0.8);
+  --card-border: #E2E8F0;
   --line: #E2E8F0;
-  --brand: #6366F1;
-  --brand-dark: #4F46E5;
+  --brand: #4F46E5;
+  --brand-dark: #4338CA;
   --brand-light: #EEF2FF;
   --muted: #64748B;
   --subtle: #94A3B8;
-  --glow: rgba(99, 102, 241, 0.15);
+  --glow: rgba(79, 70, 229, 0.08);
 }
 
 .dark {
   --background: #0B0F19;
   --foreground: #F8FAFC;
   --card-bg: #111827;
-  --card-border: rgba(31, 41, 55, 0.8);
-  --line: #1F2937;
-  --brand: #818CF8;
-  --brand-dark: #6366F1;
-  --brand-light: rgba(99, 102, 241, 0.15);
+  --card-border: #1E293B;
+  --line: #1E293B;
+  --brand: #6366F1;
+  --brand-dark: #4F46E5;
+  --brand-light: rgba(99, 102, 241, 0.12);
   --muted: #9CA3AF;
   --subtle: #6B7280;
-  --glow: rgba(129, 140, 248, 0.25);
+  --glow: rgba(99, 102, 241, 0.12);
 }
 
 body {
@@ -41,42 +41,42 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Glassmorphism Panels */
+/* Clean Enterprise Panels */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.7);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
 }
 
 .dark .glass-panel {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(31, 41, 55, 0.7);
+  background: #111827;
+  border: 1px solid #1E293B;
 }
 
-/* Card Hover Lift & Glow */
+/* Crisp Professional Card Hover */
 .card-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 12px 30px -6px rgba(99, 102, 241, 0.12);
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05);
 }
 
-/* Springy Interactive Buttons */
+.dark .card-hover:hover {
+  border-color: #334155;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Interactive Buttons */
 .btn-spring {
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, box-shadow 0.2s;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-spring:active {
-  transform: scale(0.96);
+  transform: translateY(1px);
 }
 
-/* Hero Gradient Card Bar */
+/* Hero Clean Top Accent Bar */
 .gg-hero {
   position: relative;
   overflow: hidden;
@@ -88,10 +88,10 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 3.5px;
-  background: linear-gradient(90deg, #6366F1 0%, #38BDF8 50%, #10B981 100%);
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  height: 3px;
+  background: #4F46E5;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 /* Custom Scrollbars */
@@ -119,23 +119,31 @@ body {
 
 /* Micro Animations */
 @keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.75; transform: scale(0.98); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .animate-pulse-subtle {
   animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes float-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-.animate-float-subtle {
-  animation: float-subtle 4s ease-in-out infinite;
-}
-
 .touch-scroll {
   -webkit-overflow-scrolling: touch;
+}
+
+/* Data Table & Card Refinements (Sleek Rounded Corners & Normal/Medium Typography) */
+.data-table-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.data-table th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.data-table td {
+  font-weight: 400;
 }

@@ -881,7 +881,7 @@ export default function HRMPage() {
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+                  <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                     <th className="p-4">Mã UV & Họ Tên</th>
                     <th className="p-4">Vị Trí & Phòng Ban</th>
                     <th className="p-4">SĐT & Email</th>
@@ -978,7 +978,7 @@ export default function HRMPage() {
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                   <th className="p-4">Số Hợp Đồng</th>
                   <th className="p-4">Nhân Sự</th>
                   <th className="p-4">Loại HĐ</th>
@@ -1188,7 +1188,7 @@ export default function HRMPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+                    <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px]">
                       <th className="p-3.5">Mã Chức Danh</th>
                       <th className="p-3.5">Tên Chức Danh Chuyên Môn</th>
                       <th className="p-3.5">Chức Vụ Tương Ứng</th>

@@ -293,9 +293,9 @@ export default function PayrollPage() {
 
       {/* TAB 1 & 2: PAYROLL TABLE / PAYSTUBS */}
       {(activeTab === 'payroll' || activeTab === 'paystubs') && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden">
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+            <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-emerald-600" /> Bảng Lương Chi Tiết {selectedPeriod} ({filteredPayrolls.length} Nhân Sự)
             </h3>
             <span className="text-xs text-slate-500 font-medium">Tự động kết nối Lương P3 từ Module Performance</span>
@@ -304,7 +304,7 @@ export default function PayrollPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider">
                   <th className="py-3.5 px-4">Mã & Nhân Sự</th>
                   <th className="py-3.5 px-4 text-right">Lương P1 (Cứng)</th>
                   <th className="py-3.5 px-4 text-right">Phụ Cấp P2</th>
