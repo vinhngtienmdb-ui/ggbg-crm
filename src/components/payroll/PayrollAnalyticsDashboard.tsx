@@ -76,19 +76,19 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
   ].filter((d) => d.value > 0);
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-white text-slate-900 p-6 rounded-2xl shadow-sm space-y-6 border border-slate-200/80">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold mb-1">
-            <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold mb-1">
+            <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
             <span>Phân Tích Báo Cáo Tài Chính Nhân Sự</span>
           </div>
-          <h2 className="text-lg font-semibold text-white">Dashboard Phân Tích Cơ Cấu Bảng Lương 3P & Chi Phí Nhân Sự</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Dashboard Phân Tích Cơ Cấu Bảng Lương 3P & Chi Phí Nhân Sự</h2>
         </div>
         <div className="text-right">
-          <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương NET Chi Trả:</span>
-          <span className="tabular-nums font-semibold text-emerald-400 text-lg">
+          <span className="text-xs text-slate-500 font-medium block">Tổng Quỹ Lương NET Chi Trả:</span>
+          <span className="tabular-nums font-semibold text-emerald-700 text-lg">
             {totalNet.toLocaleString('vi-VN')} ₫
           </span>
         </div>
@@ -97,19 +97,19 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: 3P Income Component Breakdown Bar Chart */}
-        <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-emerald-400" /> Cơ Cấu Thu Nhập 3P (P1 + P2 + P3 + OT) Theo Phòng Ban (Tr VNĐ)
+        <div className="lg:col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-emerald-600" /> Cơ Cấu Thu Nhập 3P (P1 + P2 + P3 + OT) Theo Phòng Ban (Tr VNĐ)
           </h3>
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={deptChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" tick={{ fontSize: 11 }} />
+                <YAxis stroke="#64748B" tick={{ fontSize: 11 }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="LươngP1" stackId="a" fill="#3B82F6" name="P1 (Cứng)" />
@@ -122,9 +122,9 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
         </div>
 
         {/* Chart 2: Net vs Deductions Pie Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <PieIcon className="w-4 h-4 text-emerald-400" /> Tỷ Lệ Lương Thực Nhận vs Khấu Trừ
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <PieIcon className="w-4 h-4 text-emerald-600" /> Tỷ Lệ Lương Thực Nhận vs Khấu Trừ
           </h3>
 
           <div className="h-48 w-full flex items-center justify-center">
@@ -144,20 +144,20 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="space-y-1.5 pt-2 border-t border-slate-700/60 text-[11px]">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200 text-[11px]">
             {deductionsPieData.map((st) => (
               <div key={st.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5 text-slate-700 font-medium">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="tabular-nums font-bold text-white">{st.value} Tr VNĐ</span>
+                <span className="tabular-nums font-bold text-slate-900">{st.value} Tr VNĐ</span>
               </div>
             ))}
           </div>

@@ -88,38 +88,38 @@ export default function KpiAnalyticsDashboard({ kpis }: KpiAnalyticsDashboardPro
   }));
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-white text-slate-900 p-6 rounded-2xl shadow-sm space-y-6 border border-slate-200/80">
       {/* Title */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-bold mb-1">
-            <BarChart3 className="w-3.5 h-3.5 text-blue-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[11px] font-bold mb-1">
+            <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
             <span>Phân Tích Báo Cáo Chuyên Sâu</span>
           </div>
-          <h2 className="text-lg font-semibold text-white">Dashboard Phân Tích Chỉ Số KPI Toàn Hệ Thống</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Dashboard Phân Tích Chỉ Số KPI Toàn Hệ Thống</h2>
         </div>
         <div className="text-right">
-          <span className="text-xs text-slate-400 font-medium block">Tổng Số Chỉ Tiêu:</span>
-          <span className="tabular-nums font-semibold text-emerald-400 text-lg">{kpis.length} KPI</span>
+          <span className="text-xs text-slate-500 font-medium block">Tổng Số Chỉ Tiêu:</span>
+          <span className="tabular-nums font-semibold text-emerald-700 text-lg">{kpis.length} KPI</span>
         </div>
       </div>
 
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Department Target vs Actual Bar Chart */}
-        <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-400" /> So Sánh Chỉ Tiêu vs Thực Tế Theo Phòng Ban
+        <div className="lg:col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-blue-600" /> So Sánh Chỉ Tiêu vs Thực Tế Theo Phòng Ban
           </h3>
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={deptChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" tick={{ fontSize: 11 }} />
+                <YAxis stroke="#64748B" tick={{ fontSize: 11 }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="ChỉTiêu" fill="#3B82F6" radius={[6, 6, 0, 0]} name="Mục Tiêu" />
@@ -130,9 +130,9 @@ export default function KpiAnalyticsDashboard({ kpis }: KpiAnalyticsDashboardPro
         </div>
 
         {/* Chart 2: Status Breakdown Pie Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <PieIcon className="w-4 h-4 text-purple-400" /> Phân Bổ Trạng Thái Tiến Độ
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <PieIcon className="w-4 h-4 text-purple-600" /> Phân Bổ Trạng Thái Tiến Độ
           </h3>
 
           <div className="h-48 w-full flex items-center justify-center">
@@ -152,21 +152,21 @@ export default function KpiAnalyticsDashboard({ kpis }: KpiAnalyticsDashboardPro
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
           {/* Custom Legend */}
-          <div className="space-y-1.5 pt-2 border-t border-slate-700/60 text-[11px]">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200 text-[11px]">
             {statusPieData.map((st) => (
               <div key={st.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5 text-slate-700 font-medium">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="tabular-nums font-bold text-white">{st.value} KPI</span>
+                <span className="tabular-nums font-bold text-slate-900">{st.value} KPI</span>
               </div>
             ))}
           </div>

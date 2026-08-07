@@ -77,19 +77,19 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
   const totalP3Pool = Object.values(gradeP3Salary).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-white text-slate-900 p-6 rounded-2xl shadow-sm space-y-6 border border-slate-200/80">
       {/* Title Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] font-bold mb-1">
-            <Award className="w-3.5 h-3.5 text-purple-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-[11px] font-bold mb-1">
+            <Award className="w-3.5 h-3.5 text-purple-600" />
             <span>Phân Tích Báo Cáo Hiệu Suất</span>
           </div>
-          <h2 className="text-lg font-semibold text-white">Dashboard Phân Tích Hiệu Suất Nhân Sự & Quỹ Lương P3</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Dashboard Phân Tích Hiệu Suất Nhân Sự & Quỹ Lương P3</h2>
         </div>
         <div className="text-right">
-          <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương P3 Đã Phân Bổ:</span>
-          <span className="tabular-nums font-semibold text-purple-400 text-lg">
+          <span className="text-xs text-slate-500 font-medium block">Tổng Quỹ Lương P3 Đã Phân Bổ:</span>
+          <span className="tabular-nums font-semibold text-purple-700 text-lg">
             {totalP3Pool.toLocaleString('vi-VN')} ₫
           </span>
         </div>
@@ -98,19 +98,19 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Grade Bell Curve Bar Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-purple-400" /> Phân Phối Chuẩn Xếp Loại Hạng (Bell Curve)
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-purple-600" /> Phân Phối Chuẩn Xếp Loại Hạng (Bell Curve)
           </h3>
 
           <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={gradeChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="grade" stroke="#9CA3AF" tick={{ fontSize: 10 }} />
-                <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="grade" stroke="#64748B" tick={{ fontSize: 10 }} />
+                <YAxis stroke="#64748B" tick={{ fontSize: 11 }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
                 <Bar dataKey="count" fill="#8B5CF6" radius={[6, 6, 0, 0]} name="Số Nhân Sự">
                   {gradeChartData.map((entry, index) => (
@@ -123,19 +123,19 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
         </div>
 
         {/* Chart 2: Dept Average Final Score Bar Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-400" /> Điểm Hiệu Suất Trung Bình (0-100) Theo Phòng Ban
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-blue-600" /> Điểm Hiệu Suất Trung Bình (0-100) Theo Phòng Ban
           </h3>
 
           <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={deptAvgChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 10 }} />
-                <YAxis domain={[0, 100]} stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 100]} stroke="#64748B" tick={{ fontSize: 11 }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
                 <Bar dataKey="ĐiểmTB" fill="#3B82F6" radius={[6, 6, 0, 0]} name="Điểm TB" />
               </BarChart>
@@ -144,9 +144,9 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
         </div>
 
         {/* Chart 3: P3 Salary Distribution Pie Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-emerald-400" /> Cơ Cấu Phân Bổ Lương P3 (Triệu VNĐ)
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-800 flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-emerald-600" /> Cơ Cấu Phân Bổ Lương P3 (Triệu VNĐ)
           </h3>
 
           <div className="h-44 w-full flex items-center justify-center">
@@ -166,20 +166,20 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#CBD5E1', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="space-y-1 pt-1 border-t border-slate-700/60 text-[11px]">
+          <div className="space-y-1 pt-1 border-t border-slate-200 text-[11px]">
             {p3PieData.map((st) => (
               <div key={st.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5 text-slate-700 font-medium">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="tabular-nums font-bold text-emerald-400">{st.value} Tr VNĐ</span>
+                <span className="tabular-nums font-bold text-slate-900">{st.value} Tr VNĐ</span>
               </div>
             ))}
           </div>

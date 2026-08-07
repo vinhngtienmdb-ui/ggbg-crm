@@ -241,20 +241,20 @@ export default function VietnamEmployeeDistributionMap({
   return (
     <div className="space-y-6">
       {/* Header Bar & Control Panel */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-xl border border-indigo-800/40 shadow-xl space-y-4">
+      <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
-              <MapIcon className="w-6 h-6 text-indigo-400" />
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center font-bold text-xl shadow-xs shrink-0">
+              <MapIcon className="w-6 h-6 text-indigo-600" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-bold text-base text-white">Bản đồ phân bổ nhân sự</h3>
-                <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-semibold uppercase flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Chuẩn 34 Tỉnh/Thành 2025
+                <h3 className="font-bold text-base text-slate-900">Bản đồ phân bổ nhân sự</h3>
+                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[10px] font-semibold uppercase flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span> Chuẩn 34 Tỉnh/Thành 2025
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
                 Bản đồ vector GIS <strong>34 đơn vị hành chính</strong> theo Nghị quyết 202/2025/QH15
                 (bao gồm Quần đảo <strong>Hoàng Sa, Trường Sa</strong>), tổng hợp từ dữ liệu nguồn mở{' '}
                 <strong>Free-GIS-Data</strong>.
@@ -263,14 +263,14 @@ export default function VietnamEmployeeDistributionMap({
           </div>
 
           {/* Group Level Toggle */}
-          <div className="flex items-center gap-2 bg-slate-800/90 p-1.5 rounded-2xl border border-slate-700 text-xs font-bold shrink-0">
+          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs font-bold shrink-0">
             <button
               onClick={() => {
                 setGroupingLevel('PROVINCE');
                 setSelectedLocation(null);
               }}
               className={`px-3.5 py-1.5 rounded-xl transition-all ${
-                groupingLevel === 'PROVINCE' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                groupingLevel === 'PROVINCE' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               🏢 Theo Tỉnh / Thành Phố
@@ -281,7 +281,7 @@ export default function VietnamEmployeeDistributionMap({
                 setSelectedLocation(null);
               }}
               className={`px-3.5 py-1.5 rounded-xl transition-all ${
-                groupingLevel === 'WARD' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                groupingLevel === 'WARD' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               📍 Theo Phường / Xã (2025)
@@ -290,9 +290,9 @@ export default function VietnamEmployeeDistributionMap({
         </div>
 
         {/* Filters Grid */}
-        <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+        <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-bold text-slate-400 flex items-center gap-1">
+            <span className="font-bold text-slate-500 flex items-center gap-1">
               <Filter className="w-3.5 h-3.5" /> Lọc Theo:
             </span>
 
@@ -300,7 +300,7 @@ export default function VietnamEmployeeDistributionMap({
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-700 text-slate-200 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="ALL">Tất Cả Phòng Ban</option>
               {uniqueDepartments.map((d) => (
@@ -311,11 +311,11 @@ export default function VietnamEmployeeDistributionMap({
             </select>
 
             {/* Region Filter */}
-            <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-700">
+            <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200">
               <button
                 onClick={() => setSelectedRegionFilter('ALL')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
-                  selectedRegionFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                  selectedRegionFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Cả Nước
@@ -323,7 +323,7 @@ export default function VietnamEmployeeDistributionMap({
               <button
                 onClick={() => setSelectedRegionFilter('BAC')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
-                  selectedRegionFilter === 'BAC' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'
+                  selectedRegionFilter === 'BAC' ? 'bg-red-600 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Miền Bắc ({regionBreakdown.BAC})
@@ -331,7 +331,7 @@ export default function VietnamEmployeeDistributionMap({
               <button
                 onClick={() => setSelectedRegionFilter('TRUNG')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
-                  selectedRegionFilter === 'TRUNG' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'
+                  selectedRegionFilter === 'TRUNG' ? 'bg-amber-600 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Miền Trung ({regionBreakdown.TRUNG})
@@ -339,7 +339,7 @@ export default function VietnamEmployeeDistributionMap({
               <button
                 onClick={() => setSelectedRegionFilter('NAM')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
-                  selectedRegionFilter === 'NAM' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                  selectedRegionFilter === 'NAM' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Miền Nam ({regionBreakdown.NAM})
@@ -355,7 +355,7 @@ export default function VietnamEmployeeDistributionMap({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm tên nhân sự, mã NV, địa chỉ..."
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-700 text-white placeholder-slate-400 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -400,23 +400,23 @@ export default function VietnamEmployeeDistributionMap({
       {/* MAIN VISUAL MAP & LOCATION RANKING GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT 7/12: 34-PROVINCE GEOJSON MAP */}
-        <div className="lg:col-span-7 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl border border-slate-800 p-6 text-white space-y-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
-          <div className="w-full flex items-center justify-between border-b border-slate-800 pb-3 z-10">
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-6 text-slate-900 space-y-4 shadow-sm relative overflow-hidden flex flex-col items-center">
+          <div className="w-full flex items-center justify-between border-b border-slate-100 pb-3 z-10">
             <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-indigo-400 animate-spin-slow" />
-              <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
+              <Globe className="w-5 h-5 text-indigo-600 animate-spin-slow" />
+              <h4 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                 Bản Đồ Vector GIS Việt Nam
                 <a
                   href="https://github.com/nguyenduy1133/Free-GIS-Data"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-sky-400 hover:underline flex items-center gap-1 tabular-nums ml-2"
+                  className="text-xs text-sky-600 hover:underline flex items-center gap-1 tabular-nums ml-2"
                 >
                   Free-GIS-Data <ExternalLink className="w-3 h-3" />
                 </a>
               </h4>
             </div>
-            <span className="px-2.5 py-0.5 bg-slate-800 tabular-nums text-[11px] text-slate-300 font-bold rounded-lg border border-slate-700">
+            <span className="px-2.5 py-0.5 bg-slate-100 tabular-nums text-[11px] text-slate-700 font-bold rounded-lg border border-slate-200">
               Tổng {filteredEmployees.length} nhân sự
             </span>
           </div>
