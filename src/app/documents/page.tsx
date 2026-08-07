@@ -43,7 +43,8 @@ import {
   DocProcessStatus,
   DocumentLedgerConfig,
   LedgerResetFrequency,
-  LedgerRetentionPeriod
+  LedgerRetentionPeriod,
+  AssignmentTargetType
 } from '@/types';
 import {
   getOfficialDocuments,
