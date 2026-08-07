@@ -901,6 +901,18 @@ export interface DocumentLedgerConfig {
   created_at: string;
 }
 
+export type AssignmentTargetType = 'DEPARTMENT' | 'DIRECT_EMPLOYEE';
+
+export interface DocumentAssignmentMeta {
+  target_type: AssignmentTargetType;
+  primary_dept?: string;
+  primary_assignee?: string;
+  coop_depts?: string[];
+  coop_assignees?: string[];
+  info_depts?: string[];
+  info_assignees?: string[];
+}
+
 export interface OfficialDocument {
   id: string;
   document_code: string;
@@ -916,6 +928,7 @@ export interface OfficialDocument {
   status: DocProcessStatus;
   assigned_department: string;
   assigned_assignee: string;
+  assignment_meta?: DocumentAssignmentMeta;
   directive_note?: string;
   file_name?: string;
   file_url?: string;

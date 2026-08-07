@@ -229,14 +229,31 @@ export default function DocumentsPage() {
     showToast(`✅ Đã vào sổ văn thư thành công: Mã số ${doc.document_code}`);
   };
 
+  const [assignTargetType, setAssignTargetType] = useState<AssignmentTargetType>('DEPARTMENT');
+  const [primaryAssigneeInput, setPrimaryAssigneeInput] = useState('Khối Kinh Doanh & TMĐT');
+  const [coopAssigneesInput, setCoopAssigneesInput] = useState('Phòng Kế Toán & Tài Chính, Ban Tech');
+  const [infoAssigneesInput, setInfoAssigneesInput] = useState('Khối Nhân Sự (HRM), Văn Thư');
+
   const handleAddDirectiveNote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDoc || !directiveInput) return;
 
+    const assignmentMeta = {
+      target_type: assignTargetType,
+      primary_dept: assignTargetType === 'DEPARTMENT' ? primaryAssigneeInput : 'Khối Kinh Doanh & TMĐT',
+      primary_assignee: assignTargetType === 'DIRECT_EMPLOYEE' ? primaryAssigneeInput : 'Đặng Tuấn Tú',
+      coop_depts: assignTargetType === 'DEPARTMENT' ? coopAssigneesInput.split(',').map(s => s.trim()) : ['Phòng Kế Toán'],
+      coop_assignees: assignTargetType === 'DIRECT_EMPLOYEE' ? coopAssigneesInput.split(',').map(s => s.trim()) : ['Vũ Thị Hằng'],
+      info_depts: assignTargetType === 'DEPARTMENT' ? infoAssigneesInput.split(',').map(s => s.trim()) : ['Khối Nhân Sự'],
+      info_assignees: assignTargetType === 'DIRECT_EMPLOYEE' ? infoAssigneesInput.split(',').map(s => s.trim()) : ['Phạm Thị Lan'],
+    };
+
     const updatedDoc: OfficialDocument = {
       ...selectedDoc,
       directive_note: directiveInput,
-      assigned_department: assigneeDeptInput,
+      assigned_department: primaryAssigneeInput,
+      assigned_assignee: assignTargetType === 'DIRECT_EMPLOYEE' ? primaryAssigneeInput : 'Đặng Tuấn Tú',
+      assignment_meta: assignmentMeta,
       status: 'IN_PROCESSING',
       comments: [
         ...(selectedDoc.comments || []),
@@ -244,7 +261,7 @@ export default function DocumentsPage() {
           id: `c_${Date.now()}`,
           author_name: 'Nguyễn Tiến Vinh',
           author_role: 'CEO / Ban Giám Đốc',
-          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput} (Giao ${assigneeDeptInput})`,
+          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput} | 🔴 Xử lý chính: ${primaryAssigneeInput} | 🟡 Phối hợp: ${coopAssigneesInput} | 🔵 Nhận để biết: ${infoAssigneesInput}`,
           created_at: new Date().toLocaleString('vi-VN'),
         },
       ],
@@ -254,8 +271,8 @@ export default function DocumentsPage() {
           id: `l_${Date.now()}`,
           actor_name: 'Nguyễn Tiến Vinh',
           actor_role: 'CEO / Ban Giám Đốc',
-          action: 'BÚT PHÊ CHỈ ĐẠO',
-          note: `${directiveInput} (Giao ${assigneeDeptInput})`,
+          action: 'BÚT PHÊ & PHÂN CÔNG 3 VAI TRÒ',
+          note: `${directiveInput} (🔴 Xử lý chính: ${primaryAssigneeInput} | 🟡 Phối hợp: ${coopAssigneesInput} | 🔵 Nhận để biết: ${infoAssigneesInput})`,
           timestamp: new Date().toLocaleString('vi-VN'),
         }
       ]
@@ -265,7 +282,7 @@ export default function DocumentsPage() {
     setDocuments([...updated]);
     setSelectedDoc(updatedDoc);
     setDirectiveInput('');
-    showToast(`✍️ Đã lưu bút phê chỉ đạo và giao phòng ${assigneeDeptInput} cho công văn ${selectedDoc.document_code}`);
+    showToast(`✍️ Đã lưu bút phê chỉ đạo và phân công 3 vai trò cho công văn ${selectedDoc.document_code}`);
   };
 
   const handleDelete = (id: string) => {
@@ -1204,40 +1221,94 @@ export default function DocumentsPage() {
                 <p className="text-slate-500 font-normal text-[11px]">Chưa có bút phê chỉ đạo cho công văn này.</p>
               )}
 
-              <form onSubmit={handleAddDirectiveNote} className="space-y-3 pt-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">Giao Phòng Ban Chủ Trì Xử Lý:</label>
-                    <select
-                      value={assigneeDeptInput}
-                      onChange={(e) => setAssigneeDeptInput(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-amber-300 rounded-xl"
+              <form onSubmit={handleAddDirectiveNote} className="space-y-3 pt-2 border-t border-amber-200/60">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-amber-600" /> Chế Độ Phân Công Nhiệm Vụ:
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAssignTargetType('DEPARTMENT')}
+                      className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                        assignTargetType === 'DEPARTMENT'
+                          ? 'bg-amber-600 text-white shadow-sm'
+                          : 'bg-white text-slate-700 border border-slate-200'
+                      }`}
                     >
-                      <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
-                      <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
-                      <option value="Phòng Kế Toán & Tài Chính">Phòng Kế Toán & Tài Chính</option>
-                      <option value="Ban Dự Án & Tech">Ban Dự Án & Tech</option>
-                      <option value="Ban Giám Đốc">Ban Giám Đốc</option>
-                    </select>
+                      🏢 Theo Phòng Ban / Trưởng Đơn Vị
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAssignTargetType('DIRECT_EMPLOYEE')}
+                      className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                        assignTargetType === 'DIRECT_EMPLOYEE'
+                          ? 'bg-purple-600 text-white shadow-sm'
+                          : 'bg-white text-slate-700 border border-slate-200'
+                      }`}
+                    >
+                      👤 Trực Tiếp Nhân Sự Cụ Thể
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">Bút Phê Chỉ Đạo Ban Giám Đốc:</label>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold">
+                  {/* Role 1: Primary Lead */}
+                  <div className="p-2.5 bg-red-50/60 border border-red-200 rounded-xl space-y-1">
+                    <label className="block text-red-900 font-bold">🔴 1. Xử Lý Chính (Lead Handler) *</label>
                     <input
                       type="text"
                       required
-                      placeholder="Nhập nội dung chỉ đạo phòng ban..."
-                      value={directiveInput}
-                      onChange={(e) => setDirectiveInput(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-amber-300 rounded-xl"
+                      value={primaryAssigneeInput}
+                      onChange={(e) => setPrimaryAssigneeInput(e.target.value)}
+                      placeholder={assignTargetType === 'DEPARTMENT' ? 'Nhập tên phòng ban chủ trì...' : 'Nhập tên nhân sự xử lý chính...'}
+                      className="w-full px-2.5 py-1.5 bg-white border border-red-200 rounded-lg text-slate-900 text-[11px]"
+                    />
+                  </div>
+
+                  {/* Role 2: Cooperating */}
+                  <div className="p-2.5 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1">
+                    <label className="block text-amber-900 font-bold">🟡 2. Phối Hợp Xử Lý (Cooperating)</label>
+                    <input
+                      type="text"
+                      value={coopAssigneesInput}
+                      onChange={(e) => setCoopAssigneesInput(e.target.value)}
+                      placeholder="Phòng Kế Toán, Ban Tech..."
+                      className="w-full px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-slate-900 text-[11px]"
+                    />
+                  </div>
+
+                  {/* Role 3: Info Only */}
+                  <div className="p-2.5 bg-blue-50/60 border border-blue-200 rounded-xl space-y-1">
+                    <label className="block text-blue-900 font-bold">🔵 3. Nhận Để Biết / Báo Cáo (Info Only)</label>
+                    <input
+                      type="text"
+                      value={infoAssigneesInput}
+                      onChange={(e) => setInfoAssigneesInput(e.target.value)}
+                      placeholder="Khối Nhân Sự, Văn Thư..."
+                      className="w-full px-2.5 py-1.5 bg-white border border-blue-200 rounded-lg text-slate-900 text-[11px]"
                     />
                   </div>
                 </div>
+
+                <div>
+                  <label className="block text-slate-900 font-bold mb-1">Bút Phê Chỉ Đạo Cụ Thể Ban Giám Đốc *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nhập nội dung chỉ đạo thực hiện và mốc thời gian hoàn thành..."
+                    value={directiveInput}
+                    onChange={(e) => setDirectiveInput(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-amber-300 rounded-xl"
+                  />
+                </div>
+
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md shrink-0"
+                    className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md shrink-0 flex items-center gap-1.5"
                   >
-                    Lưu Bút Phê & Giao Phòng Ban
+                    <MessageSquare className="w-4 h-4" /> Lưu Bút Phê & Phân Công 3 Vai Trò
                   </button>
                 </div>
               </form>
