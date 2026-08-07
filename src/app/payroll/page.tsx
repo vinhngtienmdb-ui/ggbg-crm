@@ -320,32 +320,32 @@ export default function PayrollPage() {
                 {filteredPayrolls.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
-                      <span className="text-[10px] font-mono font-bold text-blue-600 block">{p.payroll_code}</span>
+                      <span className="text-[10px] tabular-nums font-bold text-blue-600 block">{p.payroll_code}</span>
                       <span className="font-bold text-slate-900 block truncate">{p.employee_name}</span>
                       <span className="text-[10px] text-slate-400 block truncate">{p.department}</span>
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900">
+                    <td className="py-3.5 px-4 text-right tabular-nums font-bold text-slate-900">
                       {p.p1_calculated_salary.toLocaleString('vi-VN')} ₫
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-700">
+                    <td className="py-3.5 px-4 text-right tabular-nums font-bold text-slate-700">
                       {p.p2_allowances.toLocaleString('vi-VN')} ₫
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-blue-700">
+                    <td className="py-3.5 px-4 text-right tabular-nums font-bold text-blue-700">
                       {p.p3_performance_salary.toLocaleString('vi-VN')} ₫
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-purple-700">
+                    <td className="py-3.5 px-4 text-right tabular-nums font-bold text-purple-700">
                       {(p.ot_salary + p.bonus_amount).toLocaleString('vi-VN')} ₫
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-red-600">
+                    <td className="py-3.5 px-4 text-right tabular-nums font-bold text-red-600">
                       -{p.total_deductions.toLocaleString('vi-VN')} ₫
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 text-sm">
+                    <td className="py-3.5 px-4 text-right tabular-nums font-semibold text-emerald-700 text-sm">
                       {p.net_salary.toLocaleString('vi-VN')} ₫
                     </td>
 
@@ -410,7 +410,7 @@ export default function PayrollPage() {
                   step={50000}
                   value={paySettings.p2_lunch_allowance}
                   onChange={(e) => setPaySettings({ ...paySettings, p2_lunch_allowance: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -421,7 +421,7 @@ export default function PayrollPage() {
                   step={50000}
                   value={paySettings.p2_phone_allowance}
                   onChange={(e) => setPaySettings({ ...paySettings, p2_phone_allowance: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -432,7 +432,7 @@ export default function PayrollPage() {
                   step={50000}
                   value={paySettings.p2_transport_allowance}
                   onChange={(e) => setPaySettings({ ...paySettings, p2_transport_allowance: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
             </div>
@@ -450,7 +450,7 @@ export default function PayrollPage() {
                   step={0.1}
                   value={paySettings.bhxh_percent}
                   onChange={(e) => setPaySettings({ ...paySettings, bhxh_percent: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -461,7 +461,7 @@ export default function PayrollPage() {
                   step={0.1}
                   value={paySettings.bhyt_percent}
                   onChange={(e) => setPaySettings({ ...paySettings, bhyt_percent: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -472,7 +472,7 @@ export default function PayrollPage() {
                   step={0.1}
                   value={paySettings.bhtn_percent}
                   onChange={(e) => setPaySettings({ ...paySettings, bhtn_percent: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -483,7 +483,7 @@ export default function PayrollPage() {
                   step={10000}
                   value={paySettings.late_penalty_per_instance}
                   onChange={(e) => setPaySettings({ ...paySettings, late_penalty_per_instance: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
             </div>
@@ -501,7 +501,7 @@ export default function PayrollPage() {
                   step={500000}
                   value={paySettings.personal_tax_deduction_self}
                   onChange={(e) => setPaySettings({ ...paySettings, personal_tax_deduction_self: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -512,7 +512,7 @@ export default function PayrollPage() {
                   step={0.1}
                   value={paySettings.ot_multiplier_standard}
                   onChange={(e) => setPaySettings({ ...paySettings, ot_multiplier_standard: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
 
@@ -523,7 +523,7 @@ export default function PayrollPage() {
                   step={0.1}
                   value={paySettings.ot_multiplier_weekend}
                   onChange={(e) => setPaySettings({ ...paySettings, ot_multiplier_weekend: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
                 />
               </div>
             </div>

@@ -136,13 +136,13 @@ export default function ContractsPage() {
             <tbody className="divide-y divide-slate-100">
               {filteredContracts.map((cnt) => (
                 <tr key={cnt.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="p-3 font-mono font-bold text-blue-600">{cnt.contract_code}</td>
+                  <td className="p-3 tabular-nums font-bold text-blue-600">{cnt.contract_code}</td>
                   <td className="p-3">
                     <p className="font-bold text-slate-900">{cnt.company_name}</p>
                     <p className="text-[11px] text-slate-500 font-medium">Đại diện: {cnt.customer_name}</p>
                   </td>
                   <td className="p-3 font-semibold text-slate-700">{cnt.ecom_platform}</td>
-                  <td className="p-3 font-mono text-slate-600">{cnt.effective_date} ➔ {cnt.expiry_date}</td>
+                  <td className="p-3 tabular-nums text-slate-600">{cnt.effective_date} ➔ {cnt.expiry_date}</td>
                   <td className="p-3">
                     {cnt.status === 'ACTIVE' ? (
                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded font-bold text-[10px]">

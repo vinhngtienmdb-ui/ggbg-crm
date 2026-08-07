@@ -65,7 +65,7 @@ export default function FormulaConfigModal({
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                 1. Trọng Số Các Thành Phần (%)
               </h3>
-              <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full ${
+              <span className={`text-xs tabular-nums font-bold px-2.5 py-0.5 rounded-full ${
                 totalWeight === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
               }`}>
                 Tổng: {totalWeight}% {totalWeight !== 100 && '(Phải = 100%)'}

@@ -79,7 +79,7 @@ export default function VoIPCallModal({
           </div>
 
           <h4 className="font-bold text-slate-900 text-base">{targetName || 'Khách Hàng Mới'}</h4>
-          <p className="text-slate-500 font-mono text-xs mb-2">{phoneNumber}</p>
+          <p className="text-slate-500 tabular-nums text-xs mb-2">{phoneNumber}</p>
           <div className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 text-slate-700 rounded border border-slate-200 text-[11px] font-medium mb-4">
             <Building2 className="w-3 h-3 text-slate-500" />
             Vận hành Shopee & TikTok Service
@@ -93,7 +93,7 @@ export default function VoIPCallModal({
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="Nhập SĐT cần gọi..."
-                className="w-full px-3 py-2 text-center font-mono text-base bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full px-3 py-2 text-center tabular-nums text-base bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               />
               <button
                 onClick={handleStartCall}
@@ -119,7 +119,7 @@ export default function VoIPCallModal({
 
           {callState === 'CONNECTED' && (
             <div className="py-2 space-y-4">
-              <div className="text-emerald-600 font-mono font-bold text-3xl tabular-numbers">
+              <div className="text-emerald-600 tabular-nums font-bold text-3xl tabular-numbers">
                 {formatTimer(seconds)}
               </div>
               <p className="text-[11px] text-slate-400 font-medium">Đang kết nối thời gian thực & ghi âm Cloudflare R2</p>
@@ -158,7 +158,7 @@ export default function VoIPCallModal({
               <p className="font-bold text-emerald-600 text-xs flex items-center justify-center gap-1">
                 <CheckCircle2 className="w-4 h-4" /> Đã hoàn tất cuộc gọi & lưu nhật ký
               </p>
-              <p className="text-[11px] text-slate-400 font-mono">File ghi âm: r2.ggbingo.vn/call_voip_2026.mp3</p>
+              <p className="text-[11px] text-slate-400 tabular-nums">File ghi âm: r2.ggbingo.vn/call_voip_2026.mp3</p>
             </div>
           )}
         </div>

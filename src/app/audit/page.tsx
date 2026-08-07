@@ -150,20 +150,20 @@ export default function AuditTrailPage() {
             <tbody className="divide-y divide-slate-100">
               {filteredLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="p-3 font-mono text-slate-500 text-[11px] whitespace-nowrap">{log.timestamp}</td>
+                  <td className="p-3 tabular-nums text-slate-500 text-[11px] whitespace-nowrap">{log.timestamp}</td>
                   <td className="p-3">
                     <p className="font-bold text-slate-900">{log.actor_name}</p>
-                    <p className="text-[11px] text-slate-500 font-mono">@{log.actor_username} ({log.actor_role})</p>
+                    <p className="text-[11px] text-slate-500 tabular-nums">@{log.actor_username} ({log.actor_role})</p>
                   </td>
                   <td className="p-3">
-                    <span className="font-mono text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 mr-2">
+                    <span className="tabular-nums text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 mr-2">
                       {log.action_type}
                     </span>
                     <span className="text-slate-800 font-medium">{log.action_description}</span>
                   </td>
-                  <td className="p-3 font-mono text-slate-700 font-semibold text-[11px]">{log.resource_module}</td>
+                  <td className="p-3 tabular-nums text-slate-700 font-semibold text-[11px]">{log.resource_module}</td>
                   <td className="p-3 text-slate-500 text-[11px]">
-                    <p className="font-mono text-slate-800 font-semibold">{log.ip_address}</p>
+                    <p className="tabular-nums text-slate-800 font-semibold">{log.ip_address}</p>
                     <p className="text-[10px] text-slate-400">{log.device_info}</p>
                   </td>
                   <td className="p-3">{renderSeverityBadge(log.severity)}</td>

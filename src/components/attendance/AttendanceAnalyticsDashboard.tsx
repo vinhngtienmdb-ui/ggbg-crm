@@ -84,7 +84,7 @@ export default function AttendanceAnalyticsDashboard({
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Ngày Phép Đã Duyệt:</span>
-          <span className="font-mono font-semibold text-purple-400 text-lg">{totalLeaveDays} Ngày</span>
+          <span className="tabular-nums font-semibold text-purple-400 text-lg">{totalLeaveDays} Ngày</span>
         </div>
       </div>
 
@@ -150,7 +150,7 @@ export default function AttendanceAnalyticsDashboard({
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-white">{st.value} Ca</span>
+                <span className="tabular-nums font-bold text-white">{st.value} Ca</span>
               </div>
             ))}
           </div>

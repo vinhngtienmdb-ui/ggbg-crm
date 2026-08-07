@@ -414,11 +414,11 @@ export default function UnifiedKpisPerformancePage() {
                           </span>
                         </td>
 
-                        <td className="p-3 font-mono font-bold text-slate-900">
+                        <td className="p-3 tabular-nums font-bold text-slate-900">
                           {new Intl.NumberFormat('vi-VN').format(kpi.target_value)} {kpi.unit}
                         </td>
 
-                        <td className="p-3 font-mono font-bold text-blue-700">
+                        <td className="p-3 tabular-nums font-bold text-blue-700">
                           {new Intl.NumberFormat('vi-VN').format(kpi.actual_value || 0)} / {new Intl.NumberFormat('vi-VN').format(kpi.target_value)} {kpi.unit}
                         </td>
 
@@ -540,13 +540,13 @@ export default function UnifiedKpisPerformancePage() {
                     <tr key={sc.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-3">
                         <p className="font-bold text-slate-900 text-sm">{sc.employee_name}</p>
-                        <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code} · {sc.department}</p>
+                        <p className="tabular-nums text-blue-700 text-[11px]">{sc.employee_code} · {sc.department}</p>
                       </td>
 
-                      <td className="p-3 text-center font-mono font-semibold text-blue-700">{sc.kpi_score}</td>
-                      <td className="p-3 text-center font-mono font-bold text-slate-700">{sc.compliance_score}</td>
-                      <td className="p-3 text-center font-mono font-bold text-slate-700">{sc.behavior_score}</td>
-                      <td className="p-3 text-center font-mono font-semibold text-purple-700 text-sm">{sc.final_score}</td>
+                      <td className="p-3 text-center tabular-nums font-semibold text-blue-700">{sc.kpi_score}</td>
+                      <td className="p-3 text-center tabular-nums font-bold text-slate-700">{sc.compliance_score}</td>
+                      <td className="p-3 text-center tabular-nums font-bold text-slate-700">{sc.behavior_score}</td>
+                      <td className="p-3 text-center tabular-nums font-semibold text-purple-700 text-sm">{sc.final_score}</td>
 
                       <td className="p-3 text-center">
                         <span className={`px-2.5 py-1 rounded-full font-semibold text-[11px] ${
@@ -642,13 +642,13 @@ export default function UnifiedKpisPerformancePage() {
                   <tr key={sc.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
                       <p className="font-bold text-slate-900">{sc.employee_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code}</p>
+                      <p className="tabular-nums text-blue-700 text-[11px]">{sc.employee_code}</p>
                     </td>
                     <td className="p-3 font-bold text-slate-800">{sc.department}</td>
-                    <td className="p-3 text-center font-mono font-semibold text-emerald-700 text-sm">
+                    <td className="p-3 text-center tabular-nums font-semibold text-emerald-700 text-sm">
                       {sc.kpi_score}%
                     </td>
-                    <td className="p-3 text-center font-mono font-semibold text-purple-700 text-sm">
+                    <td className="p-3 text-center tabular-nums font-semibold text-purple-700 text-sm">
                       {sc.kpi_score} / 100 Điểm
                     </td>
                     <td className="p-3 text-center">

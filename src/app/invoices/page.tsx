@@ -163,9 +163,9 @@ export default function InvoicesPage() {
                 <th className="p-3">Ký Hiệu & Số Hóa Đơn</th>
                 <th className="p-3">Mã Của Cơ Quan Thuế (MCCQT)</th>
                 <th className="p-3">Tên Đơn Vị Mua Hàng & MST</th>
-                <th className="p-3 font-mono text-right">Tiền Chưa Thuế</th>
-                <th className="p-3 font-mono text-right">Thuế VAT (10%)</th>
-                <th className="p-3 font-mono text-right">Tổng Thanh Toán</th>
+                <th className="p-3 tabular-nums text-right">Tiền Chưa Thuế</th>
+                <th className="p-3 tabular-nums text-right">Thuế VAT (10%)</th>
+                <th className="p-3 tabular-nums text-right">Tổng Thanh Toán</th>
                 <th className="p-3 text-center">Trạng Thái</th>
                 <th className="p-3 text-center">Thao Tác</th>
               </tr>
@@ -174,30 +174,30 @@ export default function InvoicesPage() {
               {filteredInvoices.map((inv) => (
                 <tr key={inv.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-3">
-                    <p className="font-mono font-semibold text-emerald-700 text-xs">
+                    <p className="tabular-nums font-semibold text-emerald-700 text-xs">
                       {inv.invoice_symbol} - #{inv.invoice_number}
                     </p>
                     <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {formatDate(inv.issue_date)}</p>
                   </td>
 
-                  <td className="p-3 font-mono text-[10.5px] text-slate-600 font-bold">
+                  <td className="p-3 tabular-nums text-[10.5px] text-slate-600 font-bold">
                     {inv.tax_authority_code}
                   </td>
 
                   <td className="p-3 max-w-xs">
                     <p className="font-bold text-slate-900 text-xs leading-snug line-clamp-1">{inv.buyer_name}</p>
-                    <p className="text-[10.5px] text-purple-700 font-mono font-bold">MST: {inv.buyer_tax_code}</p>
+                    <p className="text-[10.5px] text-purple-700 tabular-nums font-bold">MST: {inv.buyer_tax_code}</p>
                   </td>
 
-                  <td className="p-3 text-right font-mono font-bold text-slate-700">
+                  <td className="p-3 text-right tabular-nums font-bold text-slate-700">
                     {formatCurrency(inv.subtotal)}
                   </td>
 
-                  <td className="p-3 text-right font-mono font-bold text-emerald-700">
+                  <td className="p-3 text-right tabular-nums font-bold text-emerald-700">
                     +{formatCurrency(inv.tax_amount)}
                   </td>
 
-                  <td className="p-3 text-right font-mono font-semibold text-slate-900 text-xs">
+                  <td className="p-3 text-right tabular-nums font-semibold text-slate-900 text-xs">
                     {formatCurrency(inv.total_amount)}
                   </td>
 
@@ -256,7 +256,7 @@ export default function InvoicesPage() {
                     required
                     value={buyerTaxCode}
                     onChange={(e) => setBuyerTaxCode(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
 
@@ -292,11 +292,11 @@ export default function InvoicesPage() {
                   required
                   value={subtotal}
                   onChange={(e) => setSubtotal(Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700 font-bold"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700 font-bold"
                 />
               </div>
 
-              <div className="p-3 bg-emerald-50 rounded-xl space-y-1 font-mono text-[11px]">
+              <div className="p-3 bg-emerald-50 rounded-xl space-y-1 tabular-nums text-[11px]">
                 <p className="text-emerald-900 font-bold">Tiền hàng chưa thuế: {formatCurrency(subtotal)}</p>
                 <p className="text-emerald-700">Tiền thuế GTGT VAT ({taxRate}%): {formatCurrency(subtotal * (taxRate / 100))}</p>
                 <p className="text-emerald-950 font-semibold text-xs pt-1 border-t border-emerald-200">
@@ -330,7 +330,7 @@ export default function InvoicesPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="font-mono text-emerald-700 text-xs font-semibold">{selectedInv.invoice_symbol} - #{selectedInv.invoice_number}</span>
+                <span className="tabular-nums text-emerald-700 text-xs font-semibold">{selectedInv.invoice_symbol} - #{selectedInv.invoice_number}</span>
                 <h3 className="font-bold text-sm text-slate-900">Hóa Đơn Giá Trị Gia Tăng (VAT Invoice)</h3>
               </div>
               <button onClick={() => setSelectedInv(null)} className="p-1 text-slate-400 hover:text-slate-700">
@@ -342,17 +342,17 @@ export default function InvoicesPage() {
               <div className="text-center border-b pb-2">
                 <h4 className="font-bold text-sm text-slate-900">CÔNG TY CỔ PHẦN GGBG CRM ENTERPRISE</h4>
                 <p className="text-[11px] text-slate-500 font-normal">Mã số thuế: 0109887766 • Mẫu số: 1/001 - Ký hiệu: {selectedInv.invoice_symbol}</p>
-                <p className="text-[11px] font-mono text-emerald-700 font-bold mt-1">{selectedInv.tax_authority_code}</p>
+                <p className="text-[11px] tabular-nums text-emerald-700 font-bold mt-1">{selectedInv.tax_authority_code}</p>
               </div>
 
               <div className="space-y-1 font-medium text-slate-800">
                 <p>Đơn vị mua hàng: <strong className="text-slate-900">{selectedInv.buyer_name}</strong></p>
-                <p>Mã số thuế: <strong className="text-purple-700 font-mono">{selectedInv.buyer_tax_code}</strong></p>
+                <p>Mã số thuế: <strong className="text-purple-700 tabular-nums">{selectedInv.buyer_tax_code}</strong></p>
                 <p>Địa chỉ: <span className="text-slate-600">{selectedInv.buyer_address}</span></p>
-                <p>Ngày phát hành: <span className="font-mono font-bold">{formatDate(selectedInv.issue_date)}</span></p>
+                <p>Ngày phát hành: <span className="tabular-nums font-bold">{formatDate(selectedInv.issue_date)}</span></p>
               </div>
 
-              <div className="p-3 bg-white border rounded-xl space-y-1 font-mono text-right">
+              <div className="p-3 bg-white border rounded-xl space-y-1 tabular-nums text-right">
                 <p className="text-slate-600">Cộng tiền hàng: {formatCurrency(selectedInv.subtotal)}</p>
                 <p className="text-emerald-700">Thuế GTGT ({selectedInv.tax_rate}%): {formatCurrency(selectedInv.tax_amount)}</p>
                 <p className="text-slate-900 font-semibold text-sm pt-1 border-t">TỔNG TIỀN: {formatCurrency(selectedInv.total_amount)}</p>

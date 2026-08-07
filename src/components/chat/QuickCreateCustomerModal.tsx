@@ -76,7 +76,7 @@ export default function QuickCreateCustomerModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs flex items-center justify-between">
             <span className="font-bold text-blue-900">Kênh Nguồn Chat:</span>
-            <span className="font-mono font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200">
+            <span className="tabular-nums font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200">
               {chat.channel_name}
             </span>
           </div>
@@ -128,7 +128,7 @@ export default function QuickCreateCustomerModal({
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
               />
             </div>
 
@@ -138,7 +138,7 @@ export default function QuickCreateCustomerModal({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
               />
             </div>
           </div>

@@ -80,7 +80,7 @@ export default function QuickCreateLeadModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-xs flex items-center justify-between">
             <span className="font-bold text-purple-900">Kênh Nguồn Đẩy Lead:</span>
-            <span className="font-mono font-bold text-purple-700 bg-white px-2 py-0.5 rounded border border-purple-200">
+            <span className="tabular-nums font-bold text-purple-700 bg-white px-2 py-0.5 rounded border border-purple-200">
               {mapChannelToLeadSource(chat.channel_type)}
             </span>
           </div>
@@ -104,7 +104,7 @@ export default function QuickCreateLeadModal({
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
               />
             </div>
 
@@ -114,7 +114,7 @@ export default function QuickCreateLeadModal({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
               />
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function QuickCreateLeadModal({
               required
               value={estimatedBudget}
               onChange={(e) => setEstimatedBudget(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-emerald-700"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-emerald-700"
             />
           </div>
 

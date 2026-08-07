@@ -89,7 +89,7 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương P3 Đã Phân Bổ:</span>
-          <span className="font-mono font-semibold text-purple-400 text-lg">
+          <span className="tabular-nums font-semibold text-purple-400 text-lg">
             {totalP3Pool.toLocaleString('vi-VN')} ₫
           </span>
         </div>
@@ -179,7 +179,7 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-emerald-400">{st.value} Tr VNĐ</span>
+                <span className="tabular-nums font-bold text-emerald-400">{st.value} Tr VNĐ</span>
               </div>
             ))}
           </div>

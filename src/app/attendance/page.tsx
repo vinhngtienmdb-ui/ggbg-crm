@@ -307,9 +307,9 @@ export default function AttendancePage() {
                         <span className="text-[10px] text-slate-400 block">{emp.employee_code} · {emp.department}</span>
                       </td>
 
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-600">{record?.date || '2026-07-29'}</td>
+                      <td className="py-3.5 px-4 tabular-nums font-bold text-slate-600">{record?.date || '2026-07-29'}</td>
 
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-blue-700">
+                      <td className="py-3.5 px-4 text-center tabular-nums font-bold text-blue-700">
                         {record?.check_in_time ? (
                           <span className="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg">{record.check_in_time}</span>
                         ) : (
@@ -317,7 +317,7 @@ export default function AttendancePage() {
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700">
+                      <td className="py-3.5 px-4 text-center tabular-nums font-bold text-emerald-700">
                         {record?.check_out_time ? (
                           <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg">{record.check_out_time}</span>
                         ) : (
@@ -342,7 +342,7 @@ export default function AttendancePage() {
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-purple-700">
+                      <td className="py-3.5 px-4 text-center tabular-nums font-bold text-purple-700">
                         {record?.ot_hours ? `+${record.ot_hours}h` : '0h'}
                       </td>
 
@@ -406,11 +406,11 @@ export default function AttendancePage() {
                 {filteredLeaves.map((lv) => (
                   <tr key={lv.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
-                      <span className="text-[10px] font-mono font-bold text-blue-600 block">{lv.request_code}</span>
+                      <span className="text-[10px] tabular-nums font-bold text-blue-600 block">{lv.request_code}</span>
                       <span className="font-bold text-slate-900 block">{lv.employee_name}</span>
                     </td>
                     <td className="py-3.5 px-4 font-bold text-purple-700">{lv.leave_type}</td>
-                    <td className="py-3.5 px-4 font-mono">{lv.start_date} → {lv.end_date}</td>
+                    <td className="py-3.5 px-4 tabular-nums">{lv.start_date} → {lv.end_date}</td>
                     <td className="py-3.5 px-4 text-center font-bold">{lv.total_days} Ngày</td>
                     <td className="py-3.5 px-4 text-slate-700">{lv.reason}</td>
                     <td className="py-3.5 px-4 text-center">
@@ -467,12 +467,12 @@ export default function AttendancePage() {
                   <tr key={ts.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4 font-bold text-slate-900">{ts.employee_name} ({ts.employee_code})</td>
                     <td className="py-3.5 px-4 font-bold text-slate-700">{ts.department}</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-600">{ts.standard_workdays}</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-blue-700">{ts.actual_workdays}</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700">{ts.paid_leave_days}</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-red-600">{ts.unpaid_leave_days}</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-purple-700">+{ts.total_ot_hours} h</td>
-                    <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 text-sm">
+                    <td className="py-3.5 px-4 text-center tabular-nums font-bold text-slate-600">{ts.standard_workdays}</td>
+                    <td className="py-3.5 px-4 text-center tabular-nums font-bold text-blue-700">{ts.actual_workdays}</td>
+                    <td className="py-3.5 px-4 text-center tabular-nums font-bold text-emerald-700">{ts.paid_leave_days}</td>
+                    <td className="py-3.5 px-4 text-center tabular-nums font-bold text-red-600">{ts.unpaid_leave_days}</td>
+                    <td className="py-3.5 px-4 text-center tabular-nums font-bold text-purple-700">+{ts.total_ot_hours} h</td>
+                    <td className="py-3.5 px-4 text-right tabular-nums font-semibold text-emerald-700 text-sm">
                       {ts.billable_workdays} / {ts.standard_workdays} Ngày
                     </td>
                   </tr>
@@ -522,7 +522,7 @@ export default function AttendancePage() {
                 type="time"
                 value={attSettings.work_start_time}
                 onChange={(e) => setAttSettings({ ...attSettings, work_start_time: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
               />
             </div>
 
@@ -532,7 +532,7 @@ export default function AttendancePage() {
                 type="time"
                 value={attSettings.work_end_time}
                 onChange={(e) => setAttSettings({ ...attSettings, work_end_time: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-slate-900"
               />
             </div>
 

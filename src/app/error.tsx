@@ -29,7 +29,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
           Trang này gặp sự cố không mong muốn. Vui lòng thử lại hoặc quay về trang chủ.
         </p>
         {error.digest && (
-          <p className="text-xs font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded mt-2">
+          <p className="text-xs tabular-nums text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded mt-2">
             Mã lỗi: {error.digest}
           </p>
         )}

@@ -202,7 +202,7 @@ export default function ProductsPage() {
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 px-2 py-0.5 bg-blue-50 rounded border border-blue-100">
+                  <span className="text-[10px] tabular-nums font-bold text-blue-600 px-2 py-0.5 bg-blue-50 rounded border border-blue-100">
                     {product.sku_code}
                   </span>
                   
@@ -291,18 +291,18 @@ export default function ProductsPage() {
                 {filteredProducts.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
                     <td className="p-4 font-bold text-slate-900">
-                      <span className="font-mono text-blue-700 text-xs block">{p.sku_code}</span>
+                      <span className="tabular-nums text-blue-700 text-xs block">{p.sku_code}</span>
                       {p.name}
                     </td>
                     <td className="p-4 text-slate-700 font-semibold">{p.category}</td>
                     <td className="p-4 font-semibold text-slate-800">{p.unit}</td>
-                    <td className="p-4 font-mono font-bold text-blue-600 text-sm">
+                    <td className="p-4 tabular-nums font-bold text-blue-600 text-sm">
                       {p.base_price.toLocaleString('vi-VN')} ₫
                     </td>
-                    <td className="p-4 font-mono font-bold text-emerald-700">
+                    <td className="p-4 tabular-nums font-bold text-emerald-700">
                       {(p.base_price * 0.85).toLocaleString('vi-VN')} ₫
                     </td>
-                    <td className="p-4 font-mono font-semibold text-slate-700">{p.vat_rate}%</td>
+                    <td className="p-4 tabular-nums font-semibold text-slate-700">{p.vat_rate}%</td>
                     <td className="p-4">
                       <button
                         onClick={() => handleToggleActive(p)}

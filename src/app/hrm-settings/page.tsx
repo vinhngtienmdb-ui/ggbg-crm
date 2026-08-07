@@ -524,7 +524,7 @@ export default function HrmSettingsPage() {
                   <tr key={t.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
                       <p className="font-bold text-slate-900 text-sm">{t.title_name}</p>
-                      <p className="font-mono text-purple-700 text-[11px]">{t.code}</p>
+                      <p className="tabular-nums text-purple-700 text-[11px]">{t.code}</p>
                     </td>
 
                     <td className="p-3 font-bold text-slate-800">{t.department}</td>
@@ -535,11 +535,11 @@ export default function HrmSettingsPage() {
                       </span>
                     </td>
 
-                    <td className="p-3 font-mono font-bold text-emerald-700">
+                    <td className="p-3 tabular-nums font-bold text-emerald-700">
                       {new Intl.NumberFormat('vi-VN').format(t.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(t.max_salary)} ₫
                     </td>
 
-                    <td className="p-3 font-mono text-[11px]">
+                    <td className="p-3 tabular-nums text-[11px]">
                       <p className="text-slate-700">Ăn trưa: <strong>{new Intl.NumberFormat('vi-VN').format(t.lunch_allowance)} ₫</strong></p>
                       <p className="text-slate-500">Đi lại: <strong>{new Intl.NumberFormat('vi-VN').format(t.travel_allowance)} ₫</strong></p>
                     </td>
@@ -650,10 +650,10 @@ export default function HrmSettingsPage() {
                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                         {shift.name}
                       </td>
-                      <td className="p-3 font-mono font-bold text-blue-700">{shift.start}</td>
-                      <td className="p-3 font-mono font-bold text-blue-700">{shift.end}</td>
+                      <td className="p-3 tabular-nums font-bold text-blue-700">{shift.start}</td>
+                      <td className="p-3 tabular-nums font-bold text-blue-700">{shift.end}</td>
                       <td className="p-3 text-slate-600">{shift.lunch}</td>
-                      <td className="p-3 text-center font-mono font-semibold text-emerald-700">{shift.hours}h</td>
+                      <td className="p-3 text-center tabular-nums font-semibold text-emerald-700">{shift.hours}h</td>
                       <td className="p-3 text-center">
                         <button
                           onClick={() => {
@@ -692,7 +692,7 @@ export default function HrmSettingsPage() {
                   type="number"
                   value={timekeepingCfg.grace_period_minutes}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, grace_period_minutes: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-amber-700 font-bold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Đi muộn dưới {timekeepingCfg.grace_period_minutes} phút được tính đầy đủ 1 ngày công.</p>
               </div>
@@ -703,7 +703,7 @@ export default function HrmSettingsPage() {
                   type="number"
                   value={timekeepingCfg.max_ot_monthly_hours}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, max_ot_monthly_hours: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-blue-700 font-bold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Theo Luật Lao động Việt Nam (Tối đa 40 giờ OT/tháng).</p>
               </div>
@@ -734,7 +734,7 @@ export default function HrmSettingsPage() {
                   <tr className="bg-blue-100/60 border-b border-blue-200 text-blue-900 font-bold">
                     <th className="p-3">Tên Trụ Sở / Chi Nhánh</th>
                     <th className="p-3">Địa Chỉ Chi Tiết</th>
-                    <th className="p-3 font-mono">Tọa Độ GPS (Lat, Long)</th>
+                    <th className="p-3 tabular-nums">Tọa Độ GPS (Lat, Long)</th>
                     <th className="p-3 text-center">Bán Kính Check-in</th>
                     <th className="p-3 text-center">Trạng Thái</th>
                   </tr>
@@ -747,10 +747,10 @@ export default function HrmSettingsPage() {
                         {loc.name}
                       </td>
                       <td className="p-3 text-slate-600">{loc.address}</td>
-                      <td className="p-3 font-mono text-[11px] font-bold text-slate-800">
+                      <td className="p-3 tabular-nums text-[11px] font-bold text-slate-800">
                         {loc.lat}, {loc.long}
                       </td>
-                      <td className="p-3 text-center font-mono font-semibold text-blue-700">
+                      <td className="p-3 text-center tabular-nums font-semibold text-blue-700">
                         {loc.radius}m
                       </td>
                       <td className="p-3 text-center">
@@ -772,7 +772,7 @@ export default function HrmSettingsPage() {
                   step={0.000001}
                   value={timekeepingCfg.office_lat}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_lat: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-[11px] font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-[11px] font-bold text-slate-900"
                 />
               </div>
 
@@ -783,7 +783,7 @@ export default function HrmSettingsPage() {
                   step={0.000001}
                   value={timekeepingCfg.office_long}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_long: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-[11px] font-bold text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-[11px] font-bold text-slate-900"
                 />
               </div>
 
@@ -794,7 +794,7 @@ export default function HrmSettingsPage() {
                   step={50}
                   value={timekeepingCfg.gps_radius_meters}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, gps_radius_meters: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono font-bold text-blue-700"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums font-bold text-blue-700"
                 />
               </div>
             </div>
@@ -814,7 +814,7 @@ export default function HrmSettingsPage() {
                   step={0.1}
                   value={timekeepingCfg.ot_weekday_mult}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekday_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho giờ làm ngoài giờ từ Thứ 2 đến Thứ 6 (x1.5).</p>
               </div>
@@ -826,7 +826,7 @@ export default function HrmSettingsPage() {
                   step={0.1}
                   value={timekeepingCfg.ot_weekend_mult}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekend_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho ngày nghỉ hằng tuần Thứ 7 & Chủ Nhật (x2.0).</p>
               </div>
@@ -838,7 +838,7 @@ export default function HrmSettingsPage() {
                   step={0.1}
                   value={timekeepingCfg.ot_holiday_mult}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_holiday_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho các ngày Lễ Tết quốc gia được hưởng nguyên lương (x3.0).</p>
               </div>
@@ -894,7 +894,7 @@ export default function HrmSettingsPage() {
                   type="number"
                   value={leavesCfg.annual_leave_default}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, annual_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-semibold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-amber-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho Hợp đồng lao động chính thức từ 1 năm trở lên.</p>
               </div>
@@ -905,7 +905,7 @@ export default function HrmSettingsPage() {
                   type="number"
                   value={leavesCfg.manager_leave_default}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, manager_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Dành cho cấp Trưởng phòng, Giám đốc Khối & C-Level.</p>
               </div>
@@ -920,14 +920,14 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.seniority_bonus_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_bonus_days: Number(e.target.value) })}
-                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center text-amber-700 font-bold"
+                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg tabular-nums text-center text-amber-700 font-bold"
                   />
                   <span className="text-[11px] text-slate-600">ngày mỗi</span>
                   <input
                     type="number"
                     value={leavesCfg.seniority_bonus_years}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_bonus_years: Number(e.target.value) })}
-                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center font-bold"
+                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg tabular-nums text-center font-bold"
                   />
                   <span className="text-[11px] text-slate-600">năm thâm niên</span>
                 </div>
@@ -941,14 +941,14 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.carry_over_max_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_max_days: Number(e.target.value) })}
-                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center font-bold"
+                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg tabular-nums text-center font-bold"
                   />
                   <span className="text-[11px] text-slate-600">ngày, hạn</span>
                   <input
                     type="text"
                     value={leavesCfg.carry_over_deadline}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_deadline: e.target.value })}
-                    className="w-20 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center text-purple-700 font-bold"
+                    className="w-20 px-2 py-1 bg-slate-50 border rounded-lg tabular-nums text-center text-purple-700 font-bold"
                   />
                 </div>
               </div>
@@ -996,8 +996,8 @@ export default function HrmSettingsPage() {
                   {holidaysList.map((h) => (
                     <tr key={h.id} className="hover:bg-purple-50/30 transition-colors">
                       <td className="p-3 font-bold text-slate-900">{h.name}</td>
-                      <td className="p-3 font-mono text-purple-700">{h.date}</td>
-                      <td className="p-3 text-center font-mono font-semibold text-emerald-700">{h.days} ngày</td>
+                      <td className="p-3 tabular-nums text-purple-700">{h.date}</td>
+                      <td className="p-3 text-center tabular-nums font-semibold text-emerald-700">{h.days} ngày</td>
                       <td className="p-3">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           h.type === 'Statutory' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-purple-100 text-purple-800 border border-purple-200'
@@ -1038,7 +1038,7 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.marriage_self_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_self_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-bold"
                   />
                   <span className="text-slate-500 shrink-0">ngày</span>
                 </div>
@@ -1051,7 +1051,7 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.marriage_child_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_child_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-bold"
                   />
                   <span className="text-slate-500 shrink-0">ngày</span>
                 </div>
@@ -1064,7 +1064,7 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.bereavement_leave_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, bereavement_leave_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-red-700 font-bold"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-red-700 font-bold"
                   />
                   <span className="text-slate-500 shrink-0">ngày</span>
                 </div>
@@ -1077,7 +1077,7 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.unpaid_leave_max_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, unpaid_leave_max_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-slate-700 font-bold"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-slate-700 font-bold"
                   />
                   <span className="text-slate-500 shrink-0">ngày/năm</span>
                 </div>
@@ -1092,7 +1092,7 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.maternity_female_months}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_female_months: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-emerald-700 font-bold"
                   />
                   <span className="text-slate-500 shrink-0">tháng</span>
                 </div>
@@ -1105,7 +1105,7 @@ export default function HrmSettingsPage() {
                     type="number"
                     value={leavesCfg.maternity_male_days}
                     onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_male_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-blue-700 font-bold"
                   />
                   <span className="text-slate-500 shrink-0">ngày</span>
                 </div>
@@ -1118,7 +1118,7 @@ export default function HrmSettingsPage() {
                   step={500000}
                   value={leavesCfg.maternity_bonus_vnd}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_bonus_vnd: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-emerald-700 font-bold"
                 />
               </div>
             </div>
@@ -1138,7 +1138,7 @@ export default function HrmSettingsPage() {
                   step={100000}
                   value={leavesCfg.birthday_gift_vnd}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, birthday_gift_vnd: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-emerald-700 font-bold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Gửi quà tặng kèm thiệp chúc mừng tự động vào ngày sinh nhật.</p>
               </div>
@@ -1150,7 +1150,7 @@ export default function HrmSettingsPage() {
                   step={100000}
                   value={leavesCfg.team_building_budget_monthly}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, team_building_budget_monthly: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-blue-700 font-bold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Quỹ ăn uống & gắn kết đội nhóm (VND/nhân sự/tháng).</p>
               </div>
@@ -1162,7 +1162,7 @@ export default function HrmSettingsPage() {
                   step={500000}
                   value={leavesCfg.health_check_budget_annual}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, health_check_budget_annual: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-purple-700 font-bold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Gói khám sức khỏe tổng quát hàng năm tại Bệnh viện Quốc tế.</p>
               </div>
@@ -1176,7 +1176,7 @@ export default function HrmSettingsPage() {
                   step={500000}
                   value={leavesCfg.seniority_reward_1y}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_1y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-slate-900 font-bold"
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-slate-900 font-bold"
                 />
               </div>
 
@@ -1187,7 +1187,7 @@ export default function HrmSettingsPage() {
                   step={1000000}
                   value={leavesCfg.seniority_reward_3y}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_3y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-blue-700 font-bold"
                 />
               </div>
 
@@ -1198,7 +1198,7 @@ export default function HrmSettingsPage() {
                   step={2000000}
                   value={leavesCfg.seniority_reward_5y}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_5y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-amber-700 font-semibold"
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl tabular-nums text-amber-700 font-semibold"
                 />
               </div>
             </div>
@@ -1225,7 +1225,7 @@ export default function HrmSettingsPage() {
                     step={0.5}
                     value={payrollCfg.bhxh_employee_pct}
                     onChange={(e) => setPayrollCfg({ ...payrollCfg, bhxh_employee_pct: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
+                    className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-blue-700"
                   />
                 </div>
 
@@ -1236,7 +1236,7 @@ export default function HrmSettingsPage() {
                     step={0.5}
                     value={payrollCfg.bhxh_company_pct}
                     onChange={(e) => setPayrollCfg({ ...payrollCfg, bhxh_company_pct: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                    className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-purple-700"
                   />
                 </div>
               </div>
@@ -1248,7 +1248,7 @@ export default function HrmSettingsPage() {
                   step={100000}
                   value={payrollCfg.min_region_salary}
                   onChange={(e) => setPayrollCfg({ ...payrollCfg, min_region_salary: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
+                  className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-emerald-700"
                 />
               </div>
             </div>
@@ -1263,7 +1263,7 @@ export default function HrmSettingsPage() {
                   step={500000}
                   value={payrollCfg.personal_deduction}
                   onChange={(e) => setPayrollCfg({ ...payrollCfg, personal_deduction: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
+                  className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-emerald-700"
                 />
               </div>
 
@@ -1274,7 +1274,7 @@ export default function HrmSettingsPage() {
                   step={100000}
                   value={payrollCfg.dependent_deduction}
                   onChange={(e) => setPayrollCfg({ ...payrollCfg, dependent_deduction: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
+                  className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-blue-700"
                 />
               </div>
 
@@ -1285,7 +1285,7 @@ export default function HrmSettingsPage() {
                   step={0.5}
                   value={payrollCfg.p3_pool_profit_share_pct}
                   onChange={(e) => setPayrollCfg({ ...payrollCfg, p3_pool_profit_share_pct: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700"
+                  className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-amber-700"
                 />
               </div>
             </div>
@@ -1347,7 +1347,7 @@ export default function HrmSettingsPage() {
                   type="number"
                   value={approvalCfg.contract_expiry_alert_days}
                   onChange={(e) => setApprovalCfg({ ...approvalCfg, contract_expiry_alert_days: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
+                  className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-purple-700"
                 />
               </div>
 
@@ -1357,7 +1357,7 @@ export default function HrmSettingsPage() {
                   type="time"
                   value={approvalCfg.checkin_reminder_time}
                   onChange={(e) => setApprovalCfg({ ...approvalCfg, checkin_reminder_time: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
+                  className="w-full px-3 py-2 bg-white border rounded-xl tabular-nums text-blue-700"
                 />
               </div>
             </div>
@@ -1423,7 +1423,7 @@ export default function HrmSettingsPage() {
                     type="text"
                     value={newTitle.salary_grade}
                     onChange={(e) => setNewTitle({ ...newTitle, salary_grade: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                   />
                 </div>
 
@@ -1434,7 +1434,7 @@ export default function HrmSettingsPage() {
                     step={1000000}
                     value={newTitle.min_salary}
                     onChange={(e) => setNewTitle({ ...newTitle, min_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-semibold"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-emerald-700 font-semibold"
                   />
                 </div>
               </div>
@@ -1447,7 +1447,7 @@ export default function HrmSettingsPage() {
                     step={50000}
                     value={newTitle.lunch_allowance}
                     onChange={(e) => setNewTitle({ ...newTitle, lunch_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
                   />
                 </div>
 
@@ -1458,7 +1458,7 @@ export default function HrmSettingsPage() {
                     step={50000}
                     value={newTitle.travel_allowance}
                     onChange={(e) => setNewTitle({ ...newTitle, travel_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-amber-700"
                   />
                 </div>
               </div>
@@ -1511,7 +1511,7 @@ export default function HrmSettingsPage() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <span className="text-slate-500 font-bold block">Mã Chức Danh:</span>
-                  <span className="font-mono font-bold text-purple-700">{viewingTitle.code}</span>
+                  <span className="tabular-nums font-bold text-purple-700">{viewingTitle.code}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 font-bold block">Ngạch / Bậc Lương:</span>
@@ -1526,7 +1526,7 @@ export default function HrmSettingsPage() {
 
               <div>
                 <span className="text-slate-500 font-bold block">Dải Lương Cơ Bản (Min - Max):</span>
-                <span className="font-mono font-bold text-emerald-700 text-sm">
+                <span className="tabular-nums font-bold text-emerald-700 text-sm">
                   {new Intl.NumberFormat('vi-VN').format(viewingTitle.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(viewingTitle.max_salary)} ₫
                 </span>
               </div>
@@ -1534,11 +1534,11 @@ export default function HrmSettingsPage() {
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
                 <div>
                   <span className="text-slate-500 font-bold block">Phụ Cấp Ăn Trưa:</span>
-                  <span className="font-mono font-bold text-blue-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.lunch_allowance)} ₫</span>
+                  <span className="tabular-nums font-bold text-blue-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.lunch_allowance)} ₫</span>
                 </div>
                 <div>
                   <span className="text-slate-500 font-bold block">Phụ Cấp Đi Lại:</span>
-                  <span className="font-mono font-bold text-amber-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.travel_allowance)} ₫</span>
+                  <span className="tabular-nums font-bold text-amber-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.travel_allowance)} ₫</span>
                 </div>
               </div>
 
@@ -1631,7 +1631,7 @@ export default function HrmSettingsPage() {
                     step={1000000}
                     value={editingTitle.min_salary}
                     onChange={(e) => setEditingTitle({ ...editingTitle, min_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-emerald-700"
                   />
                 </div>
 
@@ -1642,7 +1642,7 @@ export default function HrmSettingsPage() {
                     step={1000000}
                     value={editingTitle.max_salary}
                     onChange={(e) => setEditingTitle({ ...editingTitle, max_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-emerald-700"
                   />
                 </div>
               </div>
@@ -1655,7 +1655,7 @@ export default function HrmSettingsPage() {
                     step={50000}
                     value={editingTitle.lunch_allowance}
                     onChange={(e) => setEditingTitle({ ...editingTitle, lunch_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
                   />
                 </div>
 
@@ -1666,7 +1666,7 @@ export default function HrmSettingsPage() {
                     step={50000}
                     value={editingTitle.travel_allowance}
                     onChange={(e) => setEditingTitle({ ...editingTitle, travel_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-amber-700"
                   />
                 </div>
               </div>

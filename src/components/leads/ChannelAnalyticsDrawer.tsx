@@ -91,7 +91,7 @@ export default function ChannelAnalyticsDrawer({
 
           <div className="p-3.5 bg-purple-50 text-purple-900 rounded-2xl border border-purple-200 space-y-1">
             <p className="text-[10px] text-purple-700 font-bold uppercase">Tổng Ngân Sách</p>
-            <p className="text-xs font-mono font-bold text-purple-800 pt-1">
+            <p className="text-xs tabular-nums font-bold text-purple-800 pt-1">
               {(grandTotalBudget / 1000000).toFixed(0)}Tr ₫
             </p>
           </div>
@@ -131,11 +131,11 @@ export default function ChannelAnalyticsDrawer({
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="font-bold text-xs text-slate-900">{stat.source_name}</span>
-                      <span className="ml-2 font-mono text-[11px] text-blue-700 font-bold">
+                      <span className="ml-2 tabular-nums text-[11px] text-blue-700 font-bold">
                         {stat.total_leads} Lead ({percentage}%)
                       </span>
                     </div>
-                    <span className="font-mono text-xs font-bold text-emerald-700">
+                    <span className="tabular-nums text-xs font-bold text-emerald-700">
                       {(stat.total_budget / 1000000).toLocaleString('vi-VN')} Tr ₫
                     </span>
                   </div>

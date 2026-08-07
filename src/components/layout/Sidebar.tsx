@@ -181,7 +181,7 @@ export default function Sidebar({
                   <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.8px]">
                     {cluster.groupName}
                   </span>
-                  <span className="text-[9px] font-mono font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[9px] tabular-nums font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                     {cluster.items.length}
                   </span>
                 </div>

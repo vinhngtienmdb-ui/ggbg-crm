@@ -162,7 +162,7 @@ export default function StoresPage() {
                 <tr key={store.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="p-3">
                     <p className="font-bold text-slate-900">{store.store_name}</p>
-                    <p className="text-[11px] text-blue-600 font-mono font-semibold">{store.store_code}</p>
+                    <p className="text-[11px] text-blue-600 tabular-nums font-semibold">{store.store_code}</p>
                   </td>
                   <td className="p-3 font-medium text-slate-700">{store.platform}</td>
                   <td className="p-3">
@@ -170,8 +170,8 @@ export default function StoresPage() {
                     <p className="text-[11px] text-slate-500">{store.customer_name}</p>
                   </td>
                   <td className="p-3">
-                    <p className="font-mono font-bold text-slate-900 tabular-numbers">{store.monthly_gmv_actual.toLocaleString('vi-VN')} ₫</p>
-                    <p className="text-[10px] text-slate-400 font-mono">Mục tiêu: {store.monthly_gmv_target.toLocaleString('vi-VN')} ₫</p>
+                    <p className="tabular-nums font-bold text-slate-900 tabular-numbers">{store.monthly_gmv_actual.toLocaleString('vi-VN')} ₫</p>
+                    <p className="text-[10px] text-slate-400 tabular-nums">Mục tiêu: {store.monthly_gmv_target.toLocaleString('vi-VN')} ₫</p>
                   </td>
                   <td className="p-3">{renderHealthBadge(store.health_rating)}</td>
                   <td className="p-3 font-bold text-slate-700">{store.cancellation_rate_percent}%</td>

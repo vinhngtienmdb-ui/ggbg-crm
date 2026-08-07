@@ -274,7 +274,7 @@ export default function DigitalSignatureModal({
                   setPinCode(e.target.value);
                   setPinError('');
                 }}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl font-mono text-slate-900 font-semibold tracking-widest text-sm"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl tabular-nums text-slate-900 font-semibold tracking-widest text-sm"
               />
             </div>
             {pinError && <p className="text-[11px] text-red-600 font-bold mt-1">⚠️ {pinError}</p>}
@@ -286,7 +286,7 @@ export default function DigitalSignatureModal({
               <Lock className="w-4 h-4 text-emerald-400" />
               <span>Mã hóa SHA-256 Checksum chống chỉnh sửa văn bản</span>
             </div>
-            <span className="font-mono text-emerald-400 font-bold">SHA-256 PKI</span>
+            <span className="tabular-nums text-emerald-400 font-bold">SHA-256 PKI</span>
           </div>
 
           {/* Actions */}

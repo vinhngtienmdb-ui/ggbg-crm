@@ -26,7 +26,7 @@ export default function ContractPdfModal({ isOpen, onClose, employee }: Contract
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-base text-slate-900">Hợp Đồng Lao Động — {employee.full_name}</h3>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded font-mono text-xs font-bold border border-blue-200">
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded tabular-nums text-xs font-bold border border-blue-200">
                   {employee.contract_number}
                 </span>
               </div>
@@ -64,7 +64,7 @@ export default function ContractPdfModal({ isOpen, onClose, employee }: Contract
               <p className="font-bold text-xs text-slate-600">Độc lập - Tự do - Hạnh phúc</p>
               <div className="w-24 h-[1px] bg-slate-400 mx-auto my-2"></div>
               <h2 className="font-bold text-lg pt-2 text-slate-900 tracking-wide font-sans">HỢP ĐỒNG LAO ĐỘNG</h2>
-              <p className="text-xs font-mono text-slate-500">Số: {employee.contract_number}</p>
+              <p className="text-xs tabular-nums text-slate-500">Số: {employee.contract_number}</p>
             </div>
 
             {/* Parties */}

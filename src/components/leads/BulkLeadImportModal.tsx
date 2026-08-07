@@ -229,7 +229,7 @@ export default function BulkLeadImportModal({
                 className="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
               />
               {fileName && (
-                <p className="text-[11px] font-mono text-blue-800 font-bold">
+                <p className="text-[11px] tabular-nums text-blue-800 font-bold">
                   📁 File đã chọn: {fileName}
                 </p>
               )}
@@ -281,12 +281,12 @@ export default function BulkLeadImportModal({
                     {previewRows.map((row) => (
                       <tr key={row.id} className={row.is_duplicate ? 'bg-red-50/60' : 'hover:bg-slate-50'}>
                         <td className="p-3 font-bold text-slate-900">{row.full_name}</td>
-                        <td className="p-3 font-mono font-bold text-blue-700">{row.phone}</td>
+                        <td className="p-3 tabular-nums font-bold text-blue-700">{row.phone}</td>
                         <td className="p-3">
                           <p className="font-semibold text-slate-800">{row.company_name}</p>
                           <p className="text-slate-400 text-[10px]">{row.email}</p>
                         </td>
-                        <td className="p-3 font-mono font-bold text-emerald-700">
+                        <td className="p-3 tabular-nums font-bold text-emerald-700">
                           {row.estimated_budget.toLocaleString('vi-VN')} ₫
                         </td>
                         <td className="p-3">

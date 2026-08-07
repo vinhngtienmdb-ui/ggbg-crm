@@ -422,7 +422,7 @@ export default function SystemSettingsPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-900 text-xs">{mod.name}</span>
-                        <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                        <span className="text-[10px] tabular-nums text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
                           {mod.path}
                         </span>
                       </div>
@@ -500,7 +500,7 @@ export default function SystemSettingsPage() {
                       <span>{r2Test.message}</span>
                     </div>
                     {r2Test.latency_ms && (
-                      <span className="font-mono font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
+                      <span className="tabular-nums font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
                         Độ trễ: {r2Test.latency_ms} ms
                       </span>
                     )}
@@ -514,7 +514,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.r2.account_id}
                       onChange={(e) => setConfig({ ...config, r2: { ...config.r2, account_id: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -524,7 +524,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.r2.bucket_name}
                       onChange={(e) => setConfig({ ...config, r2: { ...config.r2, bucket_name: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -534,7 +534,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.r2.access_key_id}
                       onChange={(e) => setConfig({ ...config, r2: { ...config.r2, access_key_id: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -544,7 +544,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.r2.custom_domain}
                       onChange={(e) => setConfig({ ...config, r2: { ...config.r2, custom_domain: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                 </div>
@@ -588,7 +588,7 @@ export default function SystemSettingsPage() {
                       <span>{supabaseTest.message}</span>
                     </div>
                     {supabaseTest.latency_ms && (
-                      <span className="font-mono font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
+                      <span className="tabular-nums font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
                         Độ trễ: {supabaseTest.latency_ms} ms
                       </span>
                     )}
@@ -602,7 +602,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.supabase.project_url}
                       onChange={(e) => setConfig({ ...config, supabase: { ...config.supabase, project_url: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -612,7 +612,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.supabase.db_name}
                       onChange={(e) => setConfig({ ...config, supabase: { ...config.supabase, db_name: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -622,7 +622,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.supabase.anon_key_masked}
                       onChange={(e) => setConfig({ ...config, supabase: { ...config.supabase, anon_key_masked: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -632,7 +632,7 @@ export default function SystemSettingsPage() {
                       type="number"
                       value={config.supabase.max_connections}
                       onChange={(e) => setConfig({ ...config, supabase: { ...config.supabase, max_connections: Number(e.target.value) } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                 </div>
@@ -676,7 +676,7 @@ export default function SystemSettingsPage() {
                       <span>{voipTest.message}</span>
                     </div>
                     {voipTest.latency_ms && (
-                      <span className="font-mono font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
+                      <span className="tabular-nums font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
                         Độ trễ: {voipTest.latency_ms} ms
                       </span>
                     )}
@@ -690,7 +690,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.voip.provider_name}
                       onChange={(e) => setConfig({ ...config, voip: { ...config.voip, provider_name: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -700,7 +700,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.voip.api_endpoint}
                       onChange={(e) => setConfig({ ...config, voip: { ...config.voip, api_endpoint: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -710,7 +710,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.voip.api_key_masked}
                       onChange={(e) => setConfig({ ...config, voip: { ...config.voip, api_key_masked: e.target.value } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -720,7 +720,7 @@ export default function SystemSettingsPage() {
                       type="number"
                       value={config.voip.recording_retention_days}
                       onChange={(e) => setConfig({ ...config, voip: { ...config.voip, recording_retention_days: Number(e.target.value) } })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                 </div>
@@ -763,7 +763,7 @@ export default function SystemSettingsPage() {
                     <span>{apiKeysTest.message}</span>
                   </div>
                   {apiKeysTest.latency_ms && (
-                    <span className="font-mono font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
+                    <span className="tabular-nums font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
                       Độ trễ: {apiKeysTest.latency_ms} ms
                     </span>
                   )}
@@ -783,7 +783,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.api_keys.shopee_app_key}
                       onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, shopee_app_key: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                   <div>
@@ -793,7 +793,7 @@ export default function SystemSettingsPage() {
                         type={showKeys['shopee'] ? 'text' : 'password'}
                         value={config.api_keys.shopee_app_secret}
                         onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, shopee_app_secret: e.target.value } })}
-                        className="w-full p-2 pr-9 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                        className="w-full p-2 pr-9 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                       />
                       <button
                         type="button"
@@ -817,7 +817,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.api_keys.tiktok_app_key}
                       onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, tiktok_app_key: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                   <div>
@@ -827,7 +827,7 @@ export default function SystemSettingsPage() {
                         type={showKeys['tiktok'] ? 'text' : 'password'}
                         value={config.api_keys.tiktok_app_secret}
                         onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, tiktok_app_secret: e.target.value } })}
-                        className="w-full p-2 pr-9 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                        className="w-full p-2 pr-9 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                       />
                       <button
                         type="button"
@@ -851,7 +851,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.api_keys.lazada_app_key}
                       onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, lazada_app_key: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                   <div>
@@ -861,7 +861,7 @@ export default function SystemSettingsPage() {
                         type={showKeys['lazada'] ? 'text' : 'password'}
                         value={config.api_keys.lazada_app_secret}
                         onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, lazada_app_secret: e.target.value } })}
-                        className="w-full p-2 pr-9 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                        className="w-full p-2 pr-9 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                       />
                       <button
                         type="button"
@@ -885,7 +885,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.api_keys.amazon_seller_id}
                       onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, amazon_seller_id: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                   <div>
@@ -894,7 +894,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.api_keys.amazon_lwa_client_id}
                       onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, amazon_lwa_client_id: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                 </div>
@@ -912,7 +912,7 @@ export default function SystemSettingsPage() {
                           type={showKeys['gemini'] ? 'text' : 'password'}
                           value={config.api_keys.gemini_api_key}
                           onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, gemini_api_key: e.target.value } })}
-                          className="w-full p-2 pr-9 bg-white border border-purple-200 rounded-xl text-xs font-mono text-purple-900"
+                          className="w-full p-2 pr-9 bg-white border border-purple-200 rounded-xl text-xs tabular-nums text-purple-900"
                         />
                         <button
                           type="button"
@@ -931,7 +931,7 @@ export default function SystemSettingsPage() {
                           type={showKeys['openai'] ? 'text' : 'password'}
                           value={config.api_keys.openai_api_key}
                           onChange={(e) => setConfig({ ...config, api_keys: { ...config.api_keys, openai_api_key: e.target.value } })}
-                          className="w-full p-2 pr-9 bg-white border border-purple-200 rounded-xl text-xs font-mono text-purple-900"
+                          className="w-full p-2 pr-9 bg-white border border-purple-200 rounded-xl text-xs tabular-nums text-purple-900"
                         />
                         <button
                           type="button"
@@ -983,7 +983,7 @@ export default function SystemSettingsPage() {
                     <span>{smtpTest.message}</span>
                   </div>
                   {smtpTest.latency_ms && (
-                    <span className="font-mono font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
+                    <span className="tabular-nums font-bold px-2 py-0.5 bg-white border rounded text-[10px]">
                       Độ trễ: {smtpTest.latency_ms} ms
                     </span>
                   )}
@@ -998,7 +998,7 @@ export default function SystemSettingsPage() {
                     value={config.smtp.host}
                     onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, host: e.target.value } })}
                     placeholder="smtp.mailgun.org"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     required
                   />
                 </div>
@@ -1010,7 +1010,7 @@ export default function SystemSettingsPage() {
                       type="number"
                       value={config.smtp.port}
                       onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, port: Number(e.target.value) } })}
-                      className="w-24 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-24 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                     <select
                       value={config.smtp.encryption}
@@ -1030,7 +1030,7 @@ export default function SystemSettingsPage() {
                     type="text"
                     value={config.smtp.username}
                     onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, username: e.target.value } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     required
                   />
                 </div>
@@ -1042,7 +1042,7 @@ export default function SystemSettingsPage() {
                       type={showKeys['smtp'] ? 'text' : 'password'}
                       value={config.smtp.password_masked}
                       onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, password_masked: e.target.value } })}
-                      className="w-full p-2.5 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                       required
                     />
                     <button
@@ -1061,7 +1061,7 @@ export default function SystemSettingsPage() {
                     type="email"
                     value={config.smtp.sender_email}
                     onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, sender_email: e.target.value } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     required
                   />
                 </div>
@@ -1124,7 +1124,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.webhook.telegram_bot_token}
                       onChange={(e) => setConfig({ ...config, webhook: { ...config.webhook, telegram_bot_token: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -1134,7 +1134,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.webhook.telegram_chat_id}
                       onChange={(e) => setConfig({ ...config, webhook: { ...config.webhook, telegram_chat_id: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                 </div>
@@ -1167,7 +1167,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.webhook.zalo_zns_webhook_url}
                       onChange={(e) => setConfig({ ...config, webhook: { ...config.webhook, zalo_zns_webhook_url: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
 
@@ -1177,7 +1177,7 @@ export default function SystemSettingsPage() {
                       type="text"
                       value={config.webhook.zalo_app_id}
                       onChange={(e) => setConfig({ ...config, webhook: { ...config.webhook, zalo_app_id: e.target.value } })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     />
                   </div>
                 </div>
@@ -1241,7 +1241,7 @@ export default function SystemSettingsPage() {
                     type="number"
                     value={config.security.max_file_size_mb}
                     onChange={(e) => setConfig({ ...config, security: { ...config.security, max_file_size_mb: Number(e.target.value) } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
 
@@ -1251,7 +1251,7 @@ export default function SystemSettingsPage() {
                     type="number"
                     value={config.security.session_timeout_mins}
                     onChange={(e) => setConfig({ ...config, security: { ...config.security, session_timeout_mins: Number(e.target.value) } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
 
@@ -1261,7 +1261,7 @@ export default function SystemSettingsPage() {
                     type="number"
                     value={config.security.max_failed_logins}
                     onChange={(e) => setConfig({ ...config, security: { ...config.security, max_failed_logins: Number(e.target.value) } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
               </div>
@@ -1334,11 +1334,11 @@ export default function SystemSettingsPage() {
                     ) : (
                       config.audit_logs.map((log) => (
                         <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="p-4 font-mono text-slate-500">{log.timestamp}</td>
+                          <td className="p-4 tabular-nums text-slate-500">{log.timestamp}</td>
                           <td className="p-4 font-bold text-slate-900">{log.section}</td>
                           <td className="p-4 font-semibold text-blue-700">{log.actor_name}</td>
                           <td className="p-4">
-                            <span className="px-2 py-0.5 bg-blue-50 text-blue-800 rounded font-mono text-[10px] font-bold">
+                            <span className="px-2 py-0.5 bg-blue-50 text-blue-800 rounded tabular-nums text-[10px] font-bold">
                               {log.action}
                             </span>
                           </td>
@@ -1385,7 +1385,7 @@ export default function SystemSettingsPage() {
                         type="text"
                         value={companyInfo.tax_code}
                         onChange={(e) => setCompanyInfo({ ...companyInfo, tax_code: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                        className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                       />
                     </div>
 

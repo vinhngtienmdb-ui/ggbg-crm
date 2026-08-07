@@ -231,9 +231,9 @@ export default function FixedAssetsPage() {
               <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                 <th className="p-3">Mã & Tên Tài Sản Cố Định</th>
                 <th className="p-3">Phân Loại Tài Sản</th>
-                <th className="p-3 font-mono">Nguyên Giá (VND)</th>
-                <th className="p-3 font-mono text-center">Khấu Hao/Tháng</th>
-                <th className="p-3 font-mono text-center">Giá Trị Còn Lại</th>
+                <th className="p-3 tabular-nums">Nguyên Giá (VND)</th>
+                <th className="p-3 tabular-nums text-center">Khấu Hao/Tháng</th>
+                <th className="p-3 tabular-nums text-center">Giá Trị Còn Lại</th>
                 <th className="p-3">Phòng Ban & Người Quản Lý</th>
                 <th className="p-3 text-center">Thao Tác</th>
               </tr>
@@ -243,7 +243,7 @@ export default function FixedAssetsPage() {
                 <tr key={a.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-3">
                     <p className="font-bold text-slate-900 text-sm">{a.name}</p>
-                    <p className="font-mono text-blue-700 text-[11px]">{a.asset_code} • Mua ngày {a.purchase_date}</p>
+                    <p className="tabular-nums text-blue-700 text-[11px]">{a.asset_code} • Mua ngày {a.purchase_date}</p>
                   </td>
 
                   <td className="p-3">
@@ -252,15 +252,15 @@ export default function FixedAssetsPage() {
                     </span>
                   </td>
 
-                  <td className="p-3 font-mono font-semibold text-slate-900">
+                  <td className="p-3 tabular-nums font-semibold text-slate-900">
                     {a.purchase_price.toLocaleString('vi-VN')} ₫
                   </td>
 
-                  <td className="p-3 text-center font-mono font-bold text-purple-700">
+                  <td className="p-3 text-center tabular-nums font-bold text-purple-700">
                     {a.monthly_depreciation.toLocaleString('vi-VN')} ₫/tháng
                   </td>
 
-                  <td className="p-3 text-center font-mono font-semibold text-emerald-700">
+                  <td className="p-3 text-center tabular-nums font-semibold text-emerald-700">
                     {a.net_book_value.toLocaleString('vi-VN')} ₫
                   </td>
 
@@ -346,7 +346,7 @@ export default function FixedAssetsPage() {
                     required
                     value={newAsset.purchase_date}
                     onChange={(e) => setNewAsset({ ...newAsset, purchase_date: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
               </div>
@@ -360,7 +360,7 @@ export default function FixedAssetsPage() {
                     required
                     value={newAsset.purchase_price}
                     onChange={(e) => setNewAsset({ ...newAsset, purchase_price: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-emerald-700"
                   />
                 </div>
 
@@ -371,7 +371,7 @@ export default function FixedAssetsPage() {
                     required
                     value={newAsset.depreciation_months}
                     onChange={(e) => setNewAsset({ ...newAsset, depreciation_months: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                   />
                 </div>
               </div>
@@ -451,7 +451,7 @@ export default function FixedAssetsPage() {
                     <th className="p-2 text-right">Giá Trị Còn Lại</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y font-mono">
+                <tbody className="divide-y tabular-nums">
                   {Array.from({ length: Math.min(12, selectedAsset.depreciation_months) }).map((_, i) => {
                     const monthVal = selectedAsset.monthly_depreciation;
                     const remVal = Math.max(0, selectedAsset.purchase_price - monthVal * (i + 1));

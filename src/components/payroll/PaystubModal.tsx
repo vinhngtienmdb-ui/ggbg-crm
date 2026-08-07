@@ -32,7 +32,7 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
               <DollarSign className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider block">
+              <span className="text-[10px] tabular-nums font-bold text-emerald-400 uppercase tracking-wider block">
                 {payroll.payroll_code}
               </span>
               <h3 className="font-bold text-sm text-white">Phiếu Lương Chi Tiết - {payroll.period}</h3>
@@ -56,7 +56,7 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
             </div>
             <div className="text-right">
               <h3 className="text-sm font-semibold text-slate-900 uppercase">PHIẾU LƯƠNG NHÂN VIÊN</h3>
-              <p className="text-[11px] font-mono font-bold text-emerald-700">KỲ THUẾ: {payroll.period}</p>
+              <p className="text-[11px] tabular-nums font-bold text-emerald-700">KỲ THUẾ: {payroll.period}</p>
             </div>
           </div>
 
@@ -65,7 +65,7 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
             <div>
               <span className="text-slate-500 font-bold block">Mã & Họ Tên Nhân Sự:</span>
               <span className="font-bold text-slate-900 text-sm block">
-                {payroll.employee_name} <span className="font-mono text-xs text-blue-600">({payroll.employee_code})</span>
+                {payroll.employee_name} <span className="tabular-nums text-xs text-blue-600">({payroll.employee_code})</span>
               </span>
             </div>
             <div>
@@ -76,7 +76,7 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
             </div>
             <div>
               <span className="text-slate-500 font-bold block">Tài Khoản Ngân Hàng Nhận Lương:</span>
-              <span className="font-mono font-bold text-slate-800 block">
+              <span className="tabular-nums font-bold text-slate-800 block">
                 {payroll.bank_name || 'MBBank'} - {payroll.bank_account || '0988888888'}
               </span>
             </div>
@@ -106,66 +106,66 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
               <tbody className="divide-y divide-slate-100">
                 <tr>
                   <td className="py-2 px-3 font-medium">1. Lương Cứng P1 (Theo Công)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-slate-900">
                     {formatVND(payroll.p1_calculated_salary)}
                   </td>
                   <td className="py-2 px-3 border-l border-slate-200 font-medium">1. BHXH (8%)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-red-600">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-red-600">
                     -{formatVND(payroll.bhxh_deduction)}
                   </td>
                 </tr>
 
                 <tr>
                   <td className="py-2 px-3 font-medium">2. Phụ Cấp P2 (Ăn trưa, xăng, ĐT)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-slate-900">
                     {formatVND(payroll.p2_allowances)}
                   </td>
                   <td className="py-2 px-3 border-l border-slate-200 font-medium">2. BHYT (1.5%)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-red-600">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-red-600">
                     -{formatVND(payroll.bhyt_deduction)}
                   </td>
                 </tr>
 
                 <tr>
                   <td className="py-2 px-3 font-medium">3. Lương Hiệu Suất P3 (KPI/Rating)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-blue-700">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-blue-700">
                     {formatVND(payroll.p3_performance_salary)}
                   </td>
                   <td className="py-2 px-3 border-l border-slate-200 font-medium">3. BHTN (1%)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-red-600">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-red-600">
                     -{formatVND(payroll.bhtn_deduction)}
                   </td>
                 </tr>
 
                 <tr>
                   <td className="py-2 px-3 font-medium">4. Tiền Tăng Ca OT (x1.5)</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-slate-900">
                     {formatVND(payroll.ot_salary)}
                   </td>
                   <td className="py-2 px-3 border-l border-slate-200 font-medium">4. Phạt Đi Muộn</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-red-600">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-red-600">
                     -{formatVND(payroll.late_penalty_deduction)}
                   </td>
                 </tr>
 
                 <tr>
                   <td className="py-2 px-3 font-medium">5. Tiền Thưởng Thêm</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-emerald-700">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-emerald-700">
                     {formatVND(payroll.bonus_amount)}
                   </td>
                   <td className="py-2 px-3 border-l border-slate-200 font-medium">5. Thuế TNCN Tạm Tính</td>
-                  <td className="py-2 px-3 text-right font-mono font-bold text-red-600">
+                  <td className="py-2 px-3 text-right tabular-nums font-bold text-red-600">
                     -{formatVND(payroll.personal_income_tax)}
                   </td>
                 </tr>
 
                 <tr className="bg-slate-50 font-bold border-t border-slate-200">
                   <td className="py-2.5 px-3 text-slate-900">TỔNG THU NHẬP (GROSS):</td>
-                  <td className="py-2.5 px-3 text-right font-mono text-emerald-700">
+                  <td className="py-2.5 px-3 text-right tabular-nums text-emerald-700">
                     {formatVND(payroll.total_gross_income)}
                   </td>
                   <td className="py-2.5 px-3 border-l border-slate-200 text-slate-900">TỔNG KHẤU TRỪ:</td>
-                  <td className="py-2.5 px-3 text-right font-mono text-red-600">
+                  <td className="py-2.5 px-3 text-right tabular-nums text-red-600">
                     -{formatVND(payroll.total_deductions)}
                   </td>
                 </tr>
@@ -177,13 +177,13 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
           <div className="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl shadow-lg flex items-center justify-between">
             <div>
               <span className="text-xs font-bold text-emerald-100 block">LƯƠNG THỰC NHẬN (NET SALARY):</span>
-              <span className="text-2xl font-mono font-semibold text-white mt-0.5 block">
+              <span className="text-2xl tabular-nums font-semibold text-white mt-0.5 block">
                 {formatVND(payroll.net_salary)}
               </span>
             </div>
             <div className="text-right">
               <span className="text-[11px] font-bold text-emerald-100 block">Dự kiến chuyển khoản:</span>
-              <span className="text-xs font-mono font-bold text-white">Ngày 05 Hàng Tháng</span>
+              <span className="text-xs tabular-nums font-bold text-white">Ngày 05 Hàng Tháng</span>
             </div>
           </div>
 
@@ -202,11 +202,11 @@ export default function PaystubModal({ isOpen, onClose, payroll, onSendEmail }: 
           <div className="hidden print:grid grid-cols-2 gap-4 text-center pt-8">
             <div>
               <p className="font-bold text-slate-900">NGƯỜI LẬP BẢNG LƯƠNG</p>
-              <p className="text-[10px] text-slate-400 font-mono">(Ký & ghi rõ họ tên)</p>
+              <p className="text-[10px] text-slate-400 tabular-nums">(Ký & ghi rõ họ tên)</p>
             </div>
             <div>
               <p className="font-bold text-slate-900">GIÁM ĐỐC NHÂN SỰ (HRD)</p>
-              <p className="text-[10px] text-slate-400 font-mono">(Ký & ghi rõ họ tên)</p>
+              <p className="text-[10px] text-slate-400 tabular-nums">(Ký & ghi rõ họ tên)</p>
             </div>
           </div>
 

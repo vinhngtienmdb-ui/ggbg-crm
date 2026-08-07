@@ -100,7 +100,7 @@ export default function KpiAnalyticsDashboard({ kpis }: KpiAnalyticsDashboardPro
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Số Chỉ Tiêu:</span>
-          <span className="font-mono font-semibold text-emerald-400 text-lg">{kpis.length} KPI</span>
+          <span className="tabular-nums font-semibold text-emerald-400 text-lg">{kpis.length} KPI</span>
         </div>
       </div>
 
@@ -166,7 +166,7 @@ export default function KpiAnalyticsDashboard({ kpis }: KpiAnalyticsDashboardPro
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-white">{st.value} KPI</span>
+                <span className="tabular-nums font-bold text-white">{st.value} KPI</span>
               </div>
             ))}
           </div>

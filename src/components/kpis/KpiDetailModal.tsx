@@ -35,7 +35,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold text-blue-400 uppercase tracking-wider block">
+              <span className="text-[10px] tabular-nums font-bold text-blue-400 uppercase tracking-wider block">
                 {kpi.kpi_code || 'KPI-ITEM'}
               </span>
               <h3 className="font-bold text-sm text-white">{kpi.kpi_name}</h3>
@@ -58,7 +58,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
                 <BarChart3 className="w-4 h-4 text-blue-400" /> Tiến Độ Hoàn Thành Chỉ Tiêu
               </span>
               <span
-                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold shadow-sm ${
+                className={`px-3 py-1 rounded-xl text-xs tabular-nums font-bold shadow-sm ${
                   progress >= 100
                     ? 'bg-emerald-500 text-slate-950'
                     : progress >= 80
@@ -86,13 +86,13 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
             <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-slate-800">
               <div>
                 <span className="text-slate-400 block font-medium">Chỉ Tiêu Mục Tiêu:</span>
-                <span className="font-mono font-bold text-blue-300 text-sm mt-0.5 block">
+                <span className="tabular-nums font-bold text-blue-300 text-sm mt-0.5 block">
                   {formatVal(target, kpi.unit)}
                 </span>
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Thực Tế Đạt Được:</span>
-                <span className="font-mono font-bold text-emerald-300 text-sm mt-0.5 block">
+                <span className="tabular-nums font-bold text-emerald-300 text-sm mt-0.5 block">
                   {formatVal(actual, kpi.unit)}
                 </span>
               </div>
@@ -134,7 +134,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
               <span className="text-slate-500 font-bold block flex items-center gap-1">
                 <Award className="w-3.5 h-3.5 text-purple-600" /> Trọng Số Đánh Giá:
               </span>
-              <span className="font-mono font-bold text-slate-900 block">{kpi.weight || 100}%</span>
+              <span className="tabular-nums font-bold text-slate-900 block">{kpi.weight || 100}%</span>
             </div>
           </div>
 
@@ -149,7 +149,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
           )}
 
           {/* Metadata Footer */}
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 tabular-nums pt-2 border-t border-slate-100">
             <span>Ngày tạo: {kpi.created_at || '2026-07-01'}</span>
             <span>Mã chỉ tiêu: {kpi.kpi_code || kpi.id}</span>
           </div>

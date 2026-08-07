@@ -145,7 +145,7 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
             <span className="flex-1 text-left font-normal truncate hidden sm:block">
               Tìm khách hàng, lead, hợp đồng...
             </span>
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-mono text-slate-400 px-1.5 py-0.5 bg-slate-200/70 dark:bg-slate-700/70 rounded border border-slate-300/50 dark:border-slate-600 shrink-0">
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[10px] tabular-nums text-slate-400 px-1.5 py-0.5 bg-slate-200/70 dark:bg-slate-700/70 rounded border border-slate-300/50 dark:border-slate-600 shrink-0">
               ⌘K
             </kbd>
           </button>

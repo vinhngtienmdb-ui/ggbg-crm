@@ -173,7 +173,7 @@ export default function VietnamAddressPicker({
           {required && <span className="text-red-500">*</span>}
         </label>
 
-        <span className="px-2.5 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded-full font-mono text-[10px] font-bold flex items-center gap-1 w-fit">
+        <span className="px-2.5 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded-full tabular-nums text-[10px] font-bold flex items-center gap-1 w-fit">
           🇻🇳 Đơn Vị Hành Chính Chuẩn Sau 01/07/2025
         </span>
       </div>

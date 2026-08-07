@@ -60,13 +60,13 @@ export default function OfficialContractPdfModal({
             <div className="text-center space-y-1 border-b border-slate-200 pb-4">
               <p className="font-bold uppercase tracking-wider text-sm text-slate-900">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
               <p className="font-bold text-xs text-slate-800">Độc lập - Tự do - Hạnh phúc</p>
-              <p className="text-[10px] text-slate-400 font-mono pt-1">---***---</p>
+              <p className="text-[10px] text-slate-400 tabular-nums pt-1">---***---</p>
             </div>
 
             {/* Title */}
             <div className="text-center space-y-1">
               <h2 className="font-bold text-base uppercase text-slate-900 tracking-tight">HỢP ĐỒNG DỊCH VỤ UỶ QUYỀN VẬN HÀNH GIAN HÀNG TMĐT</h2>
-              <p className="font-mono text-xs font-bold text-blue-700">Mã Số Chứng Từ: {contractCode}</p>
+              <p className="tabular-nums text-xs font-bold text-blue-700">Mã Số Chứng Từ: {contractCode}</p>
             </div>
 
             {/* Parties Info */}
@@ -120,7 +120,7 @@ export default function OfficialContractPdfModal({
                 </div>
 
                 {/* QR Code Verification */}
-                <div className="mt-2 flex items-center justify-center gap-1.5 p-1.5 bg-slate-100 border border-slate-300 rounded font-mono text-[9px] text-slate-700">
+                <div className="mt-2 flex items-center justify-center gap-1.5 p-1.5 bg-slate-100 border border-slate-300 rounded tabular-nums text-[9px] text-slate-700">
                   <QrCode className="w-6 h-6 text-slate-800" />
                   <div className="text-left">
                     <p className="font-bold text-slate-900">Xác Thực QR Online</p>

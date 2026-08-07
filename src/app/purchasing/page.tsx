@@ -261,7 +261,7 @@ export default function PurchasingPage() {
                 {filteredOrders.map((po) => (
                   <tr key={po.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
-                      <p className="font-mono font-semibold text-indigo-700 text-xs">{po.po_code}</p>
+                      <p className="tabular-nums font-semibold text-indigo-700 text-xs">{po.po_code}</p>
                       <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {formatDate(po.order_date)}</p>
                     </td>
 
@@ -273,12 +273,12 @@ export default function PurchasingPage() {
                     <td className="p-3">
                       {po.items.map((it) => (
                         <div key={it.id} className="text-slate-800 font-bold">
-                          • {it.item_name} <span className="font-mono text-purple-700">({it.quantity} cái)</span>
+                          • {it.item_name} <span className="tabular-nums text-purple-700">({it.quantity} cái)</span>
                         </div>
                       ))}
                     </td>
 
-                    <td className="p-3 text-right font-mono font-semibold text-slate-900 text-xs">
+                    <td className="p-3 text-right tabular-nums font-semibold text-slate-900 text-xs">
                       {formatCurrency(po.grand_total)}
                     </td>
 
@@ -336,14 +336,14 @@ export default function PurchasingPage() {
                   <tr key={sup.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
                       <p className="font-bold text-slate-900 text-xs">{sup.name}</p>
-                      <p className="font-mono text-purple-700 text-[11px] font-bold">Mã số: {sup.supplier_code}</p>
+                      <p className="tabular-nums text-purple-700 text-[11px] font-bold">Mã số: {sup.supplier_code}</p>
                     </td>
 
-                    <td className="p-3 font-mono font-bold text-slate-700">{sup.tax_code}</td>
+                    <td className="p-3 tabular-nums font-bold text-slate-700">{sup.tax_code}</td>
 
                     <td className="p-3">
                       <p className="font-bold text-slate-800">👤 {sup.contact_person}</p>
-                      <p className="text-[11px] text-slate-500 font-mono">📞 {sup.phone}</p>
+                      <p className="text-[11px] text-slate-500 tabular-nums">📞 {sup.phone}</p>
                     </td>
 
                     <td className="p-3">
@@ -360,7 +360,7 @@ export default function PurchasingPage() {
                       </span>
                     </td>
 
-                    <td className="p-3 text-right font-mono font-semibold text-red-600 text-xs">
+                    <td className="p-3 text-right tabular-nums font-semibold text-red-600 text-xs">
                       {formatCurrency(sup.payable_balance)}
                     </td>
                   </tr>
@@ -419,7 +419,7 @@ export default function PurchasingPage() {
                     required
                     value={newItemQty}
                     onChange={(e) => setNewItemQty(Number(e.target.value))}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
 
@@ -430,7 +430,7 @@ export default function PurchasingPage() {
                     required
                     value={newItemPrice}
                     onChange={(e) => setNewItemPrice(Number(e.target.value))}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700 font-bold"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700 font-bold"
                   />
                 </div>
               </div>
@@ -446,7 +446,7 @@ export default function PurchasingPage() {
                 />
               </div>
 
-              <div className="p-3 bg-indigo-50 rounded-xl space-y-1 font-mono text-[11px]">
+              <div className="p-3 bg-indigo-50 rounded-xl space-y-1 tabular-nums text-[11px]">
                 <p className="text-indigo-900 font-bold">Thành tiền trước thuế: {formatCurrency(newItemQty * newItemPrice)}</p>
                 <p className="text-indigo-700">Thuế GTGT VAT (10%): {formatCurrency(newItemQty * newItemPrice * 0.1)}</p>
                 <p className="text-indigo-950 font-semibold text-xs pt-1 border-t border-indigo-200">
@@ -509,7 +509,7 @@ export default function PurchasingPage() {
                     placeholder="0101234567"
                     value={newSupTax}
                     onChange={(e) => setNewSupTax(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
 
@@ -546,7 +546,7 @@ export default function PurchasingPage() {
                     placeholder="0901234567"
                     value={newSupPhone}
                     onChange={(e) => setNewSupPhone(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
               </div>

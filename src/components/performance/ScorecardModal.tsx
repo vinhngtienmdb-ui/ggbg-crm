@@ -217,7 +217,7 @@ export default function ScorecardModal({
                 value={formData.employee_code || ''}
                 onChange={(e) => setFormData({ ...formData, employee_code: e.target.value })}
                 placeholder="VD: NV-00101"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
 
@@ -277,7 +277,7 @@ export default function ScorecardModal({
             {workItems.map((item, idx) => (
               <div key={item.id} className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2 text-xs">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-slate-500 font-mono">#{idx + 1}</span>
+                  <span className="font-bold text-slate-500 tabular-nums">#{idx + 1}</span>
                   <input
                     type="text"
                     value={item.work_title}
@@ -294,7 +294,7 @@ export default function ScorecardModal({
                       step={0.5}
                       value={item.self_score}
                       onChange={(e) => handleUpdateWorkItem(idx, 'self_score', Number(e.target.value))}
-                      className="w-14 px-1.5 py-1 bg-white border border-slate-200 rounded-lg font-mono font-bold text-blue-700 text-center"
+                      className="w-14 px-1.5 py-1 bg-white border border-slate-200 rounded-lg tabular-nums font-bold text-blue-700 text-center"
                     />
                     <span className="text-[11px] font-bold text-slate-500">/10</span>
                   </div>
@@ -364,7 +364,7 @@ export default function ScorecardModal({
                   step={0.1}
                   value={formData.kpi_score ?? ''}
                   onChange={(e) => setFormData({ ...formData, kpi_score: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg tabular-nums font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
@@ -383,7 +383,7 @@ export default function ScorecardModal({
                   step={0.1}
                   value={formData.compliance_score ?? ''}
                   onChange={(e) => setFormData({ ...formData, compliance_score: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold text-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg tabular-nums font-bold text-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
@@ -402,7 +402,7 @@ export default function ScorecardModal({
                   step={0.1}
                   value={formData.teamwork_score ?? ''}
                   onChange={(e) => setFormData({ ...formData, teamwork_score: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold text-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg tabular-nums font-bold text-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
@@ -421,7 +421,7 @@ export default function ScorecardModal({
                   step={0.1}
                   value={formData.csat_score ?? ''}
                   onChange={(e) => setFormData({ ...formData, csat_score: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg tabular-nums font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
@@ -434,7 +434,7 @@ export default function ScorecardModal({
                   max={20}
                   value={formData.bonus_score ?? ''}
                   onChange={(e) => setFormData({ ...formData, bonus_score: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-white border border-emerald-300 rounded-lg font-mono font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full px-3 py-1.5 bg-white border border-emerald-300 rounded-lg tabular-nums font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 />
               </div>
 
@@ -447,7 +447,7 @@ export default function ScorecardModal({
                   max={20}
                   value={formData.penalty_score ?? ''}
                   onChange={(e) => setFormData({ ...formData, penalty_score: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-white border border-red-300 rounded-lg font-mono font-bold text-red-700 focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="w-full px-3 py-1.5 bg-white border border-red-300 rounded-lg tabular-nums font-bold text-red-700 focus:outline-none focus:ring-2 focus:ring-red-600"
                 />
               </div>
             </div>
@@ -468,13 +468,13 @@ export default function ScorecardModal({
                   step={500000}
                   value={baseP3}
                   onChange={(e) => setFormData({ ...formData, base_p3_salary: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl font-mono font-bold text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl tabular-nums font-bold text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
               <div>
                 <span className="text-slate-300 font-bold block mb-1">Tổng Điểm Tổng Hợp:</span>
-                <div className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl font-mono font-semibold text-blue-300 text-sm">
+                <div className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl tabular-nums font-semibold text-blue-300 text-sm">
                   {computedFinalScore} / 100 Điểm
                 </div>
               </div>
@@ -504,7 +504,7 @@ export default function ScorecardModal({
             {/* Calculated Final Salary Result */}
             <div className="p-3 bg-slate-800/90 border border-slate-700 rounded-xl flex items-center justify-between text-xs">
               <span className="text-slate-300 font-bold">Lương Hiệu Suất Thực Nhận (P3 Auto-Salary):</span>
-              <span className="font-mono font-semibold text-emerald-400 text-base">
+              <span className="tabular-nums font-semibold text-emerald-400 text-base">
                 {calculatedP3.toLocaleString('vi-VN')} ₫
               </span>
             </div>

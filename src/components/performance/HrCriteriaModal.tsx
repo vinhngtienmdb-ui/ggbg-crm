@@ -103,7 +103,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
               <span className="font-bold text-slate-700 block">Tổng Trọng Số Đánh Giá:</span>
               <span className="text-slate-500">Quy định tổng trọng số các tiêu chí phải đạt chính xác 100%</span>
             </div>
-            <div className="flex items-center gap-2 font-mono font-semibold text-sm">
+            <div className="flex items-center gap-2 tabular-nums font-semibold text-sm">
               <span className={`px-3 py-1 rounded-xl ${totalWeight === 100 ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
                 {totalWeight}%
               </span>
@@ -122,7 +122,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
             {criteria.map((item, idx) => (
               <div key={item.id} className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm hover:border-purple-300 transition-colors">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-800 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-800 tabular-nums font-bold text-xs flex items-center justify-center shrink-0">
                     #{idx + 1}
                   </span>
 
@@ -143,7 +143,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
                       max={100}
                       value={item.weight}
                       onChange={(e) => handleUpdateItem(idx, 'weight', Number(e.target.value))}
-                      className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 text-center focus:outline-none focus:ring-2 focus:ring-purple-600"
+                      className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-900 text-center focus:outline-none focus:ring-2 focus:ring-purple-600"
                     />
                     <span className="text-xs font-bold text-slate-600">%</span>
                   </div>

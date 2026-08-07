@@ -294,7 +294,7 @@ export default function KpiModal({
                 value={formData.unit || 'VND'}
                 onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 placeholder="VD: VND, Lead, Cuộc gọi, Hợp đồng, %..."
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
           </div>
@@ -328,7 +328,7 @@ export default function KpiModal({
                 max={100}
                 value={formData.weight || 100}
                 onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
           </div>
@@ -352,7 +352,7 @@ export default function KpiModal({
                   value={formData.target_value ?? ''}
                   onChange={(e) => setFormData({ ...formData, target_value: Number(e.target.value) })}
                   placeholder="Nhập giá trị chỉ tiêu"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs tabular-nums font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
@@ -367,7 +367,7 @@ export default function KpiModal({
                   value={formData.actual_value ?? ''}
                   onChange={(e) => setFormData({ ...formData, actual_value: Number(e.target.value) })}
                   placeholder="Nhập giá trị thực tế đã làm"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs tabular-nums font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function KpiModal({
               <span className="text-xs font-bold text-slate-600">Tiến Độ Hoàn Thành Tính Toán:</span>
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-3 py-1 rounded-xl text-xs font-mono font-bold shadow-sm ${
+                  className={`px-3 py-1 rounded-xl text-xs tabular-nums font-bold shadow-sm ${
                     computedProgress >= 100
                       ? 'bg-emerald-600 text-white'
                       : computedProgress >= 80

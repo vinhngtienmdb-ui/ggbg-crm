@@ -148,7 +148,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Nhập mật khẩu..."
                     disabled={isSubmitting}
-                    className="w-full pl-11 pr-11 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 font-mono transition-all disabled:opacity-50"
+                    className="w-full pl-11 pr-11 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 tabular-nums transition-all disabled:opacity-50"
                   />
                   <button
                     type="button"
@@ -181,7 +181,7 @@ export default function LoginPage() {
                   onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                   placeholder="000000"
                   disabled={isSubmitting}
-                  className="w-full text-center px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-purple-400 dark:border-purple-700 rounded-2xl font-mono text-xl tracking-[10px] font-semibold text-purple-700 dark:text-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                  className="w-full text-center px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-purple-400 dark:border-purple-700 rounded-2xl tabular-nums text-xl tracking-[10px] font-semibold text-purple-700 dark:text-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                 />
               </div>
 

@@ -88,7 +88,7 @@ export default function LeadAnalyticsDashboard({ leads }: LeadAnalyticsDashboard
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tỷ Lệ Chốt Hợp Đồng Thành Công:</span>
-          <span className="font-mono font-semibold text-emerald-400 text-lg">{conversionRate}%</span>
+          <span className="tabular-nums font-semibold text-emerald-400 text-lg">{conversionRate}%</span>
         </div>
       </div>
 
@@ -151,7 +151,7 @@ export default function LeadAnalyticsDashboard({ leads }: LeadAnalyticsDashboard
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-white">{st.value} Lead</span>
+                <span className="tabular-nums font-bold text-white">{st.value} Lead</span>
               </div>
             ))}
           </div>

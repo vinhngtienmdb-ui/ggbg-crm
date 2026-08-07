@@ -284,7 +284,7 @@ export default function EmployeeModal({
                 {mode === 'edit' && `Chỉnh Sửa Hồ Sơ Nhân Sự: ${formData.full_name}`}
                 {mode === 'view' && `Chi Tiết Hồ Sơ Nhân Sự: ${formData.full_name}`}
               </h2>
-              <p className="text-xs text-slate-300 font-mono">
+              <p className="text-xs text-slate-300 tabular-nums">
                 Mã NV: <span className="text-amber-400 font-bold">{formData.employee_code || 'NV-0000'}</span> · Phòng Ban: {formData.department} · Chức Danh: {formData.position}
               </p>
             </div>
@@ -389,7 +389,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.employee_code || ''}
                       onChange={(e) => setFormData({ ...formData, employee_code: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono font-bold text-slate-900"
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums font-bold text-slate-900"
                       required
                     />
                   </div>
@@ -414,7 +414,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.date_of_birth || ''}
                       onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-slate-900"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-slate-900"
                     />
                   </div>
 
@@ -462,7 +462,7 @@ export default function EmployeeModal({
                       value={formData.id_card_number || ''}
                       onChange={(e) => setFormData({ ...formData, id_card_number: e.target.value })}
                       placeholder="001095001234"
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-blue-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-blue-700"
                     />
                   </div>
 
@@ -473,7 +473,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.id_card_issue_date || ''}
                       onChange={(e) => setFormData({ ...formData, id_card_issue_date: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums"
                     />
                   </div>
 
@@ -495,7 +495,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.phone || ''}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-slate-900"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-slate-900"
                       required
                     />
                   </div>
@@ -507,7 +507,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.email || ''}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-slate-900"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-slate-900"
                       required
                     />
                   </div>
@@ -598,7 +598,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.contract_number || ''}
                       onChange={(e) => setFormData({ ...formData, contract_number: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums"
                     />
                   </div>
 
@@ -609,7 +609,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.joined_date || ''}
                       onChange={(e) => setFormData({ ...formData, joined_date: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums"
                     />
                   </div>
 
@@ -621,7 +621,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.base_salary || 12000000}
                       onChange={(e) => setFormData({ ...formData, base_salary: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-semibold text-emerald-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-semibold text-emerald-700"
                     />
                   </div>
                 </div>
@@ -640,7 +640,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.social_insurance_code || ''}
                       onChange={(e) => setFormData({ ...formData, social_insurance_code: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-purple-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-purple-700"
                     />
                   </div>
 
@@ -651,7 +651,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.health_insurance_code || ''}
                       onChange={(e) => setFormData({ ...formData, health_insurance_code: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-blue-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-blue-700"
                     />
                   </div>
 
@@ -662,7 +662,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.personal_tax_code || ''}
                       onChange={(e) => setFormData({ ...formData, personal_tax_code: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-bold text-amber-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums font-bold text-amber-700"
                     />
                   </div>
 
@@ -684,7 +684,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.bhxh_start_date || ''}
                       onChange={(e) => setFormData({ ...formData, bhxh_start_date: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums"
                     />
                   </div>
 
@@ -737,7 +737,7 @@ export default function EmployeeModal({
                     <div key={exp.id} className="p-3 bg-white rounded-xl border space-y-1">
                       <div className="flex items-center justify-between font-bold text-slate-900">
                         <span>{exp.company_name} — {exp.position}</span>
-                        <span className="text-[11px] text-slate-400 font-mono">{exp.from_date} → {exp.to_date}</span>
+                        <span className="text-[11px] text-slate-400 tabular-nums">{exp.from_date} → {exp.to_date}</span>
                       </div>
                       <p className="text-slate-600 text-[11px]">Lý do chuyển: {exp.reason_for_leaving}</p>
                     </div>
@@ -794,7 +794,7 @@ export default function EmployeeModal({
                 </h3>
                 <div className="p-4 bg-red-50/50 border border-red-200 rounded-2xl space-y-2">
                   <p className="font-bold text-slate-900">Họ tên: {formData.emergency_contact?.name} ({formData.emergency_contact?.relationship})</p>
-                  <p className="font-mono text-red-700 font-bold">Số điện thoại: {formData.emergency_contact?.phone}</p>
+                  <p className="tabular-nums text-red-700 font-bold">Số điện thoại: {formData.emergency_contact?.phone}</p>
                   <p className="text-slate-600">Địa chỉ: {formData.emergency_contact?.address}</p>
                 </div>
               </div>
@@ -854,7 +854,7 @@ export default function EmployeeModal({
                     <div key={doc.doc_id} className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between hover:bg-slate-100/80 transition-colors">
                       <div className="min-w-0 pr-2">
                         <span className="font-bold text-slate-900 block truncate">{doc.doc_name}</span>
-                        <span className="text-[10px] text-slate-500 font-mono block">{doc.uploaded_at || 'Mới tải lên'}</span>
+                        <span className="text-[10px] text-slate-500 tabular-nums block">{doc.uploaded_at || 'Mới tải lên'}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <a
@@ -896,7 +896,7 @@ export default function EmployeeModal({
                   <div key={wp.id} className="p-4 bg-blue-50/60 border border-blue-200 rounded-2xl space-y-1">
                     <div className="flex items-center justify-between font-bold text-blue-900">
                       <span>Quyết Định: {wp.decision_number}</span>
-                      <span className="font-mono text-slate-500">{wp.effective_date}</span>
+                      <span className="tabular-nums text-slate-500">{wp.effective_date}</span>
                     </div>
                     <p className="text-slate-800 font-bold">Chức danh: {wp.old_position} → <span className="text-blue-700">{wp.new_position}</span></p>
                     <p className="text-slate-600">Lương hợp đồng: {formatVND(wp.old_salary)} → <span className="text-emerald-700 font-bold">{formatVND(wp.new_salary)}</span></p>
@@ -917,7 +917,7 @@ export default function EmployeeModal({
                   <div key={rw.id} className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1">
                     <div className="flex justify-between font-bold text-amber-900">
                       <span>{rw.decision_number} — {rw.reward_type}</span>
-                      <span className="font-mono text-emerald-700">+{formatVND(rw.amount)}</span>
+                      <span className="tabular-nums text-emerald-700">+{formatVND(rw.amount)}</span>
                     </div>
                     <p className="text-slate-700">{rw.reason}</p>
                   </div>

@@ -243,7 +243,7 @@ export default function EnterpriseProjectsPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-purple-700 font-bold text-xs">{prj.project_code}</span>
+                      <span className="tabular-nums text-purple-700 font-bold text-xs">{prj.project_code}</span>
                       <h4 className="font-bold text-slate-900 text-sm">{prj.name}</h4>
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
                         prj.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
@@ -260,7 +260,7 @@ export default function EnterpriseProjectsPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <span className="text-[10.5px] text-slate-500 block">Ngân sách vs Thực tế:</span>
-                      <span className="font-mono text-xs text-slate-900 font-bold">
+                      <span className="tabular-nums text-xs text-slate-900 font-bold">
                         {prj.actual_cost.toLocaleString('vi-VN')} / {prj.budget.toLocaleString('vi-VN')} ₫
                       </span>
                     </div>
@@ -289,7 +289,7 @@ export default function EnterpriseProjectsPage() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs text-slate-700">
                     <span>Thời gian: {prj.start_date} ➔ {prj.end_date}</span>
-                    <span className="font-mono font-semibold text-purple-700">{prj.progress_pct}% Hoàn Thành</span>
+                    <span className="tabular-nums font-semibold text-purple-700">{prj.progress_pct}% Hoàn Thành</span>
                   </div>
 
                   <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -345,7 +345,7 @@ export default function EnterpriseProjectsPage() {
               <div key={colStatus} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 min-h-[400px]">
                 <div className="flex items-center justify-between border-b pb-2">
                   <span className="font-bold text-slate-900 text-xs">{statusNames[colStatus]}</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-800 rounded-full font-mono text-[10.5px]">
+                  <span className="px-2 py-0.5 bg-slate-200 text-slate-800 rounded-full tabular-nums text-[10.5px]">
                     {allTasks.length}
                   </span>
                 </div>
@@ -356,8 +356,8 @@ export default function EnterpriseProjectsPage() {
                       <p className="font-bold text-slate-900">{t.title}</p>
                       <p className="text-[11px] text-slate-500 font-normal">👤 Phụ trách: <strong>{t.assignee_name}</strong></p>
                       <div className="flex items-center justify-between text-[10.5px] pt-1 border-t border-slate-100">
-                        <span className="text-slate-400 font-mono">📅 {t.due_date}</span>
-                        <span className="font-mono text-purple-700 font-bold">{t.progress_pct}%</span>
+                        <span className="text-slate-400 tabular-nums">📅 {t.due_date}</span>
+                        <span className="tabular-nums text-purple-700 font-bold">{t.progress_pct}%</span>
                       </div>
                     </div>
                   ))}
@@ -402,7 +402,7 @@ export default function EnterpriseProjectsPage() {
                     type="number"
                     value={prjConfig.overbudget_warning_pct}
                     onChange={(e) => setPrjConfig({ ...prjConfig, overbudget_warning_pct: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                   />
                 </div>
 
@@ -412,7 +412,7 @@ export default function EnterpriseProjectsPage() {
                     type="number"
                     value={prjConfig.max_workload_pct}
                     onChange={(e) => setPrjConfig({ ...prjConfig, max_workload_pct: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                   />
                 </div>
               </div>
@@ -442,7 +442,7 @@ export default function EnterpriseProjectsPage() {
                     type="number"
                     value={prjConfig.auto_archive_days}
                     onChange={(e) => setPrjConfig({ ...prjConfig, auto_archive_days: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-slate-800"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-slate-800"
                   />
                 </div>
               </div>
@@ -508,7 +508,7 @@ export default function EnterpriseProjectsPage() {
                     required
                     value={newProject.start_date}
                     onChange={(e) => setNewProject({ ...newProject, start_date: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
 
@@ -519,7 +519,7 @@ export default function EnterpriseProjectsPage() {
                     required
                     value={newProject.end_date}
                     onChange={(e) => setNewProject({ ...newProject, end_date: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
               </div>
@@ -532,7 +532,7 @@ export default function EnterpriseProjectsPage() {
                   required
                   value={newProject.budget}
                   onChange={(e) => setNewProject({ ...newProject, budget: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                 />
               </div>
 

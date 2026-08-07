@@ -884,7 +884,7 @@ export default function CustomersPage() {
                         }`}>
                           {cust.entity_type === 'ENTERPRISE' ? '🏢 Doanh Nghiệp' : '👤 Cá Nhân'}
                         </span>
-                        <p className="font-mono text-slate-500 font-bold text-[11px] mt-1">{cust.customer_code}</p>
+                        <p className="tabular-nums text-slate-500 font-bold text-[11px] mt-1">{cust.customer_code}</p>
                       </td>
 
                       <td className="p-4">
@@ -892,7 +892,7 @@ export default function CustomersPage() {
                         <p className="text-slate-500 text-[11px] font-medium">{cust.company_name || 'Cá Nhân Độc Lập'}</p>
                       </td>
 
-                      <td className="p-4 font-mono font-bold">
+                      <td className="p-4 tabular-nums font-bold">
                         {cust.entity_type === 'ENTERPRISE' ? (
                           <span className="text-blue-700">MST: {maskIdentification(cust.tax_code, revealPII)}</span>
                         ) : (
@@ -900,11 +900,11 @@ export default function CustomersPage() {
                         )}
                       </td>
 
-                      <td className="p-4 font-mono font-semibold text-slate-800">
+                      <td className="p-4 tabular-nums font-semibold text-slate-800">
                         {revealPII ? cust.phone : maskPhoneVal(cust.phone)}
                       </td>
 
-                      <td className="p-4 font-mono font-bold text-emerald-700 text-sm">
+                      <td className="p-4 tabular-nums font-bold text-emerald-700 text-sm">
                         {(cust.ltv_total_spent / 1000000).toLocaleString('vi-VN')} Tr ₫
                       </td>
 
@@ -996,7 +996,7 @@ export default function CustomersPage() {
                   <p className="text-slate-500 font-semibold flex items-center gap-1">
                     <Coins className="w-4 h-4 text-emerald-600" /> Tổng LTV Tích Lũy:
                   </p>
-                  <p className="text-lg font-semibold font-mono text-emerald-700 mt-1">
+                  <p className="text-lg font-semibold tabular-nums text-emerald-700 mt-1">
                     {(selectedViewCustomer.ltv_total_spent / 1000000).toLocaleString('vi-VN')} Tr ₫
                   </p>
                 </div>
@@ -1005,7 +1005,7 @@ export default function CustomersPage() {
                   <p className="text-slate-500 font-semibold flex items-center gap-1">
                     <ShoppingBag className="w-4 h-4 text-blue-600" /> GMV Trung Bình/Tháng:
                   </p>
-                  <p className="text-lg font-semibold font-mono text-blue-700 mt-1">
+                  <p className="text-lg font-semibold tabular-nums text-blue-700 mt-1">
                     {((selectedViewCustomer.avg_monthly_gmv || 0) / 1000000).toLocaleString('vi-VN')} Tr ₫
                   </p>
                 </div>
@@ -1014,7 +1014,7 @@ export default function CustomersPage() {
                   <p className="text-slate-500 font-semibold flex items-center gap-1">
                     <ShieldCheck className="w-4 h-4 text-purple-600" /> Health Score Vòng Đời:
                   </p>
-                  <p className="text-lg font-semibold font-mono text-purple-700 mt-1">
+                  <p className="text-lg font-semibold tabular-nums text-purple-700 mt-1">
                     {selectedViewCustomer.health_score}/100 ({selectedViewCustomer.lifecycle_stage})
                   </p>
                 </div>
@@ -1037,7 +1037,7 @@ export default function CustomersPage() {
 
                   <div>
                     <p className="text-slate-500">Mã Số Thuế / CCCD Định Danh:</p>
-                    <p className="font-bold font-mono text-blue-700">
+                    <p className="font-bold tabular-nums text-blue-700">
                       {selectedViewCustomer.entity_type === 'ENTERPRISE'
                         ? `MST: ${maskIdentification(selectedViewCustomer.tax_code, revealPII)}`
                         : `CCCD: ${maskIdentification(selectedViewCustomer.id_card_number, revealPII)}`}
@@ -1046,7 +1046,7 @@ export default function CustomersPage() {
 
                   <div>
                     <p className="text-slate-500">Số Điện Thoại:</p>
-                    <p className="font-bold font-mono text-slate-900">{revealPII ? selectedViewCustomer.phone : maskPhoneVal(selectedViewCustomer.phone)}</p>
+                    <p className="font-bold tabular-nums text-slate-900">{revealPII ? selectedViewCustomer.phone : maskPhoneVal(selectedViewCustomer.phone)}</p>
                   </div>
 
                   <div>
@@ -1068,7 +1068,7 @@ export default function CustomersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-slate-500">Số Tài Khoản Ngân Hàng:</p>
-                    <p className="font-bold font-mono text-slate-900">{revealPII ? (selectedViewCustomer.bank_account || 'Chưa cập nhật') : (selectedViewCustomer.bank_account ? '•••• ' + selectedViewCustomer.bank_account.slice(-4) : 'Chưa cập nhật')}</p>
+                    <p className="font-bold tabular-nums text-slate-900">{revealPII ? (selectedViewCustomer.bank_account || 'Chưa cập nhật') : (selectedViewCustomer.bank_account ? '•••• ' + selectedViewCustomer.bank_account.slice(-4) : 'Chưa cập nhật')}</p>
                   </div>
 
                   <div>
@@ -1078,7 +1078,7 @@ export default function CustomersPage() {
 
                   <div>
                     <p className="text-slate-500">Hạn Mức Tín Dụng Công Nợ:</p>
-                    <p className="font-bold font-mono text-emerald-700">
+                    <p className="font-bold tabular-nums text-emerald-700">
                       {((selectedViewCustomer.credit_limit || 0) / 1000000).toLocaleString('vi-VN')} Tr ₫
                     </p>
                   </div>
@@ -1175,7 +1175,7 @@ export default function CustomersPage() {
                       type="text"
                       value={editForm.tax_code || ''}
                       onChange={(e) => setEditForm({ ...editForm, tax_code: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-blue-700"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-blue-700"
                     />
                   </div>
                 </div>
@@ -1187,7 +1187,7 @@ export default function CustomersPage() {
                       type="text"
                       value={editForm.id_card_number || ''}
                       onChange={(e) => setEditForm({ ...editForm, id_card_number: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-purple-700"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-purple-700"
                     />
                   </div>
 
@@ -1212,7 +1212,7 @@ export default function CustomersPage() {
                     required
                     value={editForm.phone || ''}
                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
 
@@ -1244,7 +1244,7 @@ export default function CustomersPage() {
                     type="text"
                     value={editForm.bank_account || ''}
                     onChange={(e) => setEditForm({ ...editForm, bank_account: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
 
@@ -1264,7 +1264,7 @@ export default function CustomersPage() {
                     type="number"
                     value={editForm.credit_limit ?? 0}
                     onChange={(e) => setEditForm({ ...editForm, credit_limit: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-emerald-700"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-emerald-700"
                   />
                 </div>
               </div>
@@ -1381,11 +1381,11 @@ export default function CustomersPage() {
                           value={row.fileName}
                           onChange={(e) => handleRowFileNameChange(row.id, e.target.value)}
                           placeholder="Tên file hoặc chọn tệp..."
-                          className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono"
+                          className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 tabular-nums"
                         />
 
                         {row.fileSize && (
-                          <span className="px-2 py-1 bg-slate-100 text-slate-600 font-mono font-bold text-[10px] rounded-lg border whitespace-nowrap">
+                          <span className="px-2 py-1 bg-slate-100 text-slate-600 tabular-nums font-bold text-[10px] rounded-lg border whitespace-nowrap">
                             {row.fileSize}
                           </span>
                         )}
@@ -1494,7 +1494,7 @@ export default function CustomersPage() {
                     required
                     value={createForm.customer_code}
                     onChange={(e) => setCreateForm({ ...createForm, customer_code: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-blue-700"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-blue-700"
                   />
                 </div>
 
@@ -1522,7 +1522,7 @@ export default function CustomersPage() {
                     placeholder="VD: 0988 123 456"
                     value={createForm.phone}
                     onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-semibold text-slate-900"
                   />
                 </div>
               </div>
@@ -1551,7 +1551,7 @@ export default function CustomersPage() {
                         placeholder="VD: 0108928374"
                         value={createForm.tax_code}
                         onChange={(e) => setCreateForm({ ...createForm, tax_code: e.target.value })}
-                        className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
+                        className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-semibold text-slate-900"
                       />
                     </div>
                   </div>
@@ -1569,7 +1569,7 @@ export default function CustomersPage() {
                         placeholder="VD: 001198002345"
                         value={createForm.id_card_number}
                         onChange={(e) => setCreateForm({ ...createForm, id_card_number: e.target.value })}
-                        className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
+                        className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-semibold text-slate-900"
                       />
                     </div>
                     <div>
@@ -1669,7 +1669,7 @@ export default function CustomersPage() {
                     placeholder="VD: 500000000"
                     value={createForm.avg_monthly_gmv}
                     onChange={(e) => setCreateForm({ ...createForm, avg_monthly_gmv: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-semibold text-slate-900"
                   />
                 </div>
 
@@ -1680,7 +1680,7 @@ export default function CustomersPage() {
                     placeholder="VD: 200000000"
                     value={createForm.credit_limit}
                     onChange={(e) => setCreateForm({ ...createForm, credit_limit: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-semibold text-slate-900"
                   />
                 </div>
               </div>

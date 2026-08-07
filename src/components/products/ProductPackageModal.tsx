@@ -89,7 +89,7 @@ export default function ProductPackageModal({
                 {mode === 'create' ? 'Tạo Gói Dịch Vụ Mới' : `Chỉnh Sửa Gói: ${formData.name}`}
               </h2>
               <p className="text-xs text-slate-500">
-                Mã SKU: <span className="font-mono text-blue-600 font-bold">{formData.sku_code}</span> • Cấu hình thuộc tính JSONB TMĐT
+                Mã SKU: <span className="tabular-nums text-blue-600 font-bold">{formData.sku_code}</span> • Cấu hình thuộc tính JSONB TMĐT
               </p>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function ProductPackageModal({
                 value={formData.sku_code || ''}
                 onChange={e => setFormData({ ...formData, sku_code: e.target.value })}
                 placeholder="PKG-OPS-SHOPEE-PRO"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>

@@ -322,7 +322,7 @@ export default function OmnichannelChatPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
                         <span className="font-bold text-xs text-slate-900 truncate">{chat.customer_name}</span>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0">{chat.last_message_at}</span>
+                        <span className="text-[10px] tabular-nums text-slate-400 shrink-0">{chat.last_message_at}</span>
                       </div>
 
                       <p className="text-[11px] text-slate-500 truncate mb-1">{chat.last_message}</p>
@@ -363,7 +363,7 @@ export default function OmnichannelChatPage() {
                     {renderChannelBadge(activeChat.channel_type)}
                   </div>
                   <p className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                    <span>SĐT: <strong className="font-mono text-slate-800">{activeChat.customer_phone || 'Chưa cập nhật'}</strong></span>
+                    <span>SĐT: <strong className="tabular-nums text-slate-800">{activeChat.customer_phone || 'Chưa cập nhật'}</strong></span>
                     <span>• Phụ trách: <strong className="text-blue-700">{activeChat.assigned_rep_name}</strong></span>
                   </p>
                 </div>
@@ -520,7 +520,7 @@ export default function OmnichannelChatPage() {
                     <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã Liên Kết CRM 360
                     </span>
-                    <span className="font-mono font-bold text-xs text-slate-900">KH-1001</span>
+                    <span className="tabular-nums font-bold text-xs text-slate-900">KH-1001</span>
                   </div>
 
                   <div>
@@ -535,7 +535,7 @@ export default function OmnichannelChatPage() {
                     </p>
                     <p className="flex justify-between">
                       <span className="text-slate-500">GMV Hàng tháng:</span>
-                      <strong className="text-emerald-700 font-mono font-bold">850.000.000 ₫</strong>
+                      <strong className="text-emerald-700 tabular-nums font-bold">850.000.000 ₫</strong>
                     </p>
                     <p className="flex justify-between">
                       <span className="text-slate-500">Sàn vận hành:</span>
@@ -598,7 +598,7 @@ export default function OmnichannelChatPage() {
             </div>
 
             {/* System Info */}
-            <div className="p-3 bg-blue-50 text-slate-900 border border-blue-100 rounded-2xl text-[11px] space-y-1 font-mono">
+            <div className="p-3 bg-blue-50 text-slate-900 border border-blue-100 rounded-2xl text-[11px] space-y-1 tabular-nums">
               <p className="text-blue-700 font-bold">💬 Cổng Tích Hợp Omnichannel Live Chat</p>
               <p className="text-slate-500">Trạng thái: Hoạt động 100% thời gian thực</p>
             </div>

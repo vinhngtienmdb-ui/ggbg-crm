@@ -410,13 +410,13 @@ export default function VietnamEmployeeDistributionMap({
                   href="https://github.com/nguyenduy1133/Free-GIS-Data"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-sky-400 hover:underline flex items-center gap-1 font-mono ml-2"
+                  className="text-xs text-sky-400 hover:underline flex items-center gap-1 tabular-nums ml-2"
                 >
                   Free-GIS-Data <ExternalLink className="w-3 h-3" />
                 </a>
               </h4>
             </div>
-            <span className="px-2.5 py-0.5 bg-slate-800 font-mono text-[11px] text-slate-300 font-bold rounded-lg border border-slate-700">
+            <span className="px-2.5 py-0.5 bg-slate-800 tabular-nums text-[11px] text-slate-300 font-bold rounded-lg border border-slate-700">
               Tổng {filteredEmployees.length} nhân sự
             </span>
           </div>
@@ -612,7 +612,7 @@ export default function VietnamEmployeeDistributionMap({
 
               <div className="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl flex items-center justify-between text-xs">
                 <span className="font-bold text-indigo-950">Tổng số nhân sự cư trú:</span>
-                <span className="px-3 py-1 bg-indigo-600 text-white font-mono font-bold rounded-xl">
+                <span className="px-3 py-1 bg-indigo-600 text-white tabular-nums font-bold rounded-xl">
                   {selectedLocation.count} Nhân sự
                 </span>
               </div>
@@ -627,7 +627,7 @@ export default function VietnamEmployeeDistributionMap({
                         </div>
                         <div>
                           <p className="font-bold text-slate-900">{emp.full_name}</p>
-                          <p className="text-[11px] font-mono text-indigo-700">{emp.employee_code} • {emp.position}</p>
+                          <p className="text-[11px] tabular-nums text-indigo-700">{emp.employee_code} • {emp.position}</p>
                         </div>
                       </div>
                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
@@ -636,14 +636,14 @@ export default function VietnamEmployeeDistributionMap({
                     </div>
 
                     <div className="p-2 bg-white rounded-xl border border-slate-200/80 text-[11px] space-y-1 text-slate-600">
-                      <p className="flex items-center gap-1 font-mono">
+                      <p className="flex items-center gap-1 tabular-nums">
                         <Building2 className="w-3.5 h-3.5 text-slate-400" /> {emp.department}
                       </p>
                       <p className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
                         <span className="truncate">{emp.temporary_address || emp.permanent_address || 'Chưa cập nhật'}</span>
                       </p>
-                      <p className="flex items-center gap-1 font-mono text-blue-700">
+                      <p className="flex items-center gap-1 tabular-nums text-blue-700">
                         <Phone className="w-3.5 h-3.5" /> {emp.phone}
                       </p>
                     </div>
@@ -672,14 +672,14 @@ export default function VietnamEmployeeDistributionMap({
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-slate-900 flex items-center gap-1.5">
                           <span
-                            className="w-5 h-5 rounded-full font-mono text-[10px] font-bold flex items-center justify-center text-white"
+                            className="w-5 h-5 rounded-full tabular-nums text-[10px] font-bold flex items-center justify-center text-white"
                             style={{ backgroundColor: REGION_COLOR[item.region] }}
                           >
                             #{idx + 1}
                           </span>
                           {item.provinceName}
                         </span>
-                        <span className="font-mono font-bold text-indigo-700">
+                        <span className="tabular-nums font-bold text-indigo-700">
                           {item.count} nhân sự ({item.percentage}%)
                         </span>
                       </div>

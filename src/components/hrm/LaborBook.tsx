@@ -213,7 +213,7 @@ export default function LaborBook({
                 >
                   <td className="p-3">
                     <p className="font-bold text-slate-900 text-sm">{e.full_name}</p>
-                    <p className="font-mono text-blue-700 text-[11px]">{e.employee_code}</p>
+                    <p className="tabular-nums text-blue-700 text-[11px]">{e.employee_code}</p>
                   </td>
 
                   <td className="p-3">
@@ -221,7 +221,7 @@ export default function LaborBook({
                     <p className="text-slate-500">{e.date_of_birth || '—'}</p>
                   </td>
 
-                  <td className="p-3 font-mono text-slate-800">
+                  <td className="p-3 tabular-nums text-slate-800">
                     {showPII ? e.id_card_number || '—' : maskId(e.id_card_number)}
                   </td>
 

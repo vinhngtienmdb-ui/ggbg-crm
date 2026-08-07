@@ -336,13 +336,13 @@ export default function RbacPage() {
 
                     <div className="flex items-center justify-between text-[10px]">
                       {renderRankBadge(rm.rank_level)}
-                      <span className={`font-mono font-bold ${isSelected ? 'text-blue-700' : 'text-slate-500'}`}>
+                      <span className={`tabular-nums font-bold ${isSelected ? 'text-blue-700' : 'text-slate-500'}`}>
                         {grantedCount}/12 quyền
                       </span>
                     </div>
 
                     {rm.hrm_position_name && (
-                      <p className={`text-[10px] font-mono flex items-center gap-1 ${isSelected ? 'text-purple-700' : 'text-purple-600'}`}>
+                      <p className={`text-[10px] tabular-nums flex items-center gap-1 ${isSelected ? 'text-purple-700' : 'text-purple-600'}`}>
                         <Briefcase className="w-3 h-3" /> HRM: {rm.hrm_position_name}
                       </p>
                     )}
@@ -396,14 +396,14 @@ export default function RbacPage() {
                   </div>
 
                   {selectedRoleObj.role === 'SUPER_ADMIN' ? (
-                    <span className="px-3 py-1 bg-red-50 text-red-700 font-mono text-xs font-bold rounded-lg border border-red-200">
+                    <span className="px-3 py-1 bg-red-50 text-red-700 tabular-nums text-xs font-bold rounded-lg border border-red-200">
                       🔴 Toàn Công Ty (Super Admin Default)
                     </span>
                   ) : (
                     <select
                       value={selectedRoleObj.data_scope}
                       onChange={(e) => handleDataScopeChange(e.target.value as DataScopeBoundary)}
-                      className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-900 font-mono text-xs font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-900 tabular-nums text-xs font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="ALL_COMPANY">🔴 Toàn Công Ty (ALL_COMPANY)</option>
                       <option value="DEPARTMENT">🔵 Trong Phòng Ban (DEPARTMENT)</option>
@@ -445,7 +445,7 @@ export default function RbacPage() {
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                   <span className="font-bold text-xs text-slate-900">{perm.name}</span>
-                                  <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-200/60 px-1.5 py-0.5 rounded">
+                                  <span className="text-[10px] tabular-nums font-bold text-slate-400 bg-slate-200/60 px-1.5 py-0.5 rounded">
                                     {perm.key}
                                   </span>
                                 </div>

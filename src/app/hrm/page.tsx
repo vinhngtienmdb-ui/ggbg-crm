@@ -831,7 +831,7 @@ export default function HRMPage() {
                             <div className="flex items-start justify-between">
                               <div>
                                 <p className="font-bold text-slate-900 text-xs">{cand.name}</p>
-                                <p className="text-[10px] font-mono text-blue-600">{cand.candidate_code || 'UV-2026'}</p>
+                                <p className="text-[10px] tabular-nums text-blue-600">{cand.candidate_code || 'UV-2026'}</p>
                               </div>
                               <button
                                 onClick={() => {
@@ -847,7 +847,7 @@ export default function HRMPage() {
 
                             <p className="text-[11px] text-slate-600 font-semibold">{cand.position}</p>
                             <p className="text-[10px] text-slate-500">{cand.department}</p>
-                            <p className="text-[10px] font-mono text-slate-400">{cand.phone} • {cand.email}</p>
+                            <p className="text-[10px] tabular-nums text-slate-400">{cand.phone} • {cand.email}</p>
 
                             {/* Quick Stage Transition Dropdown */}
                             <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
@@ -894,7 +894,7 @@ export default function HRMPage() {
                     <tr key={cand.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-4">
                         <p className="font-bold text-slate-900 text-sm">{cand.name}</p>
-                        <p className="font-mono text-blue-700 text-[11px]">{cand.candidate_code || 'UV-2026'}</p>
+                        <p className="tabular-nums text-blue-700 text-[11px]">{cand.candidate_code || 'UV-2026'}</p>
                       </td>
 
                       <td className="p-4">
@@ -902,12 +902,12 @@ export default function HRMPage() {
                         <p className="text-slate-500 text-[11px]">{cand.department}</p>
                       </td>
 
-                      <td className="p-4 font-mono text-slate-700">
+                      <td className="p-4 tabular-nums text-slate-700">
                         <p className="font-bold">{cand.phone}</p>
                         <p className="text-slate-400 text-[10px] font-sans">{cand.email}</p>
                       </td>
 
-                      <td className="p-4 font-mono font-bold text-emerald-700">
+                      <td className="p-4 tabular-nums font-bold text-emerald-700">
                         {(cand.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫
                       </td>
 
@@ -926,7 +926,7 @@ export default function HRMPage() {
                       </td>
 
                       <td className="p-4">
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 font-mono text-[10px] font-bold rounded">
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 tabular-nums text-[10px] font-bold rounded">
                           {cand.audit_logs?.length || 0} Lần Ghi Log
                         </span>
                       </td>
@@ -988,10 +988,10 @@ export default function HRMPage() {
               <tbody className="divide-y divide-slate-100">
                 {filteredEmployees.map((emp) => (
                   <tr key={emp.id} className="hover:bg-slate-50">
-                    <td className="p-4 font-mono font-bold text-blue-700">{emp.contract_number}</td>
+                    <td className="p-4 tabular-nums font-bold text-blue-700">{emp.contract_number}</td>
                     <td className="p-4 font-bold text-slate-900">{emp.full_name}</td>
                     <td className="p-4 font-semibold text-slate-700">{emp.contract_type || 'Chính thức'}</td>
-                    <td className="p-4 font-mono font-bold text-emerald-700">15.000.000 ₫</td>
+                    <td className="p-4 tabular-nums font-bold text-emerald-700">15.000.000 ₫</td>
                     <td className="p-4"><span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-bold text-[10px]">🔒 Đã Lưu</span></td>
                     <td className="p-4 text-center">
                       <button onClick={() => handleOpenContractModal(emp)} className="px-3 py-1 bg-blue-600 text-white font-bold rounded-xl text-xs">
@@ -1209,14 +1209,14 @@ export default function HRMPage() {
                       })
                       .map((jt) => (
                         <tr key={jt.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="p-3.5 font-mono font-bold text-purple-700">{jt.code}</td>
+                          <td className="p-3.5 tabular-nums font-bold text-purple-700">{jt.code}</td>
                           <td className="p-3.5">
                             <p className="font-bold text-slate-900">{jt.name}</p>
                             <p className="text-[11px] text-slate-500">{jt.description}</p>
                           </td>
                           <td className="p-3.5 font-bold text-blue-700">{jt.position_name || 'N/A'}</td>
                           <td className="p-3.5">
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-mono font-bold rounded border border-emerald-200">
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 tabular-nums font-bold rounded border border-emerald-200">
                               {jt.grade_code || 'G4'}
                             </span>
                           </td>
@@ -1260,7 +1260,7 @@ export default function HRMPage() {
                 {positionsList.map((pos) => (
                   <div key={pos.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono text-[11px] font-bold rounded border border-blue-200">
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-800 tabular-nums text-[11px] font-bold rounded border border-blue-200">
                         {pos.code}
                       </span>
                       <button
@@ -1296,7 +1296,7 @@ export default function HRMPage() {
                 {gradeLevelsList.map((gr) => (
                   <div key={gr.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 bg-emerald-600 text-white font-mono text-xs font-semibold rounded">
+                      <span className="px-2.5 py-0.5 bg-emerald-600 text-white tabular-nums text-xs font-semibold rounded">
                         {gr.code}
                       </span>
                       <button
@@ -1307,7 +1307,7 @@ export default function HRMPage() {
                       </button>
                     </div>
                     <h5 className="font-bold text-xs text-slate-900">{gr.name}</h5>
-                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800">
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs tabular-nums font-bold text-slate-800">
                       <span>Dải Lương: </span>
                       <span className="text-emerald-700">{gr.min_salary.toLocaleString('vi-VN')} ₫</span>
                       <span> - </span>
@@ -1365,7 +1365,7 @@ export default function HRMPage() {
                     type="text"
                     value={hrmConfig.emp_prefix}
                     onChange={(e) => setHrmConfig({ ...hrmConfig, emp_prefix: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700"
                   />
                 </div>
 
@@ -1375,7 +1375,7 @@ export default function HRMPage() {
                     type="text"
                     value={hrmConfig.cand_prefix}
                     onChange={(e) => setHrmConfig({ ...hrmConfig, cand_prefix: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
                   />
                 </div>
               </div>
@@ -1387,7 +1387,7 @@ export default function HRMPage() {
                     type="number"
                     value={hrmConfig.probation_days}
                     onChange={(e) => setHrmConfig({ ...hrmConfig, probation_days: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-slate-900"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-slate-900"
                   />
                 </div>
 
@@ -1397,7 +1397,7 @@ export default function HRMPage() {
                     type="number"
                     value={hrmConfig.annual_leave_quota}
                     onChange={(e) => setHrmConfig({ ...hrmConfig, annual_leave_quota: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-emerald-700"
                   />
                 </div>
               </div>
@@ -1411,7 +1411,7 @@ export default function HRMPage() {
 
               <div className="space-y-2">
                 <p className="text-[11px] text-slate-500 font-normal">Tỷ lệ Doanh Nghiệp đóng (Tổng 21.5%):</p>
-                <div className="grid grid-cols-3 gap-2 font-mono">
+                <div className="grid grid-cols-3 gap-2 tabular-nums">
                   <div>
                     <label className="block text-[10.5px] text-slate-600 mb-0.5">BHXH (%)</label>
                     <input
@@ -1445,7 +1445,7 @@ export default function HRMPage() {
                 </div>
 
                 <p className="text-[11px] text-slate-500 font-normal pt-1">Tỷ lệ Người Lao Động đóng (Tổng 10.5%):</p>
-                <div className="grid grid-cols-3 gap-2 font-mono">
+                <div className="grid grid-cols-3 gap-2 tabular-nums">
                   <div>
                     <label className="block text-[10.5px] text-slate-600 mb-0.5">BHXH (%)</label>
                     <input
@@ -1486,7 +1486,7 @@ export default function HRMPage() {
                 3. Khung Giờ Làm Việc Tiêu Chuẩn & Hệ Số Tăng Ca (Shift & OT Rules)
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 tabular-nums">
                 <div>
                   <label className="block text-slate-700 mb-1">Giờ Vào Ca Sáng</label>
                   <input
@@ -1575,7 +1575,7 @@ export default function HRMPage() {
                   value={newCandData.phone || ''}
                   onChange={(e) => setNewCandData({ ...newCandData, phone: e.target.value })}
                   placeholder="0988 999 888"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-mono"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs tabular-nums"
                   required
                 />
               </div>
@@ -1631,7 +1631,7 @@ export default function HRMPage() {
                 <h3 className="font-bold text-base flex items-center gap-2">
                   <History className="w-5 h-5 text-blue-600" /> Nhật Ký Ghi Log Thao Tác: {selectedCandidate.name}
                 </h3>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                <p className="text-xs text-slate-500 tabular-nums mt-0.5">
                   {selectedCandidate.candidate_code} • {selectedCandidate.position} ({selectedCandidate.department})
                 </p>
               </div>
@@ -1643,10 +1643,10 @@ export default function HRMPage() {
             <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 text-xs">
                 <div className="grid grid-cols-2 gap-2">
-                  <p>SĐT: <strong className="font-mono text-slate-900">{selectedCandidate.phone}</strong></p>
+                  <p>SĐT: <strong className="tabular-nums text-slate-900">{selectedCandidate.phone}</strong></p>
                   <p>Email: <strong className="text-slate-900">{selectedCandidate.email}</strong></p>
                   <p>Trạng thái phễu: <strong className="text-blue-700 font-bold">{selectedCandidate.stage}</strong></p>
-                  <p>Lương kỳ vọng: <strong className="text-emerald-700 font-bold font-mono">{(selectedCandidate.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫</strong></p>
+                  <p>Lương kỳ vọng: <strong className="text-emerald-700 font-bold tabular-nums">{(selectedCandidate.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫</strong></p>
                 </div>
               </div>
 
@@ -1661,11 +1661,11 @@ export default function HRMPage() {
                     <div key={log.id} className="p-3 bg-blue-50/60 border border-blue-100 rounded-xl space-y-1 text-xs">
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-bold text-blue-900">{log.actor_name}</span>
-                        <span className="font-mono text-slate-400">{log.timestamp}</span>
+                        <span className="tabular-nums text-slate-400">{log.timestamp}</span>
                       </div>
                       <p className="text-slate-800 font-semibold">{log.note}</p>
                       {log.stage_from && log.stage_to && (
-                        <p className="text-[10px] text-blue-700 font-mono">
+                        <p className="text-[10px] text-blue-700 tabular-nums">
                           Chuyển phễu: <span>{log.stage_from}</span> ➔ <strong>{log.stage_to}</strong>
                         </p>
                       )}
@@ -1696,10 +1696,10 @@ export default function HRMPage() {
                 <div key={log.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="font-bold text-slate-900">{log.candidate_name}</span>
-                    <span className="font-mono text-slate-400 text-[10px]">{log.timestamp}</span>
+                    <span className="tabular-nums text-slate-400 text-[10px]">{log.timestamp}</span>
                   </div>
                   <p className="text-slate-700">{log.note}</p>
-                  <p className="text-[10px] text-blue-600 font-mono">Người thực hiện: {log.actor_name}</p>
+                  <p className="text-[10px] text-blue-600 tabular-nums">Người thực hiện: {log.actor_name}</p>
                 </div>
               ))}
             </div>
@@ -1718,7 +1718,7 @@ export default function HRMPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base">Chuyển Trạng Thái Nhân Sự</h3>
-                  <p className="text-xs text-slate-500 font-mono">
+                  <p className="text-xs text-slate-500 tabular-nums">
                     {statusTargetEmp.full_name} ({statusTargetEmp.employee_code})
                   </p>
                 </div>
@@ -1835,7 +1835,7 @@ export default function HRMPage() {
                   <select
                     value={newJtGradeCode}
                     onChange={(e) => setNewJtGradeCode(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-emerald-700 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-emerald-700 focus:outline-none"
                   >
                     {gradeLevelsList.map((g) => (
                       <option key={g.id} value={g.code}>
@@ -1853,7 +1853,7 @@ export default function HRMPage() {
                   value={newJtCode}
                   onChange={(e) => setNewJtCode(e.target.value)}
                   placeholder="VD: DIR_SALES, MGR_HR... (Tự tạo nếu trống)"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                 />
               </div>
 
@@ -1946,7 +1946,7 @@ export default function HRMPage() {
                   value={newPosCode}
                   onChange={(e) => setNewPosCode(e.target.value)}
                   placeholder="VD: POS_VP, POS_HEAD... (Tự tạo nếu trống)"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -2011,7 +2011,7 @@ export default function HRMPage() {
                     value={newGrCode}
                     onChange={(e) => setNewGrCode(e.target.value)}
                     placeholder="VD: G1, G2, G3, G7..."
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-emerald-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums font-bold text-emerald-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                   />
                 </div>
 
@@ -2036,7 +2036,7 @@ export default function HRMPage() {
                     value={newGrMinSal}
                     onChange={(e) => setNewGrMinSal(Number(e.target.value))}
                     step={500000}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums text-slate-900 focus:outline-none"
                   />
                 </div>
 
@@ -2047,7 +2047,7 @@ export default function HRMPage() {
                     value={newGrMaxSal}
                     onChange={(e) => setNewGrMaxSal(Number(e.target.value))}
                     step={500000}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl tabular-nums text-slate-900 focus:outline-none"
                   />
                 </div>
               </div>

@@ -195,7 +195,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
               <div className="space-y-2 flex-1">
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Chuỗi Secret Key Bí Mật:</span>
-                  <p className="font-mono text-purple-700 dark:text-purple-400 font-bold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <p className="tabular-nums text-purple-700 dark:text-purple-400 font-bold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
                     {totpSecret}
                   </p>
                 </div>
@@ -217,7 +217,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
                 value={totpCode}
                 onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="000000"
-                className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl font-mono text-lg tracking-[8px] font-semibold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl tabular-nums text-lg tracking-[8px] font-semibold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
               />
             </div>
 

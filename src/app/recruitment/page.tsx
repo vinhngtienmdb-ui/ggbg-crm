@@ -462,7 +462,7 @@ export default function RecruitmentModulePage() {
                       {stgCand.map((cand) => (
                         <div key={cand.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="font-mono text-[10px] font-bold text-blue-700">{cand.candidate_code}</span>
+                            <span className="tabular-nums text-[10px] font-bold text-blue-700">{cand.candidate_code}</span>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">{cand.source}</span>
                           </div>
                           <p className="font-bold text-slate-900 text-xs">{cand.full_name}</p>
@@ -490,7 +490,7 @@ export default function RecruitmentModulePage() {
                           </div>
 
                           <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                            <span className="font-mono font-semibold text-emerald-700">
+                            <span className="tabular-nums font-semibold text-emerald-700">
                               {new Intl.NumberFormat('vi-VN').format(cand.expected_salary)} ₫
                             </span>
                             <select
@@ -534,7 +534,7 @@ export default function RecruitmentModulePage() {
                       <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                         <td className="p-3">
                           <p className="font-bold text-slate-900">{c.full_name}</p>
-                          <p className="font-mono text-blue-700 text-[11px]">{c.candidate_code} · {c.phone}</p>
+                          <p className="tabular-nums text-blue-700 text-[11px]">{c.candidate_code} · {c.phone}</p>
                         </td>
 
                         <td className="p-3">
@@ -542,7 +542,7 @@ export default function RecruitmentModulePage() {
                           <p className="text-slate-500 text-[11px]">{c.department}</p>
                         </td>
 
-                        <td className="p-3 font-mono">
+                        <td className="p-3 tabular-nums">
                           <p className="font-semibold text-emerald-700">
                             {new Intl.NumberFormat('vi-VN').format(c.expected_salary)} ₫
                           </p>
@@ -770,7 +770,7 @@ export default function RecruitmentModulePage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h4 className="font-bold text-base text-slate-900">{cand.full_name}</h4>
-                          <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">{cand.candidate_code}</span>
+                          <span className="tabular-nums text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">{cand.candidate_code}</span>
                         </div>
                         <p className="text-xs text-slate-500 mt-0.5">
                           Vị trí: <strong>{cand.position_applied}</strong> • Phòng Ban: {cand.department} • Người duyệt cấp 1: <strong>{cand.direct_manager_name || 'Trưởng Phòng KD1'}</strong>
@@ -878,7 +878,7 @@ export default function RecruitmentModulePage() {
                     required
                     value={newForm.phone}
                     onChange={(e) => setNewForm({ ...newForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums"
                   />
                 </div>
               </div>
@@ -934,7 +934,7 @@ export default function RecruitmentModulePage() {
                     step={1000000}
                     value={newForm.expected_salary}
                     onChange={(e) => setNewForm({ ...newForm, expected_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-semibold"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-emerald-700 font-semibold"
                   />
                 </div>
               </div>
@@ -970,7 +970,7 @@ export default function RecruitmentModulePage() {
                   </div>
                   {selectedCvFileName ? (
                     <div className="p-2 bg-white rounded-xl border border-blue-200 flex items-center justify-between text-xs">
-                      <span className="font-mono text-blue-900 font-bold truncate">📄 {selectedCvFileName}</span>
+                      <span className="tabular-nums text-blue-900 font-bold truncate">📄 {selectedCvFileName}</span>
                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Đã sẵn sàng</span>
                     </div>
                   ) : (

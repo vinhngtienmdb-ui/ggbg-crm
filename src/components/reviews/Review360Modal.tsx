@@ -162,7 +162,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
                         <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] rounded font-bold">Trọng số {crit.weight}%</span>
                         <p className="text-[11px] text-slate-500 mt-0.5">{crit.description}</p>
                       </div>
-                      <span className="font-mono font-bold text-blue-700 text-sm">{currentScore.toFixed(1)} / 10 điểm</span>
+                      <span className="tabular-nums font-bold text-blue-700 text-sm">{currentScore.toFixed(1)} / 10 điểm</span>
                     </div>
 
                     <input

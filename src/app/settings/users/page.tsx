@@ -389,7 +389,7 @@ export default function UserAccountsPage() {
                     </td>
 
                     <td className="p-3">
-                      <p className="text-slate-700 dark:text-slate-300 font-mono text-[11.5px]">{u.email}</p>
+                      <p className="text-slate-700 dark:text-slate-300 tabular-nums text-[11.5px]">{u.email}</p>
                       <p className="text-[10.5px] text-slate-400">📅 {u.last_login_at || 'Vừa khởi tạo'}</p>
                     </td>
 
@@ -520,7 +520,7 @@ export default function UserAccountsPage() {
                   placeholder="Ví dụ: duc.pm"
                   value={formUsername}
                   onChange={(e) => setFormUsername(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl font-mono"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums"
                 />
               </div>
 
@@ -532,7 +532,7 @@ export default function UserAccountsPage() {
                   placeholder="Nhập mật khẩu..."
                   value={formPassword}
                   onChange={(e) => setFormPassword(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl font-mono"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums"
                 />
               </div>
 
@@ -601,7 +601,7 @@ export default function UserAccountsPage() {
                   required
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl font-mono"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums"
                 />
               </div>
 
@@ -676,7 +676,7 @@ export default function UserAccountsPage() {
                   placeholder="Nhập mật khẩu mới..."
                   value={adminResetPass}
                   onChange={(e) => setAdminResetPass(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700 font-bold"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700 font-bold"
                 />
               </div>
 
@@ -717,24 +717,24 @@ export default function UserAccountsPage() {
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">{selectedUser.employee_name}</span>
-                  <span className="px-2.5 py-0.5 bg-purple-100 text-purple-900 font-mono text-[10.5px] rounded-full font-semibold">
+                  <span className="px-2.5 py-0.5 bg-purple-100 text-purple-900 tabular-nums text-[10.5px] rounded-full font-semibold">
                     {selectedUser.employee_code}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-300 font-medium text-[11.5px] pt-2 border-t">
-                  <p>Tên đăng nhập: <strong className="text-slate-900 dark:text-slate-100 font-mono">{selectedUser.username}</strong></p>
-                  <p>Email: <strong className="text-slate-900 dark:text-slate-100 font-mono">{selectedUser.email}</strong></p>
+                  <p>Tên đăng nhập: <strong className="text-slate-900 dark:text-slate-100 tabular-nums">{selectedUser.username}</strong></p>
+                  <p>Email: <strong className="text-slate-900 dark:text-slate-100 tabular-nums">{selectedUser.email}</strong></p>
                   <p>Vai trò: <strong className="text-purple-700 dark:text-purple-400">{selectedUser.role_name}</strong></p>
                   <p>Trạng thái 2FA: <strong className={selectedUser.is_2fa_enabled ? 'text-emerald-600' : 'text-slate-400'}>{selectedUser.is_2fa_enabled ? '🛡️ Đã Bật 2FA' : '⚪ Chưa Bật 2FA'}</strong></p>
                   <p>Đăng nhập cuối: <strong className="text-slate-900 dark:text-slate-100">{selectedUser.last_login_at || 'Mới khởi tạo'}</strong></p>
-                  <p>Ngày tạo: <strong className="text-slate-900 dark:text-slate-100 font-mono">{selectedUser.created_at}</strong></p>
+                  <p>Ngày tạo: <strong className="text-slate-900 dark:text-slate-100 tabular-nums">{selectedUser.created_at}</strong></p>
                 </div>
               </div>
 
               <div className="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl space-y-1">
                 <p className="text-purple-900 dark:text-purple-300 font-bold uppercase text-[10.5px]">Quyền Hạn RBAC Được Cấp:</p>
-                <p className="text-purple-800 dark:text-purple-400 font-mono text-[11px]">
+                <p className="text-purple-800 dark:text-purple-400 tabular-nums text-[11px]">
                   {selectedUser.permissions ? selectedUser.permissions.join(', ') : 'Mặc định theo Vai Trò'}
                 </p>
               </div>

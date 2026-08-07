@@ -132,7 +132,7 @@ export default function Review360Page() {
         <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200 shadow-sm space-y-1">
           <p className="text-xs font-bold text-slate-500 uppercase">Phiên Đánh Giá</p>
           <p className="text-2xl font-bold text-blue-700">{filteredSessions.length} Nhân Sự</p>
-          <p className="text-[10px] text-slate-500 font-mono">{selectedPeriod}</p>
+          <p className="text-[10px] text-slate-500 tabular-nums">{selectedPeriod}</p>
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
@@ -216,7 +216,7 @@ export default function Review360Page() {
                   <tr key={session.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="p-4">
                       <p className="font-bold text-slate-900 text-sm">{session.employee_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{session.review_code}</p>
+                      <p className="tabular-nums text-blue-700 text-[11px]">{session.review_code}</p>
                     </td>
 
                     <td className="p-4">
@@ -226,23 +226,23 @@ export default function Review360Page() {
 
                     <td className="p-4 font-bold text-purple-700">{session.period_name}</td>
 
-                    <td className="p-4 font-mono font-bold text-blue-600">
+                    <td className="p-4 tabular-nums font-bold text-blue-600">
                       {session.self_score ? `${session.self_score}đ` : '—'}
                     </td>
 
-                    <td className="p-4 font-mono font-bold text-purple-600">
+                    <td className="p-4 tabular-nums font-bold text-purple-600">
                       {session.manager_score ? `${session.manager_score}đ` : '—'}
                     </td>
 
-                    <td className="p-4 font-mono font-bold text-emerald-600">
+                    <td className="p-4 tabular-nums font-bold text-emerald-600">
                       {session.peer_score ? `${session.peer_score}đ` : '—'}
                     </td>
 
-                    <td className="p-4 font-mono font-bold text-amber-600">
+                    <td className="p-4 tabular-nums font-bold text-amber-600">
                       {session.subordinate_score ? `${session.subordinate_score}đ` : '—'}
                     </td>
 
-                    <td className="p-4 font-mono font-bold text-slate-900 text-sm">
+                    <td className="p-4 tabular-nums font-bold text-slate-900 text-sm">
                       {session.overall_360_score.toFixed(1)} / 100đ
                     </td>
 

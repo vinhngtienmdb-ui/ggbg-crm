@@ -255,7 +255,7 @@ export default function JsonbSchemaBuilderModal({
                   </button>
                 </div>
 
-                <div className="mt-4 bg-white p-4 rounded-xl font-mono text-xs text-slate-800 overflow-x-auto border border-slate-200 max-h-80">
+                <div className="mt-4 bg-white p-4 rounded-xl tabular-nums text-xs text-slate-800 overflow-x-auto border border-slate-200 max-h-80">
                   <pre>{JSON.stringify(attributes, null, 2)}</pre>
                 </div>
               </div>

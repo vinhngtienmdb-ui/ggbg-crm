@@ -88,7 +88,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương NET Chi Trả:</span>
-          <span className="font-mono font-semibold text-emerald-400 text-lg">
+          <span className="tabular-nums font-semibold text-emerald-400 text-lg">
             {totalNet.toLocaleString('vi-VN')} ₫
           </span>
         </div>
@@ -157,7 +157,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-white">{st.value} Tr VNĐ</span>
+                <span className="tabular-nums font-bold text-white">{st.value} Tr VNĐ</span>
               </div>
             ))}
           </div>

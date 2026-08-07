@@ -28,7 +28,7 @@ export default function AccessDeniedGuard({ moduleName }: AccessDeniedGuardProps
             Không Có Quyền Truy Cập
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Phân hệ <strong className="text-slate-800">{moduleName || 'này'}</strong> đã bị ẩn hoặc không được phân quyền cho vai trò <span className="px-2 py-0.5 bg-slate-100 text-blue-700 rounded font-mono font-bold">{activeRole}</span>.
+            Phân hệ <strong className="text-slate-800">{moduleName || 'này'}</strong> đã bị ẩn hoặc không được phân quyền cho vai trò <span className="px-2 py-0.5 bg-slate-100 text-blue-700 rounded tabular-nums font-bold">{activeRole}</span>.
           </p>
         </div>
 

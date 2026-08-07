@@ -54,8 +54,8 @@ function PipelineBar({ label, count, amount, pct, color }: { label: string; coun
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-xs font-semibold">
-        <span className="text-slate-700 dark:text-slate-300 truncate flex-1">{label} • <span className="font-mono">{count}</span></span>
-        <span className={`font-mono ml-2 shrink-0 ${color}`}>{amount}</span>
+        <span className="text-slate-700 dark:text-slate-300 truncate flex-1">{label} • <span className="tabular-nums">{count}</span></span>
+        <span className={`tabular-nums ml-2 shrink-0 ${color}`}>{amount}</span>
       </div>
       <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${pct}%` }} />

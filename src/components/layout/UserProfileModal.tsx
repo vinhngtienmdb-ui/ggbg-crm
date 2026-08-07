@@ -201,7 +201,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
               <p className="text-xs text-slate-300 font-medium mt-0.5">
                 [{user.employee_code}] • {user.role_name}
               </p>
-              <p className="text-[11px] text-slate-400 font-mono mt-0.5">@{user.username} ({user.email})</p>
+              <p className="text-[11px] text-slate-400 tabular-nums mt-0.5">@{user.username} ({user.email})</p>
             </div>
           </div>
 
@@ -277,17 +277,17 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Mã Số Nhân Viên HRM</span>
-                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 font-mono">{user.employee_code}</p>
+                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 tabular-nums">{user.employee_code}</p>
                 </div>
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Tên Đăng Nhập System</span>
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">@{user.username}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">@{user.username}</p>
                 </div>
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Email Công Ty</span>
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">{user.email}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">{user.email}</p>
                 </div>
               </div>
 
@@ -298,8 +298,8 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                 <div className="grid grid-cols-2 gap-2 text-xs font-medium text-purple-900 dark:text-purple-200">
                   <p>Vai trò RBAC: <strong className="font-bold">{user.role_name}</strong></p>
                   <p>Xác thực 2FA: <strong className={is2faEnabled ? 'text-emerald-600' : 'text-slate-400'}>{is2faEnabled ? '🛡️ Đã Bật Google 2FA' : '⚪ Chưa Bật 2FA'}</strong></p>
-                  <p>Quyền Hạn: <strong className="font-mono">{user.is_super_admin ? 'SUPER_ADMIN (*)' : 'Xem & Sửa nghiệp vụ'}</strong></p>
-                  <p>Lần đăng nhập cuối: <strong className="font-mono">{user.login_at || 'Vừa đăng nhập'}</strong></p>
+                  <p>Quyền Hạn: <strong className="tabular-nums">{user.is_super_admin ? 'SUPER_ADMIN (*)' : 'Xem & Sửa nghiệp vụ'}</strong></p>
+                  <p>Lần đăng nhập cuối: <strong className="tabular-nums">{user.login_at || 'Vừa đăng nhập'}</strong></p>
                 </div>
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Nhập mật khẩu đang dùng..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 tabular-nums text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                   />
                   <button
                     type="button"
@@ -341,7 +341,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Nhập mật khẩu mới..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 tabular-nums text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                 />
               </div>
 
@@ -355,7 +355,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu mới..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 tabular-nums text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                 />
               </div>
 
@@ -424,7 +424,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                     <div className="space-y-2 flex-1">
                       <div>
                         <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Chuỗi Secret Key Bí Mật:</span>
-                        <p className="font-mono text-purple-700 dark:text-purple-400 font-bold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <p className="tabular-nums text-purple-700 dark:text-purple-400 font-bold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
                           {totpSecret}
                         </p>
                       </div>
@@ -445,7 +445,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                       value={totpCode}
                       onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="000000"
-                      className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl font-mono text-lg tracking-[8px] font-semibold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                      className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl tabular-nums text-lg tracking-[8px] font-semibold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                     />
                   </div>
 

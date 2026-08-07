@@ -611,7 +611,7 @@ export default function ProposalsPage() {
                     <tr key={sub.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-3">
                         <p className="font-bold text-slate-900 text-sm leading-snug">{sub.template_title}</p>
-                        <p className="font-mono text-purple-700 text-[11px] font-bold">Mã số: {sub.proposal_code}</p>
+                        <p className="tabular-nums text-purple-700 text-[11px] font-bold">Mã số: {sub.proposal_code}</p>
                       </td>
 
                       <td className="p-3">
@@ -619,10 +619,10 @@ export default function ProposalsPage() {
                         <p className="text-[11px] text-slate-500">🏢 {sub.applicant_department}</p>
                       </td>
 
-                      <td className="p-3 font-mono font-bold text-slate-600">📅 {formatDate(sub.submitted_date)}</td>
+                      <td className="p-3 tabular-nums font-bold text-slate-600">📅 {formatDate(sub.submitted_date)}</td>
 
                       <td className="p-3 text-center">
-                        <div className="flex items-center justify-center gap-1 font-mono text-[10.5px]">
+                        <div className="flex items-center justify-center gap-1 tabular-nums text-[10.5px]">
                           {sub.approval_steps.map((st) => (
                             <span
                               key={st.step_order}
@@ -728,7 +728,7 @@ export default function ProposalsPage() {
                         >
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 font-mono text-[10.5px] font-semibold border border-purple-200">
+                              <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 tabular-nums text-[10.5px] font-semibold border border-purple-200">
                                 {tmpl.template_code}
                               </span>
                               <span className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold text-xs flex items-center gap-0.5">
@@ -740,7 +740,7 @@ export default function ProposalsPage() {
                             <p className="text-[11px] text-slate-500 font-normal line-clamp-3 leading-relaxed">{tmpl.description}</p>
                           </div>
 
-                          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-600 font-mono font-bold">
+                          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-600 tabular-nums font-bold">
                             <span>📄 {tmpl.fields.length} Trường</span>
                             <span className="text-purple-700">🔄 {tmpl.approval_steps.length} Cấp duyệt</span>
                           </div>
@@ -774,7 +774,7 @@ export default function ProposalsPage() {
                   <div className="border-b border-purple-100 pb-4 flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="px-3 py-0.5 rounded-full bg-purple-100 text-purple-900 font-mono text-xs font-semibold">
+                        <span className="px-3 py-0.5 rounded-full bg-purple-100 text-purple-900 tabular-nums text-xs font-semibold">
                           {currentTemplate.template_code}
                         </span>
                         <span className="px-3 py-0.5 bg-amber-50 text-amber-900 border border-amber-200 rounded-full font-bold text-xs">
@@ -789,7 +789,7 @@ export default function ProposalsPage() {
                   {/* APPROVAL STEPS FLOW PREVIEW */}
                   <div className="p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl text-purple-900 font-bold text-xs space-y-1.5">
                     <p className="text-purple-950 font-bold">🔄 Luồng Ký Phê Duyệt Đa Cấp ({currentTemplate.approval_steps.length} cấp):</p>
-                    <div className="flex flex-wrap items-center gap-2 font-mono text-purple-800 text-[11px]">
+                    <div className="flex flex-wrap items-center gap-2 tabular-nums text-purple-800 text-[11px]">
                       {currentTemplate.approval_steps.map((st, idx) => (
                         <React.Fragment key={st.step_order}>
                           <span className="px-2.5 py-1 bg-white border border-purple-300 rounded-lg shadow-2xs">
@@ -809,7 +809,7 @@ export default function ProposalsPage() {
                       <div key={f.id} className="space-y-1.5 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
                         <label className="block text-slate-800 font-bold text-xs">
                           {f.field_label} {f.is_required && <span className="text-red-500">*</span>}
-                          <span className="text-[10px] text-purple-600 font-mono ml-2 font-semibold">[{f.data_type}]</span>
+                          <span className="text-[10px] text-purple-600 tabular-nums ml-2 font-semibold">[{f.data_type}]</span>
                         </label>
 
                         {/* EMPLOYEE SELECT COMPONENT */}
@@ -851,7 +851,7 @@ export default function ProposalsPage() {
                             placeholder={f.placeholder || '0'}
                             value={formDataValues[f.field_name] || ''}
                             onChange={(e) => handleFieldInputChange(f.field_name, Number(e.target.value))}
-                            className="w-full px-3.5 py-2.5 bg-white border rounded-xl font-mono text-purple-700 font-bold text-sm shadow-2xs"
+                            className="w-full px-3.5 py-2.5 bg-white border rounded-xl tabular-nums text-purple-700 font-bold text-sm shadow-2xs"
                           />
                         )}
 
@@ -861,7 +861,7 @@ export default function ProposalsPage() {
                             required={f.is_required}
                             value={formDataValues[f.field_name] || ''}
                             onChange={(e) => handleFieldInputChange(f.field_name, e.target.value)}
-                            className="w-full px-3.5 py-2.5 bg-white border rounded-xl font-mono text-xs shadow-2xs"
+                            className="w-full px-3.5 py-2.5 bg-white border rounded-xl tabular-nums text-xs shadow-2xs"
                           />
                         )}
 
@@ -1004,7 +1004,7 @@ export default function ProposalsPage() {
                     <tr key={t.id} className={`hover:bg-slate-50 transition-colors ${!t.is_active ? 'opacity-60 bg-slate-50/50' : ''}`}>
                       <td className="p-3">
                         <p className="font-bold text-slate-900 text-xs leading-snug">{t.title}</p>
-                        <p className="font-mono text-purple-700 text-[11px] font-bold">Mã phiếu: {t.template_code}</p>
+                        <p className="tabular-nums text-purple-700 text-[11px] font-bold">Mã phiếu: {t.template_code}</p>
                         <p className="text-[11px] text-slate-500 truncate max-w-xs">{t.description}</p>
                       </td>
 
@@ -1014,11 +1014,11 @@ export default function ProposalsPage() {
                         </span>
                       </td>
 
-                      <td className="p-3 text-center font-mono font-bold text-slate-700">
+                      <td className="p-3 text-center tabular-nums font-bold text-slate-700">
                         {t.fields.length} Trường
                       </td>
 
-                      <td className="p-3 text-center font-mono text-[10.5px] text-purple-700 font-bold">
+                      <td className="p-3 text-center tabular-nums text-[10.5px] text-purple-700 font-bold">
                         {t.approval_steps.length} Cấp Duyệt
                       </td>
 
@@ -1091,7 +1091,7 @@ export default function ProposalsPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-mono text-[10.5px] font-semibold">{previewTemplate.template_code}</span>
+                <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 tabular-nums text-[10.5px] font-semibold">{previewTemplate.template_code}</span>
                 <h3 className="font-bold text-sm text-slate-900 mt-1">{previewTemplate.title}</h3>
               </div>
               <button onClick={() => setIsPreviewTmplOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
@@ -1120,7 +1120,7 @@ export default function ProposalsPage() {
                         <p className="text-[10.5px] text-slate-500 mt-0.5">Options: {f.options.join(', ')}</p>
                       )}
                     </div>
-                    <span className="px-2.5 py-1 bg-purple-100 text-purple-800 font-mono text-[10.5px] rounded-full font-bold">
+                    <span className="px-2.5 py-1 bg-purple-100 text-purple-800 tabular-nums text-[10.5px] rounded-full font-bold">
                       {f.data_type}
                     </span>
                   </div>
@@ -1133,7 +1133,7 @@ export default function ProposalsPage() {
               <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-amber-700">
                 🔄 Cấu Hình Luồng Duyệt ({previewTemplate.approval_steps.length} Cấp):
               </h4>
-              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl font-mono text-purple-900">
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl tabular-nums text-purple-900">
                 {previewTemplate.approval_steps.map((st) => `Bước ${st.step_order}: ${st.approver_role}`).join(' ➔ ')}
               </div>
             </div>
@@ -1175,7 +1175,7 @@ export default function ProposalsPage() {
                     required
                     value={editTmplCode}
                     onChange={(e) => setEditTmplCode(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700 font-bold"
+                    className="w-full px-3 py-2 border rounded-xl tabular-nums text-purple-700 font-bold"
                   />
                 </div>
 
@@ -1257,7 +1257,7 @@ export default function ProposalsPage() {
                             updated[idx].data_type = e.target.value as FieldDataType;
                             setEditTmplFields(updated);
                           }}
-                          className="w-full px-2 py-1 border rounded bg-white font-mono text-[10.5px] text-purple-700"
+                          className="w-full px-2 py-1 border rounded bg-white tabular-nums text-[10.5px] text-purple-700"
                         >
                           <option value="TEXT_INPUT">TEXT_INPUT (Chữ ngắn)</option>
                           <option value="TEXT_AREA">TEXT_AREA (Diễn giải)</option>
@@ -1316,7 +1316,7 @@ export default function ProposalsPage() {
                 <div className="space-y-2">
                   {editTmplSteps.map((st, idx) => (
                     <div key={idx} className="p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl flex items-center gap-3">
-                      <span className="font-mono font-bold text-amber-900">Bước {idx + 1}:</span>
+                      <span className="tabular-nums font-bold text-amber-900">Bước {idx + 1}:</span>
                       <input
                         type="text"
                         value={st.approver_role}
@@ -1366,7 +1366,7 @@ export default function ProposalsPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="font-mono text-xs font-semibold text-purple-700">{selectedSub.proposal_code}</span>
+                <span className="tabular-nums text-xs font-semibold text-purple-700">{selectedSub.proposal_code}</span>
                 <h3 className="font-bold text-sm text-slate-900">Chi Tiết Phiếu Phê Duyệt & Ký Duyệt</h3>
               </div>
               <button onClick={() => setIsViewSubOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
@@ -1379,7 +1379,7 @@ export default function ProposalsPage() {
               <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
                 <p>Người làm đơn: <strong className="text-slate-900">{selectedSub.applicant_name}</strong></p>
                 <p>Đơn vị / Phòng ban: <strong className="text-slate-900">{selectedSub.applicant_department}</strong></p>
-                <p>Ngày nộp phiếu: <strong className="text-slate-900 font-mono">{selectedSub.submitted_date}</strong></p>
+                <p>Ngày nộp phiếu: <strong className="text-slate-900 tabular-nums">{selectedSub.submitted_date}</strong></p>
                 <p>Trạng thái: <strong className="text-purple-700">{selectedSub.status}</strong></p>
               </div>
             </div>
@@ -1394,7 +1394,7 @@ export default function ProposalsPage() {
                 {Object.entries(selectedSub.field_values).map(([key, val]) => (
                   <div key={key} className="flex flex-col sm:flex-row justify-between border-b border-slate-100 pb-1.5">
                     <span className="text-slate-500 font-bold">{key}:</span>
-                    <span className="text-slate-900 font-bold font-mono">
+                    <span className="text-slate-900 font-bold tabular-nums">
                       {typeof val === 'number' ? formatCurrency(val) : String(val)}
                     </span>
                   </div>

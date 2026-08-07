@@ -204,7 +204,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
             <div className="space-y-1.5">
               {contractAlerts.expired.map((e) => (
                 <div key={e.id} className="flex items-center justify-between text-xs bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                  <span className="font-bold text-slate-900">{e.full_name} <span className="font-mono text-red-600 font-normal">({e.employee_code})</span></span>
+                  <span className="font-bold text-slate-900">{e.full_name} <span className="tabular-nums text-red-600 font-normal">({e.employee_code})</span></span>
                   <span className="font-semibold text-red-700">{e.contract_end_date}</span>
                 </div>
               ))}
@@ -228,7 +228,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
             <div className="space-y-1.5">
               {contractAlerts.expiringSoon.map((e) => (
                 <div key={e.id} className="flex items-center justify-between text-xs bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                  <span className="font-bold text-slate-900">{e.full_name} <span className="font-mono text-amber-700 font-normal">({e.employee_code})</span></span>
+                  <span className="font-bold text-slate-900">{e.full_name} <span className="tabular-nums text-amber-700 font-normal">({e.employee_code})</span></span>
                   <span className="font-semibold text-amber-700">{e.contract_end_date}</span>
                 </div>
               ))}

@@ -739,7 +739,7 @@ export default function LeadsPage() {
                         className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing relative space-y-2"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono font-bold text-blue-600 px-1.5 py-0.5 bg-blue-50 rounded">
+                          <span className="text-[10px] tabular-nums font-bold text-blue-600 px-1.5 py-0.5 bg-blue-50 rounded">
                             {lead.lead_code}
                           </span>
                           <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
@@ -758,7 +758,7 @@ export default function LeadsPage() {
                           <span className="text-slate-500 font-semibold flex items-center gap-1">
                             <Flame className="w-3 h-3 text-orange-500 fill-orange-500" /> Score:
                           </span>
-                          <span className="font-semibold font-mono text-emerald-600">{lead.lead_score}/100</span>
+                          <span className="font-semibold tabular-nums text-emerald-600">{lead.lead_score}/100</span>
                         </div>
 
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
@@ -815,7 +815,7 @@ export default function LeadsPage() {
                   filteredLeads.map((lead) => (
                     <tr key={lead.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="p-4">
-                        <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        <span className="text-xs tabular-nums font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                           {lead.lead_code}
                         </span>
                         <p className="mt-1">
@@ -833,10 +833,10 @@ export default function LeadsPage() {
 
                       <td className="p-4">
                         <p className="font-semibold text-slate-800">{lead.company_name || 'Cá Nhân'}</p>
-                        <p className="text-[10px] font-mono text-slate-500">{lead.tax_code ? `MST: ${lead.tax_code}` : lead.id_card_number ? `CCCD: ${lead.id_card_number}` : ''}</p>
+                        <p className="text-[10px] tabular-nums text-slate-500">{lead.tax_code ? `MST: ${lead.tax_code}` : lead.id_card_number ? `CCCD: ${lead.id_card_number}` : ''}</p>
                       </td>
 
-                      <td className="p-4 font-mono font-bold text-slate-800">
+                      <td className="p-4 tabular-nums font-bold text-slate-800">
                         {lead.phone}
                       </td>
 
@@ -937,10 +937,10 @@ export default function LeadsPage() {
                 filteredStageLogs.map((log) => (
                   <div key={log.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded text-[11px]">
+                      <span className="tabular-nums font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded text-[11px]">
                         [{log.lead_code}] {log.lead_name}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">{log.timestamp}</span>
+                      <span className="text-[10px] text-slate-400 tabular-nums">{log.timestamp}</span>
                     </div>
 
                     <div className="flex items-center gap-2 pt-1 font-semibold text-slate-800">
@@ -1090,7 +1090,7 @@ export default function LeadsPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="0988 123 456"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
               </div>
@@ -1135,7 +1135,7 @@ export default function LeadsPage() {
                       else setIdCardNumber(e.target.value);
                     }}
                     placeholder={entityType === 'ENTERPRISE' ? '0108928374' : '001198002345'}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-900"
                   />
                 </div>
 

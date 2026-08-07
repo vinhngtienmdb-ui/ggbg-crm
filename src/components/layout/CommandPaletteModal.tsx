@@ -162,7 +162,7 @@ export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: Com
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] tabular-nums font-bold text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
                     Đi tới <ArrowRight className="w-3 h-3 inline ml-0.5" />
                   </span>
                 </div>
@@ -173,8 +173,8 @@ export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: Com
 
         {/* Footer Hint */}
         <div className="p-3 bg-slate-100/70 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-medium px-4">
-          <span>Dùng phím <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] font-mono">↑↓</kbd> để di chuyển, <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] font-mono">Enter</kbd> để chọn</span>
-          <span className="font-mono text-purple-600 font-bold">GGBingo Command Palette</span>
+          <span>Dùng phím <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] tabular-nums">↑↓</kbd> để di chuyển, <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] tabular-nums">Enter</kbd> để chọn</span>
+          <span className="tabular-nums text-purple-600 font-bold">GGBingo Command Palette</span>
         </div>
       </div>
     </div>

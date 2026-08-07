@@ -331,7 +331,7 @@ export default function DocumentsPage() {
                 {filteredDocs.map((doc) => (
                   <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
-                      <p className="font-mono font-semibold text-blue-700 text-xs">{doc.document_code}</p>
+                      <p className="tabular-nums font-semibold text-blue-700 text-xs">{doc.document_code}</p>
                       <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {doc.received_date || doc.issued_date}</p>
                     </td>
 
@@ -443,7 +443,7 @@ export default function DocumentsPage() {
                       type="text"
                       value={docConfig.outbound_prefix}
                       onChange={(e) => setDocConfig({ ...docConfig, outbound_prefix: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
                     />
                   </div>
 
@@ -453,7 +453,7 @@ export default function DocumentsPage() {
                       type="text"
                       value={docConfig.inbound_prefix}
                       onChange={(e) => setDocConfig({ ...docConfig, inbound_prefix: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
                     />
                   </div>
                 </div>
@@ -482,7 +482,7 @@ export default function DocumentsPage() {
                       type="number"
                       value={docConfig.urgent_sla_hours}
                       onChange={(e) => setDocConfig({ ...docConfig, urgent_sla_hours: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono text-red-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-red-700"
                     />
                   </div>
 
@@ -492,7 +492,7 @@ export default function DocumentsPage() {
                       type="number"
                       value={docConfig.express_sla_hours}
                       onChange={(e) => setDocConfig({ ...docConfig, express_sla_hours: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono text-red-700"
+                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-red-700"
                     />
                   </div>
                 </div>
@@ -547,7 +547,7 @@ export default function DocumentsPage() {
                   placeholder="Ví dụ: 142/CV-BCT hoặc 88/QĐ-GGBG..."
                   value={newDoc.document_code}
                   onChange={(e) => setNewDoc({ ...newDoc, document_code: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                  className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
                 />
               </div>
 
@@ -667,8 +667,8 @@ export default function DocumentsPage() {
                   </div>
                   {attachedFile ? (
                     <div className="p-2 bg-white rounded-xl border border-blue-200 flex items-center justify-between text-xs">
-                      <span className="font-mono text-blue-900 font-bold truncate max-w-[240px]">📄 {attachedFile.name}</span>
-                      <span className="font-mono text-slate-500 font-bold text-[10px]">{attachedFile.size}</span>
+                      <span className="tabular-nums text-blue-900 font-bold truncate max-w-[240px]">📄 {attachedFile.name}</span>
+                      <span className="tabular-nums text-slate-500 font-bold text-[10px]">{attachedFile.size}</span>
                     </div>
                   ) : (
                     <p className="text-[11px] text-slate-400">Chưa chọn tệp tin nào. Hệ thống sẽ tự tạo file mặc định nếu để trống.</p>
@@ -702,7 +702,7 @@ export default function DocumentsPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="font-mono text-xs font-semibold text-blue-700">{selectedDoc.document_code}</span>
+                <span className="tabular-nums text-xs font-semibold text-blue-700">{selectedDoc.document_code}</span>
                 <h3 className="font-bold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3>
               </div>
               <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
