@@ -27,7 +27,13 @@ import {
   Save,
   X,
   FileCheck,
-  Download
+  Download,
+  QrCode,
+  SlidersHorizontal,
+  Lock,
+  Layers,
+  FileSpreadsheet,
+  Award
 } from 'lucide-react';
 import {
   OfficialDocument,
@@ -51,19 +57,27 @@ export default function DocumentsPage() {
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
 
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
-  const [activeTab, setActiveTab] = useState<DocumentCategory | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
+  const [activeTab, setActiveTab] = useState<'ALL_DOCS' | 'PENDING_DIRECTIVE' | 'DIGITAL_STAMP' | 'DOC_CONFIG'>('ALL_DOCS');
+  const [selectedCategory, setSelectedCategory] = useState<DocumentCategory | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // Configuration State
+  // Configuration State for 8 Document Types
   const [docConfig, setDocConfig] = useState({
-    outbound_prefix: 'QĐ-GGBG',
-    inbound_prefix: 'CV-GGBG',
+    inbound_prefix: 'CV-BCT',
+    outbound_prefix: 'CV-GGBG',
+    decision_prefix: 'QĐ-GGBG',
+    submission_prefix: 'TTr-GGBG',
+    announcement_prefix: 'TB-GGBG',
+    sop_prefix: 'QC-GGBG',
+    contract_prefix: 'BB-GGBG',
+    report_prefix: 'BC-GGBG',
     reset_yearly: true,
     urgent_sla_hours: 24,
     express_sla_hours: 4,
-    cert_provider: 'VNPT-CA / Viettel-CA Enterprise Root',
+    cert_provider: 'VNPT-CA / Viettel-CA Enterprise Root Cloud HSM',
     auto_digital_seal: true,
+    confidential_roles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER'],
   });
 
   // Modals
@@ -72,6 +86,7 @@ export default function DocumentsPage() {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
   const [directiveInput, setDirectiveInput] = useState('');
+  const [assigneeDeptInput, setAssigneeDeptInput] = useState('Khối Kinh Doanh & TMĐT');
 
   const [attachedFile, setAttachedFile] = useState<{ name: string; size: string } | null>(null);
 
@@ -108,9 +123,24 @@ export default function DocumentsPage() {
     showToast(`📎 Đã chọn tệp đính kèm: ${file.name} (${sizeStr})`);
   };
 
+  const getPrefixForCategory = (cat: DocumentCategory) => {
+    switch (cat) {
+      case 'INBOUND': return docConfig.inbound_prefix;
+      case 'OUTBOUND': return docConfig.outbound_prefix;
+      case 'DECISION': return docConfig.decision_prefix;
+      case 'SUBMISSION_STATEMENT': return docConfig.submission_prefix;
+      case 'ANNOUNCEMENT': return docConfig.announcement_prefix;
+      case 'INTERNAL_SOP': return docConfig.sop_prefix;
+      case 'CONTRACT_MINUTES': return docConfig.contract_prefix;
+      case 'PERIODIC_REPORT': return docConfig.report_prefix;
+      default: return 'CV-GGBG';
+    }
+  };
+
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const docCode = newDoc.document_code || `${documents.length + 101}/CV-GGBG`;
+    const prefix = getPrefixForCategory(newDoc.category);
+    const docCode = newDoc.document_code || `${documents.length + 101}/${prefix}`;
     const finalFileName = attachedFile ? attachedFile.name : `Van-Ban-${docCode.replace(/\//g, '-')}.pdf`;
     const finalFileSize = attachedFile ? attachedFile.size : '2.1 MB';
 
@@ -130,10 +160,14 @@ export default function DocumentsPage() {
       assigned_department: newDoc.assigned_department,
       assigned_assignee: newDoc.assigned_assignee,
       directive_note: newDoc.directive_note,
+      sla_deadline: '2026-08-15 17:00',
       file_name: finalFileName,
       file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
       file_size: finalFileSize,
       comments: [],
+      process_logs: [
+        { id: `l_${Date.now()}`, actor_name: 'Phạm Thị Lan', actor_role: 'Văn Thư', action: 'TIẾP NHẬN', note: 'Đã vào sổ văn thư điện tử', timestamp: new Date().toLocaleString('vi-VN') }
+      ],
       created_at: new Date().toISOString().slice(0, 10),
     };
 
@@ -141,7 +175,7 @@ export default function DocumentsPage() {
     setDocuments([...updated]);
     setIsCreateOpen(false);
     setAttachedFile(null);
-    showToast(`✅ Đã vào sổ công văn mới thành công: Số ${doc.document_code}`);
+    showToast(`✅ Đã vào sổ văn thư thành công: Mã số ${doc.document_code}`);
   };
 
   const handleAddDirectiveNote = (e: React.FormEvent) => {
@@ -151,6 +185,7 @@ export default function DocumentsPage() {
     const updatedDoc: OfficialDocument = {
       ...selectedDoc,
       directive_note: directiveInput,
+      assigned_department: assigneeDeptInput,
       status: 'IN_PROCESSING',
       comments: [
         ...(selectedDoc.comments || []),
@@ -158,17 +193,28 @@ export default function DocumentsPage() {
           id: `c_${Date.now()}`,
           author_name: 'Nguyễn Tiến Vinh',
           author_role: 'CEO / Ban Giám Đốc',
-          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput}`,
+          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput} (Giao ${assigneeDeptInput})`,
           created_at: new Date().toLocaleString('vi-VN'),
         },
       ],
+      process_logs: [
+        ...(selectedDoc.process_logs || []),
+        {
+          id: `l_${Date.now()}`,
+          actor_name: 'Nguyễn Tiến Vinh',
+          actor_role: 'CEO / Ban Giám Đốc',
+          action: 'BÚT PHÊ CHỈ ĐẠO',
+          note: `${directiveInput} (Giao ${assigneeDeptInput})`,
+          timestamp: new Date().toLocaleString('vi-VN'),
+        }
+      ]
     };
 
     const updated = updateOfficialDocument(updatedDoc);
     setDocuments([...updated]);
     setSelectedDoc(updatedDoc);
     setDirectiveInput('');
-    showToast(`✍️ Đã cập nhật bút phê chỉ đạo của Ban Giám Đốc cho công văn ${selectedDoc.document_code}`);
+    showToast(`✍️ Đã lưu bút phê chỉ đạo và giao phòng ${assigneeDeptInput} cho công văn ${selectedDoc.document_code}`);
   };
 
   const handleDelete = (id: string) => {
@@ -177,17 +223,81 @@ export default function DocumentsPage() {
     showToast('🗑️ Đã lưu trữ / xóa công văn khỏi sổ');
   };
 
+  const handleSaveDocConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    showToast('⚙️ Đã lưu cấu hình Tiền Tố Mã Công Văn, Định Mức SLA & Cổng Ký Số Cloud HSM!');
+  };
+
   const filteredDocs = documents.filter((d) => {
     const q = searchTerm.toLowerCase();
     const matchesSearch = !q || d.title.toLowerCase().includes(q) || d.document_code.toLowerCase().includes(q) || d.issuer_org.toLowerCase().includes(q);
-    const matchesTab = activeTab === 'DIRECTIVE_LOG' || d.category === activeTab;
-    return matchesSearch && matchesTab;
+
+    let matchesTab = true;
+    if (activeTab === 'PENDING_DIRECTIVE') {
+      matchesTab = d.status === 'PENDING_DIRECTIVE';
+    } else if (activeTab === 'DIGITAL_STAMP') {
+      matchesTab = !!d.has_digital_stamp;
+    }
+
+    const matchesCategory = selectedCategory === 'ALL' || d.category === selectedCategory;
+
+    return matchesSearch && matchesTab && matchesCategory;
   });
 
   const totalInbound = documents.filter((d) => d.category === 'INBOUND').length;
   const totalOutbound = documents.filter((d) => d.category === 'OUTBOUND').length;
-  const totalInternal = documents.filter((d) => d.category === 'INTERNAL_SOP').length;
+  const totalDecision = documents.filter((d) => d.category === 'DECISION').length;
+  const totalSubmission = documents.filter((d) => d.category === 'SUBMISSION_STATEMENT').length;
   const totalPendingDirective = documents.filter((d) => d.status === 'PENDING_DIRECTIVE').length;
+  const totalStamped = documents.filter((d) => d.has_digital_stamp).length;
+
+  const renderCategoryLabel = (cat: DocumentCategory) => {
+    switch (cat) {
+      case 'INBOUND': return 'Công Văn Đến';
+      case 'OUTBOUND': return 'Công Văn Đi';
+      case 'DECISION': return 'Quyết Định Ban Hành';
+      case 'SUBMISSION_STATEMENT': return 'Tờ Trình Nội Bộ';
+      case 'ANNOUNCEMENT': return 'Thông Báo Doanh Nghiệp';
+      case 'INTERNAL_SOP': return 'Quy Chế & SOP';
+      case 'CONTRACT_MINUTES': return 'Hợp Đồng & Biên Bản';
+      case 'PERIODIC_REPORT': return 'Báo Cáo Chuyên Đề';
+      default: return cat;
+    }
+  };
+
+  const renderCategoryBadge = (cat: DocumentCategory) => {
+    switch (cat) {
+      case 'INBOUND':
+        return <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[11px]">📩 Công Văn Đến</span>;
+      case 'OUTBOUND':
+        return <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-bold text-[11px]">📤 Công Văn Đi</span>;
+      case 'DECISION':
+        return <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold text-[11px]">📜 Quyết Định</span>;
+      case 'SUBMISSION_STATEMENT':
+        return <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold text-[11px]">📋 Tờ Trình</span>;
+      case 'ANNOUNCEMENT':
+        return <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold text-[11px]">📢 Thông Báo</span>;
+      case 'INTERNAL_SOP':
+        return <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[11px]">📑 Quy Chế SOP</span>;
+      case 'CONTRACT_MINUTES':
+        return <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 font-bold text-[11px]">🤝 Hợp Đồng/BB</span>;
+      case 'PERIODIC_REPORT':
+        return <span className="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[11px]">📊 Báo Cáo</span>;
+    }
+  };
+
+  const renderUrgencyBadge = (urg: UrgencyLevel) => {
+    switch (urg) {
+      case 'EXPRESS':
+        return <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 font-bold text-[10px]">🔥 HỎA TỐC</span>;
+      case 'HIGHLY_URGENT':
+        return <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-[10px]">⚡ THƯỢNG KHẨN</span>;
+      case 'URGENT':
+        return <span className="px-2 py-0.5 rounded bg-orange-100 text-orange-800 font-bold text-[10px]">⚠️ KHẨN</span>;
+      default:
+        return <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold text-[10px]">THƯỜNG</span>;
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -199,18 +309,18 @@ export default function DocumentsPage() {
         </div>
       )}
 
-      {/* Header */}
+      {/* Header Hero */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <FileText className="w-6 h-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý Văn Bản & Công Văn Điện Tử (EDMS)</h1>
+            <h1 className="text-xl font-bold text-slate-900">Quản Lý Văn Bản & Công Văn Điện Tử</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-              Chuẩn Văn Thư Doanh Nghiệp
+              Chuẩn Nghị Định 30/2020/NĐ-CP
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Quản lý Sổ Công văn Đến / Sổ Công văn Đi, phân loại mức độ Mật/Khẩn, quy trình 3 cấp & Bút phê chỉ đạo của Ban Giám Đốc.
+            Sổ văn thư điện tử 8 loại văn bản, Bút phê chỉ đạo Ban Giám Đốc, Ký số PKI/HSM gắn mộc đỏ doanh nghiệp & QR Tra cứu.
           </p>
         </div>
 
@@ -218,75 +328,66 @@ export default function DocumentsPage() {
           onClick={() => setIsCreateOpen(true)}
           className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
         >
-          <Plus className="w-4 h-4" /> Tiếp Nhận / Phát Hành Văn Bản
+          <Plus className="w-4 h-4" /> Vào Sổ / Phát Hành Văn Bản Mới
         </button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-bold">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-          <span className="text-slate-500 uppercase text-[10.5px]">Công Văn Đến (Inbound)</span>
-          <p className="text-xl font-semibold text-blue-700">{totalInbound} Văn Bản</p>
-          <p className="text-amber-600 font-semibold text-[11px]">📩 {totalPendingDirective} công văn chờ Ban Giám Đốc bút phê</p>
+          <span className="text-slate-500 uppercase text-[10.5px]">Tổng Sổ Công Văn</span>
+          <p className="text-xl font-semibold text-blue-700">{documents.length} Văn Bản</p>
+          <p className="text-blue-600 font-semibold text-[11px]">📑 8 danh mục văn bản hành chính</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-          <span className="text-slate-500 uppercase text-[10.5px]">Công Văn Đi (Outbound)</span>
-          <p className="text-xl font-semibold text-purple-700">{totalOutbound} Quyết Định / Thông Báo</p>
-          <p className="text-purple-600 font-semibold text-[11px]">📤 Đã phát hành chính thức</p>
+          <span className="text-slate-500 uppercase text-[10.5px]">Chờ Ban Giám Đốc Bút Phê</span>
+          <p className="text-xl font-semibold text-amber-600">{totalPendingDirective} Công Văn</p>
+          <p className="text-amber-600 font-semibold text-[11px]">✍️ Cần CEO/Giám đốc chỉ đạo SLA</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-          <span className="text-slate-500 uppercase text-[10.5px]">Văn Bản Nội Bộ (Internal SOP)</span>
-          <p className="text-xl font-semibold text-emerald-700">{totalInternal} Quy Trình SOP</p>
-          <p className="text-emerald-600 font-semibold text-[11px]">📑 Quy chế vận hành doanh nghiệp</p>
+          <span className="text-slate-500 uppercase text-[10.5px]">Đã Ký Số & Đóng Mộc Đỏ</span>
+          <p className="text-xl font-semibold text-emerald-700">{totalStamped} Văn Bản</p>
+          <p className="text-emerald-600 font-semibold text-[11px]">🛡️ Xác thực VNPT/Viettel Cloud HSM</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-          <span className="text-slate-500 uppercase text-[10.5px]">Mức Độ Khẩn & Tối Mật</span>
-          <p className="text-xl font-semibold text-red-600">2 Văn Bản Khẩn</p>
-          <p className="text-red-500 font-semibold text-[11px]">⚡ Cần xử lý ưu tiên trong ngày</p>
+          <span className="text-slate-500 uppercase text-[10.5px]">Quyết Định & Tờ Trình</span>
+          <p className="text-xl font-semibold text-purple-700">{totalDecision + totalSubmission} Văn Bản</p>
+          <p className="text-purple-600 font-semibold text-[11px]">⚡ Quy trình 4 bước tự động</p>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 text-xs font-bold">
-        {/* Navigation Tabs */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5 text-xs font-bold">
+        {/* Navigation Tabs (Workflow Level) */}
         <div className="flex items-center gap-2 border-b pb-3 overflow-x-auto">
           <button
-            onClick={() => setActiveTab('INBOUND')}
+            onClick={() => setActiveTab('ALL_DOCS')}
             className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'INBOUND' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              activeTab === 'ALL_DOCS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Inbox className="w-4 h-4" /> Công Văn Đến ({totalInbound})
+            <BookOpen className="w-4 h-4 text-blue-400" /> Sổ Văn Thư Điện Tử ({documents.length})
           </button>
 
           <button
-            onClick={() => setActiveTab('OUTBOUND')}
+            onClick={() => setActiveTab('PENDING_DIRECTIVE')}
             className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'OUTBOUND' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              activeTab === 'PENDING_DIRECTIVE' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Send className="w-4 h-4" /> Công Văn Đi ({totalOutbound})
+            <MessageSquare className="w-4 h-4 text-amber-200" /> Chờ Lãnh Đạo Bút Phê ({totalPendingDirective})
           </button>
 
           <button
-            onClick={() => setActiveTab('INTERNAL_SOP')}
+            onClick={() => setActiveTab('DIGITAL_STAMP')}
             className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'INTERNAL_SOP' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              activeTab === 'DIGITAL_STAMP' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <BookOpen className="w-4 h-4" /> Quy Trình Nội Bộ ({totalInternal})
-          </button>
-
-          <button
-            onClick={() => setActiveTab('DIRECTIVE_LOG')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'DIRECTIVE_LOG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4 text-amber-400" /> Bút Phê & Chuyển Xử Lý
+            <ShieldCheck className="w-4 h-4 text-emerald-200" /> Đã Ký Số & Mộc Đỏ ({totalStamped})
           </button>
 
           {canAccessSettings(activeRole) && (
@@ -296,115 +397,227 @@ export default function DocumentsPage() {
                 activeTab === 'DOC_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <Building2 className="w-4 h-4 text-white" /> Cấu Hình & Ký Số
+              <Building2 className="w-4 h-4 text-white" /> Cấu Hình Văn Thư & Ký Số
             </button>
           )}
         </div>
 
-        {/* Filter Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm số công văn, trích yếu nội dung, nơi gửi..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
-            />
-          </div>
-
-          <span className="text-slate-500 font-bold">
-            Hiển thị <strong className="text-slate-900">{filteredDocs.length}</strong> văn bản
-          </span>
-        </div>
-
-        {/* Document Table */}
+        {/* Category Filter Pills (8 Document Categories) */}
         {activeTab !== 'DOC_CONFIG' && (
-          <div className="overflow-x-auto border border-slate-200 rounded-xl">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
-                  <th className="p-3">Số & Ngày Công Văn</th>
-                  <th className="p-3">Trích Yếu Nội Dung Văn Bản</th>
-                  <th className="p-3">Cơ Quan Ban Hành / Nơi Gửi</th>
-                  <th className="p-3 text-center">Độ Mật & Độ Khẩn</th>
-                  <th className="p-3">Đơn Vị Chủ Trì Xử Lý</th>
-                  <th className="p-3 text-center">Trạng Thái</th>
-                  <th className="p-3 text-center">Thao Tác</th>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-100">
+            <span className="text-slate-500 font-bold mr-1 shrink-0 flex items-center gap-1">
+              <Filter className="w-3.5 h-3.5" /> Loại Văn Bản:
+            </span>
+            <button
+              onClick={() => setSelectedCategory('ALL')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'ALL' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              Tất Cả (8 Loại)
+            </button>
+            <button
+              onClick={() => setSelectedCategory('INBOUND')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'INBOUND' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📩 Công Văn Đến ({totalInbound})
+            </button>
+            <button
+              onClick={() => setSelectedCategory('OUTBOUND')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'OUTBOUND' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📤 Công Văn Đi ({totalOutbound})
+            </button>
+            <button
+              onClick={() => setSelectedCategory('DECISION')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'DECISION' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📜 Quyết Định ({totalDecision})
+            </button>
+            <button
+              onClick={() => setSelectedCategory('SUBMISSION_STATEMENT')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'SUBMISSION_STATEMENT' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📋 Tờ Trình Nội Bộ ({totalSubmission})
+            </button>
+            <button
+              onClick={() => setSelectedCategory('ANNOUNCEMENT')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'ANNOUNCEMENT' ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📢 Thông Báo
+            </button>
+            <button
+              onClick={() => setSelectedCategory('INTERNAL_SOP')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'INTERNAL_SOP' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📑 Quy Chế SOP
+            </button>
+            <button
+              onClick={() => setSelectedCategory('CONTRACT_MINUTES')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'CONTRACT_MINUTES' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              🤝 Hợp Đồng & BB
+            </button>
+            <button
+              onClick={() => setSelectedCategory('PERIODIC_REPORT')}
+              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
+                selectedCategory === 'PERIODIC_REPORT' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📊 Báo Cáo
+            </button>
+          </div>
+        )}
+
+        {/* Filter Controls Bar */}
+        {activeTab !== 'DOC_CONFIG' && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="relative w-full sm:w-80">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Tìm số công văn, trích yếu nội dung, nơi gửi..."
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
+              />
+            </div>
+
+            <span className="text-slate-500 font-bold">
+              Hiển thị <strong className="text-slate-900">{filteredDocs.length}</strong> / {documents.length} văn bản
+            </span>
+          </div>
+        )}
+
+        {/* TAB CONTENT 1: LIST OF DOCUMENTS (8 TYPES) */}
+        {activeTab !== 'DOC_CONFIG' && (
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th className="py-3 px-4">Số / Mã Văn Bản</th>
+                  <th className="py-3 px-4">Loại Văn Bản</th>
+                  <th className="py-3 px-4">Trích Yếu Nội Dung</th>
+                  <th className="py-3 px-4">Cơ Quan Ban Hành / Nơi Nhận</th>
+                  <th className="py-3 px-4">Độ Khẩn / Mật</th>
+                  <th className="py-3 px-4">Bút Phê & Phân Công</th>
+                  <th className="py-3 px-4 text-center">Trạng Thái</th>
+                  <th className="py-3 px-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
+              <tbody className="divide-y divide-slate-100">
                 {filteredDocs.map((doc) => (
                   <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <p className="tabular-nums font-semibold text-blue-700 text-xs">{doc.document_code}</p>
-                      <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {doc.received_date || doc.issued_date}</p>
+                    <td className="py-3.5 px-4 tabular-nums font-bold text-slate-900">
+                      <div className="flex items-center gap-1.5">
+                        <span>{doc.document_code}</span>
+                        {doc.has_digital_stamp && (
+                          <span title="Đã ký số & đóng mộc đỏ HSM">
+                            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                          </span>
+                        )}
+                      </div>
                     </td>
 
-                    <td className="p-3 max-w-md">
-                      <p className="font-bold text-slate-900 text-xs leading-snug line-clamp-2">{doc.title}</p>
-                      {doc.directive_note && (
-                        <p className="text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded-lg border border-amber-200 mt-1 font-bold">
-                          ✍️ Bút phê: {doc.directive_note}
-                        </p>
+                    <td className="py-3.5 px-4">{renderCategoryBadge(doc.category)}</td>
+
+                    <td className="py-3.5 px-4 max-w-xs">
+                      <p className="font-bold text-slate-900 line-clamp-2">{doc.title}</p>
+                      <span className="text-[11px] text-slate-500 block mt-0.5 tabular-nums">
+                        📅 Ban hành: {doc.issued_date}
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <p className="font-semibold text-slate-800">{doc.issuer_org}</p>
+                      <span className="text-[11px] text-slate-500 block">➡️ {doc.recipient_org}</span>
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <div className="space-y-1">
+                        {renderUrgencyBadge(doc.urgency_level)}
+                        {doc.security_level !== 'NORMAL' && (
+                          <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-bold text-[10px] block w-fit">
+                            🔒 {doc.security_level === 'TOP_SECRET' ? 'TỐI MẬT' : doc.security_level === 'SECRET' ? 'MẬT' : 'BẢO MẬT'}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-4 max-w-xs">
+                      {doc.directive_note ? (
+                        <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                          <p className="text-[11px] font-bold text-amber-900 line-clamp-2">
+                            ✍️ {doc.directive_note}
+                          </p>
+                          <span className="text-[10px] text-slate-500 block mt-1 font-semibold">
+                            🏢 Đơn vị: {doc.assigned_department}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-amber-600 font-bold text-[11px]">📝 Chờ CEO bút phê</span>
                       )}
                     </td>
 
-                    <td className="p-3 text-slate-700 font-bold">
-                      {doc.issuer_org}
-                      <span className="block text-[10.5px] text-slate-500 font-normal">Ký bởi: {doc.signee_name}</span>
+                    <td className="py-3.5 px-4 text-center">
+                      {doc.status === 'COMPLETED' ? (
+                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[11px]">
+                          ✅ Hoàn Tất / Lưu Trữ
+                        </span>
+                      ) : doc.status === 'IN_PROCESSING' ? (
+                        <span className="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-full font-bold text-[11px]">
+                          🔄 Đang Xử Lý (SLA)
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 bg-amber-100 text-amber-900 rounded-full font-bold text-[11px]">
+                          ⏳ Chờ Chỉ Đạo
+                        </span>
+                      )}
                     </td>
 
-                    <td className="p-3 text-center space-y-1">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold block ${
-                        doc.security_level === 'CONFIDENTIAL' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700'
-                      }`}>
-                        🔒 {doc.security_level === 'CONFIDENTIAL' ? 'Bảo Mật' : 'Công Khai'}
-                      </span>
-
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold block ${
-                        doc.urgency_level === 'HIGHLY_URGENT' || doc.urgency_level === 'EXPRESS'
-                          ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
-                          : 'bg-slate-100 text-slate-700'
-                      }`}>
-                        ⚡ {doc.urgency_level === 'HIGHLY_URGENT' ? 'Thượng Khẩn' : doc.urgency_level === 'URGENT' ? 'Khẩn' : 'Thường'}
-                      </span>
-                    </td>
-
-                    <td className="p-3">
-                      <p className="font-bold text-slate-800">{doc.assigned_department}</p>
-                      <p className="text-[11px] text-slate-500">👤 {doc.assigned_assignee}</p>
-                    </td>
-
-                    <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
-                        doc.status === 'PENDING_DIRECTIVE' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-                        doc.status === 'IN_PROCESSING' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800'
-                      }`}>
-                        {doc.status === 'PENDING_DIRECTIVE' ? '⏳ Chờ Bút Phê' : doc.status === 'IN_PROCESSING' ? '🔵 Đang Xử Lý' : '✅ Hoàn Thành'}
-                      </span>
-                    </td>
-
-                    <td className="p-3 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
+                    <td className="py-3.5 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => {
                             setSelectedDoc(doc);
                             setIsViewOpen(true);
                           }}
-                          className="p-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"
-                          title="Xem File & Bút Phê"
+                          className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-bold"
+                          title="Xem Chi Tiết & Bút Phê"
                         >
-                          <Eye className="w-3.5 h-3.5" />
+                          <Eye className="w-4 h-4" />
                         </button>
-
+                        {doc.has_digital_stamp && doc.qr_code_url && (
+                          <a
+                            href={doc.qr_code_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg font-bold"
+                            title="Mã QR Tra Cứu Xác Thực Văn Bản"
+                          >
+                            <QrCode className="w-4 h-4" />
+                          </a>
+                        )}
                         <button
                           onClick={() => handleDelete(doc.id)}
-                          className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
-                          title="Xóa / Lưu Trữ"
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                          title="Lưu Trữ / Xóa"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -415,285 +628,330 @@ export default function DocumentsPage() {
           </div>
         )}
 
-        {/* TAB 5: CONFIGURATION PANEL */}
-        {activeTab === 'DOC_CONFIG' && (
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div>
-                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-indigo-600" /> Cấu Hình Sổ Văn Bản, Mã Ký Hiệu & Chứng Thư Số
+        {/* TAB CONTENT 2: CONFIGURATION & DIGITAL STAMPING SETTINGS */}
+        {activeTab === 'DOC_CONFIG' && canAccessSettings(activeRole) && (
+          <form onSubmit={handleSaveDocConfig} className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Section 1: Prefix Rules for 8 Document Categories */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
+                  <SlidersHorizontal className="w-4 h-4 text-blue-600" /> Cấu Hình Tiền Tố Mã Cho 8 Loại Văn Bản (NĐ 30/2020)
                 </h3>
-                <p className="text-[11px] text-slate-500 font-normal mt-0.5">
-                  Thiết lập tiền tố mã ký hiệu tự động, hạn xử lý công văn khẩn SLA & thông số Chứng thư chữ ký số PKI.
-                </p>
-              </div>
 
-              <button
-                onClick={() => showToast('💾 Đã lưu thành công cấu hình sổ công văn & ký số!')}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
-              >
-                <Save className="w-4 h-4" /> Lưu Cấu Hình Văn Bản
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Box 1: Cấu hình Đánh Số Công Văn */}
-              <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
-                <h4 className="font-bold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
-                  1. Cấu Hình Đánh Số Công Văn Tự Động
-                </h4>
-
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 text-xs font-bold">
                   <div>
-                    <label className="block text-slate-700 mb-1">Tiền tố Công Văn Đi *</label>
-                    <input
-                      type="text"
-                      value={docConfig.outbound_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, outbound_prefix: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 mb-1">Tiền tố Công Văn Đến *</label>
+                    <label className="block text-slate-700 mb-1">1. Công Văn Đến (Inbound):</label>
                     <input
                       type="text"
                       value={docConfig.inbound_prefix}
                       onChange={(e) => setDocConfig({ ...docConfig, inbound_prefix: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">2. Công Văn Đi (Outbound):</label>
+                    <input
+                      type="text"
+                      value={docConfig.outbound_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, outbound_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">3. Quyết Định (Decision):</label>
+                    <input
+                      type="text"
+                      value={docConfig.decision_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, decision_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">4. Tờ Trình (Submission):</label>
+                    <input
+                      type="text"
+                      value={docConfig.submission_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, submission_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">5. Thông Báo (Announcement):</label>
+                    <input
+                      type="text"
+                      value={docConfig.announcement_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, announcement_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">6. Quy Chế & SOP:</label>
+                    <input
+                      type="text"
+                      value={docConfig.sop_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, sop_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">7. Hợp Đồng / Biên Bản:</label>
+                    <input
+                      type="text"
+                      value={docConfig.contract_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, contract_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 mb-1">8. Báo Cáo Chuyên Đề:</label>
+                    <input
+                      type="text"
+                      value={docConfig.report_prefix}
+                      onChange={(e) => setDocConfig({ ...docConfig, report_prefix: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
                     />
                   </div>
                 </div>
 
-                <div className="pt-2 border-t flex items-center justify-between text-slate-700">
-                  <span>Reset số công văn về 001 hàng năm:</span>
+                <div className="flex items-center gap-2 pt-2 border-t text-xs font-bold text-slate-700">
                   <input
                     type="checkbox"
+                    id="reset_yearly"
                     checked={docConfig.reset_yearly}
                     onChange={(e) => setDocConfig({ ...docConfig, reset_yearly: e.target.checked })}
-                    className="w-4 h-4 accent-indigo-600 rounded"
+                    className="rounded text-blue-600"
                   />
+                  <label htmlFor="reset_yearly">Tự động Reset số thứ tự công văn về 001 vào ngày 01/01 hàng năm</label>
                 </div>
               </div>
 
-              {/* Box 2: Cấu hình Hạn Xử Lý SLA */}
-              <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
-                <h4 className="font-bold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
-                  2. Cấu Hình Thời Hạn Xử Lý SLA (Giờ)
-                </h4>
+              {/* Section 2: SLA & Provider Settings */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" /> Cài Đặt Cổng Ký Số Cloud HSM & Định Mức SLA
+                </h3>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3 text-xs font-bold">
                   <div>
-                    <label className="block text-slate-700 mb-1">Công Văn Thượng Khẩn (Giờ) *</label>
+                    <label className="block text-slate-700 mb-1">Nhà Cung Cấp Chứng Thư Số (CA / HSM Gateway):</label>
                     <input
-                      type="number"
-                      value={docConfig.urgent_sla_hours}
-                      onChange={(e) => setDocConfig({ ...docConfig, urgent_sla_hours: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-red-700"
+                      type="text"
+                      value={docConfig.cert_provider}
+                      onChange={(e) => setDocConfig({ ...docConfig, cert_provider: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-slate-700 mb-1">Công Văn Hỏa Tốc (Giờ) *</label>
-                    <input
-                      type="number"
-                      value={docConfig.express_sla_hours}
-                      onChange={(e) => setDocConfig({ ...docConfig, express_sla_hours: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-xl tabular-nums text-red-700"
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-700 mb-1">SLA Công Văn Khẩn (Giờ):</label>
+                      <input
+                        type="number"
+                        value={docConfig.urgent_sla_hours}
+                        onChange={(e) => setDocConfig({ ...docConfig, urgent_sla_hours: Number(e.target.value) })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-700 mb-1">SLA Hỏa Tốc (Giờ):</label>
+                      <input
+                        type="number"
+                        value={docConfig.express_sla_hours}
+                        onChange={(e) => setDocConfig({ ...docConfig, express_sla_hours: Number(e.target.value) })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="pt-2 border-t flex items-center justify-between text-slate-700">
-                  <span>Tự động đóng Dấu Mộc Đỏ sau khi ký số:</span>
-                  <input
-                    type="checkbox"
-                    checked={docConfig.auto_digital_seal}
-                    onChange={(e) => setDocConfig({ ...docConfig, auto_digital_seal: e.target.checked })}
-                    className="w-4 h-4 accent-indigo-600 rounded"
-                  />
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="auto_seal"
+                        checked={docConfig.auto_digital_seal}
+                        onChange={(e) => setDocConfig({ ...docConfig, auto_digital_seal: e.target.checked })}
+                        className="rounded text-emerald-600"
+                      />
+                      <label htmlFor="auto_seal" className="text-emerald-900 font-bold">
+                        Tự động đóng mộc đỏ con dấu doanh nghiệp khi Lãnh đạo ký duyệt
+                      </label>
+                    </div>
+                    <p className="text-[11px] text-emerald-700 font-normal">
+                      Mộc đỏ pháp nhân có gắn Timestamp và mã Checksum SHA-256 xác thực trực tuyến qua mã QR.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
+              >
+                <Save className="w-4 h-4" /> Lưu Cấu Hình Văn Thư & Ký Số
+              </button>
+            </div>
+          </form>
         )}
       </div>
 
-      {/* MODAL TIẾP NHẬN / PHÁT HÀNH CÔNG VĂN MỚI */}
+      {/* MODAL VÀO SỔ / TẠO MỚI VĂN BẢN (SUPPORTING ALL 8 TYPES) */}
       {isCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-semibold">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-600" /> Tiếp Nhận / Phát Hành Văn Bản Mới
-              </h3>
-              <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                <h3 className="font-bold text-base text-slate-900">Vào Sổ / Khởi Tạo Văn Bản Mới</h3>
+              </div>
+              <button onClick={() => setIsCreateOpen(false)} className="p-1 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="space-y-3">
-              <div>
-                <label className="block text-slate-700 mb-1">Loại Công Văn *</label>
-                <select
-                  value={newDoc.category}
-                  onChange={(e) => setNewDoc({ ...newDoc, category: e.target.value as DocumentCategory })}
-                  className="w-full px-3 py-2 border rounded-xl"
-                >
-                  <option value="INBOUND">📥 Công Văn Đến</option>
-                  <option value="OUTBOUND">📤 Công Văn Đi</option>
-                  <option value="INTERNAL_SOP">📑 Văn Bản Nội Bộ</option>
-                </select>
+            <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs font-bold">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Loại Văn Bản (8 Danh Mục):</label>
+                  <select
+                    value={newDoc.category}
+                    onChange={(e) => setNewDoc({ ...newDoc, category: e.target.value as DocumentCategory })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
+                  >
+                    <option value="INBOUND">📩 Công Văn Đến (Inbound)</option>
+                    <option value="OUTBOUND">📤 Công Văn Đi (Outbound)</option>
+                    <option value="DECISION">📜 Quyết Định Ban Hành (Decision)</option>
+                    <option value="SUBMISSION_STATEMENT">📋 Tờ Trình Nội Bộ (Submission)</option>
+                    <option value="ANNOUNCEMENT">📢 Thông Báo Doanh Nghiệp (Announcement)</option>
+                    <option value="INTERNAL_SOP">📑 Quy Chế & SOP Vận Hành</option>
+                    <option value="CONTRACT_MINUTES">🤝 Hợp Đồng & Biên Bản Meeting</option>
+                    <option value="PERIODIC_REPORT">📊 Báo Cáo Chuyên Đề</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Số / Mã Văn Bản (Cấp Tự Động):</label>
+                  <input
+                    type="text"
+                    placeholder={`Ví dụ: 142/${getPrefixForCategory(newDoc.category)}`}
+                    value={newDoc.document_code}
+                    onChange={(e) => setNewDoc({ ...newDoc, document_code: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 mb-1">Số / Mã Ký Hiệu Công Văn *</label>
+                <label className="block text-slate-700 mb-1">Trích Yếu Nội Dung Văn Bản:</label>
                 <input
                   type="text"
                   required
-                  placeholder="Ví dụ: 142/CV-BCT hoặc 88/QĐ-GGBG..."
-                  value={newDoc.document_code}
-                  onChange={(e) => setNewDoc({ ...newDoc, document_code: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl tabular-nums text-blue-700"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1">Trích Yếu Nội Dung Văn Bản *</label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Nhập nội dung trích yếu của công văn..."
+                  placeholder="Nhập tiêu đề hoặc trích yếu nội dung văn bản..."
                   value={newDoc.title}
                   onChange={(e) => setNewDoc({ ...newDoc, title: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Cơ Quan / Nơi Ban Hành *</label>
+                  <label className="block text-slate-700 mb-1">Cơ Quan / Đơn Vị Ban Hành:</label>
                   <input
                     type="text"
                     required
                     value={newDoc.issuer_org}
                     onChange={(e) => setNewDoc({ ...newDoc, issuer_org: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 mb-1">Người Ký Văn Bản *</label>
+                  <label className="block text-slate-700 mb-1">Nơi Nhận / Đơn Vị Tiếp Nhận:</label>
                   <input
                     type="text"
                     required
-                    value={newDoc.signee_name}
-                    onChange={(e) => setNewDoc({ ...newDoc, signee_name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl"
+                    value={newDoc.recipient_org}
+                    onChange={(e) => setNewDoc({ ...newDoc, recipient_org: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Mức Độ Bảo Mật</label>
-                  <select
-                    value={newDoc.security_level}
-                    onChange={(e) => setNewDoc({ ...newDoc, security_level: e.target.value as SecurityLevel })}
-                    className="w-full px-3 py-2 border rounded-xl"
-                  >
-                    <option value="NORMAL">Thường (Công khai)</option>
-                    <option value="CONFIDENTIAL">🔒 Bảo Mật Nội Bộ</option>
-                    <option value="SECRET">🔒 Mật</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Mức Độ Ưu Tiên / Khẩn</label>
+                  <label className="block text-slate-700 mb-1">Độ Khẩn:</label>
                   <select
                     value={newDoc.urgency_level}
                     onChange={(e) => setNewDoc({ ...newDoc, urgency_level: e.target.value as UrgencyLevel })}
-                    className="w-full px-3 py-2 border rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
                   >
-                    <option value="NORMAL">Thường</option>
-                    <option value="URGENT">Khẩn</option>
-                    <option value="HIGHLY_URGENT">⚡ Thượng Khẩn (Trong ngày)</option>
+                    <option value="NORMAL">THƯỜNG</option>
+                    <option value="URGENT">KHẨN (24h)</option>
+                    <option value="HIGHLY_URGENT">THƯỢNG KHẨN (12h)</option>
+                    <option value="EXPRESS">HỎA TỐC (4h)</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Phòng Ban Phụ Trách *</label>
+                  <label className="block text-slate-700 mb-1">Độ Mật:</label>
+                  <select
+                    value={newDoc.security_level}
+                    onChange={(e) => setNewDoc({ ...newDoc, security_level: e.target.value as SecurityLevel })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
+                  >
+                    <option value="NORMAL">THƯỜNG</option>
+                    <option value="CONFIDENTIAL">BẢO MẬT</option>
+                    <option value="SECRET">MẬT</option>
+                    <option value="TOP_SECRET">TỐI MẬT</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Đơn Vị Phụ Trách Xử Lý:</label>
                   <select
                     value={newDoc.assigned_department}
                     onChange={(e) => setNewDoc({ ...newDoc, assigned_department: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
                   >
                     <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
-                    <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
                     <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
+                    <option value="Phòng Kế Toán">Phòng Kế Toán & Tài Chính</option>
+                    <option value="Ban Dự Án">Ban Dự Án & Tech</option>
                     <option value="Ban Giám Đốc">Ban Giám Đốc</option>
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Cán Bộ Chủ Trì *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newDoc.assigned_assignee}
-                    onChange={(e) => setNewDoc({ ...newDoc, assigned_assignee: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl"
-                  />
-                </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 mb-1">Tệp Đính Kèm Gốc (PDF, DOC, DOCX, Hình Ảnh)</label>
-                <div className="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-2xl space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all">
-                      <Paperclip className="w-4 h-4" /> Tải Lên Tệp Tin Từ Máy Tính
-                      <input
-                        type="file"
-                        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                        className="hidden"
-                        onChange={handleDocFileSelect}
-                      />
-                    </label>
-                    {attachedFile && (
-                      <button
-                        type="button"
-                        onClick={() => setAttachedFile(null)}
-                        className="text-red-600 hover:underline text-[11px] font-bold"
-                      >
-                        Xóa file
-                      </button>
-                    )}
-                  </div>
-                  {attachedFile ? (
-                    <div className="p-2 bg-white rounded-xl border border-blue-200 flex items-center justify-between text-xs">
-                      <span className="tabular-nums text-blue-900 font-bold truncate max-w-[240px]">📄 {attachedFile.name}</span>
-                      <span className="tabular-nums text-slate-500 font-bold text-[10px]">{attachedFile.size}</span>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-slate-400">Chưa chọn tệp tin nào. Hệ thống sẽ tự tạo file mặc định nếu để trống.</p>
-                  )}
+              {/* File Attachment */}
+              <div className="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-700 font-bold flex items-center gap-1.5">
+                    <Paperclip className="w-4 h-4 text-blue-600" /> Tệp Văn Bản Đính Kèm (PDF / Word):
+                  </span>
+                  <label className="px-3 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg cursor-pointer text-[11px] font-bold">
+                    Chọn File PDF
+                    <input type="file" accept=".pdf,.doc,.docx" onChange={handleDocFileSelect} className="hidden" />
+                  </label>
                 </div>
+                {attachedFile && (
+                  <p className="text-emerald-700 font-bold text-[11px]">
+                    📄 File đã chọn: {attachedFile.name} ({attachedFile.size})
+                  </p>
+                )}
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl"
                 >
-                  Hủy
+                  Hủy Bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md"
                 >
                   Vào Sổ Văn Bản
                 </button>
@@ -703,90 +961,47 @@ export default function DocumentsPage() {
         </div>
       )}
 
-      {/* MODAL XEM VĂN BẢN, PDF VIEWER & BÚT PHÊ GIÁM ĐỐC */}
+      {/* MODAL XEM CHI TIẾT VĂN BẢN & BÚT PHÊ CHỈ ĐẠO BAN GIÁM ĐỐC */}
       {isViewOpen && selectedDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto sleeker-scrollbar text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="tabular-nums text-xs font-semibold text-blue-700">{selectedDoc.document_code}</span>
-                <h3 className="font-bold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3>
+                <span className="text-[11px] text-blue-600 uppercase font-bold block">
+                  {renderCategoryLabel(selectedDoc.category)} • Số: {selectedDoc.document_code}
+                </span>
+                <h3 className="font-bold text-base text-slate-900 mt-1">{selectedDoc.title}</h3>
               </div>
-              <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
+              <button onClick={() => setIsViewOpen(false)} className="p-1 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-              <h4 className="font-bold text-slate-900 text-sm leading-snug">{selectedDoc.title}</h4>
-              <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
-                <p>Nơi ban hành: <strong className="text-slate-900">{selectedDoc.issuer_org}</strong></p>
-                <p>Người ký: <strong className="text-slate-900">{selectedDoc.signee_name}</strong></p>
-                <p>Đơn vị xử lý: <strong className="text-slate-900">{selectedDoc.assigned_department}</strong></p>
-                <p>Cán bộ chủ trì: <strong className="text-blue-700 font-bold">{selectedDoc.assigned_assignee}</strong></p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div>
+                <span className="text-slate-500 text-[10.5px] uppercase block">Cơ Quan Ban Hành</span>
+                <p className="text-slate-900 font-bold">{selectedDoc.issuer_org}</p>
               </div>
-            </div>
-
-            {/* Direct File Attachment Viewer Card */}
-            <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-2xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
-                  <Paperclip className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-bold text-slate-900">{selectedDoc.file_name || 'Văn-Bản-Dinh-Kem.pdf'}</p>
-                  <p className="text-[11px] text-slate-500 font-normal">Dung lượng: {selectedDoc.file_size || '2.1 MB'} • Định dạng tệp PDF</p>
+              <div>
+                <span className="text-slate-500 text-[10.5px] uppercase block">Nơi Nhận</span>
+                <p className="text-slate-900 font-bold">{selectedDoc.recipient_org}</p>
+              </div>
+              <div>
+                <span className="text-slate-500 text-[10.5px] uppercase block">Độ Khẩn / Mật</span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  {renderUrgencyBadge(selectedDoc.urgency_level)}
                 </div>
               </div>
-
-              <a
-                href={selectedDoc.file_url || '#'}
-                target="_blank"
-                rel="noreferrer"
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[11px] flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95"
-              >
-                <Download className="w-3.5 h-3.5" /> Xem / Tải File PDF
-              </a>
-            </div>
-
-            {/* Digital Red Stamp Seal Badge */}
-            <div className="p-4 bg-red-50/60 border border-red-200 rounded-2xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full border-2 border-red-600 text-red-600 flex items-center justify-center font-semibold text-xs uppercase tracking-wider rotate-[-12deg] bg-white shadow-sm">
-                  GGBG
-                </div>
-                <div>
-                  <p className="font-bold text-red-900">
-                    {selectedDoc.has_digital_stamp ? '🔴 Dấu Mộc Đỏ Điện Tử: ĐÃ ĐÓNG DẤU CHÍNH THỨC' : '⚪ Dấu Mộc Điện Tử: CHƯA ĐÓNG DẤU MỘC'}
-                  </p>
-                  <p className="text-[11px] text-slate-500 font-normal">
-                    {selectedDoc.has_digital_stamp ? `Phát hành & xác thực ngày ${selectedDoc.stamped_at || selectedDoc.issued_date}` : 'Văn bản dự thảo chờ Giám đốc đóng dấu mộc'}
-                  </p>
-                </div>
+              <div>
+                <span className="text-slate-500 text-[10.5px] uppercase block">Trạng Thái Ký Số</span>
+                <p className="text-emerald-700 font-bold">
+                  {selectedDoc.has_digital_stamp ? '🛡️ Đã Ký Số Cloud HSM' : '📝 Bản Thảo'}
+                </p>
               </div>
-
-              {!selectedDoc.has_digital_stamp && (
-                <button
-                  onClick={() => {
-                    const updated = {
-                      ...selectedDoc,
-                      has_digital_stamp: true,
-                      stamped_at: new Date().toLocaleString('vi-VN'),
-                    };
-                    updateOfficialDocument(updated);
-                    setSelectedDoc(updated);
-                    setDocuments(getOfficialDocuments());
-                    showToast(`🔴 Đã đóng dấu mộc đỏ điện tử chính thức cho văn bản ${selectedDoc.document_code}`);
-                  }}
-                  className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-[11px] flex items-center gap-1.5 shadow-md shadow-red-600/30 transition-all active:scale-95 shrink-0"
-                >
-                  <FileCheck className="w-3.5 h-3.5" /> Đóng Dấu Mộc Đỏ
-                </button>
-              )}
             </div>
 
             {/* Bút Phê Chỉ Đạo Section */}
-            <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-2xl space-y-3">
+            <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-2xl space-y-3">
               <h4 className="font-bold text-amber-900 text-xs flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-amber-600" /> Bút Phê Chỉ Đạo Của Ban Giám Đốc
               </h4>
@@ -799,33 +1014,71 @@ export default function DocumentsPage() {
                 <p className="text-slate-500 font-normal text-[11px]">Chưa có bút phê chỉ đạo cho công văn này.</p>
               )}
 
-              <form onSubmit={handleAddDirectiveNote} className="space-y-2 pt-2">
-                <label className="block text-slate-700 font-bold">Cập Nhật Bút Phê Chỉ Đạo Mới (CEO / Director):</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Nhập nội dung chỉ đạo phòng ban thực hiện..."
-                    value={directiveInput}
-                    onChange={(e) => setDirectiveInput(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-white border border-amber-300 rounded-xl"
-                  />
+              <form onSubmit={handleAddDirectiveNote} className="space-y-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Giao Phòng Ban Chủ Trì Xử Lý:</label>
+                    <select
+                      value={assigneeDeptInput}
+                      onChange={(e) => setAssigneeDeptInput(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-amber-300 rounded-xl"
+                    >
+                      <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
+                      <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
+                      <option value="Phòng Kế Toán & Tài Chính">Phòng Kế Toán & Tài Chính</option>
+                      <option value="Ban Dự Án & Tech">Ban Dự Án & Tech</option>
+                      <option value="Ban Giám Đốc">Ban Giám Đốc</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Bút Phê Chỉ Đạo Ban Giám Đốc:</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Nhập nội dung chỉ đạo phòng ban..."
+                      value={directiveInput}
+                      onChange={(e) => setDirectiveInput(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-amber-300 rounded-xl"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
                   <button
                     type="submit"
                     className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md shrink-0"
                   >
-                    Lưu Bút Phê
+                    Lưu Bút Phê & Giao Phòng Ban
                   </button>
                 </div>
               </form>
             </div>
 
-            <div className="flex items-center justify-between pt-2">
+            {/* Timeline Process Logs */}
+            {selectedDoc.process_logs && selectedDoc.process_logs.length > 0 && (
+              <div className="space-y-2 border-t pt-3">
+                <h4 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-blue-600" /> Nhật Ký Xử Lý Xuyên Suốt Luồng Công Văn:
+                </h4>
+                <div className="space-y-2">
+                  {selectedDoc.process_logs.map((log) => (
+                    <div key={log.id} className="p-2.5 bg-slate-50 border rounded-xl flex items-start justify-between text-[11px]">
+                      <div>
+                        <span className="font-bold text-blue-700">[{log.action}]</span> <span className="font-bold text-slate-900">{log.actor_name}</span> ({log.actor_role})
+                        <p className="text-slate-600 font-normal mt-0.5">{log.note}</p>
+                      </div>
+                      <span className="text-slate-400 tabular-nums font-normal shrink-0 ml-2">{log.timestamp}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-2 border-t">
               <button
                 onClick={() => setIsSignModalOpen(true)}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md flex items-center gap-1.5 transition-all active:scale-95"
               >
-                <ShieldCheck className="w-4 h-4" /> ✍️ Trình Ký Số Điện Tử (E-Sign)
+                <ShieldCheck className="w-4 h-4" /> ✍️ Trình Ký Số Điện Tử PKI/HSM
               </button>
 
               <button
@@ -839,7 +1092,7 @@ export default function DocumentsPage() {
         </div>
       )}
 
-      {/* MODAL TRÌNH KÝ SỐ ĐIỆN TỬ */}
+      {/* MODAL TRÌNH KÝ SỐ ĐIỆN TỬ PKI/HSM CLOUD */}
       {selectedDoc && (
         <DigitalSignatureModal
           isOpen={isSignModalOpen}
@@ -853,12 +1106,13 @@ export default function DocumentsPage() {
               ...selectedDoc,
               has_digital_stamp: true,
               stamped_at: sig.signed_at,
-              directive_note: (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') + `[Chữ ký số: ${sig.signature_type} • ${sig.sha256_hash.slice(0, 16)}...]`,
+              qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedDoc.document_code)}`,
+              directive_note: (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') + `[Ký số HSM: ${sig.signature_type} • ${sig.sha256_hash.slice(0, 16)}...]`,
             };
             updateOfficialDocument(updated);
             setSelectedDoc(updated);
             setDocuments(getOfficialDocuments());
-            showToast(`✍️ Đã ký số điện tử thành công cho văn bản ${selectedDoc.document_code}! Mã Checksum: ${sig.sha256_hash.slice(0, 18)}...`);
+            showToast(`✍️ Đã ký số điện tử HSM thành công cho văn bản ${selectedDoc.document_code}! Checksum: ${sig.sha256_hash.slice(0, 18)}...`);
           }}
         />
       )}

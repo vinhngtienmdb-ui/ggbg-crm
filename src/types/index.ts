@@ -838,7 +838,16 @@ export interface EnterpriseProject {
   tasks: ProjectTask[];
 }
 
-export type DocumentCategory = 'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP';
+export type DocumentCategory =
+  | 'INBOUND'
+  | 'OUTBOUND'
+  | 'DECISION'
+  | 'SUBMISSION_STATEMENT'
+  | 'ANNOUNCEMENT'
+  | 'INTERNAL_SOP'
+  | 'CONTRACT_MINUTES'
+  | 'PERIODIC_REPORT';
+
 export type SecurityLevel = 'NORMAL' | 'CONFIDENTIAL' | 'SECRET' | 'TOP_SECRET';
 export type UrgencyLevel = 'NORMAL' | 'URGENT' | 'HIGHLY_URGENT' | 'EXPRESS';
 export type DocProcessStatus = 'PENDING_DIRECTIVE' | 'IN_PROCESSING' | 'COMPLETED' | 'ARCHIVED';
@@ -849,6 +858,15 @@ export interface DocumentComment {
   author_role: string;
   comment: string;
   created_at: string;
+}
+
+export interface DocumentProcessLog {
+  id: string;
+  actor_name: string;
+  actor_role: string;
+  action: string;
+  note: string;
+  timestamp: string;
 }
 
 export interface OfficialDocument {
@@ -872,7 +890,16 @@ export interface OfficialDocument {
   file_size?: string;
   has_digital_stamp?: boolean;
   stamped_at?: string;
+  sla_deadline?: string;
+  qr_code_url?: string;
+  digital_signature_meta?: {
+    signed_by: string;
+    signed_at: string;
+    ca_provider: string;
+    seal_applied: boolean;
+  };
   comments?: DocumentComment[];
+  process_logs?: DocumentProcessLog[];
   created_at: string;
 }
 
