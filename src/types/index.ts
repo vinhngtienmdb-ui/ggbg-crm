@@ -869,6 +869,19 @@ export interface DocumentProcessLog {
   timestamp: string;
 }
 
+export type SignatureType = 'MARGINAL' | 'SUBMISSION' | 'APPROVAL' | 'OFFICIAL_SEAL';
+
+export interface DigitalSignatureRecord {
+  id: string;
+  signature_type: SignatureType;
+  signer_name: string;
+  signer_role: string;
+  signed_at: string;
+  ca_provider: string;
+  sha256_hash: string;
+  seal_applied?: boolean;
+}
+
 export interface OfficialDocument {
   id: string;
   document_code: string;
@@ -898,6 +911,7 @@ export interface OfficialDocument {
     ca_provider: string;
     seal_applied: boolean;
   };
+  signatures?: DigitalSignatureRecord[];
   comments?: DocumentComment[];
   process_logs?: DocumentProcessLog[];
   created_at: string;

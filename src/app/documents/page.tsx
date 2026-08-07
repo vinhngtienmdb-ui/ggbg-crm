@@ -1091,17 +1091,50 @@ export default function DocumentsPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-2 border-t">
-              <button
-                onClick={() => setIsSignModalOpen(true)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md flex items-center gap-1.5 transition-all active:scale-95"
-              >
-                <ShieldCheck className="w-4 h-4" /> ✍️ Trình Ký Số Điện Tử PKI/HSM
-              </button>
+            {/* 4 Signature Action Buttons */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  onClick={() => {
+                    setSelectedDoc(selectedDoc);
+                    setIsSignModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-bold rounded-xl text-[11px] flex items-center gap-1 transition-all"
+                >
+                  ✍️ Ký Nháy
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDoc(selectedDoc);
+                    setIsSignModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-bold rounded-xl text-[11px] flex items-center gap-1 transition-all"
+                >
+                  📋 Ký Trình
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDoc(selectedDoc);
+                    setIsSignModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-[11px] flex items-center gap-1 shadow-md shadow-purple-600/30 transition-all active:scale-95"
+                >
+                  📜 CEO Ký Phê Duyệt
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDoc(selectedDoc);
+                    setIsSignModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-[11px] flex items-center gap-1 shadow-md shadow-red-600/30 transition-all active:scale-95"
+                >
+                  🛡️ Ký Đóng Dấu Mộc Đỏ
+                </button>
+              </div>
 
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl"
+                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl shrink-0"
               >
                 Đóng
               </button>
@@ -1110,7 +1143,7 @@ export default function DocumentsPage() {
         </div>
       )}
 
-      {/* MODAL TRÌNH KÝ SỐ ĐIỆN TỬ PKI/HSM CLOUD */}
+      {/* MODAL TRÌNH KÝ SỐ ĐIỆN TỬ PKI/HSM CLOUD (SUPPORTING 4 LEGAL SIGNATURE TYPES) */}
       {selectedDoc && (
         <DigitalSignatureModal
           isOpen={isSignModalOpen}
@@ -1119,18 +1152,43 @@ export default function DocumentsPage() {
           documentTitle={selectedDoc.title}
           signerName="Nguyễn Tiến Vinh"
           signerRole="CEO / Ban Giám Đốc"
+          defaultSignatureType="APPROVAL"
           onSignComplete={(sig) => {
-            const updated = {
-              ...selectedDoc,
-              has_digital_stamp: true,
-              stamped_at: sig.signed_at,
-              qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedDoc.document_code)}`,
-              directive_note: (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') + `[Ký số HSM: ${sig.signature_type} • ${sig.sha256_hash.slice(0, 16)}...]`,
+            const sigTypeLabel =
+              sig.signature_type === 'MARGINAL'
+                ? 'Ký Nháy (Marginal)'
+                : sig.signature_type === 'SUBMISSION'
+                ? 'Ký Trình (Submission)'
+                : sig.signature_type === 'APPROVAL'
+                ? 'Ký Phê Duyệt (Executive Approval)'
+                : 'Ký Đóng Dấu Mộc Đỏ (Official Seal)';
+
+            const newLog = {
+              id: `l_${Date.now()}`,
+              actor_name: sig.signer_name,
+              actor_role: sig.signer_role,
+              action: `KÝ SỐ: ${sigTypeLabel}`,
+              note: `Đã đóng chữ ký số điện tử. Hash SHA-256: ${sig.sha256_hash.slice(0, 20)}...`,
+              timestamp: sig.signed_at,
             };
+
+            const updated: OfficialDocument = {
+              ...selectedDoc,
+              has_digital_stamp: sig.seal_applied || selectedDoc.has_digital_stamp,
+              stamped_at: sig.seal_applied ? sig.signed_at : selectedDoc.stamped_at,
+              qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedDoc.document_code)}`,
+              directive_note:
+                (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') +
+                `[Chữ ký số: ${sigTypeLabel} • ${sig.sha256_hash.slice(0, 16)}...]`,
+              process_logs: [...(selectedDoc.process_logs || []), newLog],
+            };
+
             updateOfficialDocument(updated);
             setSelectedDoc(updated);
             setDocuments(getOfficialDocuments());
-            showToast(`✍️ Đã ký số điện tử HSM thành công cho văn bản ${selectedDoc.document_code}! Checksum: ${sig.sha256_hash.slice(0, 18)}...`);
+            showToast(
+              `✍️ Đã ký số [${sigTypeLabel}] thành công cho văn bản ${selectedDoc.document_code}! SHA-256: ${sig.sha256_hash.slice(0, 18)}...`
+            );
           }}
         />
       )}
