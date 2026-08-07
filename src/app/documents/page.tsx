@@ -40,13 +40,20 @@ import {
   DocumentCategory,
   SecurityLevel,
   UrgencyLevel,
-  DocProcessStatus
+  DocProcessStatus,
+  DocumentLedgerConfig,
+  LedgerResetFrequency,
+  LedgerRetentionPeriod
 } from '@/types';
 import {
   getOfficialDocuments,
   addOfficialDocument,
   updateOfficialDocument,
-  deleteOfficialDocument
+  deleteOfficialDocument,
+  getDocumentLedgers,
+  addDocumentLedger,
+  updateDocumentLedger,
+  deleteDocumentLedger
 } from '@/lib/documentStore';
 import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
 import { useAuth } from '@/context/AuthContext';
@@ -57,6 +64,7 @@ export default function DocumentsPage() {
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
 
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
+  const [ledgers, setLedgers] = useState<DocumentLedgerConfig[]>(() => getDocumentLedgers());
   const [activeTab, setActiveTab] = useState<'INBOUND_LEDGER' | 'OUTBOUND_LEDGER' | 'INTERNAL_LEDGER' | 'PENDING_DIRECTIVE' | 'DIGITAL_STAMP' | 'DOC_CONFIG'>('INBOUND_LEDGER');
   const [selectedInternalCategory, setSelectedInternalCategory] = useState<DocumentCategory | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -106,9 +114,52 @@ export default function DocumentsPage() {
     directive_note: '',
   });
 
+  const [isCreateLedgerOpen, setIsCreateLedgerOpen] = useState(false);
+  const [newLedger, setNewLedger] = useState<{
+    ledger_name: string;
+    ledger_type: 'INBOUND' | 'OUTBOUND' | 'INTERNAL';
+    prefix: string;
+    suffix: string;
+    current_number: number;
+    number_padding: number;
+    reset_frequency: LedgerResetFrequency;
+    retention_period: LedgerRetentionPeriod;
+  }>({
+    ledger_name: 'Sổ Công Văn Mới 2026',
+    ledger_type: 'INBOUND',
+    prefix: 'CV-NEW',
+    suffix: '/2026',
+    current_number: 1,
+    number_padding: 3,
+    reset_frequency: 'YEARLY',
+    retention_period: '10_YEARS',
+  });
+
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3500);
+  };
+
+  const handleCreateLedgerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const created: DocumentLedgerConfig = {
+      id: `ledger_${Date.now()}`,
+      ledger_name: newLedger.ledger_name,
+      ledger_type: newLedger.ledger_type,
+      prefix: newLedger.prefix,
+      suffix: newLedger.suffix,
+      current_number: newLedger.current_number,
+      number_padding: newLedger.number_padding,
+      reset_frequency: newLedger.reset_frequency,
+      retention_period: newLedger.retention_period,
+      allowed_categories: newLedger.ledger_type === 'INBOUND' ? ['INBOUND'] : newLedger.ledger_type === 'OUTBOUND' ? ['OUTBOUND'] : ['DECISION', 'SUBMISSION_STATEMENT', 'ANNOUNCEMENT'],
+      is_active: true,
+      created_at: new Date().toISOString().split('T')[0],
+    };
+    const updatedLedgers = addDocumentLedger(created);
+    setLedgers([...updatedLedgers]);
+    setIsCreateLedgerOpen(false);
+    showToast(`📚 Đã tạo thành công sổ văn bản mới: "${newLedger.ledger_name}"!`);
   };
 
   const handleDocFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -646,172 +697,293 @@ export default function DocumentsPage() {
           </div>
         )}
 
-        {/* TAB CONTENT 2: CONFIGURATION & DIGITAL STAMPING SETTINGS */}
+        {/* TAB CONTENT 2: MULTI-LEDGER MANAGEMENT & SYSTEM CONFIGURATION */}
         {activeTab === 'DOC_CONFIG' && canAccessSettings(activeRole) && (
-          <form onSubmit={handleSaveDocConfig} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Section 1: Prefix Rules for 8 Document Categories */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
-                  <SlidersHorizontal className="w-4 h-4 text-blue-600" /> Cấu Hình Tiền Tố Mã Cho 8 Loại Văn Bản (NĐ 30/2020)
-                </h3>
-
-                <div className="grid grid-cols-2 gap-3 text-xs font-bold">
-                  <div>
-                    <label className="block text-slate-700 mb-1">1. Công Văn Đến (Inbound):</label>
-                    <input
-                      type="text"
-                      value={docConfig.inbound_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, inbound_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">2. Công Văn Đi (Outbound):</label>
-                    <input
-                      type="text"
-                      value={docConfig.outbound_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, outbound_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">3. Quyết Định (Decision):</label>
-                    <input
-                      type="text"
-                      value={docConfig.decision_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, decision_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">4. Tờ Trình (Submission):</label>
-                    <input
-                      type="text"
-                      value={docConfig.submission_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, submission_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">5. Thông Báo (Announcement):</label>
-                    <input
-                      type="text"
-                      value={docConfig.announcement_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, announcement_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">6. Quy Chế & SOP:</label>
-                    <input
-                      type="text"
-                      value={docConfig.sop_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, sop_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">7. Hợp Đồng / Biên Bản:</label>
-                    <input
-                      type="text"
-                      value={docConfig.contract_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, contract_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 mb-1">8. Báo Cáo Chuyên Đề:</label>
-                    <input
-                      type="text"
-                      value={docConfig.report_prefix}
-                      onChange={(e) => setDocConfig({ ...docConfig, report_prefix: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
-                  </div>
+          <div className="space-y-6">
+            {/* SUB-SECTION 1: MULTI-LEDGER MANAGEMENT LIST */}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-3">
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-blue-600" /> Quản Lý Nhiều Sổ Văn Bản Doanh Nghiệp (Multi-Ledger)
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                    Tạo và quản lý các sổ công văn đến, sổ công văn đi và sổ văn bản nội bộ độc lập theo năm hoặc phòng ban.
+                  </p>
                 </div>
-
-                <div className="flex items-center gap-2 pt-2 border-t text-xs font-bold text-slate-700">
-                  <input
-                    type="checkbox"
-                    id="reset_yearly"
-                    checked={docConfig.reset_yearly}
-                    onChange={(e) => setDocConfig({ ...docConfig, reset_yearly: e.target.checked })}
-                    className="rounded text-blue-600"
-                  />
-                  <label htmlFor="reset_yearly">Tự động Reset số thứ tự công văn về 001 vào ngày 01/01 hàng năm</label>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCreateLedgerOpen(true)}
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all shrink-0 active:scale-95"
+                >
+                  <Plus className="w-4 h-4" /> Thêm Sổ Văn Bản Mới
+                </button>
               </div>
 
-              {/* Section 2: SLA & Provider Settings */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" /> Cài Đặt Cổng Ký Số Cloud HSM & Định Mức SLA
-                </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {ledgers.map((lg) => (
+                  <div key={lg.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 hover:border-blue-300 transition-all">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                        {lg.ledger_type === 'INBOUND' ? '📩' : lg.ledger_type === 'OUTBOUND' ? '📤' : '🏢'} {lg.ledger_name}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${lg.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>
+                        {lg.is_active ? '● Đang Hoạt Động' : 'Tạm Dừng'}
+                      </span>
+                    </div>
 
-                <div className="space-y-3 text-xs font-bold">
-                  <div>
-                    <label className="block text-slate-700 mb-1">Nhà Cung Cấp Chứng Thư Số (CA / HSM Gateway):</label>
-                    <input
-                      type="text"
-                      value={docConfig.cert_provider}
-                      onChange={(e) => setDocConfig({ ...docConfig, cert_provider: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                    />
+                    <div className="grid grid-cols-2 gap-2 text-[11px] font-normal text-slate-600 bg-white p-2.5 rounded-xl border border-slate-100">
+                      <div>Tiền tố: <strong className="text-blue-700">{lg.prefix}</strong></div>
+                      <div>Hậu tố: <strong className="text-purple-700">{lg.suffix}</strong></div>
+                      <div>Số hiện tại: <strong className="text-emerald-700 tabular-nums">{lg.current_number}</strong></div>
+                      <div>Quy tắc Reset: <strong className="text-amber-800">{lg.reset_frequency === 'YEARLY' ? 'Theo Năm (01/01)' : lg.reset_frequency === 'MONTHLY' ? 'Theo Tháng' : 'Liên Tục'}</strong></div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10.5px] text-slate-500 font-medium pt-1">
+                      <span>Thời gian lưu trữ sổ: <strong className="text-slate-900">{lg.retention_period === 'PERMANENT' ? 'Vĩnh Viễn' : lg.retention_period === '10_YEARS' ? '10 Năm' : '5 Năm'}</strong></span>
+                      <button
+                        onClick={() => {
+                          const updated = updateDocumentLedger({ ...lg, is_active: !lg.is_active });
+                          setLedgers([...updated]);
+                          showToast(`Đã cập nhật trạng thái sổ ${lg.ledger_name}`);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 font-bold"
+                      >
+                        {lg.is_active ? 'Đổi sang Tạm dừng' : 'Bật hoạt động'}
+                      </button>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+            {/* SUB-SECTION 2: DETAILED FORM FOR NUMBERING, SLA, RESET & RETENTION */}
+            <form onSubmit={handleSaveDocConfig} className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Card 1: Category Prefix & Reset Rules */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                  <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
+                    <SlidersHorizontal className="w-4 h-4 text-blue-600" /> Cấu Hình Tiền Tố & Đánh Số Công Văn (NĐ 30/2020)
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-3 text-xs font-bold">
                     <div>
-                      <label className="block text-slate-700 mb-1">SLA Công Văn Khẩn (Giờ):</label>
+                      <label className="block text-slate-700 mb-1">1. Công Văn Đến (Inbound):</label>
                       <input
-                        type="number"
-                        value={docConfig.urgent_sla_hours}
-                        onChange={(e) => setDocConfig({ ...docConfig, urgent_sla_hours: Number(e.target.value) })}
-                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums"
+                        type="text"
+                        value={docConfig.inbound_prefix}
+                        onChange={(e) => setDocConfig({ ...docConfig, inbound_prefix: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 mb-1">SLA Hỏa Tốc (Giờ):</label>
+                      <label className="block text-slate-700 mb-1">2. Công Văn Đi (Outbound):</label>
                       <input
-                        type="number"
-                        value={docConfig.express_sla_hours}
-                        onChange={(e) => setDocConfig({ ...docConfig, express_sla_hours: Number(e.target.value) })}
-                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums"
+                        type="text"
+                        value={docConfig.outbound_prefix}
+                        onChange={(e) => setDocConfig({ ...docConfig, outbound_prefix: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-700 mb-1">3. Quyết Định (Decision):</label>
+                      <input
+                        type="text"
+                        value={docConfig.decision_prefix}
+                        onChange={(e) => setDocConfig({ ...docConfig, decision_prefix: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-700 mb-1">4. Tờ Trình Nội Bộ:</label>
+                      <input
+                        type="text"
+                        value={docConfig.submission_prefix}
+                        onChange={(e) => setDocConfig({ ...docConfig, submission_prefix: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
                       />
                     </div>
                   </div>
 
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2 text-xs font-bold text-blue-900">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        id="auto_seal"
-                        checked={docConfig.auto_digital_seal}
-                        onChange={(e) => setDocConfig({ ...docConfig, auto_digital_seal: e.target.checked })}
-                        className="rounded text-emerald-600"
+                        id="reset_yearly"
+                        checked={docConfig.reset_yearly}
+                        onChange={(e) => setDocConfig({ ...docConfig, reset_yearly: e.target.checked })}
+                        className="rounded text-blue-600"
                       />
-                      <label htmlFor="auto_seal" className="text-emerald-900 font-bold">
-                        Tự động đóng mộc đỏ con dấu doanh nghiệp khi Lãnh đạo ký duyệt
-                      </label>
+                      <label htmlFor="reset_yearly">Tự động Reset số thứ tự tất cả sổ văn bản về 001 vào ngày 01/01 hàng năm</label>
                     </div>
-                    <p className="text-[11px] text-emerald-700 font-normal">
-                      Mộc đỏ pháp nhân có gắn Timestamp và mã Checksum SHA-256 xác thực trực tuyến qua mã QR.
+                    <p className="text-[11px] text-blue-700 font-normal">
+                      Quy định theo Luật Lưu trữ và Nghị định 30/2020/NĐ-CP của Chính phủ về công tác văn thư.
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
-              >
-                <Save className="w-4 h-4" /> Lưu Cấu Hình Văn Thư & Ký Số
+                {/* Card 2: Retention Period & Digital HSM Signing */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                  <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" /> Cấu Hình Lưu Trữ Sổ & Cổng Ký Số Cloud HSM
+                  </h3>
+
+                  <div className="space-y-3 text-xs font-bold">
+                    <div>
+                      <label className="block text-slate-700 mb-1">Thời Gian Lưu Trữ Sổ Văn Thư Mặc Định:</label>
+                      <select className="w-full px-3 py-2 bg-slate-50 border rounded-xl">
+                        <option value="PERMANENT">🏛️ Lưu trữ vĩnh viễn (Quyết định, SOP, BB HĐQT)</option>
+                        <option value="10_YEARS">📜 Lưu trữ 10 năm (Công văn đến/đi, Hợp đồng)</option>
+                        <option value="5_YEARS">📋 Lưu trữ 5 năm (Tờ trình, Thông báo nội bộ)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 mb-1">Nhà Cung Cấp Chứng Thư Số (CA / HSM Gateway):</label>
+                      <input
+                        type="text"
+                        value={docConfig.cert_provider}
+                        onChange={(e) => setDocConfig({ ...docConfig, cert_provider: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-700 mb-1">SLA Công Văn Khẩn (Giờ):</label>
+                        <input
+                          type="number"
+                          value={docConfig.urgent_sla_hours}
+                          onChange={(e) => setDocConfig({ ...docConfig, urgent_sla_hours: Number(e.target.value) })}
+                          className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 mb-1">SLA Hỏa Tốc (Giờ):</label>
+                        <input
+                          type="number"
+                          value={docConfig.express_sla_hours}
+                          onChange={(e) => setDocConfig({ ...docConfig, express_sla_hours: Number(e.target.value) })}
+                          className="w-full px-3 py-2 bg-slate-50 border rounded-xl tabular-nums"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
+                >
+                  <Save className="w-4 h-4" /> Lưu Tất Cả Cấu Hình Văn Thư & Đa Sổ
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+      {/* MODAL TẠO MỚI SỔ VĂN BẢN (CREATE NEW DOCUMENT LEDGER) */}
+      {isCreateLedgerOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200 text-xs font-bold">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+                <h3 className="font-bold text-base text-slate-900">Khởi Tạo Sổ Văn Bản Mới</h3>
+              </div>
+              <button onClick={() => setIsCreateLedgerOpen(false)} className="p-1 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
-          </form>
-        )}
+
+            <form onSubmit={handleCreateLedgerSubmit} className="space-y-4">
+              <div>
+                <label className="block text-slate-700 mb-1">Tên Sổ Văn Bản *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Sổ Công Văn Đến Khối Kinh Doanh 2026..."
+                  value={newLedger.ledger_name}
+                  onChange={(e) => setNewLedger({ ...newLedger, ledger_name: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Phân Loại Sổ *</label>
+                  <select
+                    value={newLedger.ledger_type}
+                    onChange={(e) => setNewLedger({ ...newLedger, ledger_type: e.target.value as any })}
+                    className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                  >
+                    <option value="INBOUND">📩 Sổ Công Văn Đến</option>
+                    <option value="OUTBOUND">📤 Sổ Công Văn Đi</option>
+                    <option value="INTERNAL">🏢 Sổ Văn Bản Nội Bộ</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Tiền Tố Mã (Prefix) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newLedger.prefix}
+                    onChange={(e) => setNewLedger({ ...newLedger, prefix: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Quy Tắc Reset Sổ *</label>
+                  <select
+                    value={newLedger.reset_frequency}
+                    onChange={(e) => setNewLedger({ ...newLedger, reset_frequency: e.target.value as any })}
+                    className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                  >
+                    <option value="YEARLY">Theo Năm (01/01)</option>
+                    <option value="MONTHLY">Theo Tháng</option>
+                    <option value="NEVER">Duy Trì Liên Tục</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 mb-1">Thời Gian Lưu Trữ *</label>
+                  <select
+                    value={newLedger.retention_period}
+                    onChange={(e) => setNewLedger({ ...newLedger, retention_period: e.target.value as any })}
+                    className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
+                  >
+                    <option value="PERMANENT">Vĩnh Viễn</option>
+                    <option value="10_YEARS">10 Năm</option>
+                    <option value="5_YEARS">5 Năm</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateLedgerOpen(false)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md"
+                >
+                  Lưu Sổ Mới
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       </div>
 
       {/* MODAL VÀO SỔ / TẠO MỚI VĂN BẢN (SUPPORTING ALL 8 TYPES) */}

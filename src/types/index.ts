@@ -882,6 +882,25 @@ export interface DigitalSignatureRecord {
   seal_applied?: boolean;
 }
 
+export type LedgerResetFrequency = 'NEVER' | 'YEARLY' | 'QUARTERLY' | 'MONTHLY';
+export type LedgerRetentionPeriod = 'PERMANENT' | '10_YEARS' | '5_YEARS' | 'CUSTOM';
+
+export interface DocumentLedgerConfig {
+  id: string;
+  ledger_name: string;
+  ledger_type: 'INBOUND' | 'OUTBOUND' | 'INTERNAL';
+  prefix: string;
+  suffix: string;
+  current_number: number;
+  number_padding: number;
+  reset_frequency: LedgerResetFrequency;
+  retention_period: LedgerRetentionPeriod;
+  retention_years?: number;
+  allowed_categories: DocumentCategory[];
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface OfficialDocument {
   id: string;
   document_code: string;
