@@ -24,6 +24,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [densityMode, setDensityModeState] = useState<DensityMode>('comfortable');
   const [primaryColor, setPrimaryColorState] = useState<PrimaryColor>('blue');
 
+  // Apply theme to <html> element — required for Tailwind dark: prefix classes
+  useEffect(() => {
+    const root = document.documentElement;
+    if (themeMode === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [themeMode]);
+
+  // Apply density class to <html> for global density-aware styles
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('density-compact', densityMode === 'compact');
+    root.classList.toggle('density-comfortable', densityMode === 'comfortable');
+  }, [densityMode]);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('ggbg_theme_mode') as ThemeMode;
     const savedDensity = localStorage.getItem('ggbg_density_mode') as DensityMode;
@@ -72,9 +89,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setPrimaryColor,
       }}
     >
-      <div className={themeMode === 'dark' ? 'dark-theme' : 'light-theme'}>
-        {children}
-      </div>
+      {children}
     </ThemeContext.Provider>
   );
 }

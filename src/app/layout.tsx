@@ -1,66 +1,14 @@
-'use client';
-
-import React, { useState } from 'react';
+import type { Metadata } from 'next';
 import './globals.css';
-import dynamic from 'next/dynamic';
-import Sidebar from '@/components/layout/Sidebar';
-import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
-import { usePathname } from 'next/navigation';
+import AppShell from '@/components/layout/AppShell';
 
-const VoIPCallModal = dynamic(() => import('@/components/telephony/VoIPCallModal'), { ssr: false });
-
-import MobileBottomNav from '@/components/layout/MobileBottomNav';
-import AccessDeniedGuard from '@/components/layout/AccessDeniedGuard';
-import { useAuth } from '@/context/AuthContext';
-import { useModuleToggles } from '@/context/ModuleToggleContext';
-import { isRouteAllowedForRole } from '@/lib/permissions';
-
-function AppLayout({ children }: { children: React.ReactNode }) {
-  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const pathname = usePathname();
-  const { user, simulatedRole } = useAuth();
-  const { toggles } = useModuleToggles();
-
-  const activeRole = simulatedRole || user?.role || 'SUPER_ADMIN';
-
-  // If visiting /login page, render clean without Sidebar & Header
-  if (pathname === '/login') {
-    return <main className="min-h-screen bg-slate-900">{children}</main>;
-  }
-
-  const isAllowed = isRouteAllowedForRole(pathname, activeRole, toggles);
-
-  return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
-      <Sidebar
-        isOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
-      />
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        <Header
-          onOpenPhoneModal={() => setIsPhoneModalOpen(true)}
-          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-        />
-        <main className="flex-1 overflow-y-auto p-3 sm:p-6 pb-20 md:pb-6 bg-slate-50 touch-scroll">
-          {isAllowed ? children : <AccessDeniedGuard />}
-        </main>
-      </div>
-
-      <MobileBottomNav
-        onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-      />
-
-      <VoIPCallModal
-        isOpen={isPhoneModalOpen}
-        onClose={() => setIsPhoneModalOpen(false)}
-      />
-    </div>
-  );
-}
+export const metadata: Metadata = {
+  title: 'GGBingo CRM - Enterprise E-Commerce Platform',
+  description: 'Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN',
+};
 
 export default function RootLayout({
   children,
@@ -68,16 +16,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <head>
-        <title>GGBingo CRM - Enterprise E-Commerce Platform</title>
-        <meta name="description" content="Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans">
+      <body className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-sans">
         <ThemeProvider>
           <AuthProvider>
             <ModuleToggleProvider>
-              <AppLayout>{children}</AppLayout>
+              <AppShell>{children}</AppShell>
             </ModuleToggleProvider>
           </AuthProvider>
         </ThemeProvider>
