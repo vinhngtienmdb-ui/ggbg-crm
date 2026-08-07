@@ -57,8 +57,8 @@ export default function DocumentsPage() {
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
 
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
-  const [activeTab, setActiveTab] = useState<'ALL_DOCS' | 'PENDING_DIRECTIVE' | 'DIGITAL_STAMP' | 'DOC_CONFIG'>('ALL_DOCS');
-  const [selectedCategory, setSelectedCategory] = useState<DocumentCategory | 'ALL'>('ALL');
+  const [activeTab, setActiveTab] = useState<'INBOUND_LEDGER' | 'OUTBOUND_LEDGER' | 'INTERNAL_LEDGER' | 'PENDING_DIRECTIVE' | 'DIGITAL_STAMP' | 'DOC_CONFIG'>('INBOUND_LEDGER');
+  const [selectedInternalCategory, setSelectedInternalCategory] = useState<DocumentCategory | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -233,21 +233,37 @@ export default function DocumentsPage() {
     const matchesSearch = !q || d.title.toLowerCase().includes(q) || d.document_code.toLowerCase().includes(q) || d.issuer_org.toLowerCase().includes(q);
 
     let matchesTab = true;
-    if (activeTab === 'PENDING_DIRECTIVE') {
+    if (activeTab === 'INBOUND_LEDGER') {
+      matchesTab = d.category === 'INBOUND';
+    } else if (activeTab === 'OUTBOUND_LEDGER') {
+      matchesTab = d.category === 'OUTBOUND';
+    } else if (activeTab === 'INTERNAL_LEDGER') {
+      // Sổ Văn Bản Nội Bộ bao gồm Quyết Định, Tờ Trình, Thông Báo, SOP, Biên Bản, Báo Cáo
+      const internalCategories: DocumentCategory[] = [
+        'DECISION',
+        'SUBMISSION_STATEMENT',
+        'ANNOUNCEMENT',
+        'INTERNAL_SOP',
+        'CONTRACT_MINUTES',
+        'PERIODIC_REPORT',
+      ];
+      const isInternal = internalCategories.includes(d.category);
+      const matchesSubCat = selectedInternalCategory === 'ALL' || d.category === selectedInternalCategory;
+      matchesTab = isInternal && matchesSubCat;
+    } else if (activeTab === 'PENDING_DIRECTIVE') {
       matchesTab = d.status === 'PENDING_DIRECTIVE';
     } else if (activeTab === 'DIGITAL_STAMP') {
       matchesTab = !!d.has_digital_stamp;
     }
 
-    const matchesCategory = selectedCategory === 'ALL' || d.category === selectedCategory;
-
-    return matchesSearch && matchesTab && matchesCategory;
+    return matchesSearch && matchesTab;
   });
 
   const totalInbound = documents.filter((d) => d.category === 'INBOUND').length;
   const totalOutbound = documents.filter((d) => d.category === 'OUTBOUND').length;
-  const totalDecision = documents.filter((d) => d.category === 'DECISION').length;
-  const totalSubmission = documents.filter((d) => d.category === 'SUBMISSION_STATEMENT').length;
+  const totalInternal = documents.filter((d) =>
+    ['DECISION', 'SUBMISSION_STATEMENT', 'ANNOUNCEMENT', 'INTERNAL_SOP', 'CONTRACT_MINUTES', 'PERIODIC_REPORT'].includes(d.category)
+  ).length;
   const totalPendingDirective = documents.filter((d) => d.status === 'PENDING_DIRECTIVE').length;
   const totalStamped = documents.filter((d) => d.has_digital_stamp).length;
 
@@ -353,28 +369,46 @@ export default function DocumentsPage() {
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-          <span className="text-slate-500 uppercase text-[10.5px]">Quyết Định & Tờ Trình</span>
-          <p className="text-xl font-semibold text-purple-700">{totalDecision + totalSubmission} Văn Bản</p>
+          <span className="text-slate-500 uppercase text-[10.5px]">Văn Bản Nội Bộ</span>
+          <p className="text-xl font-semibold text-purple-700">{totalInternal} Văn Bản</p>
           <p className="text-purple-600 font-semibold text-[11px]">⚡ Quy trình 4 bước tự động</p>
         </div>
       </div>
 
       {/* Main Content Area */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5 text-xs font-bold">
-        {/* Navigation Tabs (Workflow Level) */}
+        {/* Navigation Tabs (3 Dedicated Document Ledgers) */}
         <div className="flex items-center gap-2 border-b pb-3 overflow-x-auto">
           <button
-            onClick={() => setActiveTab('ALL_DOCS')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'ALL_DOCS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            onClick={() => setActiveTab('INBOUND_LEDGER')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 font-bold ${
+              activeTab === 'INBOUND_LEDGER' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <BookOpen className="w-4 h-4 text-blue-400" /> Sổ Văn Thư Điện Tử ({documents.length})
+            <Inbox className="w-4 h-4 text-blue-200" /> Sổ Văn Bản Đến ({totalInbound})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('OUTBOUND_LEDGER')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 font-bold ${
+              activeTab === 'OUTBOUND_LEDGER' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Send className="w-4 h-4 text-purple-200" /> Sổ Văn Bản Đi ({totalOutbound})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('INTERNAL_LEDGER')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 font-bold ${
+              activeTab === 'INTERNAL_LEDGER' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <BookOpen className="w-4 h-4 text-emerald-200" /> Sổ Văn Bản Nội Bộ ({totalInternal})
           </button>
 
           <button
             onClick={() => setActiveTab('PENDING_DIRECTIVE')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 font-bold ${
               activeTab === 'PENDING_DIRECTIVE' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -383,17 +417,17 @@ export default function DocumentsPage() {
 
           <button
             onClick={() => setActiveTab('DIGITAL_STAMP')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'DIGITAL_STAMP' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 font-bold ${
+              activeTab === 'DIGITAL_STAMP' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <ShieldCheck className="w-4 h-4 text-emerald-200" /> Đã Ký Số & Mộc Đỏ ({totalStamped})
+            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Đã Ký Số & Mộc Đỏ ({totalStamped})
           </button>
 
           {canAccessSettings(activeRole) && (
             <button
               onClick={() => setActiveTab('DOC_CONFIG')}
-              className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 font-bold ${
                 activeTab === 'DOC_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -402,83 +436,67 @@ export default function DocumentsPage() {
           )}
         </div>
 
-        {/* Category Filter Pills (8 Document Categories) */}
-        {activeTab !== 'DOC_CONFIG' && (
+        {/* Sub-Category Pills for Internal Document Register */}
+        {activeTab === 'INTERNAL_LEDGER' && (
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-100">
             <span className="text-slate-500 font-bold mr-1 shrink-0 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" /> Loại Văn Bản:
+              <Filter className="w-3.5 h-3.5" /> Lọc Theo Loại Nội Bộ:
             </span>
             <button
-              onClick={() => setSelectedCategory('ALL')}
+              onClick={() => setSelectedInternalCategory('ALL')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'ALL' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'ALL' ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              Tất Cả (8 Loại)
+              Tất Cả Sổ Nội Bộ
             </button>
             <button
-              onClick={() => setSelectedCategory('INBOUND')}
+              onClick={() => setSelectedInternalCategory('DECISION')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'INBOUND' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'DECISION' ? 'bg-amber-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              📩 Công Văn Đến ({totalInbound})
+              📜 Quyết Định
             </button>
             <button
-              onClick={() => setSelectedCategory('OUTBOUND')}
+              onClick={() => setSelectedInternalCategory('SUBMISSION_STATEMENT')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'OUTBOUND' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'SUBMISSION_STATEMENT' ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              📤 Công Văn Đi ({totalOutbound})
+              📋 Tờ Trình
             </button>
             <button
-              onClick={() => setSelectedCategory('DECISION')}
+              onClick={() => setSelectedInternalCategory('ANNOUNCEMENT')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'DECISION' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              📜 Quyết Định ({totalDecision})
-            </button>
-            <button
-              onClick={() => setSelectedCategory('SUBMISSION_STATEMENT')}
-              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'SUBMISSION_STATEMENT' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              📋 Tờ Trình Nội Bộ ({totalSubmission})
-            </button>
-            <button
-              onClick={() => setSelectedCategory('ANNOUNCEMENT')}
-              className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'ANNOUNCEMENT' ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'ANNOUNCEMENT' ? 'bg-sky-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               📢 Thông Báo
             </button>
             <button
-              onClick={() => setSelectedCategory('INTERNAL_SOP')}
+              onClick={() => setSelectedInternalCategory('INTERNAL_SOP')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'INTERNAL_SOP' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'INTERNAL_SOP' ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              📑 Quy Chế SOP
+              📑 Quy Chế & SOP
             </button>
             <button
-              onClick={() => setSelectedCategory('CONTRACT_MINUTES')}
+              onClick={() => setSelectedInternalCategory('CONTRACT_MINUTES')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'CONTRACT_MINUTES' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'CONTRACT_MINUTES' ? 'bg-teal-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               🤝 Hợp Đồng & BB
             </button>
             <button
-              onClick={() => setSelectedCategory('PERIODIC_REPORT')}
+              onClick={() => setSelectedInternalCategory('PERIODIC_REPORT')}
               className={`px-3 py-1 rounded-xl transition-all shrink-0 ${
-                selectedCategory === 'PERIODIC_REPORT' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                selectedInternalCategory === 'PERIODIC_REPORT' ? 'bg-rose-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              📊 Báo Cáo
+              📊 Báo Cáo Chuyên Đề
             </button>
           </div>
         )}
