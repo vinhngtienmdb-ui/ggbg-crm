@@ -160,7 +160,13 @@ const INITIAL_BUDGETS: DepartmentBudget[] = [
   },
 ];
 
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
+
 export default function FinancePage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [plStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
   const [transactions, setTransactions] = useState<CashFlowTransaction[]>(INITIAL_TRANSACTIONS);
@@ -340,14 +346,16 @@ export default function FinancePage() {
           <Building2 className="w-4 h-4 text-emerald-400" /> Cân Đối Kế Toán
         </button>
 
-        <button
-          onClick={() => setActiveTab('FINANCE_CONFIG')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'FINANCE_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <Building2 className="w-4 h-4 text-white" /> Cấu Hình
-        </button>
+        {canAccessSettings(activeRole) && (
+          <button
+            onClick={() => setActiveTab('FINANCE_CONFIG')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'FINANCE_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Building2 className="w-4 h-4 text-white" /> Cấu Hình
+          </button>
+        )}
       </div>
 
       {/* TAB 1: EXECUTIVE FINANCIAL DASHBOARD */}

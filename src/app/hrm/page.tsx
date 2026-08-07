@@ -171,7 +171,13 @@ const INITIAL_ONBOARDING: OnboardingTask[] = [
   { id: 'onb_3', employee_name: 'Lê Thị Mai', position: 'Chuyên Viên CSKH', department: 'Phòng CSKH', joined_date: '2026-07-15', equipment_delivered: true, crm_account_created: false, training_completed: false },
 ];
 
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
+
 export default function HRMPage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [employees, setEmployees] = useState<EmployeeProfile[]>(() => getEmployees());
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
@@ -739,14 +745,16 @@ export default function HRMPage() {
           🗺️ Bản Đồ Phân Bổ
         </button>
 
-        <button
-          onClick={() => setActiveTab('CONFIG')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'CONFIG' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
-          }`}
-        >
-          ⚙️ Cấu Hình
-        </button>
+        {canAccessSettings(activeRole) && (
+          <button
+            onClick={() => setActiveTab('CONFIG')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'CONFIG' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
+            }`}
+          >
+            ⚙️ Cấu Hình
+          </button>
+        )}
       </div>
 
       {/* TAB 1: HỒ SƠ NHÂN SỰ & SỔ QUẢN LÝ LAO ĐỘNG (NĐ 145/2020/NĐ-CP) */}

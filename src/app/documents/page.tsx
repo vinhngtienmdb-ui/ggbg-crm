@@ -43,8 +43,13 @@ import {
   deleteOfficialDocument
 } from '@/lib/documentStore';
 import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
 
 export default function DocumentsPage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
   const [activeTab, setActiveTab] = useState<DocumentCategory | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
   const [searchTerm, setSearchTerm] = useState('');
@@ -284,14 +289,16 @@ export default function DocumentsPage() {
             <MessageSquare className="w-4 h-4 text-amber-400" /> Bút Phê & Chuyển Xử Lý
           </button>
 
-          <button
-            onClick={() => setActiveTab('DOC_CONFIG')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'DOC_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Building2 className="w-4 h-4 text-white" /> Cấu Hình & Ký Số
-          </button>
+          {canAccessSettings(activeRole) && (
+            <button
+              onClick={() => setActiveTab('DOC_CONFIG')}
+              className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+                activeTab === 'DOC_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Building2 className="w-4 h-4 text-white" /> Cấu Hình & Ký Số
+            </button>
+          )}
         </div>
 
         {/* Filter Controls */}

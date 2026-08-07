@@ -198,7 +198,13 @@ function EmployeePickerSelect({
   );
 }
 
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
+
 export default function ProposalsPage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
   const [submissions, setSubmissions] = useState<ProposalSubmission[]>(() => getProposalSubmissions());
   const [activeTab, setActiveTab] = useState<'SUBMISSIONS' | 'CREATE_NEW' | 'TEMPLATE_CONFIG'>('SUBMISSIONS');
@@ -551,14 +557,16 @@ export default function ProposalsPage() {
             <PlusCircle className="w-4 h-4" /> Nộp Phiếu Mới
           </button>
 
-          <button
-            onClick={() => setActiveTab('TEMPLATE_CONFIG')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-              activeTab === 'TEMPLATE_CONFIG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Settings className="w-4 h-4 text-amber-400" /> Cấu Hình Mẫu Phiếu
-          </button>
+          {canAccessSettings(activeRole) && (
+            <button
+              onClick={() => setActiveTab('TEMPLATE_CONFIG')}
+              className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+                activeTab === 'TEMPLATE_CONFIG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Settings className="w-4 h-4 text-amber-400" /> Cấu Hình Mẫu Phiếu
+            </button>
+          )}
         </div>
 
         {/* TAB 1: SUBMISSIONS LIST */}

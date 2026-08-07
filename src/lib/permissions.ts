@@ -302,8 +302,21 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
   },
 ];
 
+export function canAccessSettings(role: UserRole): boolean {
+  const adminRoles: UserRole[] = ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER'];
+  return adminRoles.includes(role);
+}
+
 export function isRouteAllowedForRole(href: string, role: UserRole, toggles?: ModuleToggles): boolean {
   if (role === 'SUPER_ADMIN') return true;
+
+  // Siết chặt kiểm tra các trang Cấu Hình & Cài Đặt hệ thống
+  if (href.startsWith('/settings') || href === '/hrm-settings') {
+    if (href === '/settings/system' || href === '/settings/rbac') {
+      return role === 'DIRECTOR';
+    }
+    return canAccessSettings(role);
+  }
 
   for (const group of MENU_CLUSTERS) {
     for (const item of group.items) {
