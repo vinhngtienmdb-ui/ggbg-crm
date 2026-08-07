@@ -503,13 +503,13 @@ export default function ProposalsPage() {
         <div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-purple-600" />
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý Phê Duyệt (Approval Management Engine)</h1>
+            <h1 className="text-xl font-bold text-slate-900">Quản Lý Phê Duyệt</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
-              Lark Approval Standards (22 Mẫu Phiếu)
+              22 Mẫu Phiếu
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Hệ thống quản lý quy trình phê duyệt đa cấp chuẩn doanh nghiệp. Tích hợp 22 loại phiếu phân nhóm trực quan & Chọn Nhân viên HRM (Cùng bộ phận, Cùng chức danh, Cấp trên).
+            Quản lý quy trình phê duyệt đa cấp, xét duyệt đơn từ và tờ trình nội bộ.
           </p>
         </div>
 
@@ -536,7 +536,7 @@ export default function ProposalsPage() {
               activeTab === 'SUBMISSIONS' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <FileCheck className="w-4 h-4" /> 📋 1. Sổ Phiếu Phê Duyệt ({submissions.length})
+            <FileCheck className="w-4 h-4" /> Sổ Phiếu Duyệt ({submissions.length})
           </button>
 
           <button
@@ -548,7 +548,7 @@ export default function ProposalsPage() {
               activeTab === 'CREATE_NEW' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <PlusCircle className="w-4 h-4" /> ✍️ 2. Nộp Phiếu Mới (Luồng 2 Bước)
+            <PlusCircle className="w-4 h-4" /> Nộp Phiếu Mới
           </button>
 
           <button
@@ -557,7 +557,7 @@ export default function ProposalsPage() {
               activeTab === 'TEMPLATE_CONFIG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Settings className="w-4 h-4 text-amber-400" /> ⚙️ 3. Cấu Hình Loại Phiếu (Template Manager - 22 Mẫu)
+            <Settings className="w-4 h-4 text-amber-400" /> Cấu Hình Mẫu Phiếu
           </button>
         </div>
 
@@ -925,16 +925,16 @@ export default function ProposalsPage() {
           </div>
         )}
 
-        {/* TAB 3: ADMIN TEMPLATE CONFIGURATOR (XEM, SỬA, XÓA, BẬT/TẮT CÁC LOẠI PHIẾU) */}
+        {/* TAB 3: ADMIN TEMPLATE CONFIGURATOR */}
         {activeTab === 'TEMPLATE_CONFIG' && (
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-3">
               <div>
                 <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-amber-600" /> Trình Cấu Hình Loại Phiếu Phê Duyệt (Template Manager)
+                  <Settings className="w-5 h-5 text-amber-600" /> Cấu Hình Mẫu Phiếu Phê Duyệt
                 </h3>
                 <p className="text-[11px] text-slate-500 font-normal mt-0.5">
-                  Quản lý 22 mẫu phiếu phê duyệt chuẩn Lark Approval. Hỗ trợ Admin: <strong>Xem cấu hình</strong>, <strong>Chỉnh sửa trường & luồng duyệt</strong>, <strong>Xóa</strong>, <strong>Bật/Tắt active</strong> và <strong>Tạo mẫu phiếu mới</strong>.
+                  Quản lý danh sách mẫu phiếu phê duyệt, điều chỉnh luồng ký và trường thông tin.
                 </p>
               </div>
 
@@ -942,7 +942,7 @@ export default function ProposalsPage() {
                 onClick={handleOpenCreateTemplateModal}
                 className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 shrink-0"
               >
-                <Plus className="w-4 h-4 text-amber-400" /> ➕ Tạo Mẫu Phiếu Mới
+                <Plus className="w-4 h-4 text-amber-400" /> Tạo Mẫu Phiếu Mới
               </button>
             </div>
 
@@ -976,8 +976,8 @@ export default function ProposalsPage() {
                   className="px-3 py-1.5 bg-slate-50 border rounded-xl font-bold text-slate-700 text-xs"
                 >
                   <option value="ALL">Tất Cả Trạng Thái</option>
-                  <option value="ACTIVE">🟢 Đang Bật (Active)</option>
-                  <option value="INACTIVE">⚪ Đang Tắt (Inactive)</option>
+                  <option value="ACTIVE">Đang Bật</option>
+                  <option value="INACTIVE">Đang Tắt</option>
                 </select>
               </div>
 
