@@ -85,7 +85,7 @@ export default function ProductPackageModal({
               <Package className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-slate-900">
+              <h2 className="text-base font-bold text-slate-900">
                 {mode === 'create' ? 'Tạo Gói Dịch Vụ Mới' : `Chỉnh Sửa Gói: ${formData.name}`}
               </h2>
               <p className="text-xs text-slate-500">

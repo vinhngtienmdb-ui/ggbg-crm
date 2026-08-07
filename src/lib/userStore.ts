@@ -128,7 +128,7 @@ let auditLogs: AuditLogItem[] = [
   },
   {
     id: 'l2',
-    user_name: 'Lê Thị Mai (Sale Exec)',
+    user_name: 'Lê Thị Mai',
     action: 'Xuất File Excel Danh Sách Lead',
     target: 'Phễu Dịch Vụ Shopee/TikTok (35 Leads)',
     ip: '118.70.188.45',

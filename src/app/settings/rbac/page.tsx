@@ -138,7 +138,7 @@ export default function RbacPage() {
     switch (rank) {
       case 1:
         return (
-          <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded text-[10px] font-black uppercase">
+          <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded text-[10px] font-semibold uppercase">
             Cấp 1: Giám Đốc
           </span>
         );
@@ -257,7 +257,7 @@ export default function RbacPage() {
         <div className="lg:col-span-4 space-y-4">
           <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-indigo-600" /> Danh Sách Chức Danh ({roleMatrix.length})
               </h3>
             </div>
@@ -362,7 +362,7 @@ export default function RbacPage() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <h2 className="text-lg font-black text-slate-900">{selectedRoleObj.role_name}</h2>
+                      <h2 className="text-lg font-semibold text-slate-900">{selectedRoleObj.role_name}</h2>
                       {renderRankBadge(selectedRoleObj.rank_level)}
                     </div>
                     <p className="text-xs text-slate-500 mt-1 max-w-xl">
@@ -420,7 +420,7 @@ export default function RbacPage() {
                   const CatIcon = cat.icon;
                   return (
                     <div key={cat.category} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-5 space-y-3">
-                      <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                      <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2.5">
                         <CatIcon className={`w-4 h-4 ${cat.color}`} />
                         <span>{cat.category}</span>
                       </h4>
@@ -488,14 +488,14 @@ export default function RbacPage() {
       {/* CREATE CUSTOM ROLE / JOB TITLE MODAL */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-900 space-y-5 animate-in fade-in zoom-in-95 duration-150 my-8">
+          <div className="bg-white rounded-xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-900 space-y-5 animate-in fade-in zoom-in-95 duration-150 my-8">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2.5">
                 <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-slate-900">Tạo Chức Danh / Chức Vụ Mới</h3>
+                  <h3 className="font-bold text-base text-slate-900">Tạo Chức Danh / Chức Vụ Mới</h3>
                   <p className="text-xs text-slate-500">Khai báo chức danh và phân quyền tự động</p>
                 </div>
               </div>
@@ -606,7 +606,7 @@ export default function RbacPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Danh

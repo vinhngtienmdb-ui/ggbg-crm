@@ -167,7 +167,7 @@ export default function VietnamAddressPicker({
     <div className="space-y-3 p-4 bg-slate-50/90 rounded-2xl border border-slate-200/90 text-xs">
       {/* Label & Official Standard Badge */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-200/80 pb-2">
-        <label className="font-extrabold text-slate-800 flex items-center gap-1.5">
+        <label className="font-bold text-slate-800 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-red-600" />
           <span>{label}</span>
           {required && <span className="text-red-500">*</span>}

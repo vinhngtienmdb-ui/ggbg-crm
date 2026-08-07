@@ -185,19 +185,19 @@ export default function OmnichannelChatPage() {
     switch (type) {
       case 'ZALO_OA':
         return (
-          <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-extrabold flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-bold flex items-center gap-1">
             💬 Zalo OA
           </span>
         );
       case 'ZALO_PERSONAL':
         return (
-          <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-200 text-[10px] font-extrabold flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-200 text-[10px] font-bold flex items-center gap-1">
             📱 Zalo Cá Nhân
           </span>
         );
       case 'FACEBOOK_FANPAGE':
         return (
-          <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-extrabold flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-bold flex items-center gap-1">
             📘 Fanpage FB
           </span>
         );
@@ -517,25 +517,25 @@ export default function OmnichannelChatPage() {
                 /* LINKED CRM CUSTOMER 360 PROFILE */
                 <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold rounded-full flex items-center gap-1">
+                    <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã Liên Kết CRM 360
                     </span>
                     <span className="font-mono font-bold text-xs text-slate-900">KH-1001</span>
                   </div>
 
                   <div>
-                    <h4 className="font-extrabold text-sm text-slate-900">{activeChat.customer_name}</h4>
+                    <h4 className="font-bold text-sm text-slate-900">{activeChat.customer_name}</h4>
                     <p className="text-xs text-slate-500 font-medium">Công ty TNHH Vận Tải Hồng Lực</p>
                   </div>
 
                   <div className="p-2.5 bg-slate-50 rounded-xl space-y-1.5 text-xs">
                     <p className="flex justify-between">
                       <span className="text-slate-500">Phân hạng:</span>
-                      <strong className="text-purple-700 font-extrabold">Platinum Merchant</strong>
+                      <strong className="text-purple-700 font-bold">Platinum Merchant</strong>
                     </p>
                     <p className="flex justify-between">
                       <span className="text-slate-500">GMV Hàng tháng:</span>
-                      <strong className="text-emerald-700 font-mono font-extrabold">850.000.000 ₫</strong>
+                      <strong className="text-emerald-700 font-mono font-bold">850.000.000 ₫</strong>
                     </p>
                     <p className="flex justify-between">
                       <span className="text-slate-500">Sàn vận hành:</span>

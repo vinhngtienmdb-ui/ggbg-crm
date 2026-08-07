@@ -183,14 +183,14 @@ export default function AttendancePage() {
 
         <button
           onClick={() => setIsLeaveModalOpen(true)}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" /> Tạo Đơn Xin Nghỉ Phép
         </button>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-bold">
         <button
           onClick={() => setActiveTab('reports')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
@@ -250,7 +250,7 @@ export default function AttendancePage() {
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3 py-1.5 bg-slate-900 text-white font-extrabold rounded-xl focus:outline-none"
+              className="px-3 py-1.5 bg-slate-900 text-white font-bold rounded-xl focus:outline-none"
             >
               <option value="Tháng 07/2026">Tháng 07/2026</option>
               <option value="Tháng 08/2026">Tháng 08/2026</option>
@@ -275,7 +275,7 @@ export default function AttendancePage() {
       {activeTab === 'daily' && (
         <div className="space-y-4">
           <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
-            <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
               <Clock className="w-4 h-4 text-blue-600" /> Nhật Ký Chấm Công Hàng Ngày (GPS & GPS Radius: {attSettings.gps_radius_meters}m)
             </h3>
             <span className="text-xs text-slate-500 font-medium">
@@ -303,7 +303,7 @@ export default function AttendancePage() {
                   return (
                     <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-3.5 px-4">
-                        <span className="font-extrabold text-slate-900 block">{emp.full_name}</span>
+                        <span className="font-bold text-slate-900 block">{emp.full_name}</span>
                         <span className="text-[10px] text-slate-400 block">{emp.employee_code} · {emp.department}</span>
                       </td>
 
@@ -378,7 +378,7 @@ export default function AttendancePage() {
       {activeTab === 'leaves' && (
         <div className="space-y-4">
           <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
-            <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-purple-600" /> Danh Sách Đơn Xin Nghỉ Phép ({filteredLeaves.length})
             </h3>
             <button
@@ -407,7 +407,7 @@ export default function AttendancePage() {
                   <tr key={lv.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
                       <span className="text-[10px] font-mono font-bold text-blue-600 block">{lv.request_code}</span>
-                      <span className="font-extrabold text-slate-900 block">{lv.employee_name}</span>
+                      <span className="font-bold text-slate-900 block">{lv.employee_name}</span>
                     </td>
                     <td className="py-3.5 px-4 font-bold text-purple-700">{lv.leave_type}</td>
                     <td className="py-3.5 px-4 font-mono">{lv.start_date} → {lv.end_date}</td>
@@ -442,7 +442,7 @@ export default function AttendancePage() {
       {activeTab === 'timesheet' && (
         <div className="space-y-4">
           <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
-            <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
               <FileSpreadsheet className="w-4 h-4 text-amber-600" /> Bảng Tổng Hợp Chấm Công ({selectedPeriod})
             </h3>
             <span className="text-xs text-slate-500 font-bold">Công chuẩn: {attSettings.standard_workdays} Ngày</span>
@@ -465,14 +465,14 @@ export default function AttendancePage() {
               <tbody className="divide-y divide-slate-100 font-medium">
                 {timesheets.map((ts) => (
                   <tr key={ts.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-extrabold text-slate-900">{ts.employee_name} ({ts.employee_code})</td>
+                    <td className="py-3.5 px-4 font-bold text-slate-900">{ts.employee_name} ({ts.employee_code})</td>
                     <td className="py-3.5 px-4 font-bold text-slate-700">{ts.department}</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-600">{ts.standard_workdays}</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-blue-700">{ts.actual_workdays}</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700">{ts.paid_leave_days}</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-red-600">{ts.unpaid_leave_days}</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-purple-700">+{ts.total_ot_hours} h</td>
-                    <td className="py-3.5 px-4 text-right font-mono font-black text-emerald-700 text-sm">
+                    <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 text-sm">
                       {ts.billable_workdays} / {ts.standard_workdays} Ngày
                     </td>
                   </tr>
@@ -488,7 +488,7 @@ export default function AttendancePage() {
         <form onSubmit={handleSaveSettingsSubmit} className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
           <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
             <Settings className="w-5 h-5 text-emerald-600" />
-            <h3 className="font-extrabold text-base text-slate-900">Cấu Hình Cài Đặt Chấm Công & Quy Định Ca Làm Việc</h3>
+            <h3 className="font-bold text-base text-slate-900">Cấu Hình Cài Đặt Chấm Công & Quy Định Ca Làm Việc</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -560,7 +560,7 @@ export default function AttendancePage() {
           <div className="flex items-center justify-end pt-3">
             <button
               type="submit"
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5"
             >
               <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công
             </button>
@@ -571,8 +571,8 @@ export default function AttendancePage() {
       {/* CREATE LEAVE MODAL */}
       {isLeaveModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 space-y-4">
-            <h3 className="font-extrabold text-sm text-slate-900">Tạo Đơn Xin Nghỉ Phép Mới</h3>
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md p-6 space-y-4">
+            <h3 className="font-bold text-sm text-slate-900">Tạo Đơn Xin Nghỉ Phép Mới</h3>
             <form onSubmit={handleCreateLeaveSubmit} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Chọn Nhân Sự</label>

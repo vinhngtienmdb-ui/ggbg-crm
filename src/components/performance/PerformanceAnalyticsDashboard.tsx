@@ -77,7 +77,7 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
   const totalP3Pool = Object.values(gradeP3Salary).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6 border border-slate-800">
       {/* Title Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
@@ -85,11 +85,11 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
             <Award className="w-3.5 h-3.5 text-purple-400" />
             <span>Phân Tích Báo Cáo Hiệu Suất</span>
           </div>
-          <h2 className="text-lg font-black text-white">Dashboard Phân Tích Hiệu Suất Nhân Sự & Quỹ Lương P3</h2>
+          <h2 className="text-lg font-semibold text-white">Dashboard Phân Tích Hiệu Suất Nhân Sự & Quỹ Lương P3</h2>
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương P3 Đã Phân Bổ:</span>
-          <span className="font-mono font-black text-purple-400 text-lg">
+          <span className="font-mono font-semibold text-purple-400 text-lg">
             {totalP3Pool.toLocaleString('vi-VN')} ₫
           </span>
         </div>
@@ -99,7 +99,7 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Grade Bell Curve Bar Chart */}
         <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-purple-400" /> Phân Phối Chuẩn Xếp Loại Hạng (Bell Curve)
           </h3>
 
@@ -124,7 +124,7 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
 
         {/* Chart 2: Dept Average Final Score Bar Chart */}
         <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-blue-400" /> Điểm Hiệu Suất Trung Bình (0-100) Theo Phòng Ban
           </h3>
 
@@ -145,7 +145,7 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
 
         {/* Chart 3: P3 Salary Distribution Pie Chart */}
         <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-emerald-400" /> Cơ Cấu Phân Bổ Lương P3 (Triệu VNĐ)
           </h3>
 

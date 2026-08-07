@@ -76,7 +76,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
   ].filter((d) => d.value > 0);
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6 border border-slate-800">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
@@ -84,11 +84,11 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
             <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
             <span>Phân Tích Báo Cáo Tài Chính Nhân Sự</span>
           </div>
-          <h2 className="text-lg font-black text-white">Dashboard Phân Tích Cơ Cấu Bảng Lương 3P & Chi Phí Nhân Sự</h2>
+          <h2 className="text-lg font-semibold text-white">Dashboard Phân Tích Cơ Cấu Bảng Lương 3P & Chi Phí Nhân Sự</h2>
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương NET Chi Trả:</span>
-          <span className="font-mono font-black text-emerald-400 text-lg">
+          <span className="font-mono font-semibold text-emerald-400 text-lg">
             {totalNet.toLocaleString('vi-VN')} ₫
           </span>
         </div>
@@ -98,7 +98,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: 3P Income Component Breakdown Bar Chart */}
         <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-emerald-400" /> Cơ Cấu Thu Nhập 3P (P1 + P2 + P3 + OT) Theo Phòng Ban (Tr VNĐ)
           </h3>
 
@@ -123,7 +123,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
 
         {/* Chart 2: Net vs Deductions Pie Chart */}
         <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <PieIcon className="w-4 h-4 text-emerald-400" /> Tỷ Lệ Lương Thực Nhận vs Khấu Trừ
           </h3>
 

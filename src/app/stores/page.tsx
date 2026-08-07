@@ -91,7 +91,7 @@ export default function StoresPage() {
               <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
               <span>Multi-Store Health & GMV Engine</span>
             </div>
-            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
+            <h1 className="text-lg md:text-xl font-bold tracking-tight text-blue-700">
               Quản Lý Gian Hàng Đa Sàn TMĐT & Chỉ Số Sức Khỏe Shop
             </h1>
             <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
@@ -146,7 +146,7 @@ export default function StoresPage() {
         <div className="overflow-x-auto touch-scroll sleek-scrollbar">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wide text-[10.5px]">
                 <th className="p-3">Mã & Tên Gian Hàng</th>
                 <th className="p-3">Sàn TMĐT</th>
                 <th className="p-3">Chủ Sở Hữu / Doanh Nghiệp</th>

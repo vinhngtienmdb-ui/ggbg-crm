@@ -43,7 +43,7 @@ export default function FormulaConfigModal({
               <Sliders className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-slate-900">Cấu Hình Trọng Số & Ngưỡng Xếp Loại Performance</h2>
+              <h2 className="text-base font-bold text-slate-900">Cấu Hình Trọng Số & Ngưỡng Xếp Loại Performance</h2>
               <p className="text-xs text-slate-500">
                 Formula Engine: Tổng Điểm = (KPI × W1) + (Kỷ Luật × W2) + (Thái Độ × W3) + Thưởng - Phạt
               </p>

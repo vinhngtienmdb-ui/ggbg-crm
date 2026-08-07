@@ -69,6 +69,7 @@ export interface UploadRow {
   id: string;
   category: string;
   fileName: string;
+  fileSize?: string;
 }
 
 const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
@@ -90,8 +91,8 @@ const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
     ltv_total_spent: 3850000000,
     ecom_platforms: ['Shopee', 'TikTokShop', 'Lazada'],
     avg_monthly_gmv: 1200000000,
-    owner_name: 'Trần Văn Hoàng (Sale Exec)',
-    ops_manager_name: 'Đỗ Thị Quyên (Ops Leader)',
+    owner_name: 'Trần Văn Hoàng',
+    ops_manager_name: 'Đỗ Thị Quyên',
     contract_r2_file: 'HDLD_KH8801.pdf',
     kyc_status: 'VERIFIED',
     kyc_documents: [
@@ -107,7 +108,7 @@ const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
     bank_account: '1903888999001',
     bank_name: 'Techcombank - CN Cầu Giấy',
     credit_limit: 500000000,
-    notes: 'Khách hàng VIP agency ưu tiên hỗ trợ 24/7',
+    notes: 'Khách hàng thân thiết ưu tiên hỗ trợ 24/7',
     tags: ['Doanh số cao', 'Hợp đồng 2 năm'],
     created_at: '2026-01-15',
   },
@@ -130,8 +131,8 @@ const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
     ltv_total_spent: 1250000000,
     ecom_platforms: ['TikTokShop', 'GGBingoVN'],
     avg_monthly_gmv: 450000000,
-    owner_name: 'Nguyễn Quốc Tuấn (Sale Senior)',
-    ops_manager_name: 'Phạm Minh Đức (Ops Specialist)',
+    owner_name: 'Nguyễn Quốc Tuấn',
+    ops_manager_name: 'Phạm Minh Đức',
     contract_r2_file: 'HDLD_KH8802.pdf',
     kyc_status: 'VERIFIED',
     kyc_documents: [
@@ -169,8 +170,8 @@ const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
     ltv_total_spent: 680000000,
     ecom_platforms: ['Shopee', 'Amazon'],
     avg_monthly_gmv: 280000000,
-    owner_name: 'Lê Thị Mai (Sale Exec)',
-    ops_manager_name: 'Nguyễn Văn Bình (Ops Specialist)',
+    owner_name: 'Lê Thị Mai',
+    ops_manager_name: 'Nguyễn Văn Bình',
     contract_r2_file: 'HDLD_KH8803.pdf',
     kyc_status: 'PENDING',
     bank_account: '112000888999',
@@ -284,7 +285,7 @@ export default function CustomersPage() {
     tier: 'Standard',
     lifecycle_stage: 'Prospect',
     avg_monthly_gmv: '0',
-    owner_name: 'Trần Văn Hoàng (Sale Exec)',
+    owner_name: 'Trần Văn Hoàng',
     bank_account: '',
     bank_name: '',
     credit_limit: '0',
@@ -330,7 +331,7 @@ export default function CustomersPage() {
       tier: 'Standard',
       lifecycle_stage: 'Prospect',
       avg_monthly_gmv: '0',
-      owner_name: 'Trần Văn Hoàng (Sale Exec)',
+      owner_name: 'Trần Văn Hoàng',
       bank_account: '',
       bank_name: '',
       credit_limit: '0',
@@ -369,7 +370,7 @@ export default function CustomersPage() {
       ltv_total_spent: 0,
       ecom_platforms: (createForm.ecom_platforms.length > 0 ? createForm.ecom_platforms : ['Shopee']) as any,
       avg_monthly_gmv: Number(createForm.avg_monthly_gmv) || 0,
-      owner_name: createForm.owner_name || 'Trần Văn Hoàng (Sale Exec)',
+      owner_name: createForm.owner_name || 'Trần Văn Hoàng',
       kyc_status: 'PENDING',
       bank_account: createForm.bank_account.trim(),
       bank_name: createForm.bank_name.trim(),
@@ -492,7 +493,7 @@ export default function CustomersPage() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  // MULTI-FILE UPLOAD ROW MANAGEMENT (+ BUTTON)
+  // MULTI-FILE UPLOAD ROW MANAGEMENT (+ BUTTON & FILE PICKER)
   const handleAddUploadRow = () => {
     const newRow: UploadRow = {
       id: `row_${Date.now()}`,
@@ -515,13 +516,57 @@ export default function CustomersPage() {
     setUploadRows(uploadRows.map((r) => (r.id === rowId ? { ...r, fileName } : r)));
   };
 
+  const handleRowFileSelect = (rowId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+    setUploadRows(
+      uploadRows.map((r) =>
+        r.id === rowId
+          ? { ...r, fileName: file.name, fileSize: sizeStr }
+          : r
+      )
+    );
+  };
+
+  const handleBatchFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newRows: UploadRow[] = Array.from(files).map((file, idx) => {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+      const nameUpper = file.name.toUpperCase();
+      let category = 'OTHER';
+      if (nameUpper.includes('GPKD') || nameUpper.includes('BUSINESS')) category = 'GPKD';
+      else if (nameUpper.includes('CCCD') && nameUpper.includes('SAU')) category = 'CCCD_BACK';
+      else if (nameUpper.includes('CCCD') || nameUpper.includes('CMND')) category = 'CCCD_FRONT';
+      else if (nameUpper.includes('THUE') || nameUpper.includes('TAX')) category = 'TAX_DOC';
+      else if (nameUpper.includes('HOPDONG') || nameUpper.includes('CONTRACT')) category = 'CONTRACT';
+
+      return {
+        id: `row_${Date.now()}_${idx}`,
+        category,
+        fileName: file.name,
+        fileSize: sizeStr,
+      };
+    });
+
+    if (uploadRows.length === 1 && !uploadRows[0].fileName) {
+      setUploadRows(newRows);
+    } else {
+      setUploadRows([...uploadRows, ...newRows]);
+    }
+  };
+
   const handleMultiFileUploadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCustomer) return;
 
     const validRows = uploadRows.filter((r) => r.fileName.trim().length > 0);
     if (validRows.length === 0) {
-      setToastMessage('⚠️ Vui lòng nhập hoặc chọn ít nhất 1 tệp tin chứng từ!');
+      setToastMessage('⚠️ Vui lòng chọn hoặc tải lên ít nhất 1 tệp tin chứng từ!');
       setTimeout(() => setToastMessage(''), 4000);
       return;
     }
@@ -658,7 +703,7 @@ export default function CustomersPage() {
             <Users className="w-3 h-3 text-blue-600" />
             <span>Hồ Sơ Khách Hàng 360°</span>
           </div>
-          <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700 flex items-center gap-2">
+          <h1 className="text-lg md:text-xl font-bold tracking-tight text-blue-700 flex items-center gap-2">
             Danh Mục Khách Hàng 360°
           </h1>
           <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
@@ -704,7 +749,7 @@ export default function CustomersPage() {
       {selectedIds.length > 0 && (
         <div className="p-4 rounded-2xl bg-white text-slate-900 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top duration-200">
           <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs shadow-sm">
+            <span className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">
               {selectedIds.length}
             </span>
             <div>
@@ -834,7 +879,7 @@ export default function CustomersPage() {
                       </td>
 
                       <td className="p-4">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                           cust.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-purple-100 text-purple-800 border border-purple-200'
                         }`}>
                           {cust.entity_type === 'ENTERPRISE' ? '🏢 Doanh Nghiệp' : '👤 Cá Nhân'}
@@ -859,7 +904,7 @@ export default function CustomersPage() {
                         {revealPII ? cust.phone : maskPhoneVal(cust.phone)}
                       </td>
 
-                      <td className="p-4 font-mono font-extrabold text-emerald-700 text-sm">
+                      <td className="p-4 font-mono font-bold text-emerald-700 text-sm">
                         {(cust.ltv_total_spent / 1000000).toLocaleString('vi-VN')} Tr ₫
                       </td>
 
@@ -918,7 +963,7 @@ export default function CustomersPage() {
       {/* MODAL 1: XEM CHI TIẾT HỒ SƠ KHÁCH HÀNG 360° (NÚT XEM) */}
       {isViewDetailModalOpen && selectedViewCustomer && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
@@ -926,8 +971,8 @@ export default function CustomersPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-base text-slate-900">{selectedViewCustomer.name}</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
+                    <h3 className="font-bold text-base text-slate-900">{selectedViewCustomer.name}</h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-700 border border-blue-200">
                       {selectedViewCustomer.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'}
                     </span>
                   </div>
@@ -951,7 +996,7 @@ export default function CustomersPage() {
                   <p className="text-slate-500 font-semibold flex items-center gap-1">
                     <Coins className="w-4 h-4 text-emerald-600" /> Tổng LTV Tích Lũy:
                   </p>
-                  <p className="text-lg font-black font-mono text-emerald-700 mt-1">
+                  <p className="text-lg font-semibold font-mono text-emerald-700 mt-1">
                     {(selectedViewCustomer.ltv_total_spent / 1000000).toLocaleString('vi-VN')} Tr ₫
                   </p>
                 </div>
@@ -960,7 +1005,7 @@ export default function CustomersPage() {
                   <p className="text-slate-500 font-semibold flex items-center gap-1">
                     <ShoppingBag className="w-4 h-4 text-blue-600" /> GMV Trung Bình/Tháng:
                   </p>
-                  <p className="text-lg font-black font-mono text-blue-700 mt-1">
+                  <p className="text-lg font-semibold font-mono text-blue-700 mt-1">
                     {((selectedViewCustomer.avg_monthly_gmv || 0) / 1000000).toLocaleString('vi-VN')} Tr ₫
                   </p>
                 </div>
@@ -969,7 +1014,7 @@ export default function CustomersPage() {
                   <p className="text-slate-500 font-semibold flex items-center gap-1">
                     <ShieldCheck className="w-4 h-4 text-purple-600" /> Health Score Vòng Đời:
                   </p>
-                  <p className="text-lg font-black font-mono text-purple-700 mt-1">
+                  <p className="text-lg font-semibold font-mono text-purple-700 mt-1">
                     {selectedViewCustomer.health_score}/100 ({selectedViewCustomer.lifecycle_stage})
                   </p>
                 </div>
@@ -1067,14 +1112,14 @@ export default function CustomersPage() {
       {/* MODAL 2: CHỈNH SỬA THÔNG TIN KHÁCH HÀNG (NÚT SỬA ĐÃ FIX 100%) */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
                   <Edit3 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-slate-900">Chỉnh Sửa Thông Tin Hồ Sơ Khách Hàng</h3>
+                  <h3 className="font-bold text-base text-slate-900">Chỉnh Sửa Thông Tin Hồ Sơ Khách Hàng</h3>
                   <p className="text-xs text-slate-500">Mã KH: {editForm.customer_code} • Cập nhật thông tin chi tiết</p>
                 </div>
               </div>
@@ -1247,7 +1292,7 @@ export default function CustomersPage() {
       {/* MODAL 3: UPLOAD NHIỀU FILE VỚI NÚT + */}
       {isKycModalOpen && selectedCustomer && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
@@ -1255,8 +1300,8 @@ export default function CustomersPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-base text-slate-900">{selectedCustomer.name}</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
+                    <h3 className="font-bold text-base text-slate-900">{selectedCustomer.name}</h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-700 border border-blue-200">
                       {selectedCustomer.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'}
                     </span>
                   </div>
@@ -1275,26 +1320,44 @@ export default function CustomersPage() {
 
             <div className="p-6 overflow-y-auto space-y-6 flex-1">
               <form onSubmit={handleMultiFileUploadSubmit} className="p-5 bg-blue-50/70 rounded-2xl border border-blue-200 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-                    <Upload className="w-4 h-4 text-blue-600" /> Upload Nhiều Tệp Chứng Từ Hàng Loạt
-                  </h4>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-blue-200/80 pb-3">
+                  <div>
+                    <h4 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
+                      <Upload className="w-4 h-4 text-blue-600" /> Upload Tệp Chứng Từ Từ Máy Tính
+                    </h4>
+                    <p className="text-[11px] text-slate-500">
+                      Hỗ trợ chọn nhiều file trực tiếp (PDF, DOCX, JPG, PNG)
+                    </p>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={handleAddUploadRow}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-blue-600/20 transition-all active:scale-95"
-                  >
-                    <Plus className="w-4 h-4" /> Thêm Dòng File Mới
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <label className="cursor-pointer px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-emerald-600/20 transition-all active:scale-95">
+                      <FileCheck className="w-4 h-4" /> Chọn Nhiều Tệp Dòng Hàng Loạt
+                      <input
+                        type="file"
+                        multiple
+                        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip"
+                        className="hidden"
+                        onChange={handleBatchFilesSelect}
+                      />
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={handleAddUploadRow}
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-blue-600/20 transition-all active:scale-95"
+                    >
+                      <Plus className="w-4 h-4" /> Thêm Dòng Thủ Công
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
                   {uploadRows.map((row, idx) => (
-                    <div key={row.id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center gap-3 text-xs shadow-xs animate-in fade-in duration-200">
-                      <span className="font-bold text-slate-400 text-[11px] w-5 text-center">{idx + 1}.</span>
+                    <div key={row.id} className="p-3 bg-white border border-slate-200 rounded-xl flex flex-col md:flex-row md:items-center gap-3 text-xs shadow-xs animate-in fade-in duration-200">
+                      <span className="font-bold text-slate-400 text-[11px] w-5 text-center hidden md:inline">{idx + 1}.</span>
 
-                      <div className="w-1/3">
+                      <div className="w-full md:w-1/3">
                         <select
                           value={row.category}
                           onChange={(e) => handleRowCategoryChange(row.id, e.target.value)}
@@ -1311,22 +1374,38 @@ export default function CustomersPage() {
                         </select>
                       </div>
 
-                      <div className="flex-1">
+                      <div className="flex-1 flex items-center gap-2">
                         <input
                           type="text"
                           required
                           value={row.fileName}
                           onChange={(e) => handleRowFileNameChange(row.id, e.target.value)}
-                          placeholder="Tên tệp tin (VD: GPKD_2026.pdf, CCCD_2026.jpg...)"
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono"
+                          placeholder="Tên file hoặc chọn tệp..."
+                          className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono"
                         />
+
+                        {row.fileSize && (
+                          <span className="px-2 py-1 bg-slate-100 text-slate-600 font-mono font-bold text-[10px] rounded-lg border whitespace-nowrap">
+                            {row.fileSize}
+                          </span>
+                        )}
+
+                        <label className="cursor-pointer px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl border border-slate-200 text-[11px] flex items-center gap-1 shrink-0 transition-colors">
+                          <Upload className="w-3.5 h-3.5 text-blue-600" /> Chọn Tệp
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                            className="hidden"
+                            onChange={(e) => handleRowFileSelect(row.id, e)}
+                          />
+                        </label>
                       </div>
 
                       {uploadRows.length > 1 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveUploadRow(row.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors self-end md:self-center"
                           title="Xóa dòng này"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1353,14 +1432,14 @@ export default function CustomersPage() {
       {/* MODAL 4: TẠO MỚI KHÁCH HÀNG (CREATE CUSTOMER MODAL) */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-slate-900">Tạo Mới Hồ Sơ Khách Hàng 360°</h3>
+                  <h3 className="font-bold text-base text-slate-900">Tạo Mới Hồ Sơ Khách Hàng 360°</h3>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Nhập thông tin khách hàng Doanh Nghiệp hoặc Cá Nhân mới vào hệ thống CRM
                   </p>

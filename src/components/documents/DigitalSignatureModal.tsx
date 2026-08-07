@@ -138,7 +138,7 @@ export default function DigitalSignatureModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b pb-3">
           <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export default function DigitalSignatureModal({
               <PenTool className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900">Trình Ký Điện Tử & Ký Số PKI (E-Signature)</h3>
+              <h3 className="font-bold text-sm text-slate-900">Trình Ký Điện Tử & Ký Số PKI (E-Signature)</h3>
               <p className="text-[10.5px] text-slate-500 font-normal">Văn bản: {documentCode}</p>
             </div>
           </div>
@@ -158,7 +158,7 @@ export default function DigitalSignatureModal({
 
         {/* Document Context Card */}
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
-          <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-1">{documentTitle}</p>
+          <p className="font-bold text-slate-900 text-xs leading-snug line-clamp-1">{documentTitle}</p>
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium pt-1 border-t border-slate-200/80">
             <span>Người ký: <strong className="text-blue-700">{signerName}</strong></span>
             <span>Chức vụ: <strong>{signerRole}</strong></span>
@@ -179,7 +179,7 @@ export default function DigitalSignatureModal({
               }`}
             >
               <div className="flex items-center justify-between w-full">
-                <span className="font-extrabold text-xs">🖊️ Vẽ Chữ Ký Tay</span>
+                <span className="font-bold text-xs">🖊️ Vẽ Chữ Ký Tay</span>
                 {signType === 'HANDWRITTEN_CANVAS' && <Check className="w-4 h-4 text-blue-600" />}
               </div>
               <span className="text-[10.5px] font-normal text-slate-500 mt-1">Ký trực tiếp trên màn hình Canvas</span>
@@ -195,7 +195,7 @@ export default function DigitalSignatureModal({
               }`}
             >
               <div className="flex items-center justify-between w-full">
-                <span className="font-extrabold text-xs">🔑 Certificate PKI</span>
+                <span className="font-bold text-xs">🔑 Certificate PKI</span>
                 {signType === 'PKI_CERTIFICATE' && <Check className="w-4 h-4 text-purple-600" />}
               </div>
               <span className="text-[10.5px] font-normal text-slate-500 mt-1">Sử dụng Chứng thư số USB Token</span>
@@ -245,7 +245,7 @@ export default function DigitalSignatureModal({
           {/* PKI Certificate Info Section */}
           {signType === 'PKI_CERTIFICATE' && (
             <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl space-y-2 text-purple-900">
-              <div className="flex items-center gap-2 font-extrabold text-xs">
+              <div className="flex items-center gap-2 font-bold text-xs">
                 <ShieldCheck className="w-4 h-4 text-purple-600" />
                 <span>Chứng Thư Số Doanh Nghiệp GGBG - USB Token PKI</span>
               </div>
@@ -274,7 +274,7 @@ export default function DigitalSignatureModal({
                   setPinCode(e.target.value);
                   setPinError('');
                 }}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl font-mono text-slate-900 font-black tracking-widest text-sm"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl font-mono text-slate-900 font-semibold tracking-widest text-sm"
               />
             </div>
             {pinError && <p className="text-[11px] text-red-600 font-bold mt-1">⚠️ {pinError}</p>}
@@ -301,7 +301,7 @@ export default function DigitalSignatureModal({
 
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30 flex items-center gap-1.5"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4" /> Xác Nhận Đóng Chữ Ký Số
             </button>

@@ -14,7 +14,7 @@ interface Review360ModalProps {
 
 export default function Review360Modal({ isOpen, onClose, session, onSubmitted }: Review360ModalProps) {
   const [perspective, setPerspective] = useState<ReviewerPerspective>('PEER');
-  const [reviewerName, setReviewerName] = useState('Nguyễn Văn Minh (Sale Exec)');
+  const [reviewerName, setReviewerName] = useState('Nguyễn Văn Minh');
   const [reviewerRole, setReviewerRole] = useState('Đồng Nghiệp Ngang Cấp');
 
   const [scores, setScores] = useState<Record<string, number>>({});
@@ -65,7 +65,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
         <div className="bg-blue-50 border-b border-blue-100 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
         <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
           {/* Section 1: Reviewer Role & Perspective */}
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
               <UserCheck className="w-4 h-4 text-blue-600" /> Góc Nhìn Đánh Giá
             </h3>
 
@@ -147,7 +147,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
 
           {/* Section 2: Customizable Criteria Sliders */}
           <div className="space-y-4">
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-blue-600 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5 border-b border-slate-200 pb-2">
               <Sliders className="w-4 h-4" /> Tiêu Chí Đánh Giá
             </h3>
 
@@ -162,7 +162,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
                         <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] rounded font-bold">Trọng số {crit.weight}%</span>
                         <p className="text-[11px] text-slate-500 mt-0.5">{crit.description}</p>
                       </div>
-                      <span className="font-mono font-extrabold text-blue-700 text-sm">{currentScore.toFixed(1)} / 10 điểm</span>
+                      <span className="font-mono font-bold text-blue-700 text-sm">{currentScore.toFixed(1)} / 10 điểm</span>
                     </div>
 
                     <input
@@ -182,7 +182,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
 
           {/* Section 3: Qualitative Feedback Comments */}
           <div className="space-y-3">
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-blue-600 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5 border-b border-slate-200 pb-2">
               <MessageSquare className="w-4 h-4" /> Nhận Xét Chi Tiết
             </h3>
 
@@ -213,7 +213,7 @@ export default function Review360Modal({ isOpen, onClose, session, onSubmitted }
           <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-center justify-between">
             <div>
               <p className="text-[11px] text-slate-500 font-bold uppercase">Điểm 360° Quy Đổi Thời Gian Thực:</p>
-              <p className="text-2xl font-extrabold text-blue-700">{computeTotalWeightedScore()} / 100 Điểm</p>
+              <p className="text-2xl font-bold text-blue-700">{computeTotalWeightedScore()} / 100 Điểm</p>
             </div>
 
             <button

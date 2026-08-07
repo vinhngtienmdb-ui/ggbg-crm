@@ -272,31 +272,31 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Tên Nhân Viên</span>
-                  <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{user.name}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{user.name}</p>
                 </div>
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Mã Số Nhân Viên HRM</span>
-                  <p className="text-sm font-extrabold text-purple-700 dark:text-purple-400 font-mono">{user.employee_code}</p>
+                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 font-mono">{user.employee_code}</p>
                 </div>
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Tên Đăng Nhập System</span>
-                  <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100 font-mono">@{user.username}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">@{user.username}</p>
                 </div>
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
                   <span className="text-slate-400 text-[10.5px] uppercase font-bold">Email Công Ty</span>
-                  <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100 font-mono">{user.email}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">{user.email}</p>
                 </div>
               </div>
 
               <div className="p-4 bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-2xl space-y-2">
-                <h4 className="text-purple-900 dark:text-purple-300 font-extrabold text-xs uppercase tracking-wider">
+                <h4 className="text-purple-900 dark:text-purple-300 font-bold text-xs uppercase tracking-wider">
                   🛡️ Trạng Thái Phân Quyền & Bảo Mật:
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-xs font-medium text-purple-900 dark:text-purple-200">
-                  <p>Vai trò RBAC: <strong className="font-extrabold">{user.role_name}</strong></p>
+                  <p>Vai trò RBAC: <strong className="font-bold">{user.role_name}</strong></p>
                   <p>Xác thực 2FA: <strong className={is2faEnabled ? 'text-emerald-600' : 'text-slate-400'}>{is2faEnabled ? '🛡️ Đã Bật Google 2FA' : '⚪ Chưa Bật 2FA'}</strong></p>
                   <p>Quyền Hạn: <strong className="font-mono">{user.is_super_admin ? 'SUPER_ADMIN (*)' : 'Xem & Sửa nghiệp vụ'}</strong></p>
                   <p>Lần đăng nhập cuối: <strong className="font-mono">{user.login_at || 'Vừa đăng nhập'}</strong></p>
@@ -363,7 +363,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                 <button
                   type="submit"
                   disabled={passLoading}
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition-all active:scale-95"
+                  className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                   <KeyRound className="w-4 h-4 text-amber-400" />
                   <span>{passLoading ? 'Đang cập nhật...' : 'Cập Nhật Mật Khẩu Cá Nhân'}</span>
@@ -385,7 +385,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm">Tài Khoản Đã Được Bảo Vệ 2FA</h4>
+                    <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">Tài Khoản Đã Được Bảo Vệ 2FA</h4>
                     <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
                       Mỗi khi đăng nhập, hệ thống sẽ yêu cầu nhập mã 6 số từ ứng dụng <strong>Google Authenticator</strong> trên điện thoại của bạn.
                     </p>
@@ -396,7 +396,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                       type="button"
                       onClick={handleDisable2FA}
                       disabled={twoFaSubmitting}
-                      className="px-5 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl font-extrabold text-xs transition-colors"
+                      className="px-5 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl font-bold text-xs transition-colors"
                     >
                       🔴 Tắt Tính Năng Google Authenticator 2FA
                     </button>
@@ -405,7 +405,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
               ) : (
                 <form onSubmit={handleEnable2FA} className="space-y-4">
                   <div className="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl space-y-1 text-[11.5px] text-purple-900 dark:text-purple-300">
-                    <p className="font-extrabold">📱 Hướng dẫn kích hoạt Google Authenticator:</p>
+                    <p className="font-bold">📱 Hướng dẫn kích hoạt Google Authenticator:</p>
                     <ol className="list-decimal list-inside font-medium space-y-0.5">
                       <li>Mở ứng dụng <strong>Google Authenticator</strong> trên smartphone.</li>
                       <li>Chọn <strong>Quét mã QR</strong> bên dưới hoặc nhập chuỗi Secret Key.</li>
@@ -424,7 +424,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                     <div className="space-y-2 flex-1">
                       <div>
                         <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Chuỗi Secret Key Bí Mật:</span>
-                        <p className="font-mono text-purple-700 dark:text-purple-400 font-extrabold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <p className="font-mono text-purple-700 dark:text-purple-400 font-bold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
                           {totpSecret}
                         </p>
                       </div>
@@ -435,7 +435,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                   </div>
 
                   <div className="space-y-1.5 pt-2">
-                    <label className="block text-slate-800 dark:text-slate-200 font-extrabold">
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
                       Nhập Mã Xác Nhận 6 Chữ Số Từ App *
                     </label>
                     <input
@@ -445,14 +445,14 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                       value={totpCode}
                       onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="000000"
-                      className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl font-mono text-lg tracking-[8px] font-black text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                      className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl font-mono text-lg tracking-[8px] font-semibold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={twoFaSubmitting}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95"
                   >
                     <ShieldCheck className="w-4 h-4" />
                     <span>{twoFaSubmitting ? 'Đang xác minh...' : 'Xác Minh & Bật Bảo Mật 2FA'}</span>
@@ -468,7 +468,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 bg-slate-900 dark:bg-slate-800 text-white font-extrabold rounded-xl"
+            className="px-5 py-2 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl"
           >
             Đóng
           </button>

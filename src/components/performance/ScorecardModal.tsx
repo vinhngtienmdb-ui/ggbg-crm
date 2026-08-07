@@ -166,7 +166,7 @@ export default function ScorecardModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -174,7 +174,7 @@ export default function ScorecardModal({
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white">
+              <h2 className="text-base font-bold text-white">
                 {mode === 'create' ? 'Tạo Bảng Điểm Hiệu Suất Tháng Mới' : 'Đánh Giá Hiệu Suất & Tự Tính Lương P3'}
               </h2>
               <p className="text-xs text-slate-300">
@@ -250,7 +250,7 @@ export default function ScorecardModal({
             <select
               value={formData.status || 'DRAFT_SELF'}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as ScorecardStatus })}
-              className="px-3 py-1.5 bg-white border border-slate-300 font-extrabold text-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="px-3 py-1.5 bg-white border border-slate-300 font-bold text-blue-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               <option value="DRAFT_SELF">📝 Cá Nhân Tự Đánh Giá (Ngày 01)</option>
               <option value="SUBMITTED_MANAGER">👔 Quản Lý Trực Tiếp Chấm Điểm</option>
@@ -262,7 +262,7 @@ export default function ScorecardModal({
           {/* SECTION 1: SELF-WORK ITEMS (Cá nhân tự thêm mới công việc hoàn thành kèm kết quả) */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h4 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+              <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-blue-600" /> Danh Sách Công Việc Hoàn Thành Kèm Kết Quả (Self-Assessment)
               </h4>
               <button
@@ -336,7 +336,7 @@ export default function ScorecardModal({
           {/* SECTION 2: EVALUATION CRITERIA SCORES & KPI SYNC */}
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-              <h4 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+              <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
                 <Calculator className="w-4 h-4 text-purple-600" /> Chấm Điểm Tiêu Chí Theo Thẩm Quyền (0 - 10 Điểm)
               </h4>
               <button
@@ -352,7 +352,7 @@ export default function ScorecardModal({
               {/* KPI Score */}
               <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-800 flex items-center gap-1">
+                  <span className="font-bold text-slate-800 flex items-center gap-1">
                     🎯 Điểm Chỉ Tiêu KPI ({weights.kpi_weight}%)
                   </span>
                   <span className="text-[10px] font-bold text-blue-600">👔 Quản Lý Chấm</span>
@@ -371,7 +371,7 @@ export default function ScorecardModal({
               {/* Compliance Score */}
               <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-800 flex items-center gap-1">
+                  <span className="font-bold text-slate-800 flex items-center gap-1">
                     📋 Tuân Thủ Nội Quy ({weights.compliance_weight}%)
                   </span>
                   <span className="text-[10px] font-bold text-purple-600">📋 HR Chấm</span>
@@ -390,7 +390,7 @@ export default function ScorecardModal({
               {/* Teamwork Score */}
               <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-800 flex items-center gap-1">
+                  <span className="font-bold text-slate-800 flex items-center gap-1">
                     👥 Phối Hợp Đội Nhóm ({weights.teamwork_weight || 15}%)
                   </span>
                   <span className="text-[10px] font-bold text-indigo-600">👥 QL Gián Tiếp Chấm</span>
@@ -409,7 +409,7 @@ export default function ScorecardModal({
               {/* CSAT / Quality Score */}
               <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-800 flex items-center gap-1">
+                  <span className="font-bold text-slate-800 flex items-center gap-1">
                     ⭐ Chất Lượng CSAT ({weights.csat_weight || 15}%)
                   </span>
                   <span className="text-[10px] font-bold text-blue-600">👔 Quản Lý Chấm</span>
@@ -427,7 +427,7 @@ export default function ScorecardModal({
 
               {/* Bonus Score */}
               <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-1">
-                <span className="font-extrabold text-emerald-900 block">🎁 Điểm Thưởng Cộng Thêm (Bonus +)</span>
+                <span className="font-bold text-emerald-900 block">🎁 Điểm Thưởng Cộng Thêm (Bonus +)</span>
                 <input
                   type="number"
                   min={0}
@@ -440,7 +440,7 @@ export default function ScorecardModal({
 
               {/* Penalty Score */}
               <div className="p-3 bg-red-50/60 border border-red-200 rounded-xl space-y-1">
-                <span className="font-extrabold text-red-900 block">⚠️ Điểm Phạt Trừ (Penalty -)</span>
+                <span className="font-bold text-red-900 block">⚠️ Điểm Phạt Trừ (Penalty -)</span>
                 <input
                   type="number"
                   min={0}
@@ -455,7 +455,7 @@ export default function ScorecardModal({
 
           {/* SECTION 3: AUTOMATED PERFORMANCE SALARY P3 CALCULATOR & RATING GRADE */}
           <div className="p-4 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl space-y-4 border border-indigo-800/40">
-            <h4 className="font-extrabold text-xs text-white flex items-center gap-1.5 border-b border-slate-800 pb-2">
+            <h4 className="font-bold text-xs text-white flex items-center gap-1.5 border-b border-slate-800 pb-2">
               <DollarSign className="w-4 h-4 text-emerald-400" /> Tự Động Xếp Loại A,B,C,D & Tính Lương Hiệu Suất P3
             </h4>
 
@@ -474,7 +474,7 @@ export default function ScorecardModal({
 
               <div>
                 <span className="text-slate-300 font-bold block mb-1">Tổng Điểm Tổng Hợp:</span>
-                <div className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl font-mono font-black text-blue-300 text-sm">
+                <div className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl font-mono font-semibold text-blue-300 text-sm">
                   {computedFinalScore} / 100 Điểm
                 </div>
               </div>
@@ -483,7 +483,7 @@ export default function ScorecardModal({
                 <span className="text-slate-300 font-bold block mb-1">Xếp Loại Hiệu Suất:</span>
                 <div className="flex items-center gap-2">
                   <span
-                    className={`px-3 py-1 rounded-xl font-extrabold text-xs shadow-md ${
+                    className={`px-3 py-1 rounded-xl font-bold text-xs shadow-md ${
                       computedGrade === 'S'
                         ? 'bg-purple-500 text-white'
                         : computedGrade === 'A'
@@ -504,7 +504,7 @@ export default function ScorecardModal({
             {/* Calculated Final Salary Result */}
             <div className="p-3 bg-slate-800/90 border border-slate-700 rounded-xl flex items-center justify-between text-xs">
               <span className="text-slate-300 font-bold">Lương Hiệu Suất Thực Nhận (P3 Auto-Salary):</span>
-              <span className="font-mono font-black text-emerald-400 text-base">
+              <span className="font-mono font-semibold text-emerald-400 text-base">
                 {calculatedP3.toLocaleString('vi-VN')} ₫
               </span>
             </div>
@@ -535,7 +535,7 @@ export default function ScorecardModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95"
             >
               <Check className="w-4 h-4" />
               {mode === 'create' ? 'Tạo Bảng Điểm' : 'Lưu Thay Đổi & Tính Lương P3'}

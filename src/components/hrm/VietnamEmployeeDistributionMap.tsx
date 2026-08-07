@@ -241,7 +241,7 @@ export default function VietnamEmployeeDistributionMap({
   return (
     <div className="space-y-6">
       {/* Header Bar & Control Panel */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-3xl border border-indigo-800/40 shadow-xl space-y-4">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-xl border border-indigo-800/40 shadow-xl space-y-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
@@ -249,8 +249,8 @@ export default function VietnamEmployeeDistributionMap({
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-extrabold text-base text-white">Bản đồ phân bổ nhân sự</h3>
-                <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
+                <h3 className="font-bold text-base text-white">Bản đồ phân bổ nhân sự</h3>
+                <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 rounded-full text-[10px] font-semibold uppercase flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> Chuẩn 34 Tỉnh/Thành 2025
                 </span>
               </div>
@@ -366,7 +366,7 @@ export default function VietnamEmployeeDistributionMap({
         <div className="p-4 bg-white rounded-2xl border border-red-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-500 font-bold block">⛰️ Khối Kinh Doanh Miền Bắc</span>
-            <span className="text-2xl font-black text-red-600 mt-1 block">{regionBreakdown.BAC} nhân sự</span>
+            <span className="text-2xl font-semibold text-red-600 mt-1 block">{regionBreakdown.BAC} nhân sự</span>
             <span className="text-[11px] text-slate-400">Hà Nội, Hải Phòng, Quảng Ninh...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 font-bold flex items-center justify-center text-lg">
@@ -377,7 +377,7 @@ export default function VietnamEmployeeDistributionMap({
         <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-500 font-bold block">🏖️ Khối Kinh Doanh Miền Trung</span>
-            <span className="text-2xl font-black text-amber-600 mt-1 block">{regionBreakdown.TRUNG} nhân sự</span>
+            <span className="text-2xl font-semibold text-amber-600 mt-1 block">{regionBreakdown.TRUNG} nhân sự</span>
             <span className="text-[11px] text-slate-400">Đà Nẵng, Nghệ An, Khánh Hòa...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 font-bold flex items-center justify-center text-lg">
@@ -388,7 +388,7 @@ export default function VietnamEmployeeDistributionMap({
         <div className="p-4 bg-white rounded-2xl border border-emerald-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-500 font-bold block">🌴 Khối Kinh Doanh Miền Nam</span>
-            <span className="text-2xl font-black text-emerald-600 mt-1 block">{regionBreakdown.NAM} nhân sự</span>
+            <span className="text-2xl font-semibold text-emerald-600 mt-1 block">{regionBreakdown.NAM} nhân sự</span>
             <span className="text-[11px] text-slate-400">TP. Hồ Chí Minh, Cần Thơ, Đồng Nai...</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center text-lg">
@@ -400,11 +400,11 @@ export default function VietnamEmployeeDistributionMap({
       {/* MAIN VISUAL MAP & LOCATION RANKING GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT 7/12: 34-PROVINCE GEOJSON MAP */}
-        <div className="lg:col-span-7 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-3xl border border-slate-800 p-6 text-white space-y-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        <div className="lg:col-span-7 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl border border-slate-800 p-6 text-white space-y-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="w-full flex items-center justify-between border-b border-slate-800 pb-3 z-10">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-indigo-400 animate-spin-slow" />
-              <h4 className="font-extrabold text-sm text-white flex items-center gap-1.5">
+              <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
                 Bản Đồ Vector GIS Việt Nam
                 <a
                   href="https://github.com/nguyenduy1133/Free-GIS-Data"
@@ -594,11 +594,11 @@ export default function VietnamEmployeeDistributionMap({
         {/* RIGHT 5/12: LOCATION BREAKDOWN & EMPLOYEE ROSTER PANEL */}
         <div className="lg:col-span-5 space-y-4">
           {selectedLocation ? (
-            <div className="bg-white rounded-3xl border border-indigo-200 p-6 shadow-sm space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-xl border border-indigo-200 p-6 shadow-sm space-y-4 animate-in fade-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 block">Chi Tiết Địa Bàn Chọn</span>
-                  <h4 className="font-extrabold text-base text-slate-900 flex items-center gap-1.5">
+                  <h4 className="font-bold text-base text-slate-900 flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 text-red-600" /> {selectedLocation.provinceName}
                   </h4>
                 </div>
@@ -626,7 +626,7 @@ export default function VietnamEmployeeDistributionMap({
                           {emp.full_name.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-extrabold text-slate-900">{emp.full_name}</p>
+                          <p className="font-bold text-slate-900">{emp.full_name}</p>
                           <p className="text-[11px] font-mono text-indigo-700">{emp.employee_code} • {emp.position}</p>
                         </div>
                       </div>
@@ -652,8 +652,8 @@ export default function VietnamEmployeeDistributionMap({
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-4">
-              <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <div className="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+              <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <BarChart3 className="w-4 h-4 text-indigo-600" /> Bảng Xếp Hạng Mật Độ Địa Bàn
               </h4>
 
@@ -670,7 +670,7 @@ export default function VietnamEmployeeDistributionMap({
                       className="p-3 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200/80 rounded-2xl transition-all cursor-pointer space-y-1.5"
                     >
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <span className="font-bold text-slate-900 flex items-center gap-1.5">
                           <span
                             className="w-5 h-5 rounded-full font-mono text-[10px] font-bold flex items-center justify-center text-white"
                             style={{ backgroundColor: REGION_COLOR[item.region] }}
@@ -679,7 +679,7 @@ export default function VietnamEmployeeDistributionMap({
                           </span>
                           {item.provinceName}
                         </span>
-                        <span className="font-mono font-extrabold text-indigo-700">
+                        <span className="font-mono font-bold text-indigo-700">
                           {item.count} nhân sự ({item.percentage}%)
                         </span>
                       </div>

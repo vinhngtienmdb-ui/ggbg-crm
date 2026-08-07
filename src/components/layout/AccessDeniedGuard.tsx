@@ -15,16 +15,16 @@ export default function AccessDeniedGuard({ moduleName }: AccessDeniedGuardProps
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-200 shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
+      <div className="max-w-md w-full bg-white rounded-xl p-8 border border-slate-200 shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
         <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 text-red-600 mx-auto flex items-center justify-center shadow-inner">
           <ShieldAlert className="w-8 h-8" />
         </div>
 
         <div>
-          <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+          <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-[10px] font-bold uppercase tracking-wider">
             403 • ACCESS DENIED
           </span>
-          <h2 className="text-lg font-extrabold text-slate-900 mt-2">
+          <h2 className="text-lg font-bold text-slate-900 mt-2">
             Không Có Quyền Truy Cập
           </h2>
           <p className="text-xs text-slate-500 mt-1">

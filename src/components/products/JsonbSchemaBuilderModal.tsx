@@ -95,7 +95,7 @@ export default function JsonbSchemaBuilderModal({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 Trình Cấu Hình Thuộc Tính Động Dynamic JSONB Schema Builder
               </h2>
               <p className="text-xs text-slate-500">

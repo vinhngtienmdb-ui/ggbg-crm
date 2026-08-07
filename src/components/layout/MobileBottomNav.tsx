@@ -42,7 +42,7 @@ export default function MobileBottomNav({ onToggleMobileSidebar }: MobileBottomN
             href={item.href}
             prefetch={true}
             className={`flex flex-col items-center justify-center py-1 px-2 min-w-[56px] rounded-xl text-[10px] font-bold transition-all active:scale-95 ${
-              isActive ? 'text-blue-600 font-extrabold' : 'text-slate-400 hover:text-blue-600'
+              isActive ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-blue-600'
             }`}
           >
             <div className={`p-1 rounded-lg ${isActive ? 'bg-blue-50 text-blue-600' : ''}`}>

@@ -68,7 +68,7 @@ export default function ChangePasswordModal({ isOpen, onClose, onSuccess }: Chan
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
@@ -76,7 +76,7 @@ export default function ChangePasswordModal({ isOpen, onClose, onSuccess }: Chan
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Tự Đổi Mật Khẩu Cá Nhân</h3>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Tự Đổi Mật Khẩu Cá Nhân</h3>
               <p className="text-[11px] text-slate-400 font-medium">Bảo mật tài khoản với mật khẩu mạnh</p>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function ChangePasswordModal({ isOpen, onClose, onSuccess }: Chan
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
             >
               {loading ? 'Đang cập nhật...' : 'Cập Nhật Mật Khẩu'}
             </button>

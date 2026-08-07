@@ -71,7 +71,7 @@ export default function AuditTrailPage() {
             <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
             <span>System Audit Trail & Security Center</span>
           </div>
-          <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
+          <h1 className="text-lg md:text-xl font-bold tracking-tight text-blue-700">
             Nhật Ký Hệ Thống & Bảo Mật Thao Tác
           </h1>
           <p className="text-slate-500 text-xs mt-1">
@@ -138,7 +138,7 @@ export default function AuditTrailPage() {
         <div className="overflow-x-auto touch-scroll sleek-scrollbar">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wide text-[10.5px]">
                 <th className="p-3">Thời Gian</th>
                 <th className="p-3">Tài Khoản Thực Hiện</th>
                 <th className="p-3">Loại Thao Tác & Mô Tả</th>

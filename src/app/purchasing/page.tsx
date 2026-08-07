@@ -170,14 +170,14 @@ export default function PurchasingPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsSupModalOpen(true)}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all"
+            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
           >
             <Building2 className="w-4 h-4 text-slate-600" /> Thêm Nhà Cung Cấp
           </button>
 
           <button
             onClick={() => setIsPoModalOpen(true)}
-            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
           >
             <Plus className="w-4 h-4" /> Lập Đơn Mua Hàng PO
           </button>
@@ -188,19 +188,19 @@ export default function PurchasingPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-bold">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Tổng Giá Trị Đơn Mua PO</span>
-          <p className="text-xl font-black text-indigo-700">{formatCurrency(totalPoValue)}</p>
+          <p className="text-xl font-semibold text-indigo-700">{formatCurrency(totalPoValue)}</p>
           <p className="text-indigo-600 font-semibold text-[11px]">🛒 {orders.length} Đơn mua hàng đã lập</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Công Nợ Phải Trả NCC (TK 331)</span>
-          <p className="text-xl font-black text-red-600">{formatCurrency(totalPayable)}</p>
+          <p className="text-xl font-semibold text-red-600">{formatCurrency(totalPayable)}</p>
           <p className="text-red-500 font-semibold text-[11px]">💳 Nợ phải trả nhà cung cấp</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Số Lượng Nhà Cung Cấp</span>
-          <p className="text-xl font-black text-emerald-700">{suppliers.length} Đối Tác NCC</p>
+          <p className="text-xl font-semibold text-emerald-700">{suppliers.length} Đối Tác NCC</p>
           <p className="text-emerald-600 font-semibold text-[11px]">⭐ Xếp hạng uy tín Rating A/B</p>
         </div>
       </div>
@@ -247,7 +247,7 @@ export default function PurchasingPage() {
           <div className="overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                   <th className="p-3">Mã & Ngày Đơn Mua PO</th>
                   <th className="p-3">Tên Nhà Cung Cấp</th>
                   <th className="p-3">Hạng Mục Hàng Mua</th>
@@ -261,12 +261,12 @@ export default function PurchasingPage() {
                 {filteredOrders.map((po) => (
                   <tr key={po.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
-                      <p className="font-mono font-black text-indigo-700 text-xs">{po.po_code}</p>
+                      <p className="font-mono font-semibold text-indigo-700 text-xs">{po.po_code}</p>
                       <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {formatDate(po.order_date)}</p>
                     </td>
 
                     <td className="p-3 max-w-xs">
-                      <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-1">{po.supplier_name}</p>
+                      <p className="font-bold text-slate-900 text-xs leading-snug line-clamp-1">{po.supplier_name}</p>
                       <p className="text-[10.5px] text-slate-500 font-normal">Giao hàng dự kiến: {formatDate(po.expected_delivery_date)}</p>
                     </td>
 
@@ -278,12 +278,12 @@ export default function PurchasingPage() {
                       ))}
                     </td>
 
-                    <td className="p-3 text-right font-mono font-black text-slate-900 text-xs">
+                    <td className="p-3 text-right font-mono font-semibold text-slate-900 text-xs">
                       {formatCurrency(po.grand_total)}
                     </td>
 
                     <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
                         po.delivery_status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' :
                         po.delivery_status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
                       }`}>
@@ -292,7 +292,7 @@ export default function PurchasingPage() {
                     </td>
 
                     <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
                         po.payment_status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {po.payment_status === 'PAID' ? '✅ Đã Thanh Toán' : '🔴 Chưa Thanh Toán'}
@@ -322,7 +322,7 @@ export default function PurchasingPage() {
           <div className="overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                   <th className="p-3">Mã & Tên Nhà Cung Cấp</th>
                   <th className="p-3">Mã Số Thuế</th>
                   <th className="p-3">Người Liên Hệ & SĐT</th>
@@ -335,7 +335,7 @@ export default function PurchasingPage() {
                 {filteredSuppliers.map((sup) => (
                   <tr key={sup.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
-                      <p className="font-extrabold text-slate-900 text-xs">{sup.name}</p>
+                      <p className="font-bold text-slate-900 text-xs">{sup.name}</p>
                       <p className="font-mono text-purple-700 text-[11px] font-bold">Mã số: {sup.supplier_code}</p>
                     </td>
 
@@ -353,14 +353,14 @@ export default function PurchasingPage() {
                     </td>
 
                     <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-black text-[11px] ${
+                      <span className={`px-2.5 py-1 rounded-full font-semibold text-[11px] ${
                         sup.rating === 'A' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800'
                       }`}>
                         ⭐ Rating {sup.rating}
                       </span>
                     </td>
 
-                    <td className="p-3 text-right font-mono font-black text-red-600 text-xs">
+                    <td className="p-3 text-right font-mono font-semibold text-red-600 text-xs">
                       {formatCurrency(sup.payable_balance)}
                     </td>
                   </tr>
@@ -374,9 +374,9 @@ export default function PurchasingPage() {
       {/* MODAL KHỞI TẠO ĐƠN MUA HÀNG PO MỚI */}
       {isPoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <ShoppingCart className="w-5 h-5 text-indigo-600" /> Lập Đơn Đặt Hàng Mua Hàng PO Mới
               </h3>
               <button onClick={() => setIsPoModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700">
@@ -449,7 +449,7 @@ export default function PurchasingPage() {
               <div className="p-3 bg-indigo-50 rounded-xl space-y-1 font-mono text-[11px]">
                 <p className="text-indigo-900 font-bold">Thành tiền trước thuế: {formatCurrency(newItemQty * newItemPrice)}</p>
                 <p className="text-indigo-700">Thuế GTGT VAT (10%): {formatCurrency(newItemQty * newItemPrice * 0.1)}</p>
-                <p className="text-indigo-950 font-black text-xs pt-1 border-t border-indigo-200">
+                <p className="text-indigo-950 font-semibold text-xs pt-1 border-t border-indigo-200">
                   TỔNG THANH TOÁN: {formatCurrency(newItemQty * newItemPrice * 1.1)}
                 </p>
               </div>
@@ -464,7 +464,7 @@ export default function PurchasingPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-1.5"
                 >
                   <ShoppingCart className="w-4 h-4" /> Khởi Tạo Đơn Mua PO
                 </button>
@@ -477,9 +477,9 @@ export default function PurchasingPage() {
       {/* MODAL THÊM NHÀ CUNG CẤP MỚI */}
       {isSupModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-indigo-600" /> Thêm Hồ Sơ Nhà Cung Cấp Mới
               </h3>
               <button onClick={() => setIsSupModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700">
@@ -561,7 +561,7 @@ export default function PurchasingPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-1.5"
                 >
                   <Building2 className="w-4 h-4" /> Lưu Hồ Sơ Nhà Cung Cấp
                 </button>

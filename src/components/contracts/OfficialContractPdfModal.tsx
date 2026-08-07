@@ -65,7 +65,7 @@ export default function OfficialContractPdfModal({
 
             {/* Title */}
             <div className="text-center space-y-1">
-              <h2 className="font-extrabold text-base uppercase text-slate-900 tracking-tight">HỢP ĐỒNG DỊCH VỤ UỶ QUYỀN VẬN HÀNH GIAN HÀNG TMĐT</h2>
+              <h2 className="font-bold text-base uppercase text-slate-900 tracking-tight">HỢP ĐỒNG DỊCH VỤ UỶ QUYỀN VẬN HÀNH GIAN HÀNG TMĐT</h2>
               <p className="font-mono text-xs font-bold text-blue-700">Mã Số Chứng Từ: {contractCode}</p>
             </div>
 
@@ -113,9 +113,9 @@ export default function OfficialContractPdfModal({
                 <p className="font-bold text-slate-900 uppercase mb-1">ĐẠI DIỆN BÊN A (GGBINGO)</p>
 
                 {/* Digital Red Seal */}
-                <div className="w-28 h-28 border-4 border-red-600 rounded-full flex flex-col items-center justify-center p-2 text-center text-red-600 font-extrabold rotate-[-12deg] shadow-sm bg-red-50/20 mx-auto my-1">
+                <div className="w-28 h-28 border-4 border-red-600 rounded-full flex flex-col items-center justify-center p-2 text-center text-red-600 font-bold rotate-[-12deg] shadow-sm bg-red-50/20 mx-auto my-1">
                   <span className="text-[8px] uppercase tracking-tighter">CÔNG TY CP TẬP ĐOÀN</span>
-                  <span className="text-xs font-black">GGBINGO</span>
+                  <span className="text-xs font-semibold">GGBINGO</span>
                   <span className="text-[7px]">★ CON DẤU ĐIỆN TỬ ★</span>
                 </div>
 

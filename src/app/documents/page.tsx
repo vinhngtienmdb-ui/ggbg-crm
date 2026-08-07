@@ -68,6 +68,8 @@ export default function DocumentsPage() {
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
   const [directiveInput, setDirectiveInput] = useState('');
 
+  const [attachedFile, setAttachedFile] = useState<{ name: string; size: string } | null>(null);
+
   const [newDoc, setNewDoc] = useState({
     title: '',
     category: 'INBOUND' as DocumentCategory,
@@ -89,9 +91,23 @@ export default function DocumentsPage() {
     setTimeout(() => setToastMsg(null), 3500);
   };
 
+  const handleDocFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+    setAttachedFile({
+      name: file.name,
+      size: sizeStr,
+    });
+    showToast(`📎 Đã chọn tệp đính kèm: ${file.name} (${sizeStr})`);
+  };
+
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const docCode = newDoc.document_code || `${documents.length + 101}/CV-GGBG`;
+    const finalFileName = attachedFile ? attachedFile.name : `Van-Ban-${docCode.replace(/\//g, '-')}.pdf`;
+    const finalFileSize = attachedFile ? attachedFile.size : '2.1 MB';
 
     const doc: OfficialDocument = {
       id: `doc_${Date.now()}`,
@@ -109,9 +125,9 @@ export default function DocumentsPage() {
       assigned_department: newDoc.assigned_department,
       assigned_assignee: newDoc.assigned_assignee,
       directive_note: newDoc.directive_note,
-      file_name: `Van-Ban-${docCode.replace(/\//g, '-')}.pdf`,
+      file_name: finalFileName,
       file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-      file_size: '2.1 MB',
+      file_size: finalFileSize,
       comments: [],
       created_at: new Date().toISOString().slice(0, 10),
     };
@@ -119,6 +135,7 @@ export default function DocumentsPage() {
     const updated = addOfficialDocument(doc);
     setDocuments([...updated]);
     setIsCreateOpen(false);
+    setAttachedFile(null);
     showToast(`✅ Đã vào sổ công văn mới thành công: Số ${doc.document_code}`);
   };
 
@@ -194,7 +211,7 @@ export default function DocumentsPage() {
 
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" /> Tiếp Nhận / Phát Hành Văn Bản
         </button>
@@ -204,25 +221,25 @@ export default function DocumentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-bold">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Công Văn Đến (Inbound)</span>
-          <p className="text-xl font-black text-blue-700">{totalInbound} Văn Bản</p>
+          <p className="text-xl font-semibold text-blue-700">{totalInbound} Văn Bản</p>
           <p className="text-amber-600 font-semibold text-[11px]">📩 {totalPendingDirective} công văn chờ Ban Giám Đốc bút phê</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Công Văn Đi (Outbound)</span>
-          <p className="text-xl font-black text-purple-700">{totalOutbound} Quyết Định / Thông Báo</p>
+          <p className="text-xl font-semibold text-purple-700">{totalOutbound} Quyết Định / Thông Báo</p>
           <p className="text-purple-600 font-semibold text-[11px]">📤 Đã phát hành chính thức</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Văn Bản Nội Bộ (Internal SOP)</span>
-          <p className="text-xl font-black text-emerald-700">{totalInternal} Quy Trình SOP</p>
+          <p className="text-xl font-semibold text-emerald-700">{totalInternal} Quy Trình SOP</p>
           <p className="text-emerald-600 font-semibold text-[11px]">📑 Quy chế vận hành doanh nghiệp</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Mức Độ Khẩn & Tối Mật</span>
-          <p className="text-xl font-black text-red-600">2 Văn Bản Khẩn</p>
+          <p className="text-xl font-semibold text-red-600">2 Văn Bản Khẩn</p>
           <p className="text-red-500 font-semibold text-[11px]">⚡ Cần xử lý ưu tiên trong ngày</p>
         </div>
       </div>
@@ -300,7 +317,7 @@ export default function DocumentsPage() {
           <div className="overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                   <th className="p-3">Số & Ngày Công Văn</th>
                   <th className="p-3">Trích Yếu Nội Dung Văn Bản</th>
                   <th className="p-3">Cơ Quan Ban Hành / Nơi Gửi</th>
@@ -314,12 +331,12 @@ export default function DocumentsPage() {
                 {filteredDocs.map((doc) => (
                   <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
-                      <p className="font-mono font-black text-blue-700 text-xs">{doc.document_code}</p>
+                      <p className="font-mono font-semibold text-blue-700 text-xs">{doc.document_code}</p>
                       <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {doc.received_date || doc.issued_date}</p>
                     </td>
 
                     <td className="p-3 max-w-md">
-                      <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-2">{doc.title}</p>
+                      <p className="font-bold text-slate-900 text-xs leading-snug line-clamp-2">{doc.title}</p>
                       {doc.directive_note && (
                         <p className="text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded-lg border border-amber-200 mt-1 font-bold">
                           ✍️ Bút phê: {doc.directive_note}
@@ -333,13 +350,13 @@ export default function DocumentsPage() {
                     </td>
 
                     <td className="p-3 text-center space-y-1">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold block ${
                         doc.security_level === 'CONFIDENTIAL' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700'
                       }`}>
                         🔒 {doc.security_level === 'CONFIDENTIAL' ? 'Bảo Mật' : 'Công Khai'}
                       </span>
 
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black block ${
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold block ${
                         doc.urgency_level === 'HIGHLY_URGENT' || doc.urgency_level === 'EXPRESS'
                           ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
                           : 'bg-slate-100 text-slate-700'
@@ -354,7 +371,7 @@ export default function DocumentsPage() {
                     </td>
 
                     <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
                         doc.status === 'PENDING_DIRECTIVE' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
                         doc.status === 'IN_PROCESSING' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800'
                       }`}>
@@ -396,7 +413,7 @@ export default function DocumentsPage() {
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-indigo-600" /> Cấu Hình Sổ Văn Bản, Mã Ký Hiệu & Chứng Thư Số
                 </h3>
                 <p className="text-[11px] text-slate-500 font-normal mt-0.5">
@@ -406,7 +423,7 @@ export default function DocumentsPage() {
 
               <button
                 onClick={() => showToast('💾 Đã lưu thành công cấu hình sổ công văn & ký số!')}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
               >
                 <Save className="w-4 h-4" /> Lưu Cấu Hình Văn Bản
               </button>
@@ -415,7 +432,7 @@ export default function DocumentsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Box 1: Cấu hình Đánh Số Công Văn */}
               <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
-                <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
+                <h4 className="font-bold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
                   1. Cấu Hình Đánh Số Công Văn Tự Động
                 </h4>
 
@@ -454,7 +471,7 @@ export default function DocumentsPage() {
 
               {/* Box 2: Cấu hình Hạn Xử Lý SLA */}
               <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
-                <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
+                <h4 className="font-bold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
                   2. Cấu Hình Thời Hạn Xử Lý SLA (Giờ)
                 </h4>
 
@@ -498,9 +515,9 @@ export default function DocumentsPage() {
       {/* MODAL TIẾP NHẬN / PHÁT HÀNH CÔNG VĂN MỚI */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-semibold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-600" /> Tiếp Nhận / Phát Hành Văn Bản Mới
               </h3>
               <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
@@ -516,9 +533,9 @@ export default function DocumentsPage() {
                   onChange={(e) => setNewDoc({ ...newDoc, category: e.target.value as DocumentCategory })}
                   className="w-full px-3 py-2 border rounded-xl"
                 >
-                  <option value="INBOUND">📥 Công Văn Đến (Gửi từ Cơ quan / Đối tác bên ngoài)</option>
-                  <option value="OUTBOUND">📤 Công Văn Đi (GGBG CRM phát hành ra bên ngoài)</option>
-                  <option value="INTERNAL_SOP">📑 Văn Bản Nội Bộ (Quy chế, Quy trình SOP)</option>
+                  <option value="INBOUND">📥 Công Văn Đến</option>
+                  <option value="OUTBOUND">📤 Công Văn Đi</option>
+                  <option value="INTERNAL_SOP">📑 Văn Bản Nội Bộ</option>
                 </select>
               </div>
 
@@ -625,6 +642,40 @@ export default function DocumentsPage() {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-slate-700 mb-1">Tệp Đính Kèm Gốc (PDF, DOC, DOCX, Hình Ảnh)</label>
+                <div className="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all">
+                      <Paperclip className="w-4 h-4" /> Tải Lên Tệp Tin Từ Máy Tính
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                        className="hidden"
+                        onChange={handleDocFileSelect}
+                      />
+                    </label>
+                    {attachedFile && (
+                      <button
+                        type="button"
+                        onClick={() => setAttachedFile(null)}
+                        className="text-red-600 hover:underline text-[11px] font-bold"
+                      >
+                        Xóa file
+                      </button>
+                    )}
+                  </div>
+                  {attachedFile ? (
+                    <div className="p-2 bg-white rounded-xl border border-blue-200 flex items-center justify-between text-xs">
+                      <span className="font-mono text-blue-900 font-bold truncate max-w-[240px]">📄 {attachedFile.name}</span>
+                      <span className="font-mono text-slate-500 font-bold text-[10px]">{attachedFile.size}</span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400">Chưa chọn tệp tin nào. Hệ thống sẽ tự tạo file mặc định nếu để trống.</p>
+                  )}
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-3 border-t">
                 <button
                   type="button"
@@ -635,7 +686,7 @@ export default function DocumentsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30"
                 >
                   Vào Sổ Văn Bản
                 </button>
@@ -648,11 +699,11 @@ export default function DocumentsPage() {
       {/* MODAL XEM VĂN BẢN, PDF VIEWER & BÚT PHÊ GIÁM ĐỐC */}
       {isViewOpen && selectedDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="font-mono text-xs font-black text-blue-700">{selectedDoc.document_code}</span>
-                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3>
+                <span className="font-mono text-xs font-semibold text-blue-700">{selectedDoc.document_code}</span>
+                <h3 className="font-bold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3>
               </div>
               <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -660,12 +711,12 @@ export default function DocumentsPage() {
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-              <h4 className="font-extrabold text-slate-900 text-sm leading-snug">{selectedDoc.title}</h4>
+              <h4 className="font-bold text-slate-900 text-sm leading-snug">{selectedDoc.title}</h4>
               <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
                 <p>Nơi ban hành: <strong className="text-slate-900">{selectedDoc.issuer_org}</strong></p>
                 <p>Người ký: <strong className="text-slate-900">{selectedDoc.signee_name}</strong></p>
                 <p>Đơn vị xử lý: <strong className="text-slate-900">{selectedDoc.assigned_department}</strong></p>
-                <p>Cán bộ chủ trì: <strong className="text-blue-700 font-extrabold">{selectedDoc.assigned_assignee}</strong></p>
+                <p>Cán bộ chủ trì: <strong className="text-blue-700 font-bold">{selectedDoc.assigned_assignee}</strong></p>
               </div>
             </div>
 
@@ -676,7 +727,7 @@ export default function DocumentsPage() {
                   <Paperclip className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-slate-900">{selectedDoc.file_name || 'Văn-Bản-Dinh-Kem.pdf'}</p>
+                  <p className="font-bold text-slate-900">{selectedDoc.file_name || 'Văn-Bản-Dinh-Kem.pdf'}</p>
                   <p className="text-[11px] text-slate-500 font-normal">Dung lượng: {selectedDoc.file_size || '2.1 MB'} • Định dạng tệp PDF</p>
                 </div>
               </div>
@@ -685,7 +736,7 @@ export default function DocumentsPage() {
                 href={selectedDoc.file_url || '#'}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-extrabold text-[11px] flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95"
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[11px] flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95"
               >
                 <Download className="w-3.5 h-3.5" /> Xem / Tải File PDF
               </a>
@@ -694,11 +745,11 @@ export default function DocumentsPage() {
             {/* Digital Red Stamp Seal Badge */}
             <div className="p-4 bg-red-50/60 border border-red-200 rounded-2xl flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full border-2 border-red-600 text-red-600 flex items-center justify-center font-black text-xs uppercase tracking-wider rotate-[-12deg] bg-white shadow-sm">
+                <div className="w-10 h-10 rounded-full border-2 border-red-600 text-red-600 flex items-center justify-center font-semibold text-xs uppercase tracking-wider rotate-[-12deg] bg-white shadow-sm">
                   GGBG
                 </div>
                 <div>
-                  <p className="font-extrabold text-red-900">
+                  <p className="font-bold text-red-900">
                     {selectedDoc.has_digital_stamp ? '🔴 Dấu Mộc Đỏ Điện Tử: ĐÃ ĐÓNG DẤU CHÍNH THỨC' : '⚪ Dấu Mộc Điện Tử: CHƯA ĐÓNG DẤU MỘC'}
                   </p>
                   <p className="text-[11px] text-slate-500 font-normal">
@@ -720,7 +771,7 @@ export default function DocumentsPage() {
                     setDocuments(getOfficialDocuments());
                     showToast(`🔴 Đã đóng dấu mộc đỏ điện tử chính thức cho văn bản ${selectedDoc.document_code}`);
                   }}
-                  className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-extrabold text-[11px] flex items-center gap-1.5 shadow-md shadow-red-600/30 transition-all active:scale-95 shrink-0"
+                  className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-[11px] flex items-center gap-1.5 shadow-md shadow-red-600/30 transition-all active:scale-95 shrink-0"
                 >
                   <FileCheck className="w-3.5 h-3.5" /> Đóng Dấu Mộc Đỏ
                 </button>
@@ -729,12 +780,12 @@ export default function DocumentsPage() {
 
             {/* Bút Phê Chỉ Đạo Section */}
             <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-amber-900 text-xs flex items-center gap-2">
+              <h4 className="font-bold text-amber-900 text-xs flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-amber-600" /> Bút Phê Chỉ Đạo Của Ban Giám Đốc
               </h4>
 
               {selectedDoc.directive_note ? (
-                <p className="p-3 bg-white border border-amber-200 rounded-xl font-extrabold text-amber-900 leading-relaxed text-xs">
+                <p className="p-3 bg-white border border-amber-200 rounded-xl font-bold text-amber-900 leading-relaxed text-xs">
                   ✍️ {selectedDoc.directive_note}
                 </p>
               ) : (
@@ -754,7 +805,7 @@ export default function DocumentsPage() {
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-md shrink-0"
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md shrink-0"
                   >
                     Lưu Bút Phê
                   </button>
@@ -765,14 +816,14 @@ export default function DocumentsPage() {
             <div className="flex items-center justify-between pt-2">
               <button
                 onClick={() => setIsSignModalOpen(true)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1.5 transition-all active:scale-95"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md flex items-center gap-1.5 transition-all active:scale-95"
               >
                 <ShieldCheck className="w-4 h-4" /> ✍️ Trình Ký Số Điện Tử (E-Sign)
               </button>
 
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl"
               >
                 Đóng
               </button>

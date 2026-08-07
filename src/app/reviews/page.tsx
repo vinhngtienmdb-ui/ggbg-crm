@@ -131,7 +131,7 @@ export default function Review360Page() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200 shadow-sm space-y-1">
           <p className="text-xs font-bold text-slate-500 uppercase">Phiên Đánh Giá</p>
-          <p className="text-2xl font-extrabold text-blue-700">{filteredSessions.length} Nhân Sự</p>
+          <p className="text-2xl font-bold text-blue-700">{filteredSessions.length} Nhân Sự</p>
           <p className="text-[10px] text-slate-500 font-mono">{selectedPeriod}</p>
         </div>
 
@@ -139,7 +139,7 @@ export default function Review360Page() {
           <p className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             👤 Tự Đánh Giá
           </p>
-          <p className="text-xl font-extrabold text-blue-600">92.5 / 100đ</p>
+          <p className="text-xl font-bold text-blue-600">92.5 / 100đ</p>
           <p className="text-[10px] text-slate-400">Trung bình nhân viên tự chấm</p>
         </div>
 
@@ -147,7 +147,7 @@ export default function Review360Page() {
           <p className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             👔 Quản Lý
           </p>
-          <p className="text-xl font-extrabold text-purple-600">95.0 / 100đ</p>
+          <p className="text-xl font-bold text-purple-600">95.0 / 100đ</p>
           <p className="text-[10px] text-slate-400">Trung bình Trưởng phòng chấm</p>
         </div>
 
@@ -155,7 +155,7 @@ export default function Review360Page() {
           <p className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             🤝 Đồng Nghiệp
           </p>
-          <p className="text-xl font-extrabold text-emerald-600">88.0 / 100đ</p>
+          <p className="text-xl font-bold text-emerald-600">88.0 / 100đ</p>
           <p className="text-[10px] text-slate-400">Đồng nghiệp ngang cấp đánh giá</p>
         </div>
 
@@ -163,7 +163,7 @@ export default function Review360Page() {
           <p className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             👥 Cấp Dưới
           </p>
-          <p className="text-xl font-extrabold text-amber-600">90.5 / 100đ</p>
+          <p className="text-xl font-bold text-amber-600">90.5 / 100đ</p>
           <p className="text-[10px] text-slate-400">Cấp dưới đánh giá Leader</p>
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function Review360Page() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wide text-[10.5px]">
                 <th className="p-4">Họ Và Tên</th>
                 <th className="p-4">Phòng Ban & Vị Trí</th>
                 <th className="p-4">Kỳ Đánh Giá</th>
@@ -242,7 +242,7 @@ export default function Review360Page() {
                       {session.subordinate_score ? `${session.subordinate_score}đ` : '—'}
                     </td>
 
-                    <td className="p-4 font-mono font-extrabold text-slate-900 text-sm">
+                    <td className="p-4 font-mono font-bold text-slate-900 text-sm">
                       {session.overall_360_score.toFixed(1)} / 100đ
                     </td>
 
@@ -268,7 +268,7 @@ export default function Review360Page() {
       {/* MODAL 1: TẠO PHIÊN ĐÁNH GIÁ 360° MỚI */}
       {isNewSessionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-blue-50 border-b border-blue-100 p-5 flex items-center justify-between">
               <h3 className="font-bold text-base flex items-center gap-2 text-blue-700">
                 <Plus className="w-5 h-5 text-blue-600" /> Khởi Tạo Phiên Đánh Giá 360° Mới
@@ -339,7 +339,7 @@ export default function Review360Page() {
       {/* MODAL 2: TUỲ BIẾN BỘ TIÊU CHÍ ĐÁNH GIÁ 360° (CUSTOM CRITERIA FRAMEWORK) */}
       {isConfigModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-blue-50 border-b border-blue-100 p-5 flex items-center justify-between">
               <h3 className="font-bold text-base flex items-center gap-2 text-blue-700">
                 <Sliders className="w-5 h-5 text-blue-600" /> Cấu Hình Khung Tiêu Chí & Trọng Số 360°

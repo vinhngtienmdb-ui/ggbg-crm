@@ -64,15 +64,45 @@ export default function BulkLeadImportModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setFileName(file.name);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+    setFileName(`${file.name} (${sizeStr})`);
     setIsParsing(true);
+
+    let rowsToValidate: any[] = MOCK_CSV_SAMPLE_ROWS;
+
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      try {
+        const text = await file.text();
+        const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+        if (lines.length > 1) {
+          const parsed = lines.slice(1).map((line) => {
+            const parts = line.split(',').map((p) => p.trim().replace(/^["']|["']$/g, ''));
+            return {
+              full_name: parts[0] || 'Khách Hàng Import',
+              phone: parts[1] || '0900000000',
+              email: parts[2] || '',
+              company_name: parts[3] || 'Doanh Nghiệp Import',
+              source_name: parts[4] || 'Bulk Import CSV',
+              estimated_budget: Number(parts[5]) || 150000000,
+            };
+          }).filter((r) => r.full_name && r.phone);
+
+          if (parsed.length > 0) {
+            rowsToValidate = parsed;
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi parse file CSV:', err);
+      }
+    }
 
     try {
       const res = await fetch('/api/leads/bulk-import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          rows: MOCK_CSV_SAMPLE_ROWS,
+          rows: rowsToValidate,
           existing_phones: existingPhones,
         }),
       });
@@ -82,7 +112,23 @@ export default function BulkLeadImportModal({
         setPreviewRows(data.validated_rows || []);
       }
     } catch {
-      // fallback mock validation
+      // Fallback local validation logic if API route fails
+      const fallbackValidated: BulkImportRow[] = rowsToValidate.map((r, i) => {
+        const isDup = existingPhones.includes(r.phone);
+        return {
+          id: `imp_${i}`,
+          full_name: r.full_name,
+          phone: r.phone,
+          email: r.email,
+          company_name: r.company_name,
+          source_name: r.source_name || 'Bulk Import CSV',
+          entity_type: 'ENTERPRISE' as CustomerEntityType,
+          estimated_budget: r.estimated_budget,
+          is_duplicate: isDup,
+          duplicate_reason: isDup ? 'SĐT đã tồn tại trên CRM' : undefined,
+        };
+      });
+      setPreviewRows(fallbackValidated);
     } finally {
       setIsParsing(false);
     }
@@ -93,10 +139,10 @@ export default function BulkLeadImportModal({
     if (rowsToImport.length === 0) return;
 
     const salesList = [
-      'Trần Văn Hoàng (Đội 1)',
-      'Nguyễn Quốc Tuấn (Đội 2)',
-      'Đỗ Thị Quyên (Đội 3)',
-      'Phạm Minh Đức (Enterprise)',
+      'Trần Văn Hoàng',
+      'Nguyễn Quốc Tuấn',
+      'Đỗ Thị Quyên',
+      'Phạm Minh Đức',
     ];
 
     const newLeads: Lead[] = rowsToImport.map((row, idx) => {
@@ -133,7 +179,7 @@ export default function BulkLeadImportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
         {/* Header */}
         <div className="bg-slate-50 border-b border-slate-200 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -141,7 +187,7 @@ export default function BulkLeadImportModal({
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-slate-900">Nhập Lead Hàng Loạt Từ File Excel / CSV</h3>
+              <h3 className="font-bold text-base text-slate-900">Nhập Lead Hàng Loạt Từ File Excel / CSV</h3>
               <p className="text-xs text-slate-500">
                 Kiểm tra trùng lặp SĐT tự động & Phân bổ Lead xoay vòng cho Sales Exec
               </p>
@@ -158,7 +204,7 @@ export default function BulkLeadImportModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
               <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-                <Download className="w-4 h-4 text-blue-600" /> Tải Mẫu File Chuẩn (Template CSV)
+                <Download className="w-4 h-4 text-blue-600" /> Tải Mẫu File Chuẩn
               </h4>
               <p className="text-[11px] text-slate-500">
                 File mẫu bao gồm các cột chuẩn: Họ tên, SĐT, Email, Tên công ty, Ngân sách.
@@ -223,7 +269,7 @@ export default function BulkLeadImportModal({
               <div className="border border-slate-200 rounded-2xl overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wide text-[10.5px]">
                       <th className="p-3">Họ Và Tên</th>
                       <th className="p-3">Số Điện Thoại</th>
                       <th className="p-3">Công Ty / Email</th>
@@ -240,7 +286,7 @@ export default function BulkLeadImportModal({
                           <p className="font-semibold text-slate-800">{row.company_name}</p>
                           <p className="text-slate-400 text-[10px]">{row.email}</p>
                         </td>
-                        <td className="p-3 font-mono font-extrabold text-emerald-700">
+                        <td className="p-3 font-mono font-bold text-emerald-700">
                           {row.estimated_budget.toLocaleString('vi-VN')} ₫
                         </td>
                         <td className="p-3">

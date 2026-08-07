@@ -161,7 +161,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
   ];
 
   const cardCls = 'bg-white border border-slate-200 rounded-xl p-4 shadow-sm';
-  const labelCls = 'text-[10.5px] font-extrabold tracking-wide text-slate-500 uppercase';
+  const labelCls = 'text-[10.5px] font-bold tracking-wide text-slate-500 uppercase';
 
   const renderPieLabel = (entry: any) => `${entry.name}: ${entry.value}`;
 
@@ -179,7 +179,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
-              <p className={`font-extrabold text-slate-900 ${c.small ? 'text-base' : 'text-2xl'}`}>{c.value}</p>
+              <p className={`font-bold text-slate-900 ${c.small ? 'text-base' : 'text-2xl'}`}>{c.value}</p>
               {c.sub && <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>}
             </div>
           );
@@ -194,7 +194,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
               <AlertTriangle className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-extrabold text-slate-900 text-sm">HĐ Đã Hết Hạn</p>
+              <p className="font-bold text-slate-900 text-sm">HĐ Đã Hết Hạn</p>
               <p className="text-[11px] text-slate-500">{contractAlerts.expired.length} hợp đồng cần xử lý gấp</p>
             </div>
           </div>
@@ -218,7 +218,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
               <CalendarClock className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-extrabold text-slate-900 text-sm">HĐ Sắp Hết Hạn (60 ngày)</p>
+              <p className="font-bold text-slate-900 text-sm">HĐ Sắp Hết Hạn (60 ngày)</p>
               <p className="text-[11px] text-slate-500">{contractAlerts.expiringSoon.length} hợp đồng cần gia hạn</p>
             </div>
           </div>
@@ -241,7 +241,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Cơ cấu loại hợp đồng */}
         <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Loại Hợp Đồng</h3>
+          <h3 className="font-bold text-slate-900 text-sm mb-1">Cơ Cấu Loại Hợp Đồng</h3>
           <p className="text-[11px] text-slate-500 mb-3">Phân bổ theo loại hợp đồng lao động</p>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
@@ -258,7 +258,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
 
         {/* Cơ cấu giới tính - Donut */}
         <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Giới Tính</h3>
+          <h3 className="font-bold text-slate-900 text-sm mb-1">Cơ Cấu Giới Tính</h3>
           <p className="text-[11px] text-slate-500 mb-3">Tỷ lệ nam / nữ / khác</p>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
@@ -275,7 +275,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
 
         {/* Cơ cấu trình độ chuyên môn */}
         <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Trình Độ Chuyên Môn</h3>
+          <h3 className="font-bold text-slate-900 text-sm mb-1">Cơ Cấu Trình Độ Chuyên Môn</h3>
           <p className="text-[11px] text-slate-500 mb-3">Trình độ chuyên môn kỹ thuật (CMKT)</p>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={educationData}>
@@ -294,7 +294,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
 
         {/* Cơ cấu thâm niên */}
         <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Thâm Niên</h3>
+          <h3 className="font-bold text-slate-900 text-sm mb-1">Cơ Cấu Thâm Niên</h3>
           <p className="text-[11px] text-slate-500 mb-3">Số năm công tác tính từ ngày vào làm</p>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={seniorityData}>
@@ -314,7 +314,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
 
       {/* Phân bổ trạng thái theo phòng ban - stacked */}
       <div className={cardCls}>
-        <h3 className="font-extrabold text-slate-900 text-sm mb-1">Phân Bổ Trạng Thái Lao Động Theo Phòng Ban</h3>
+        <h3 className="font-bold text-slate-900 text-sm mb-1">Phân Bổ Trạng Thái Lao Động Theo Phòng Ban</h3>
         <p className="text-[11px] text-slate-500 mb-3">Số lượng nhân sự theo trạng thái làm việc tại từng phòng ban</p>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={deptStatusData.rows} margin={{ bottom: 10 }}>
@@ -332,7 +332,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
 
       {/* Khối thời giờ làm việc & nghỉ ngơi */}
       <div>
-        <h3 className="font-extrabold text-slate-900 text-sm mb-3 flex items-center gap-2">
+        <h3 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-blue-600" /> Thời Giờ Làm Việc & Nghỉ Ngơi
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -341,7 +341,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
               <CalendarDays className="w-4 h-4 text-blue-600" />
               <span className={labelCls}>Tổng Ngày Phép</span>
             </div>
-            <p className="font-extrabold text-slate-900 text-2xl">{formatCompact(timeStats.totalLeave)}</p>
+            <p className="font-bold text-slate-900 text-2xl">{formatCompact(timeStats.totalLeave)}</p>
             <p className="text-[11px] text-slate-500">ngày phép năm</p>
           </div>
           <div className={cardCls}>
@@ -349,7 +349,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
               <Plane className="w-4 h-4 text-amber-600" />
               <span className={labelCls}>Đã Nghỉ</span>
             </div>
-            <p className="font-extrabold text-slate-900 text-2xl">{formatCompact(timeStats.takenLeave)}</p>
+            <p className="font-bold text-slate-900 text-2xl">{formatCompact(timeStats.takenLeave)}</p>
             <p className="text-[11px] text-slate-500">ngày đã sử dụng</p>
           </div>
           <div className={cardCls}>
@@ -357,7 +357,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
               <CalendarDays className="w-4 h-4 text-emerald-600" />
               <span className={labelCls}>Còn Lại</span>
             </div>
-            <p className="font-extrabold text-emerald-600 text-2xl">{formatCompact(timeStats.remainingLeave)}</p>
+            <p className="font-bold text-emerald-600 text-2xl">{formatCompact(timeStats.remainingLeave)}</p>
             <p className="text-[11px] text-slate-500">ngày phép còn lại</p>
           </div>
           <div className={cardCls}>
@@ -365,7 +365,7 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
               <Timer className="w-4 h-4 text-red-600" />
               <span className={labelCls}>Tổng Giờ OT</span>
             </div>
-            <p className="font-extrabold text-slate-900 text-2xl">{formatCompact(timeStats.totalOT)}</p>
+            <p className="font-bold text-slate-900 text-2xl">{formatCompact(timeStats.totalOT)}</p>
             <p className="text-[11px] text-slate-500">giờ làm thêm lũy kế</p>
           </div>
         </div>

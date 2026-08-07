@@ -114,7 +114,7 @@ export default function InvoicesPage() {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" /> Xuất Hóa Đơn Điện Tử VAT
         </button>
@@ -124,19 +124,19 @@ export default function InvoicesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-bold">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Doanh Thu Chưa Thuế</span>
-          <p className="text-xl font-black text-slate-900">{formatCurrency(totalSalesSubtotal)}</p>
+          <p className="text-xl font-semibold text-slate-900">{formatCurrency(totalSalesSubtotal)}</p>
           <p className="text-slate-600 font-semibold text-[11px]">🧾 {invoices.length} Hóa đơn đã xuất</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Thuế GTGT Đầu Ra (VAT Output)</span>
-          <p className="text-xl font-black text-emerald-700">{formatCurrency(totalTaxOutput)}</p>
+          <p className="text-xl font-semibold text-emerald-700">{formatCurrency(totalTaxOutput)}</p>
           <p className="text-emerald-600 font-semibold text-[11px]">🏛️ Thuế GTGT 10% nộp ngân sách</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Tổng Giá Trị Thanh Toán Hóa Đơn</span>
-          <p className="text-xl font-black text-blue-700">{formatCurrency(totalGrandAmount)}</p>
+          <p className="text-xl font-semibold text-blue-700">{formatCurrency(totalGrandAmount)}</p>
           <p className="text-blue-600 font-semibold text-[11px]">✅ Đã phát hành chính thức</p>
         </div>
       </div>
@@ -159,7 +159,7 @@ export default function InvoicesPage() {
         <div className="overflow-x-auto border border-slate-200 rounded-xl">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                 <th className="p-3">Ký Hiệu & Số Hóa Đơn</th>
                 <th className="p-3">Mã Của Cơ Quan Thuế (MCCQT)</th>
                 <th className="p-3">Tên Đơn Vị Mua Hàng & MST</th>
@@ -174,7 +174,7 @@ export default function InvoicesPage() {
               {filteredInvoices.map((inv) => (
                 <tr key={inv.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-3">
-                    <p className="font-mono font-black text-emerald-700 text-xs">
+                    <p className="font-mono font-semibold text-emerald-700 text-xs">
                       {inv.invoice_symbol} - #{inv.invoice_number}
                     </p>
                     <p className="text-[11px] text-slate-500 font-bold mt-0.5">📅 {formatDate(inv.issue_date)}</p>
@@ -185,7 +185,7 @@ export default function InvoicesPage() {
                   </td>
 
                   <td className="p-3 max-w-xs">
-                    <p className="font-extrabold text-slate-900 text-xs leading-snug line-clamp-1">{inv.buyer_name}</p>
+                    <p className="font-bold text-slate-900 text-xs leading-snug line-clamp-1">{inv.buyer_name}</p>
                     <p className="text-[10.5px] text-purple-700 font-mono font-bold">MST: {inv.buyer_tax_code}</p>
                   </td>
 
@@ -197,12 +197,12 @@ export default function InvoicesPage() {
                     +{formatCurrency(inv.tax_amount)}
                   </td>
 
-                  <td className="p-3 text-right font-mono font-black text-slate-900 text-xs">
+                  <td className="p-3 text-right font-mono font-semibold text-slate-900 text-xs">
                     {formatCurrency(inv.total_amount)}
                   </td>
 
                   <td className="p-3 text-center">
-                    <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-extrabold text-[10.5px] border border-emerald-200">
+                    <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10.5px] border border-emerald-200">
                       ✅ Đã Phát Hành
                     </span>
                   </td>
@@ -226,9 +226,9 @@ export default function InvoicesPage() {
       {/* MODAL XUẤT HÓA ĐƠN ĐIỆN TỬ MỚI */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-emerald-600" /> Xuất Hóa Đơn Điện Tử VAT (Thông Tư 78)
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700">
@@ -299,7 +299,7 @@ export default function InvoicesPage() {
               <div className="p-3 bg-emerald-50 rounded-xl space-y-1 font-mono text-[11px]">
                 <p className="text-emerald-900 font-bold">Tiền hàng chưa thuế: {formatCurrency(subtotal)}</p>
                 <p className="text-emerald-700">Tiền thuế GTGT VAT ({taxRate}%): {formatCurrency(subtotal * (taxRate / 100))}</p>
-                <p className="text-emerald-950 font-black text-xs pt-1 border-t border-emerald-200">
+                <p className="text-emerald-950 font-semibold text-xs pt-1 border-t border-emerald-200">
                   TỔNG CỘNG TIỀN THANH TOÁN: {formatCurrency(subtotal * (1 + taxRate / 100))}
                 </p>
               </div>
@@ -314,7 +314,7 @@ export default function InvoicesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5"
                 >
                   <FileSpreadsheet className="w-4 h-4" /> Ký Số & Phát Hành Hóa Đơn VAT
                 </button>
@@ -327,11 +327,11 @@ export default function InvoicesPage() {
       {/* MODAL XEM HÓA ĐƠN CHI TIẾT IN AN */}
       {selectedInv && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="font-mono text-emerald-700 text-xs font-black">{selectedInv.invoice_symbol} - #{selectedInv.invoice_number}</span>
-                <h3 className="font-extrabold text-sm text-slate-900">Hóa Đơn Giá Trị Gia Tăng (VAT Invoice)</h3>
+                <span className="font-mono text-emerald-700 text-xs font-semibold">{selectedInv.invoice_symbol} - #{selectedInv.invoice_number}</span>
+                <h3 className="font-bold text-sm text-slate-900">Hóa Đơn Giá Trị Gia Tăng (VAT Invoice)</h3>
               </div>
               <button onClick={() => setSelectedInv(null)} className="p-1 text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -340,9 +340,9 @@ export default function InvoicesPage() {
 
             <div className="p-4 border rounded-2xl bg-slate-50 space-y-3">
               <div className="text-center border-b pb-2">
-                <h4 className="font-extrabold text-sm text-slate-900">CÔNG TY CỔ PHẦN GGBG CRM ENTERPRISE</h4>
+                <h4 className="font-bold text-sm text-slate-900">CÔNG TY CỔ PHẦN GGBG CRM ENTERPRISE</h4>
                 <p className="text-[11px] text-slate-500 font-normal">Mã số thuế: 0109887766 • Mẫu số: 1/001 - Ký hiệu: {selectedInv.invoice_symbol}</p>
-                <p className="text-[11px] font-mono text-emerald-700 font-extrabold mt-1">{selectedInv.tax_authority_code}</p>
+                <p className="text-[11px] font-mono text-emerald-700 font-bold mt-1">{selectedInv.tax_authority_code}</p>
               </div>
 
               <div className="space-y-1 font-medium text-slate-800">
@@ -355,7 +355,7 @@ export default function InvoicesPage() {
               <div className="p-3 bg-white border rounded-xl space-y-1 font-mono text-right">
                 <p className="text-slate-600">Cộng tiền hàng: {formatCurrency(selectedInv.subtotal)}</p>
                 <p className="text-emerald-700">Thuế GTGT ({selectedInv.tax_rate}%): {formatCurrency(selectedInv.tax_amount)}</p>
-                <p className="text-slate-900 font-black text-sm pt-1 border-t">TỔNG TIỀN: {formatCurrency(selectedInv.total_amount)}</p>
+                <p className="text-slate-900 font-semibold text-sm pt-1 border-t">TỔNG TIỀN: {formatCurrency(selectedInv.total_amount)}</p>
               </div>
 
               <div className="pt-2 text-center text-emerald-800 text-[11px]">
@@ -368,13 +368,13 @@ export default function InvoicesPage() {
                 onClick={() => {
                   window.print();
                 }}
-                className="px-4 py-2 bg-emerald-600 text-white font-extrabold rounded-xl flex items-center gap-1.5"
+                className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl flex items-center gap-1.5"
               >
                 <Printer className="w-4 h-4" /> In Hóa Đơn VAT
               </button>
               <button
                 onClick={() => setSelectedInv(null)}
-                className="px-4 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+                className="px-4 py-2 bg-slate-900 text-white font-bold rounded-xl"
               >
                 Đóng
               </button>

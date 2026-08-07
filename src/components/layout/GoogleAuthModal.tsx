@@ -111,7 +111,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
@@ -119,7 +119,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Bảo Mật 2 Lớp Google Authenticator (2FA)</h3>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Bảo Mật 2 Lớp Google Authenticator (2FA)</h3>
               <p className="text-[11px] text-slate-400 font-medium">Bảo vệ tài khoản với mã OTP 6 chữ số biến đổi 30s</p>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
               <CheckCircle2 className="w-7 h-7" />
             </div>
             <div>
-              <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm">Tài Khoản Đã Được Bảo Vệ 2FA</h4>
+              <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">Tài Khoản Đã Được Bảo Vệ 2FA</h4>
               <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mt-1 font-normal">
                 Mỗi khi đăng nhập, hệ thống sẽ yêu cầu nhập mã 6 số ngẫu nhiên từ ứng dụng <strong>Google Authenticator</strong> trên điện thoại của bạn.
               </p>
@@ -151,7 +151,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
                 type="button"
                 onClick={handleDisable2FA}
                 disabled={submitting}
-                className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl font-extrabold text-xs transition-colors"
+                className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl font-bold text-xs transition-colors"
               >
                 🔴 Tắt Tính Năng 2FA Google Authenticator
               </button>
@@ -175,7 +175,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
             )}
 
             <div className="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl space-y-1 text-[11.5px] text-purple-900 dark:text-purple-300">
-              <p className="font-extrabold">📱 Hướng dẫn 2 Bước kích hoạt Google Authenticator:</p>
+              <p className="font-bold">📱 Hướng dẫn 2 Bước kích hoạt Google Authenticator:</p>
               <ol className="list-decimal list-inside font-normal space-y-0.5">
                 <li>Mở ứng dụng <strong>Google Authenticator</strong> (hoặc Authy) trên smartphone.</li>
                 <li>Chọn <strong>Quét mã QR</strong> hoặc nhập chuỗi Secret Key bí mật bên dưới.</li>
@@ -195,7 +195,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
               <div className="space-y-2 flex-1">
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Chuỗi Secret Key Bí Mật:</span>
-                  <p className="font-mono text-purple-700 dark:text-purple-400 font-extrabold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <p className="font-mono text-purple-700 dark:text-purple-400 font-bold text-xs select-all bg-white dark:bg-slate-900 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
                     {totpSecret}
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
 
             {/* CONFIRMATION CODE INPUT */}
             <div className="space-y-1.5 pt-2">
-              <label className="block text-slate-800 dark:text-slate-200 font-extrabold">
+              <label className="block text-slate-800 dark:text-slate-200 font-bold">
                 Nhập Mã Xác Nhận 6 Chữ Số Từ Ứng Dụng *
               </label>
               <input
@@ -217,7 +217,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
                 value={totpCode}
                 onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="000000"
-                className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl font-mono text-lg tracking-[8px] font-black text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                className="w-full text-center px-4 py-3 bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded-2xl font-mono text-lg tracking-[8px] font-semibold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
               />
             </div>
 
@@ -232,7 +232,7 @@ export default function GoogleAuthModal({ isOpen, onClose, onSuccess }: GoogleAu
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95"
               >
                 {submitting ? 'Đang xác minh...' : '✅ Xác Minh & Bật 2FA'}
               </button>

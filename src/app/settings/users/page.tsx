@@ -300,7 +300,7 @@ export default function UserAccountsPage() {
 
         <button
           onClick={handleOpenCreateModal}
-          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
         >
           <UserPlus className="w-4 h-4" /> Cấp Tài Khoản Từ HRM
         </button>
@@ -342,7 +342,7 @@ export default function UserAccountsPage() {
         <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-extrabold uppercase text-[10.5px]">
+              <tr className="bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase text-[10.5px]">
                 <th className="p-3">Tài Khoản & Nhân Viên HRM</th>
                 <th className="p-3">Email & Đăng Nhập Cuối</th>
                 <th className="p-3">Vai Trò Phân Quyền (RBAC)</th>
@@ -369,14 +369,14 @@ export default function UserAccountsPage() {
                   <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-850 transition-colors">
                     <td className="p-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-purple-600 text-white font-semibold text-xs flex items-center justify-center shrink-0">
                           {u.username.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-extrabold text-slate-900 dark:text-slate-100 text-xs flex items-center gap-1.5">
+                          <p className="font-bold text-slate-900 dark:text-slate-100 text-xs flex items-center gap-1.5">
                             {u.username}
                             {u.is_super_admin && (
-                              <span className="px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 font-black text-[9.5px]">
+                              <span className="px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 font-semibold text-[9.5px]">
                                 ADMIN
                               </span>
                             )}
@@ -401,7 +401,7 @@ export default function UserAccountsPage() {
 
                     <td className="p-3 text-center">
                       {u.is_2fa_enabled ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10.5px] font-black border border-emerald-300">
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10.5px] font-semibold border border-emerald-300">
                           🛡️ Đã Bật 2FA
                         </span>
                       ) : (
@@ -412,7 +412,7 @@ export default function UserAccountsPage() {
                     </td>
 
                     <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
                         u.account_status === 'Active' || (u.account_status as string) === 'ACTIVE'
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-300'
                           : 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border border-red-300'
@@ -489,9 +489,9 @@ export default function UserAccountsPage() {
       {/* MODAL 1: CREATE USER FROM HRM */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <UserPlus className="w-4 h-4 text-purple-600" /> Cấp Tài Khoản Mới Từ Nhân Sự HRM
               </h3>
               <button onClick={() => setIsCreateModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
@@ -559,7 +559,7 @@ export default function UserAccountsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg"
                 >
                   Cấp Tài Khoản
                 </button>
@@ -572,9 +572,9 @@ export default function UserAccountsPage() {
       {/* MODAL 2: EDIT USER ACCOUNT */}
       {isEditModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Edit className="w-4 h-4 text-blue-600" /> Chỉnh Sửa Tài Khoản: {selectedUser.username}
               </h3>
               <button onClick={() => setIsEditModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
@@ -640,7 +640,7 @@ export default function UserAccountsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-lg"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg"
                 >
                   <Save className="w-4 h-4 inline mr-1" /> Lưu Thay Đổi
                 </button>
@@ -653,9 +653,9 @@ export default function UserAccountsPage() {
       {/* MODAL 3: ADMIN RESET PASSWORD */}
       {isResetPassModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <KeyRound className="w-4 h-4 text-amber-500" /> Admin Reset Mật Khẩu User
               </h3>
               <button onClick={() => setIsResetPassModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
@@ -690,7 +690,7 @@ export default function UserAccountsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-lg"
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-lg"
                 >
                   🔑 Reset Mật Khẩu
                 </button>
@@ -703,9 +703,9 @@ export default function UserAccountsPage() {
       {/* MODAL 4: VIEW USER 360° */}
       {isViewModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Eye className="w-4 h-4 text-purple-600" /> Chi Tiết Hồ Sơ User 360°
               </h3>
               <button onClick={() => setIsViewModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
@@ -716,8 +716,8 @@ export default function UserAccountsPage() {
             <div className="space-y-3">
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">{selectedUser.employee_name}</span>
-                  <span className="px-2.5 py-0.5 bg-purple-100 text-purple-900 font-mono text-[10.5px] rounded-full font-black">
+                  <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">{selectedUser.employee_name}</span>
+                  <span className="px-2.5 py-0.5 bg-purple-100 text-purple-900 font-mono text-[10.5px] rounded-full font-semibold">
                     {selectedUser.employee_code}
                   </span>
                 </div>
@@ -733,7 +733,7 @@ export default function UserAccountsPage() {
               </div>
 
               <div className="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl space-y-1">
-                <p className="text-purple-900 dark:text-purple-300 font-extrabold uppercase text-[10.5px]">Quyền Hạn RBAC Được Cấp:</p>
+                <p className="text-purple-900 dark:text-purple-300 font-bold uppercase text-[10.5px]">Quyền Hạn RBAC Được Cấp:</p>
                 <p className="text-purple-800 dark:text-purple-400 font-mono text-[11px]">
                   {selectedUser.permissions ? selectedUser.permissions.join(', ') : 'Mặc định theo Vai Trò'}
                 </p>

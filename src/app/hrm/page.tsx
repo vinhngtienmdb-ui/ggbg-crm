@@ -640,7 +640,7 @@ export default function HRMPage() {
   const renderRankBadge = (rank?: number) => {
     switch (rank) {
       case 1:
-        return <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded text-[10px] font-black uppercase">Cấp 1: Ban Giám Đốc</span>;
+        return <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded text-[10px] font-semibold uppercase">Cấp 1: Ban Giám Đốc</span>;
       case 2:
         return <span className="px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-200 rounded text-[10px] font-bold uppercase">Cấp 2: Quản Lý & Lead</span>;
       case 3:
@@ -824,7 +824,7 @@ export default function HRMPage() {
                     <div>
                       <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
                         <span className="font-bold text-slate-800 text-[11px]" style={{ color: col.color }}>{col.name}</span>
-                        <span className="px-2 py-0.5 bg-slate-200 rounded-full font-black text-[10px] text-slate-700">{stageCands.length}</span>
+                        <span className="px-2 py-0.5 bg-slate-200 rounded-full font-semibold text-[10px] text-slate-700">{stageCands.length}</span>
                       </div>
 
                       <div className="space-y-3">
@@ -832,7 +832,7 @@ export default function HRMPage() {
                           <div key={cand.id} className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:shadow-md transition-all">
                             <div className="flex items-start justify-between">
                               <div>
-                                <p className="font-extrabold text-slate-900 text-xs">{cand.name}</p>
+                                <p className="font-bold text-slate-900 text-xs">{cand.name}</p>
                                 <p className="text-[10px] font-mono text-blue-600">{cand.candidate_code || 'UV-2026'}</p>
                               </div>
                               <button
@@ -909,7 +909,7 @@ export default function HRMPage() {
                         <p className="text-slate-400 text-[10px] font-sans">{cand.email}</p>
                       </td>
 
-                      <td className="p-4 font-mono font-extrabold text-emerald-700">
+                      <td className="p-4 font-mono font-bold text-emerald-700">
                         {(cand.salary_expectation || 15000000).toLocaleString('vi-VN')} ₫
                       </td>
 
@@ -966,12 +966,12 @@ export default function HRMPage() {
 
             <div className="p-4 bg-white rounded-2xl border border-slate-200">
               <p className="text-xs text-slate-500 font-semibold">Tổng Hợp Đồng Đã Lưu</p>
-              <p className="text-xl font-extrabold text-slate-900">{filteredEmployees.length} File PDF</p>
+              <p className="text-xl font-bold text-slate-900">{filteredEmployees.length} File PDF</p>
             </div>
 
             <div className="p-4 bg-white rounded-2xl border border-slate-200">
               <p className="text-xs text-slate-500 font-semibold">Tổng Quỹ Lương Cơ Bản</p>
-              <p className="text-xl font-extrabold text-emerald-700">185.000.000 ₫/tháng</p>
+              <p className="text-xl font-bold text-emerald-700">185.000.000 ₫/tháng</p>
             </div>
           </div>
 
@@ -993,7 +993,7 @@ export default function HRMPage() {
                     <td className="p-4 font-mono font-bold text-blue-700">{emp.contract_number}</td>
                     <td className="p-4 font-bold text-slate-900">{emp.full_name}</td>
                     <td className="p-4 font-semibold text-slate-700">{emp.contract_type || 'Chính thức'}</td>
-                    <td className="p-4 font-mono font-extrabold text-emerald-700">15.000.000 ₫</td>
+                    <td className="p-4 font-mono font-bold text-emerald-700">15.000.000 ₫</td>
                     <td className="p-4"><span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-bold text-[10px]">🔒 Đã Lưu</span></td>
                     <td className="p-4 text-center">
                       <button onClick={() => handleOpenContractModal(emp)} className="px-3 py-1 bg-blue-600 text-white font-bold rounded-xl text-xs">
@@ -1087,8 +1087,8 @@ export default function HRMPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-base text-slate-900">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
-                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
+                  <h3 className="font-bold text-base text-slate-900">Quản Lý Chức Danh, Chức Vụ & Cấp Bậc (G1-G6)</h3>
+                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-semibold uppercase flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span> Auto Synced
                   </span>
                 </div>
@@ -1102,7 +1102,7 @@ export default function HRMPage() {
             {jobSubTab === 'TITLES' && (
               <button
                 onClick={() => setIsJobTitleModalOpen(true)}
-                className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Chức Danh Mới
@@ -1112,7 +1112,7 @@ export default function HRMPage() {
             {jobSubTab === 'POSITIONS' && (
               <button
                 onClick={() => setIsPositionModalOpen(true)}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Chức Vụ Mới
@@ -1122,7 +1122,7 @@ export default function HRMPage() {
             {jobSubTab === 'GRADES' && (
               <button
                 onClick={() => setIsGradeModalOpen(true)}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 shrink-0"
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Cấp Bậc G-Series
@@ -1131,7 +1131,7 @@ export default function HRMPage() {
           </div>
 
           {/* Sub-Tab Navigation Bar */}
-          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 w-fit text-xs font-extrabold">
+          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 w-fit text-xs font-bold">
             <button
               onClick={() => setJobSubTab('TITLES')}
               className={`px-4 py-2 rounded-xl transition-all ${
@@ -1162,10 +1162,10 @@ export default function HRMPage() {
 
           {/* SUB-TAB 1: CHỨC DANH CHUYÊN MÔN (JOB TITLES) */}
           {jobSubTab === 'TITLES' && (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+            <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                     <Briefcase className="w-4 h-4 text-purple-600" /> Danh Mục Chức Danh Chuyên Môn
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1246,10 +1246,10 @@ export default function HRMPage() {
 
           {/* SUB-TAB 2: CHỨC VỤ QUẢN LÝ (POSITIONS) */}
           {jobSubTab === 'POSITIONS' && (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+            <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-blue-600" /> Danh Mục Chức Vụ Hành Chính / Quản Lý
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1272,7 +1272,7 @@ export default function HRMPage() {
                         Xóa
                       </button>
                     </div>
-                    <h5 className="font-extrabold text-sm text-slate-900">{pos.name}</h5>
+                    <h5 className="font-bold text-sm text-slate-900">{pos.name}</h5>
                     <p className="text-xs text-slate-500 leading-relaxed">{pos.description}</p>
                   </div>
                 ))}
@@ -1282,10 +1282,10 @@ export default function HRMPage() {
 
           {/* SUB-TAB 3: KHUNG CẤP BẬC G-SERIES (GRADE LEVELS) */}
           {jobSubTab === 'GRADES' && (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+            <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                     <Award className="w-4 h-4 text-emerald-600" /> Thang Cấp Bậc & Khung Băng Ngạch Năng Lực (G-Series)
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1298,7 +1298,7 @@ export default function HRMPage() {
                 {gradeLevelsList.map((gr) => (
                   <div key={gr.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 bg-emerald-600 text-white font-mono text-xs font-black rounded">
+                      <span className="px-2.5 py-0.5 bg-emerald-600 text-white font-mono text-xs font-semibold rounded">
                         {gr.code}
                       </span>
                       <button
@@ -1308,7 +1308,7 @@ export default function HRMPage() {
                         Xóa
                       </button>
                     </div>
-                    <h5 className="font-extrabold text-xs text-slate-900">{gr.name}</h5>
+                    <h5 className="font-bold text-xs text-slate-900">{gr.name}</h5>
                     <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800">
                       <span>Dải Lương: </span>
                       <span className="text-emerald-700">{gr.min_salary.toLocaleString('vi-VN')} ₫</span>
@@ -1334,7 +1334,7 @@ export default function HRMPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
           <div className="flex items-center justify-between border-b pb-4">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Sliders className="w-5 h-5 text-purple-600" /> Cấu Hình Tham Số Phân Hệ Quản Lý Nhân Sự (HRM Configuration)
               </h3>
               <p className="text-[11px] text-slate-500 font-normal mt-0.5">
@@ -1347,7 +1347,7 @@ export default function HRMPage() {
                 setStatusToast('✅ Đã lưu thành công Cấu hình Phân Hệ Quản Lý Nhân Sự!');
                 setTimeout(() => setStatusToast(''), 4000);
               }}
-              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all"
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all"
             >
               <Save className="w-4 h-4" /> Lưu Cấu Hình Nhân Sự
             </button>
@@ -1356,7 +1356,7 @@ export default function HRMPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Box 1: Mã NV & Quy Tắc Thử Việc */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
+              <h4 className="font-bold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
                 1. Quy Tắc Định Dạng Mã & Thử Việc
               </h4>
 
@@ -1407,7 +1407,7 @@ export default function HRMPage() {
 
             {/* Box 2: Tỷ Lệ BHXH */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
+              <h4 className="font-bold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
                 2. Tỷ Lệ Trích Nộp Bảo Hiểm Xã Hội (BHXH/BHYT/BHTN)
               </h4>
 
@@ -1484,7 +1484,7 @@ export default function HRMPage() {
 
             {/* Box 3: Khung Giờ Làm Việc & Shift Rules */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 md:col-span-2">
-              <h4 className="font-extrabold text-slate-900 text-xs text-amber-700 uppercase tracking-wider">
+              <h4 className="font-bold text-slate-900 text-xs text-amber-700 uppercase tracking-wider">
                 3. Khung Giờ Làm Việc Tiêu Chuẩn & Hệ Số Tăng Ca (Shift & OT Rules)
               </h4>
 
@@ -1546,7 +1546,7 @@ export default function HRMPage() {
       {/* MODAL 1: THÊM ỨNG VIÊN MỚI TRONG PHỄU TUYỂN DỤNG */}
       {isNewCandModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-blue-600" />
@@ -1627,7 +1627,7 @@ export default function HRMPage() {
       {/* MODAL 2: XEM AUDIT LOGS CHI TIẾT THEO ỨNG VIÊN */}
       {isCandidateModalOpen && selectedCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
             <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-base flex items-center gap-2">
@@ -1712,7 +1712,7 @@ export default function HRMPage() {
       {/* MODAL: CHUYỂN TRẠNG THÁI NHÂN SỰ */}
       {isStatusModalOpen && statusTargetEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700 font-bold">
@@ -1787,7 +1787,7 @@ export default function HRMPage() {
       {/* MODAL 1: THÊM CHỨC DANH MỚI (JOB TITLE) */}
       {isJobTitleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-purple-50 text-slate-900 border-b border-purple-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-purple-100 border border-purple-200 rounded-xl text-purple-700">
@@ -1898,7 +1898,7 @@ export default function HRMPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-purple-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Danh
@@ -1912,7 +1912,7 @@ export default function HRMPage() {
       {/* MODAL 2: THÊM CHỨC VỤ MỚI (POSITION) */}
       {isPositionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-blue-50 text-slate-900 border-b border-blue-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-blue-100 border border-blue-200 rounded-xl text-blue-700">
@@ -1973,7 +1973,7 @@ export default function HRMPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Chức Vụ
@@ -1987,7 +1987,7 @@ export default function HRMPage() {
       {/* MODAL 3: THÊM CẤP BẬC G-SERIES MỚI (GRADE LEVEL) */}
       {isGradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-emerald-50 text-slate-900 border-b border-emerald-100 p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-emerald-100 border border-emerald-200 rounded-xl text-emerald-700">
@@ -2075,7 +2075,7 @@ export default function HRMPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Tạo Cấp Bậc G-Series

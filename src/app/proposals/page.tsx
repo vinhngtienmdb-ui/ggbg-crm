@@ -519,7 +519,7 @@ export default function ProposalsPage() {
               setActiveTab('CREATE_NEW');
               setCreateFormStep('SELECT_TEMPLATE');
             }}
-            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
           >
             <Plus className="w-4 h-4" /> Nộp Phiếu Phê Duyệt Mới
           </button>
@@ -597,7 +597,7 @@ export default function ProposalsPage() {
             <div className="overflow-x-auto border border-slate-200 rounded-xl">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                     <th className="p-3">Mã & Loại Phiếu Phê Duyệt</th>
                     <th className="p-3">Người Nộp & Phòng Ban</th>
                     <th className="p-3">Ngày Trình Ký</th>
@@ -610,7 +610,7 @@ export default function ProposalsPage() {
                   {filteredSubmissions.map((sub) => (
                     <tr key={sub.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-3">
-                        <p className="font-extrabold text-slate-900 text-sm leading-snug">{sub.template_title}</p>
+                        <p className="font-bold text-slate-900 text-sm leading-snug">{sub.template_title}</p>
                         <p className="font-mono text-purple-700 text-[11px] font-bold">Mã số: {sub.proposal_code}</p>
                       </td>
 
@@ -626,7 +626,7 @@ export default function ProposalsPage() {
                           {sub.approval_steps.map((st) => (
                             <span
                               key={st.step_order}
-                              className={`px-2 py-0.5 rounded font-black border ${
+                              className={`px-2 py-0.5 rounded font-semibold border ${
                                 st.status === 'APPROVED'
                                   ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                                   : st.status === 'REJECTED'
@@ -642,7 +642,7 @@ export default function ProposalsPage() {
                       </td>
 
                       <td className="p-3 text-center">
-                        <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10.5px] ${
+                        <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
                           sub.status === 'PENDING' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
                           sub.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-red-100 text-red-800'
                         }`}>
@@ -656,7 +656,7 @@ export default function ProposalsPage() {
                             setSelectedSub(sub);
                             setIsViewSubOpen(true);
                           }}
-                          className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-extrabold flex items-center gap-1 mx-auto transition-all"
+                          className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-bold flex items-center gap-1 mx-auto transition-all"
                         >
                           <Eye className="w-3.5 h-3.5" /> Xem Form & Duyệt
                         </button>
@@ -677,10 +677,10 @@ export default function ProposalsPage() {
               <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold animate-in fade-in duration-200">
                 <div className="border-b pb-3 flex items-center justify-between">
                   <div>
-                    <h3 className="font-extrabold text-sm text-slate-900">Bước 1: Chọn Loại Phiếu Phê Duyệt</h3>
+                    <h3 className="font-bold text-sm text-slate-900">Bước 1: Chọn Loại Phiếu Phê Duyệt</h3>
                     <p className="text-[11px] text-slate-500 font-normal mt-0.5">Vui lòng bấm vào một mẫu phiếu dưới đây để chuyển sang màn hình điền thông tin chi tiết.</p>
                   </div>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-900 rounded-full text-[11px] font-extrabold">
+                  <span className="px-3 py-1 bg-purple-100 text-purple-900 rounded-full text-[11px] font-bold">
                     Bước 1 / 2
                   </span>
                 </div>
@@ -692,7 +692,7 @@ export default function ProposalsPage() {
                       key={grp.category}
                       type="button"
                       onClick={() => setSelectedCategoryGroupTab(grp.category)}
-                      className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs flex items-center gap-2 transition-all shrink-0 border ${
+                      className={`px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 border ${
                         selectedCategoryGroupTab === grp.category
                           ? 'bg-purple-600 text-white border-purple-600 shadow-md scale-102'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-purple-50'
@@ -709,7 +709,7 @@ export default function ProposalsPage() {
 
                 {/* CARD GRID OF TEMPLATES IN SELECTED CATEGORY GROUP */}
                 <div className="space-y-3">
-                  <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <h4 className="font-bold text-slate-900 text-xs text-purple-700 uppercase tracking-wider flex items-center gap-1.5">
                     <FolderTree className="w-4 h-4" /> Danh Sách Các Loại Phiếu Thuộc Nhóm: {selectedCategoryGroupTab}
                   </h4>
 
@@ -728,7 +728,7 @@ export default function ProposalsPage() {
                         >
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 font-mono text-[10.5px] font-black border border-purple-200">
+                              <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 font-mono text-[10.5px] font-semibold border border-purple-200">
                                 {tmpl.template_code}
                               </span>
                               <span className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold text-xs flex items-center gap-0.5">
@@ -736,7 +736,7 @@ export default function ProposalsPage() {
                               </span>
                             </div>
 
-                            <h5 className="font-extrabold text-slate-900 text-sm leading-snug group-hover:text-purple-700 transition-colors">{tmpl.title}</h5>
+                            <h5 className="font-bold text-slate-900 text-sm leading-snug group-hover:text-purple-700 transition-colors">{tmpl.title}</h5>
                             <p className="text-[11px] text-slate-500 font-normal line-clamp-3 leading-relaxed">{tmpl.description}</p>
                           </div>
 
@@ -759,36 +759,36 @@ export default function ProposalsPage() {
                   <button
                     type="button"
                     onClick={() => setCreateFormStep('SELECT_TEMPLATE')}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all active:scale-95"
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95"
                   >
                     <ArrowLeft className="w-4 h-4 text-purple-600" /> Quay Lại Chọn Loại Phiếu Khác
                   </button>
 
-                  <span className="px-3 py-1 bg-purple-100 text-purple-900 rounded-full text-xs font-extrabold">
+                  <span className="px-3 py-1 bg-purple-100 text-purple-900 rounded-full text-xs font-bold">
                     Bước 2 / 2: Điền Thông Tin Phiếu Phê Duyệt
                   </span>
                 </div>
 
                 {/* FORM CONTAINER */}
-                <form onSubmit={handleCreateSubmissionSubmit} className="space-y-6 max-w-3xl mx-auto bg-white p-8 rounded-3xl border border-purple-300 shadow-2xl">
+                <form onSubmit={handleCreateSubmissionSubmit} className="space-y-6 max-w-3xl mx-auto bg-white p-8 rounded-xl border border-purple-300 shadow-2xl">
                   <div className="border-b border-purple-100 pb-4 flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="px-3 py-0.5 rounded-full bg-purple-100 text-purple-900 font-mono text-xs font-black">
+                        <span className="px-3 py-0.5 rounded-full bg-purple-100 text-purple-900 font-mono text-xs font-semibold">
                           {currentTemplate.template_code}
                         </span>
                         <span className="px-3 py-0.5 bg-amber-50 text-amber-900 border border-amber-200 rounded-full font-bold text-xs">
                           {currentTemplate.category_name}
                         </span>
                       </div>
-                      <h2 className="font-black text-lg text-slate-900 mt-2">{currentTemplate.title}</h2>
+                      <h2 className="font-semibold text-lg text-slate-900 mt-2">{currentTemplate.title}</h2>
                       <p className="text-xs text-slate-500 font-medium mt-1">{currentTemplate.description}</p>
                     </div>
                   </div>
 
                   {/* APPROVAL STEPS FLOW PREVIEW */}
                   <div className="p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl text-purple-900 font-bold text-xs space-y-1.5">
-                    <p className="text-purple-950 font-extrabold">🔄 Luồng Ký Phê Duyệt Đa Cấp ({currentTemplate.approval_steps.length} cấp):</p>
+                    <p className="text-purple-950 font-bold">🔄 Luồng Ký Phê Duyệt Đa Cấp ({currentTemplate.approval_steps.length} cấp):</p>
                     <div className="flex flex-wrap items-center gap-2 font-mono text-purple-800 text-[11px]">
                       {currentTemplate.approval_steps.map((st, idx) => (
                         <React.Fragment key={st.step_order}>
@@ -803,7 +803,7 @@ export default function ProposalsPage() {
 
                   {/* RENDER FORM FIELDS WITH EMPLOYEE_SELECT INTEGRATION */}
                   <div className="space-y-5 pt-2">
-                    <h3 className="font-extrabold text-sm text-slate-900 border-b pb-2">📋 Điền Thông Tin Dữ Liệu Trường</h3>
+                    <h3 className="font-bold text-sm text-slate-900 border-b pb-2">📋 Điền Thông Tin Dữ Liệu Trường</h3>
 
                     {currentTemplate.fields.map((f) => (
                       <div key={f.id} className="space-y-1.5 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
@@ -914,7 +914,7 @@ export default function ProposalsPage() {
 
                     <button
                       type="submit"
-                      className="px-7 py-3 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-xl shadow-purple-600/30 flex items-center gap-2 text-xs transition-all active:scale-95"
+                      className="px-7 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-xl shadow-purple-600/30 flex items-center gap-2 text-xs transition-all active:scale-95"
                     >
                       <FileCheck className="w-4 h-4" /> Nộp Phiếu Phê Duyệt Này
                     </button>
@@ -930,7 +930,7 @@ export default function ProposalsPage() {
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-3">
               <div>
-                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                   <Settings className="w-5 h-5 text-amber-600" /> Trình Cấu Hình Loại Phiếu Phê Duyệt (Template Manager)
                 </h3>
                 <p className="text-[11px] text-slate-500 font-normal mt-0.5">
@@ -940,7 +940,7 @@ export default function ProposalsPage() {
 
               <button
                 onClick={handleOpenCreateTemplateModal}
-                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold shadow-md flex items-center gap-1.5 shrink-0"
+                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 shrink-0"
               >
                 <Plus className="w-4 h-4 text-amber-400" /> ➕ Tạo Mẫu Phiếu Mới
               </button>
@@ -990,7 +990,7 @@ export default function ProposalsPage() {
             <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white shadow-sm">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                     <th className="p-3">Mã & Tên Mẫu Phiếu</th>
                     <th className="p-3">Nhóm Danh Mục</th>
                     <th className="p-3 text-center">Số Trường Form</th>
@@ -1003,7 +1003,7 @@ export default function ProposalsPage() {
                   {filteredTemplates.map((t) => (
                     <tr key={t.id} className={`hover:bg-slate-50 transition-colors ${!t.is_active ? 'opacity-60 bg-slate-50/50' : ''}`}>
                       <td className="p-3">
-                        <p className="font-extrabold text-slate-900 text-xs leading-snug">{t.title}</p>
+                        <p className="font-bold text-slate-900 text-xs leading-snug">{t.title}</p>
                         <p className="font-mono text-purple-700 text-[11px] font-bold">Mã phiếu: {t.template_code}</p>
                         <p className="text-[11px] text-slate-500 truncate max-w-xs">{t.description}</p>
                       </td>
@@ -1025,7 +1025,7 @@ export default function ProposalsPage() {
                       <td className="p-3 text-center">
                         <button
                           onClick={() => handleToggleTemplateActive(t.id)}
-                          className={`px-3 py-1 rounded-full font-extrabold text-[10.5px] border transition-all flex items-center gap-1.5 mx-auto ${
+                          className={`px-3 py-1 rounded-full font-bold text-[10.5px] border transition-all flex items-center gap-1.5 mx-auto ${
                             t.is_active ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-slate-100 text-slate-500 border-slate-300'
                           }`}
                         >
@@ -1088,11 +1088,11 @@ export default function ProposalsPage() {
       {/* MODAL 1: XEM CHI TIẾT CẤU HÌNH LOẠI PHIẾU (SCHEMA PREVIEW) */}
       {isPreviewTmplOpen && previewTemplate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-mono text-[10.5px] font-black">{previewTemplate.template_code}</span>
-                <h3 className="font-extrabold text-sm text-slate-900 mt-1">{previewTemplate.title}</h3>
+                <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-mono text-[10.5px] font-semibold">{previewTemplate.template_code}</span>
+                <h3 className="font-bold text-sm text-slate-900 mt-1">{previewTemplate.title}</h3>
               </div>
               <button onClick={() => setIsPreviewTmplOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -1100,13 +1100,13 @@ export default function ProposalsPage() {
             </div>
 
             <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1">
-              <p className="text-purple-900 font-extrabold">{previewTemplate.category_name}</p>
+              <p className="text-purple-900 font-bold">{previewTemplate.category_name}</p>
               <p className="text-purple-800 font-normal text-[11.5px]">{previewTemplate.description}</p>
             </div>
 
             {/* FIELDS SCHEMA LIST */}
             <div className="space-y-2 pt-2">
-              <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-purple-700">
+              <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-purple-700">
                 📄 Danh Sách {previewTemplate.fields.length} Trường Dữ Liệu Form:
               </h4>
 
@@ -1114,7 +1114,7 @@ export default function ProposalsPage() {
                 {previewTemplate.fields.map((f, idx) => (
                   <div key={f.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div>
-                      <span className="font-extrabold text-slate-900">{idx + 1}. {f.field_label}</span>
+                      <span className="font-bold text-slate-900">{idx + 1}. {f.field_label}</span>
                       {f.is_required && <span className="text-red-500 ml-1">* (Bắt buộc)</span>}
                       {f.options && (
                         <p className="text-[10.5px] text-slate-500 mt-0.5">Options: {f.options.join(', ')}</p>
@@ -1130,7 +1130,7 @@ export default function ProposalsPage() {
 
             {/* APPROVAL STEPS */}
             <div className="space-y-2 pt-2">
-              <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-amber-700">
+              <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-amber-700">
                 🔄 Cấu Hình Luồng Duyệt ({previewTemplate.approval_steps.length} Cấp):
               </h4>
               <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl font-mono text-purple-900">
@@ -1141,7 +1141,7 @@ export default function ProposalsPage() {
             <div className="flex items-center justify-end pt-3 border-t">
               <button
                 onClick={() => setIsPreviewTmplOpen(false)}
-                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl"
               >
                 Đóng
               </button>
@@ -1153,10 +1153,10 @@ export default function ProposalsPage() {
       {/* MODAL 2: EDIT / CREATE TEMPLATE MODAL (SỬA VÀ THÊM MỚI LOẠI PHIẾU) */}
       {isEditTmplOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                   <Edit className="w-4 h-4 text-purple-600" />
                   {isCreatingNewTmpl ? 'Tạo Mới Loại Phiếu Phê Duyệt' : `Chỉnh Sửa Mẫu Phiếu: ${editTmplTitle}`}
                 </h3>
@@ -1186,7 +1186,7 @@ export default function ProposalsPage() {
                     required
                     value={editTmplTitle}
                     onChange={(e) => setEditTmplTitle(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl font-extrabold"
+                    className="w-full px-3 py-2 border rounded-xl font-bold"
                   />
                 </div>
               </div>
@@ -1219,13 +1219,13 @@ export default function ProposalsPage() {
               {/* DYNAMIC FIELDS EDITOR */}
               <div className="pt-3 border-t space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-purple-700 text-xs uppercase tracking-wider">
+                  <h4 className="font-bold text-purple-700 text-xs uppercase tracking-wider">
                     📄 Cấu Hình Danh Sách Trường Thông Tin ({editTmplFields.length} Trường)
                   </h4>
                   <button
                     type="button"
                     onClick={handleAddFieldInEditModal}
-                    className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-extrabold flex items-center gap-1 transition-all"
+                    className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-bold flex items-center gap-1 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" /> Thêm Trường Mới
                   </button>
@@ -1301,13 +1301,13 @@ export default function ProposalsPage() {
               {/* APPROVAL STEPS EDITOR */}
               <div className="pt-3 border-t space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-amber-700 text-xs uppercase tracking-wider">
+                  <h4 className="font-bold text-amber-700 text-xs uppercase tracking-wider">
                     🔄 Cấu Hình Luồng Duyệt Đa Cấp ({editTmplSteps.length} Cấp)
                   </h4>
                   <button
                     type="button"
                     onClick={handleAddStepInEditModal}
-                    className="px-3 py-1.5 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-xl font-extrabold flex items-center gap-1 transition-all"
+                    className="px-3 py-1.5 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-xl font-bold flex items-center gap-1 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" /> Thêm Cấp Duyệt
                   </button>
@@ -1350,7 +1350,7 @@ export default function ProposalsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl shadow-lg flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg flex items-center gap-1.5"
                 >
                   <Save className="w-4 h-4 text-amber-400" /> Lưu Cấu Hình Mẫu Phiếu
                 </button>
@@ -1363,11 +1363,11 @@ export default function ProposalsPage() {
       {/* MODAL 3: XEM CHI TIẾT PHIẾU ĐÃ NỘP & THAO TÁC PHÊ DUYỆT */}
       {isViewSubOpen && selectedSub && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-bold max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <span className="font-mono text-xs font-black text-purple-700">{selectedSub.proposal_code}</span>
-                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Phiếu Phê Duyệt & Ký Duyệt</h3>
+                <span className="font-mono text-xs font-semibold text-purple-700">{selectedSub.proposal_code}</span>
+                <h3 className="font-bold text-sm text-slate-900">Chi Tiết Phiếu Phê Duyệt & Ký Duyệt</h3>
               </div>
               <button onClick={() => setIsViewSubOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -1375,7 +1375,7 @@ export default function ProposalsPage() {
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-              <h4 className="font-extrabold text-slate-900 text-sm">{selectedSub.template_title}</h4>
+              <h4 className="font-bold text-slate-900 text-sm">{selectedSub.template_title}</h4>
               <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
                 <p>Người làm đơn: <strong className="text-slate-900">{selectedSub.applicant_name}</strong></p>
                 <p>Đơn vị / Phòng ban: <strong className="text-slate-900">{selectedSub.applicant_department}</strong></p>
@@ -1386,7 +1386,7 @@ export default function ProposalsPage() {
 
             {/* DISPLAY ALL FILLED FORM DATA FIELDS */}
             <div className="p-4 bg-purple-50/60 border border-purple-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-purple-900 text-xs uppercase tracking-wider">
+              <h4 className="font-bold text-purple-900 text-xs uppercase tracking-wider">
                 📄 Dữ Liệu Chi Tiết Đã Điền Trong Form Phiếu Phê Duyệt:
               </h4>
 
@@ -1394,7 +1394,7 @@ export default function ProposalsPage() {
                 {Object.entries(selectedSub.field_values).map(([key, val]) => (
                   <div key={key} className="flex flex-col sm:flex-row justify-between border-b border-slate-100 pb-1.5">
                     <span className="text-slate-500 font-bold">{key}:</span>
-                    <span className="text-slate-900 font-extrabold font-mono">
+                    <span className="text-slate-900 font-bold font-mono">
                       {typeof val === 'number' ? formatCurrency(val) : String(val)}
                     </span>
                   </div>
@@ -1404,7 +1404,7 @@ export default function ProposalsPage() {
 
             {/* APPROVAL STEPS PROGRESSION */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-              <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider">
+              <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
                 🔄 Tiến Độ Luồng Duyệt ({selectedSub.approval_steps.length} Cấp):
               </h4>
 
@@ -1417,7 +1417,7 @@ export default function ProposalsPage() {
                       {st.comment && <p className="text-[11px] text-emerald-700 italic">💬 "{st.comment}"</p>}
                     </div>
 
-                    <span className={`px-2.5 py-0.5 rounded font-black text-[10.5px] ${
+                    <span className={`px-2.5 py-0.5 rounded font-semibold text-[10.5px] ${
                       st.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
                       st.status === 'REJECTED' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
                     }`}>
@@ -1431,7 +1431,7 @@ export default function ProposalsPage() {
             {/* ACTION SECTION FOR APPROVER */}
             {selectedSub.status === 'PENDING' && (
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
-                <h4 className="font-extrabold text-amber-900 text-xs">✍️ Ký Phê Duyệt Hoặc Từ Chối Phiếu:</h4>
+                <h4 className="font-bold text-amber-900 text-xs">✍️ Ký Phê Duyệt Hoặc Từ Chối Phiếu:</h4>
 
                 <div className="space-y-2">
                   <input
@@ -1445,14 +1445,14 @@ export default function ProposalsPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={handleApproveCurrentStep}
-                      className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-md flex items-center justify-center gap-1"
+                      className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-1"
                     >
                       <CheckCircle2 className="w-4 h-4" /> ✅ Phê Duyệt Cấp {selectedSub.current_step_order}
                     </button>
 
                     <button
                       onClick={handleRejectProposal}
-                      className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-xl shadow-md flex items-center justify-center gap-1"
+                      className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-1"
                     >
                       <X className="w-4 h-4" /> ❌ Từ Chối
                     </button>
@@ -1472,7 +1472,7 @@ export default function ProposalsPage() {
             <div className="flex items-center justify-end pt-2">
               <button
                 onClick={() => setIsViewSubOpen(false)}
-                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl"
               >
                 Đóng
               </button>

@@ -140,7 +140,7 @@ export default function KpiModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
         <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -148,7 +148,7 @@ export default function KpiModal({
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white">
+              <h2 className="text-base font-bold text-white">
                 {mode === 'create' ? 'Tạo & Phân Bổ Chỉ Tiêu KPI Mới' : 'Cập Nhật Tiến Độ & Chỉnh Sửa KPI'}
               </h2>
               <p className="text-xs text-slate-300">
@@ -335,7 +335,7 @@ export default function KpiModal({
 
           {/* Target & Actual Numbers Section */}
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
-            <h4 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+            <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
               <Calculator className="w-4 h-4 text-blue-600" /> Giá Trị Chỉ Tiêu & Thực Tế
             </h4>
 
@@ -377,7 +377,7 @@ export default function KpiModal({
               <span className="text-xs font-bold text-slate-600">Tiến Độ Hoàn Thành Tính Toán:</span>
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-3 py-1 rounded-xl text-xs font-mono font-extrabold shadow-sm ${
+                  className={`px-3 py-1 rounded-xl text-xs font-mono font-bold shadow-sm ${
                     computedProgress >= 100
                       ? 'bg-emerald-600 text-white'
                       : computedProgress >= 80
@@ -389,7 +389,7 @@ export default function KpiModal({
                 >
                   {computedProgress}%
                 </span>
-                <span className="text-xs font-extrabold text-slate-800">
+                <span className="text-xs font-bold text-slate-800">
                   {computedProgress >= 110
                     ? '🔥 Vượt Chỉ Tiêu'
                     : computedProgress >= 100
@@ -427,7 +427,7 @@ export default function KpiModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95"
             >
               <Check className="w-4 h-4" />
               {mode === 'create' ? 'Tạo & Phân Bổ KPI' : 'Lưu Thay Đổi'}

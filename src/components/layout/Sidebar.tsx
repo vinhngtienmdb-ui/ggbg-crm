@@ -271,20 +271,22 @@ export default function Sidebar({
         </nav>
 
         {/* ── Collapse Toggle Button (desktop only) ── */}
-        <div className="hidden md:flex items-center justify-end px-2 py-1.5 border-t border-slate-100 dark:border-slate-800/60">
-          <button
-            onClick={onToggleCollapse}
-            className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label={isCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
-            title={isCollapsed ? 'Mở rộng' : 'Thu gọn'}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <ChevronLeft className="w-4 h-4" />
-            )}
-          </button>
-        </div>
+        {onToggleCollapse && (
+          <div className="hidden md:flex items-center justify-end px-2 py-1.5 border-t border-slate-100 dark:border-slate-800/60">
+            <button
+              onClick={onToggleCollapse}
+              className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label={isCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+              title={isCollapsed ? 'Mở rộng' : 'Thu gọn'}
+            >
+              {isCollapsed ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <ChevronLeft className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+        )}
 
         {/* ── User Footer ── */}
         <div
@@ -297,7 +299,7 @@ export default function Sidebar({
           `}
         >
           <div
-            className={`w-8 h-8 rounded-xl ${roleColor} font-extrabold flex items-center justify-center text-[11px] shrink-0 shadow-sm`}
+            className={`w-8 h-8 rounded-xl ${roleColor} font-bold flex items-center justify-center text-[11px] shrink-0 shadow-xs`}
             title={`${user ? user.name : 'Super Admin'} — ${activeRole}`}
           >
             {avatarInitials}

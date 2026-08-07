@@ -137,7 +137,7 @@ export default function FixedAssetsPage() {
 
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" /> Khai Báo Tài Sản Mới
         </button>
@@ -147,25 +147,25 @@ export default function FixedAssetsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-bold">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Tổng Nguyên Giá Tài Sản</span>
-          <p className="text-xl font-black text-slate-900">{totalValue.toLocaleString('vi-VN')} ₫</p>
+          <p className="text-xl font-semibold text-slate-900">{totalValue.toLocaleString('vi-VN')} ₫</p>
           <p className="text-blue-600 font-semibold text-[11px]">📦 {assets.length} Tài sản đang quản lý</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Giá Trị Còn Lại (Net Book Value)</span>
-          <p className="text-xl font-black text-emerald-700">{totalNetBookValue.toLocaleString('vi-VN')} ₫</p>
+          <p className="text-xl font-semibold text-emerald-700">{totalNetBookValue.toLocaleString('vi-VN')} ₫</p>
           <p className="text-emerald-600 font-semibold text-[11px]">🟢 Giá trị tài sản thực tế</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Khấu Hao Hàng Tháng (Monthly Dep)</span>
-          <p className="text-xl font-black text-purple-700">{totalMonthlyDep.toLocaleString('vi-VN')} ₫</p>
+          <p className="text-xl font-semibold text-purple-700">{totalMonthlyDep.toLocaleString('vi-VN')} ₫</p>
           <p className="text-purple-600 font-semibold text-[11px]">📉 Hạch toán thẳng Sổ cái chi phí</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Trạng Thái Sử Dụng</span>
-          <p className="text-xl font-black text-blue-700">100% Đang Sử Dụng</p>
+          <p className="text-xl font-semibold text-blue-700">100% Đang Sử Dụng</p>
           <p className="text-slate-500 font-semibold text-[11px]">🛡️ Phân bổ đúng phòng ban</p>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function FixedAssetsPage() {
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-extrabold text-amber-900 text-sm">🛠️ Lịch Bảo Trì Thiết Bị Định Kỳ & Bảo Hành 2026</h4>
+            <h4 className="font-bold text-amber-900 text-sm">🛠️ Lịch Bảo Trì Thiết Bị Định Kỳ & Bảo Hành 2026</h4>
             <p className="text-amber-700 font-medium text-[11.5px] mt-0.5">
               • Máy chủ Server Dell T340: <strong>Bảo trì định kỳ ngày 15/08/2026</strong> | • Xe Tải Suzuki Carry: <strong>Bảo dưỡng định kỳ 20.000km ngày 25/08/2026</strong>
             </p>
@@ -186,7 +186,7 @@ export default function FixedAssetsPage() {
 
         <button
           onClick={() => showToast('🔔 Đã đặt lịch nhắc bảo trì thiết bị tự động cho Phòng Vận Hành')}
-          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-md shrink-0 transition-all active:scale-95"
+          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md shrink-0 transition-all active:scale-95"
         >
           🔔 Đặt Lịch Nhắc Bảo Trì
         </button>
@@ -228,7 +228,7 @@ export default function FixedAssetsPage() {
         <div className="overflow-x-auto border border-slate-200 rounded-xl">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold uppercase text-[10.5px]">
+              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10.5px]">
                 <th className="p-3">Mã & Tên Tài Sản Cố Định</th>
                 <th className="p-3">Phân Loại Tài Sản</th>
                 <th className="p-3 font-mono">Nguyên Giá (VND)</th>
@@ -242,17 +242,17 @@ export default function FixedAssetsPage() {
               {filteredAssets.map((a) => (
                 <tr key={a.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-3">
-                    <p className="font-extrabold text-slate-900 text-sm">{a.name}</p>
+                    <p className="font-bold text-slate-900 text-sm">{a.name}</p>
                     <p className="font-mono text-blue-700 text-[11px]">{a.asset_code} • Mua ngày {a.purchase_date}</p>
                   </td>
 
                   <td className="p-3">
-                    <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-full font-extrabold border border-purple-200 text-[10.5px]">
+                    <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-full font-bold border border-purple-200 text-[10.5px]">
                       {a.category_name}
                     </span>
                   </td>
 
-                  <td className="p-3 font-mono font-black text-slate-900">
+                  <td className="p-3 font-mono font-semibold text-slate-900">
                     {a.purchase_price.toLocaleString('vi-VN')} ₫
                   </td>
 
@@ -260,7 +260,7 @@ export default function FixedAssetsPage() {
                     {a.monthly_depreciation.toLocaleString('vi-VN')} ₫/tháng
                   </td>
 
-                  <td className="p-3 text-center font-mono font-black text-emerald-700">
+                  <td className="p-3 text-center font-mono font-semibold text-emerald-700">
                     {a.net_book_value.toLocaleString('vi-VN')} ₫
                   </td>
 
@@ -301,9 +301,9 @@ export default function FixedAssetsPage() {
       {/* MODAL KHAI BÁO TÀI SẢN MỚI */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Truck className="w-5 h-5 text-blue-600" /> Khai Báo Tài Sản Cố Định Mới (ERP Asset Intake)
               </h3>
               <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
@@ -413,7 +413,7 @@ export default function FixedAssetsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30"
                 >
                   Khai Báo Sổ Tài Sản
                 </button>
@@ -426,11 +426,11 @@ export default function FixedAssetsPage() {
       {/* MODAL LỊCH KHẤU HAO CHI TIẾT */}
       {isScheduleOpen && selectedAsset && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
             <div className="flex items-center justify-between border-b pb-3">
               <div className="flex items-center gap-2">
                 <PieChart className="w-5 h-5 text-purple-600" />
-                <h3 className="font-extrabold text-sm text-slate-900">Lịch Trích Khấu Hao: {selectedAsset.name}</h3>
+                <h3 className="font-bold text-sm text-slate-900">Lịch Trích Khấu Hao: {selectedAsset.name}</h3>
               </div>
               <button onClick={() => setIsScheduleOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -438,14 +438,14 @@ export default function FixedAssetsPage() {
             </div>
 
             <div className="p-3 bg-purple-50 border border-purple-200 rounded-2xl space-y-1">
-              <p className="text-purple-900 font-extrabold">Nguyên giá: {selectedAsset.purchase_price.toLocaleString('vi-VN')} ₫</p>
+              <p className="text-purple-900 font-bold">Nguyên giá: {selectedAsset.purchase_price.toLocaleString('vi-VN')} ₫</p>
               <p className="text-purple-700">Khấu hao mỗi tháng: <strong>{selectedAsset.monthly_depreciation.toLocaleString('vi-VN')} ₫/tháng</strong> (Thời gian: {selectedAsset.depreciation_months} tháng)</p>
             </div>
 
             <div className="max-h-60 overflow-y-auto border rounded-xl">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100 border-b font-extrabold">
+                  <tr className="bg-slate-100 border-b font-bold">
                     <th className="p-2">Kỳ Khấu Hao</th>
                     <th className="p-2 text-right">Số Tiền Khấu Hao</th>
                     <th className="p-2 text-right">Giá Trị Còn Lại</th>
@@ -470,7 +470,7 @@ export default function FixedAssetsPage() {
             <div className="flex items-center justify-end pt-2">
               <button
                 onClick={() => setIsScheduleOpen(false)}
-                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl"
               >
                 Đóng
               </button>

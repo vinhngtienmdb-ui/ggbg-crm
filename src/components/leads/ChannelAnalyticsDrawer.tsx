@@ -81,17 +81,17 @@ export default function ChannelAnalyticsDrawer({
         <div className="grid grid-cols-3 gap-3">
           <div className="p-3.5 bg-blue-50 text-slate-900 rounded-2xl border border-blue-200 space-y-1">
             <p className="text-[10px] text-blue-700 font-bold uppercase">Tổng Lead Đa Kênh</p>
-            <p className="text-xl font-extrabold text-blue-700">{totalLeadsCount}</p>
+            <p className="text-xl font-bold text-blue-700">{totalLeadsCount}</p>
           </div>
 
           <div className="p-3.5 bg-emerald-50 text-emerald-900 rounded-2xl border border-emerald-200 space-y-1">
             <p className="text-[10px] text-emerald-700 font-bold uppercase">Tỷ Lệ Chuyển Đổi</p>
-            <p className="text-xl font-extrabold text-emerald-700">{overallConversionRate}%</p>
+            <p className="text-xl font-bold text-emerald-700">{overallConversionRate}%</p>
           </div>
 
           <div className="p-3.5 bg-purple-50 text-purple-900 rounded-2xl border border-purple-200 space-y-1">
             <p className="text-[10px] text-purple-700 font-bold uppercase">Tổng Ngân Sách</p>
-            <p className="text-xs font-mono font-extrabold text-purple-800 pt-1">
+            <p className="text-xs font-mono font-bold text-purple-800 pt-1">
               {(grandTotalBudget / 1000000).toFixed(0)}Tr ₫
             </p>
           </div>
@@ -135,7 +135,7 @@ export default function ChannelAnalyticsDrawer({
                         {stat.total_leads} Lead ({percentage}%)
                       </span>
                     </div>
-                    <span className="font-mono text-xs font-extrabold text-emerald-700">
+                    <span className="font-mono text-xs font-bold text-emerald-700">
                       {(stat.total_budget / 1000000).toLocaleString('vi-VN')} Tr ₫
                     </span>
                   </div>

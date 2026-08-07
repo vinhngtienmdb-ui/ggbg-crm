@@ -95,7 +95,7 @@ export default function ContractsPage() {
               <FileText className="w-3.5 h-3.5 text-blue-600" />
               <span>Official Contract PDF & Stamp Engine</span>
             </div>
-            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">
+            <h1 className="text-lg md:text-xl font-bold tracking-tight text-blue-700">
               Quản Lý Hợp Đồng Dịch Vụ & Xuất File PDF Bản Quyền
             </h1>
             <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
@@ -124,7 +124,7 @@ export default function ContractsPage() {
         <div className="overflow-x-auto touch-scroll sleek-scrollbar">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wide text-[10.5px]">
                 <th className="p-3">Mã Hợp Đồng</th>
                 <th className="p-3">Khách Hàng / Công Ty</th>
                 <th className="p-3">Gói Sàn TMĐT</th>
@@ -163,7 +163,7 @@ export default function ContractsPage() {
                             cnt.expiry_date = '2027-09-01';
                             alert(`📜 Đã sinh Phụ lục Gia hạn Hợp đồng thêm 12 tháng thành công cho ${cnt.company_name}!`);
                           }}
-                          className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded text-[11px] inline-flex items-center gap-1 shadow-xs transition-colors"
+                          className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded text-[11px] inline-flex items-center gap-1 shadow-xs transition-colors"
                         >
                           <Sparkles className="w-3.5 h-3.5" /> Phụ Lục Gia Hạn 1-Click
                         </button>

@@ -27,7 +27,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -38,7 +38,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
               <span className="text-[10px] font-mono font-bold text-blue-400 uppercase tracking-wider block">
                 {kpi.kpi_code || 'KPI-ITEM'}
               </span>
-              <h3 className="font-extrabold text-sm text-white">{kpi.kpi_name}</h3>
+              <h3 className="font-bold text-sm text-white">{kpi.kpi_name}</h3>
             </div>
           </div>
           <button
@@ -58,7 +58,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
                 <BarChart3 className="w-4 h-4 text-blue-400" /> Tiến Độ Hoàn Thành Chỉ Tiêu
               </span>
               <span
-                className={`px-3 py-1 rounded-xl text-xs font-mono font-extrabold shadow-sm ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold shadow-sm ${
                   progress >= 100
                     ? 'bg-emerald-500 text-slate-950'
                     : progress >= 80
@@ -86,13 +86,13 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
             <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-slate-800">
               <div>
                 <span className="text-slate-400 block font-medium">Chỉ Tiêu Mục Tiêu:</span>
-                <span className="font-mono font-extrabold text-blue-300 text-sm mt-0.5 block">
+                <span className="font-mono font-bold text-blue-300 text-sm mt-0.5 block">
                   {formatVal(target, kpi.unit)}
                 </span>
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Thực Tế Đạt Được:</span>
-                <span className="font-mono font-extrabold text-emerald-300 text-sm mt-0.5 block">
+                <span className="font-mono font-bold text-emerald-300 text-sm mt-0.5 block">
                   {formatVal(actual, kpi.unit)}
                 </span>
               </div>
@@ -105,7 +105,7 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
               <span className="text-slate-500 font-bold block flex items-center gap-1">
                 <Layers className="w-3.5 h-3.5 text-blue-600" /> Cấp Phân Bổ:
               </span>
-              <span className="font-extrabold text-slate-900 block">
+              <span className="font-bold text-slate-900 block">
                 {kpi.assignee_type === 'Company'
                   ? '🌐 Toàn Công Ty'
                   : kpi.assignee_type === 'Department'
@@ -120,21 +120,21 @@ export default function KpiDetailModal({ isOpen, onClose, kpi, onEdit }: KpiDeta
               <span className="text-slate-500 font-bold block flex items-center gap-1">
                 <Building2 className="w-3.5 h-3.5 text-indigo-600" /> Đối Tượng Phụ Trách:
               </span>
-              <span className="font-extrabold text-slate-900 block truncate">{kpi.assignee_name}</span>
+              <span className="font-bold text-slate-900 block truncate">{kpi.assignee_name}</span>
             </div>
 
             <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
               <span className="text-slate-500 font-bold block flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-emerald-600" /> Kỳ Đánh Giá:
               </span>
-              <span className="font-extrabold text-slate-900 block">{kpi.period}</span>
+              <span className="font-bold text-slate-900 block">{kpi.period}</span>
             </div>
 
             <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
               <span className="text-slate-500 font-bold block flex items-center gap-1">
                 <Award className="w-3.5 h-3.5 text-purple-600" /> Trọng Số Đánh Giá:
               </span>
-              <span className="font-mono font-extrabold text-slate-900 block">{kpi.weight || 100}%</span>
+              <span className="font-mono font-bold text-slate-900 block">{kpi.weight || 100}%</span>
             </div>
           </div>
 

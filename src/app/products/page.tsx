@@ -89,7 +89,7 @@ export default function ProductsPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700">Quản Lý Sản Phẩm & Gói Dịch Vụ Admin Custom</h1>
+              <h1 className="text-lg md:text-xl font-bold tracking-tight text-blue-700">Quản Lý Sản Phẩm & Gói Dịch Vụ Admin Custom</h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10.5px] font-bold border border-blue-200">
                 <Sparkles className="w-3 h-3 text-blue-600" /> CRM SaaS, Tư Vấn & Bảo Trì Cloud
               </span>
@@ -221,7 +221,7 @@ export default function ProductsPage() {
 
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4 space-y-1">
                   <p className="text-xs text-slate-400 font-medium">Giá Niêm Yết & Giá Sàn Tối Thiểu</p>
-                  <p className="text-2xl font-extrabold text-blue-600">
+                  <p className="text-2xl font-bold text-blue-600">
                     {product.base_price.toLocaleString('vi-VN')} ₫{' '}
                     <span className="text-xs font-normal text-slate-500">/ {product.unit}</span>
                   </p>
@@ -276,7 +276,7 @@ export default function ProductsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10.5px] font-extrabold uppercase tracking-wide">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10.5px] font-bold uppercase tracking-wide">
                   <th className="p-4">Mã SP & Tên Gói</th>
                   <th className="p-4">Danh Mục Dịch Vụ</th>
                   <th className="p-4">Đơn Vi Tính</th>
@@ -296,7 +296,7 @@ export default function ProductsPage() {
                     </td>
                     <td className="p-4 text-slate-700 font-semibold">{p.category}</td>
                     <td className="p-4 font-semibold text-slate-800">{p.unit}</td>
-                    <td className="p-4 font-mono font-extrabold text-blue-600 text-sm">
+                    <td className="p-4 font-mono font-bold text-blue-600 text-sm">
                       {p.base_price.toLocaleString('vi-VN')} ₫
                     </td>
                     <td className="p-4 font-mono font-bold text-emerald-700">

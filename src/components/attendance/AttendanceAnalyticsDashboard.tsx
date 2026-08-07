@@ -72,7 +72,7 @@ export default function AttendanceAnalyticsDashboard({
   const totalLeaveDays = annualLeave + sickLeave + maternityLeave + unpaidLeave;
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6 border border-slate-800">
       {/* Title */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
@@ -80,11 +80,11 @@ export default function AttendanceAnalyticsDashboard({
             <Clock className="w-3.5 h-3.5 text-blue-400" />
             <span>Phân Tích Báo Cáo Chấm Công & Nghỉ Phép</span>
           </div>
-          <h2 className="text-lg font-black text-white">Dashboard Phân Tích Kỷ Luật Đi Làm & Quỹ Phép Năm</h2>
+          <h2 className="text-lg font-semibold text-white">Dashboard Phân Tích Kỷ Luật Đi Làm & Quỹ Phép Năm</h2>
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-400 font-medium block">Tổng Ngày Phép Đã Duyệt:</span>
-          <span className="font-mono font-black text-purple-400 text-lg">{totalLeaveDays} Ngày</span>
+          <span className="font-mono font-semibold text-purple-400 text-lg">{totalLeaveDays} Ngày</span>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export default function AttendanceAnalyticsDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Workdays Comparison Bar Chart */}
         <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-blue-400" /> Ngày Công Thực Tế vs Nghỉ Phép Theo Nhân Sự (Ngày)
           </h3>
 
@@ -116,7 +116,7 @@ export default function AttendanceAnalyticsDashboard({
 
         {/* Chart 2: Attendance Status Pie Chart */}
         <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
+          <h3 className="font-bold text-xs text-slate-200 flex items-center gap-2">
             <PieIcon className="w-4 h-4 text-purple-400" /> Tỷ Lệ Trạng Thái Đi Làm
           </h3>
 

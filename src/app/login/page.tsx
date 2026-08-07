@@ -165,12 +165,12 @@ export default function LoginPage() {
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
               <div className="p-4 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-2xl space-y-1 text-center">
                 <ShieldCheck className="w-8 h-8 text-purple-600 dark:text-purple-400 mx-auto" />
-                <p className="font-extrabold text-purple-900 dark:text-purple-300 text-xs">Yêu Cầu Xác Thực 2 Lớp Google Authenticator</p>
+                <p className="font-bold text-purple-900 dark:text-purple-300 text-xs">Yêu Cầu Xác Thực 2 Lớp Google Authenticator</p>
                 <p className="text-[11px] text-purple-700 dark:text-purple-400 font-medium">Nhập mã 6 chữ số đang hiển thị trong app của bạn</p>
               </div>
 
               <div>
-                <label className="block text-xs font-extrabold text-slate-800 dark:text-slate-200 mb-1.5 uppercase tracking-wider text-center">
+                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5 uppercase tracking-wider text-center">
                   Mã Xác Thực OTP 6 Chữ Số *
                 </label>
                 <input
@@ -181,7 +181,7 @@ export default function LoginPage() {
                   onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                   placeholder="000000"
                   disabled={isSubmitting}
-                  className="w-full text-center px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-purple-400 dark:border-purple-700 rounded-2xl font-mono text-xl tracking-[10px] font-black text-purple-700 dark:text-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                  className="w-full text-center px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-purple-400 dark:border-purple-700 rounded-2xl font-mono text-xl tracking-[10px] font-semibold text-purple-700 dark:text-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                 />
               </div>
 
@@ -199,7 +199,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl py-3 text-xs tracking-wide flex items-center justify-center gap-2 transition-all active:scale-95 mt-6 disabled:opacity-70 shadow-lg shadow-purple-600/30"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl py-3 text-xs tracking-wide flex items-center justify-center gap-2 transition-all active:scale-95 mt-6 disabled:opacity-70 shadow-lg shadow-purple-600/30"
           >
             {isSubmitting ? (
               <>

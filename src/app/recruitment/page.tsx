@@ -208,6 +208,8 @@ export default function RecruitmentModulePage() {
   const [approvalNote, setApprovalNote] = useState('');
   const [selectedApprovalCand, setSelectedApprovalCand] = useState<Candidate | null>(null);
 
+  const [selectedCvFileName, setSelectedCvFileName] = useState<string | null>(null);
+
   const [newForm, setNewForm] = useState({
     full_name: '',
     email: '',
@@ -227,6 +229,10 @@ export default function RecruitmentModulePage() {
 
   const handleAddCandidate = (e: React.FormEvent) => {
     e.preventDefault();
+    const cvPath = selectedCvFileName
+      ? `storage.ggbingo.vn/cv/${selectedCvFileName}`
+      : `storage.ggbingo.vn/cv/${newForm.full_name.replace(/\s+/g, '')}_CV.pdf`;
+
     const newCand: Candidate = {
       id: `cand_${Date.now()}`,
       candidate_code: `UV-2026-${String(candidates.length + 1).padStart(3, '0')}`,
@@ -239,7 +245,7 @@ export default function RecruitmentModulePage() {
       stage: 'APPLIED',
       expected_salary: Number(newForm.expected_salary),
       experience_years: Number(newForm.experience_years),
-      cv_file: `storage.ggbingo.vn/cv/${newForm.full_name.replace(/\s+/g, '')}_CV.pdf`,
+      cv_file: cvPath,
       applied_date: new Date().toISOString().split('T')[0],
       onboarding_progress: 0,
       approval_status: 'PENDING_DIRECT_MANAGER',
@@ -248,6 +254,7 @@ export default function RecruitmentModulePage() {
     };
     setCandidates([newCand, ...candidates]);
     setIsModalOpen(false);
+    setSelectedCvFileName(null);
     showToast(`✅ Đã tiếp nhận ứng viên mới: ${newCand.full_name} (${newCand.candidate_code})`);
   };
 
@@ -332,7 +339,7 @@ export default function RecruitmentModulePage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" /> Tiếp Nhận Ứng Viên Mới
           </button>
@@ -340,7 +347,7 @@ export default function RecruitmentModulePage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-bold">
         <button
           onClick={() => setActiveTab('PIPELINE')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
@@ -376,7 +383,7 @@ export default function RecruitmentModulePage() {
         >
           ⏳ 4. Phê Duyệt
           {pendingCount > 0 && (
-            <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-full animate-pulse">
+            <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-semibold rounded-full animate-pulse">
               {pendingCount}
             </span>
           )}
@@ -418,7 +425,7 @@ export default function RecruitmentModulePage() {
               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
                 <button
                   onClick={() => setViewMode('KANBAN')}
-                  className={`px-3 py-1.5 rounded-lg font-extrabold flex items-center gap-1.5 transition-all ${
+                  className={`px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all ${
                     viewMode === 'KANBAN' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -426,7 +433,7 @@ export default function RecruitmentModulePage() {
                 </button>
                 <button
                   onClick={() => setViewMode('LIST')}
-                  className={`px-3 py-1.5 rounded-lg font-extrabold flex items-center gap-1.5 transition-all ${
+                  className={`px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all ${
                     viewMode === 'LIST' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -444,7 +451,7 @@ export default function RecruitmentModulePage() {
                 const cfg = STAGE_CONFIG[stgKey];
                 return (
                   <div key={stgKey} className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-3 min-w-[220px]">
-                    <div className={`p-2.5 rounded-xl border font-black flex items-center justify-between ${cfg.cls} ${cfg.border}`}>
+                    <div className={`p-2.5 rounded-xl border font-semibold flex items-center justify-between ${cfg.cls} ${cfg.border}`}>
                       <span>{cfg.label}</span>
                       <span className="w-5 h-5 rounded-full bg-white text-slate-900 flex items-center justify-center text-[10px] shadow-sm">
                         {stgCand.length}
@@ -458,7 +465,7 @@ export default function RecruitmentModulePage() {
                             <span className="font-mono text-[10px] font-bold text-blue-700">{cand.candidate_code}</span>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">{cand.source}</span>
                           </div>
-                          <p className="font-extrabold text-slate-900 text-xs">{cand.full_name}</p>
+                          <p className="font-bold text-slate-900 text-xs">{cand.full_name}</p>
                           <p className="text-[11px] text-slate-500">{cand.position_applied}</p>
                           <p className="text-[10px] text-slate-400">{cand.department}</p>
 
@@ -471,7 +478,7 @@ export default function RecruitmentModulePage() {
                             >
                               <FileText className="w-3 h-3 text-blue-500" /> Xem CV
                             </a>
-                            <label className="cursor-pointer text-amber-700 hover:text-amber-800 font-extrabold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 transition-colors">
+                            <label className="cursor-pointer text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 transition-colors">
                               <Upload className="w-3 h-3 text-amber-600" /> Upload CV
                               <input
                                 type="file"
@@ -483,7 +490,7 @@ export default function RecruitmentModulePage() {
                           </div>
 
                           <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                            <span className="font-mono font-black text-emerald-700">
+                            <span className="font-mono font-semibold text-emerald-700">
                               {new Intl.NumberFormat('vi-VN').format(cand.expected_salary)} ₫
                             </span>
                             <select
@@ -513,7 +520,7 @@ export default function RecruitmentModulePage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                    <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase text-[10.5px]">
                       <th className="p-3">Mã & Họ Tên Ứng Viên</th>
                       <th className="p-3">Vị Trí & Phòng Ban</th>
                       <th className="p-3">Kinh Nghiệm & Lương Kỳ Vọng</th>
@@ -526,7 +533,7 @@ export default function RecruitmentModulePage() {
                     {filteredCandidates.map((c) => (
                       <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                         <td className="p-3">
-                          <p className="font-extrabold text-slate-900">{c.full_name}</p>
+                          <p className="font-bold text-slate-900">{c.full_name}</p>
                           <p className="font-mono text-blue-700 text-[11px]">{c.candidate_code} · {c.phone}</p>
                         </td>
 
@@ -536,7 +543,7 @@ export default function RecruitmentModulePage() {
                         </td>
 
                         <td className="p-3 font-mono">
-                          <p className="font-black text-emerald-700">
+                          <p className="font-semibold text-emerald-700">
                             {new Intl.NumberFormat('vi-VN').format(c.expected_salary)} ₫
                           </p>
                           <p className="text-slate-500 text-[10px]">{c.experience_years} năm kinh nghiệm</p>
@@ -568,11 +575,11 @@ export default function RecruitmentModulePage() {
                               href={`https://${c.cv_file}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-3 py-1.5 bg-blue-50 text-blue-700 font-extrabold rounded-xl hover:bg-blue-100 transition-all inline-block border border-blue-200"
+                              className="px-3 py-1.5 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 transition-all inline-block border border-blue-200"
                             >
                               📄 Xem CV
                             </a>
-                            <label className="cursor-pointer px-3 py-1.5 bg-amber-50 text-amber-800 font-extrabold rounded-xl hover:bg-amber-100 transition-all inline-block border border-amber-200">
+                            <label className="cursor-pointer px-3 py-1.5 bg-amber-50 text-amber-800 font-bold rounded-xl hover:bg-amber-100 transition-all inline-block border border-amber-200">
                               📤 Upload CV
                               <input
                                 type="file"
@@ -599,32 +606,32 @@ export default function RecruitmentModulePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-bold">
             <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
               <span className="text-slate-500 uppercase text-[10.5px]">Tổng Ứng Viên Tiếp Nhận</span>
-              <p className="text-2xl font-black text-slate-900">45 Ứng Viên</p>
+              <p className="text-2xl font-semibold text-slate-900">45 Ứng Viên</p>
               <span className="text-emerald-600 text-[11px] font-semibold">↑ +12% so với tháng trước</span>
             </div>
 
             <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
               <span className="text-slate-500 uppercase text-[10.5px]">Đã Phỏng Vấn (Round 1/2)</span>
-              <p className="text-2xl font-black text-amber-600">14 Ứng Viên</p>
+              <p className="text-2xl font-semibold text-amber-600">14 Ứng Viên</p>
               <span className="text-slate-500 text-[11px] font-semibold">Tỷ lệ đạt CV: 31.1%</span>
             </div>
 
             <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
               <span className="text-slate-500 uppercase text-[10.5px]">Đã Gửi Offer Nhận Việc</span>
-              <p className="text-2xl font-black text-emerald-600">8 Ứng Viên</p>
+              <p className="text-2xl font-semibold text-emerald-600">8 Ứng Viên</p>
               <span className="text-emerald-600 text-[11px] font-semibold">Tỷ lệ chấp nhận offer: 87.5%</span>
             </div>
 
             <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
               <span className="text-slate-500 uppercase text-[10.5px]">Đang Onboarding (Thử Việc)</span>
-              <p className="text-2xl font-black text-purple-600">6 Nhân Sự</p>
+              <p className="text-2xl font-semibold text-purple-600">6 Nhân Sự</p>
               <span className="text-purple-600 text-[11px] font-semibold">Tiến độ hoàn thành: 78%</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <BarChart className="w-4 h-4 text-blue-600" /> Biểu Đồ Phễu Tuyển Dụng Qua Các Bước
               </h3>
               <div className="h-64">
@@ -641,7 +648,7 @@ export default function RecruitmentModulePage() {
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Users className="w-4 h-4 text-purple-600" /> Phân Bổ Nguồn Ứng Viên (Channel Intake)
               </h3>
               <div className="h-64 flex items-center justify-center">
@@ -665,7 +672,7 @@ export default function RecruitmentModulePage() {
       {activeTab === 'ONBOARDING' && (
         <div className="space-y-6 text-xs">
           <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-            <h3 className="font-black text-sm text-purple-900 flex items-center gap-2">
+            <h3 className="font-semibold text-sm text-purple-900 flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-purple-600" /> Danh Sách Nhân Sự Đang Trong Quá Trình Onboarding (Thử Việc 60 Ngày)
             </h3>
 
@@ -676,15 +683,15 @@ export default function RecruitmentModulePage() {
                   <div key={cand.id} className="p-5 bg-purple-50/50 border border-purple-200 rounded-2xl space-y-3">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                       <div>
-                        <p className="font-black text-base text-slate-900">{cand.full_name} ({cand.candidate_code})</p>
+                        <p className="font-semibold text-base text-slate-900">{cand.full_name} ({cand.candidate_code})</p>
                         <p className="text-slate-600">Vị trí: <strong className="text-purple-700">{cand.position_applied}</strong> · Phòng Ban: {cand.department}</p>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <span className="font-extrabold text-purple-800">Tiến độ Onboarding: {cand.onboarding_progress}%</span>
+                        <span className="font-bold text-purple-800">Tiến độ Onboarding: {cand.onboarding_progress}%</span>
                         <button
                           onClick={() => showToast(`🎉 Đã hoàn tất thử việc & Chuyển nhân sự ${cand.full_name} sang Hợp Đồng Chính Thức!`)}
-                          className="px-3 py-1.5 bg-emerald-600 text-white font-extrabold rounded-xl shadow-md"
+                          className="px-3 py-1.5 bg-emerald-600 text-white font-bold rounded-xl shadow-md"
                         >
                           ✅ Chuyển Chính Thức
                         </button>
@@ -728,7 +735,7 @@ export default function RecruitmentModulePage() {
       {activeTab === 'APPROVAL_PIPELINE' && (
         <div className="space-y-6 text-xs">
           <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-900 flex items-center gap-2">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-amber-900 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-amber-700" /> Sơ Đồ Quy Trình Phê Duyệt Nhân Sự Mới (3 Cấp Nối Tiếp):
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
@@ -762,7 +769,7 @@ export default function RecruitmentModulePage() {
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-200 pb-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-extrabold text-base text-slate-900">{cand.full_name}</h4>
+                          <h4 className="font-bold text-base text-slate-900">{cand.full_name}</h4>
                           <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">{cand.candidate_code}</span>
                         </div>
                         <p className="text-xs text-slate-500 mt-0.5">
@@ -829,9 +836,9 @@ export default function RecruitmentModulePage() {
       {/* MODAL THÊM ỨNG VIÊN MỚI */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-blue-600 text-white p-5 flex items-center justify-between">
-              <h3 className="font-extrabold text-base flex items-center gap-2">
+              <h3 className="font-bold text-base flex items-center gap-2">
                 <UserPlus className="w-5 h-5" /> Tiếp Nhận Hồ Sơ Ứng Viên Mới
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
@@ -916,7 +923,7 @@ export default function RecruitmentModulePage() {
                     <option value="TopCV">TopCV</option>
                     <option value="LinkedIn">LinkedIn</option>
                     <option value="Facebook Ads">Facebook Ads</option>
-                    <option value="Referral">Referral (Giới thiệu)</option>
+                    <option value="Referral">Referral</option>
                   </select>
                 </div>
 
@@ -927,28 +934,48 @@ export default function RecruitmentModulePage() {
                     step={1000000}
                     value={newForm.expected_salary}
                     onChange={(e) => setNewForm({ ...newForm, expected_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-black"
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-semibold"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-slate-700 mb-1">File CV Đính Kèm (.pdf, .doc, .docx)</label>
-                <div className="flex items-center gap-2">
-                  <label className="cursor-pointer flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-blue-50 border border-dashed border-blue-300 rounded-xl text-blue-700 font-bold hover:bg-blue-100 transition-colors">
-                    <Upload className="w-4 h-4" /> Tải Lên File CV Tốt Nhất
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          showToast(`📄 Đã chọn file CV: ${file.name}`);
-                        }
-                      }}
-                    />
-                  </label>
+                <div className="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                      <Upload className="w-4 h-4" /> Chọn File CV Từ Máy Tính
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setSelectedCvFileName(file.name);
+                            showToast(`📄 Đã đính kèm file CV: ${file.name}`);
+                          }
+                        }}
+                      />
+                    </label>
+                    {selectedCvFileName && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCvFileName(null)}
+                        className="text-red-600 hover:underline text-[11px] font-bold"
+                      >
+                        Bỏ chọn file
+                      </button>
+                    )}
+                  </div>
+                  {selectedCvFileName ? (
+                    <div className="p-2 bg-white rounded-xl border border-blue-200 flex items-center justify-between text-xs">
+                      <span className="font-mono text-blue-900 font-bold truncate">📄 {selectedCvFileName}</span>
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Đã sẵn sàng</span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400">Chưa chọn file CV. Hệ thống sẽ tự tạo mẫu CV nếu để trống.</p>
+                  )}
                 </div>
               </div>
 
@@ -962,7 +989,7 @@ export default function RecruitmentModulePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30"
+                  className="px-5 py-2 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30"
                 >
                   Lưu Hồ Sơ Ứng Viên
                 </button>

@@ -148,13 +148,13 @@ export default function PayrollPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={handleCalculatePayroll}
-            className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all active:scale-95"
+            className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95"
           >
             <RefreshCw className="w-4 h-4 text-emerald-400" /> Tính Lương Tự Động
           </button>
           <button
             onClick={handleBatchSendPaystubs}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95"
           >
             <Send className="w-4 h-4" /> Gửi Bảng Lương Hàng Loạt
           </button>
@@ -162,7 +162,7 @@ export default function PayrollPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-bold">
         <button
           onClick={() => setActiveTab('reports')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
@@ -211,7 +211,7 @@ export default function PayrollPage() {
           <div className="p-4 bg-white rounded-2xl border border-emerald-200/80 shadow-sm flex items-center justify-between">
             <div>
               <span className="text-slate-500 font-bold block">Tổng Lương Thực Nhận (NET)</span>
-              <span className="text-xl font-black text-emerald-700 mt-1 block">
+              <span className="text-xl font-semibold text-emerald-700 mt-1 block">
                 {stats.totalNet.toLocaleString('vi-VN')} ₫
               </span>
               <span className="text-[11px] text-slate-400">Chi trả qua tài khoản ngân hàng</span>
@@ -224,7 +224,7 @@ export default function PayrollPage() {
           <div className="p-4 bg-white rounded-2xl border border-blue-200/80 shadow-sm flex items-center justify-between">
             <div>
               <span className="text-slate-500 font-bold block">Tổng Quỹ Lương Gross</span>
-              <span className="text-xl font-black text-blue-700 mt-1 block">
+              <span className="text-xl font-semibold text-blue-700 mt-1 block">
                 {stats.totalGross.toLocaleString('vi-VN')} ₫
               </span>
               <span className="text-[11px] text-slate-400">P1 + P2 + P3 + OT + Thưởng</span>
@@ -237,7 +237,7 @@ export default function PayrollPage() {
           <div className="p-4 bg-white rounded-2xl border border-purple-200/80 shadow-sm flex items-center justify-between">
             <div>
               <span className="text-slate-500 font-bold block">Tổng Trích Nộp Bảo Hiểm</span>
-              <span className="text-xl font-black text-purple-700 mt-1 block">
+              <span className="text-xl font-semibold text-purple-700 mt-1 block">
                 {stats.totalInsurance.toLocaleString('vi-VN')} ₫
               </span>
               <span className="text-[11px] text-slate-400">BHXH + BHYT + BHTN (10.5%)</span>
@@ -250,7 +250,7 @@ export default function PayrollPage() {
           <div className="p-4 bg-white rounded-2xl border border-amber-200/80 shadow-sm flex items-center justify-between">
             <div>
               <span className="text-slate-500 font-bold block">Tổng Thuế TNCN Khấu Trừ</span>
-              <span className="text-xl font-black text-amber-700 mt-1 block">
+              <span className="text-xl font-semibold text-amber-700 mt-1 block">
                 {stats.totalTax.toLocaleString('vi-VN')} ₫
               </span>
               <span className="text-[11px] text-slate-400">Tạm tính nộp ngân sách nhà nước</span>
@@ -270,7 +270,7 @@ export default function PayrollPage() {
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3 py-1.5 bg-slate-900 text-white font-extrabold rounded-xl focus:outline-none"
+              className="px-3 py-1.5 bg-slate-900 text-white font-bold rounded-xl focus:outline-none"
             >
               <option value="Tháng 07/2026">Tháng 07/2026</option>
               <option value="Tháng 08/2026">Tháng 08/2026</option>
@@ -321,7 +321,7 @@ export default function PayrollPage() {
                   <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
                       <span className="text-[10px] font-mono font-bold text-blue-600 block">{p.payroll_code}</span>
-                      <span className="font-extrabold text-slate-900 block truncate">{p.employee_name}</span>
+                      <span className="font-bold text-slate-900 block truncate">{p.employee_name}</span>
                       <span className="text-[10px] text-slate-400 block truncate">{p.department}</span>
                     </td>
 
@@ -345,7 +345,7 @@ export default function PayrollPage() {
                       -{p.total_deductions.toLocaleString('vi-VN')} ₫
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-black text-emerald-700 text-sm">
+                    <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 text-sm">
                       {p.net_salary.toLocaleString('vi-VN')} ₫
                     </td>
 
@@ -395,11 +395,11 @@ export default function PayrollPage() {
         <form onSubmit={handleSavePayrollSettings} className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
           <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
             <Settings className="w-5 h-5 text-purple-600" />
-            <h3 className="font-extrabold text-base text-slate-900">Cấu Hình Cài Đặt Bảng Lương, Phụ Cấp & Bảo Hiểm</h3>
+            <h3 className="font-bold text-base text-slate-900">Cấu Hình Cài Đặt Bảng Lương, Phụ Cấp & Bảo Hiểm</h3>
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-extrabold text-xs text-blue-700 uppercase tracking-wider">
+            <h4 className="font-bold text-xs text-blue-700 uppercase tracking-wider">
               1. Cấu Hình Phụ Cấp P2 (Hàng Tháng)
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -439,7 +439,7 @@ export default function PayrollPage() {
           </div>
 
           <div className="space-y-4 pt-2 border-t border-slate-100">
-            <h4 className="font-extrabold text-xs text-purple-700 uppercase tracking-wider">
+            <h4 className="font-bold text-xs text-purple-700 uppercase tracking-wider">
               2. Tỷ Lệ Trích Nộp Bảo Hiểm & Mức Phạt Đi Muộn
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
@@ -490,7 +490,7 @@ export default function PayrollPage() {
           </div>
 
           <div className="space-y-4 pt-2 border-t border-slate-100">
-            <h4 className="font-extrabold text-xs text-amber-700 uppercase tracking-wider">
+            <h4 className="font-bold text-xs text-amber-700 uppercase tracking-wider">
               3. Giảm Trừ Thuế TNCN & Hệ Số OT
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -532,7 +532,7 @@ export default function PayrollPage() {
           <div className="flex items-center justify-end pt-3">
             <button
               type="submit"
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5"
             >
               <Save className="w-4 h-4" /> Lưu Cấu Hình Cài Đặt Bảng Lương
             </button>

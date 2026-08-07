@@ -152,7 +152,7 @@ export default function EmployeeModal({
     education_history: [
       {
         id: 'edu_1',
-        school_name: 'Đại Học Kinh Tế Quốc Dân (NEU)',
+        school_name: 'Đại Học Kinh Tế Quốc Dân',
         major: 'Quản Trị Kinh Doanh TMĐT',
         degree_level: 'Cử Nhân',
         graduation_year: '2017',
@@ -194,12 +194,12 @@ export default function EmployeeModal({
         effective_date: '2024-01-01',
         decision_number: 'QĐ-2024/001-GGBG',
         old_position: 'Chuyên Viên Sale',
-        new_position: 'Trưởng Nhóm Sale (Team Lead)',
+        new_position: 'Trưởng Nhóm Kinh Doanh',
         old_department: 'Phòng Kinh Doanh 1',
         new_department: 'Phòng Kinh Doanh 1',
         old_salary: 12000000,
         new_salary: 18000000,
-        approved_by: 'Tổng Giám Đốc (Giám Đốc Nhân Sự)',
+        approved_by: 'Tổng Giám Đốc',
       },
     ],
     rewards: [
@@ -218,10 +218,34 @@ export default function EmployeeModal({
     special_notes: 'Lao động có năng lực lãnh đạo tốt, tác phong chuyên nghiệp, đủ điều kiện quy hoạch Trưởng Phòng Kinh Doanh.',
   });
 
-  // Dynamic File Upload Rows
-  const [uploadRows, setUploadRows] = useState<UploadRow[]>([
-    { id: 'row_1', category: 'CCCD_FRONT', fileName: '' },
-  ]);
+  // Dynamic File Upload State
+  const [newDocCategory, setNewDocCategory] = useState<string>('CCCD_FRONT');
+
+  const handleFileUploadForEmployee = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const newDocItem = {
+      doc_id: `doc_${Date.now()}`,
+      doc_type: newDocCategory as any,
+      doc_name: file.name,
+      file_r2_path: `storage.ggbingo.vn/hrm/docs/${file.name}`,
+      uploaded_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'VALID' as const,
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      kyc_documents: [...(prev.kyc_documents || []), newDocItem],
+    }));
+  };
+
+  const handleRemoveEmployeeDoc = (docId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      kyc_documents: (prev.kyc_documents || []).filter((d) => d.doc_id !== docId),
+    }));
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -233,7 +257,6 @@ export default function EmployeeModal({
         contract_number: `HĐLĐ-2026/${String(Math.floor(Math.random() * 900) + 100)}`,
       }));
     }
-    setUploadRows([{ id: `row_${Date.now()}`, category: 'CCCD_FRONT', fileName: '' }]);
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
@@ -248,7 +271,7 @@ export default function EmployeeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-5xl overflow-hidden my-6 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-5xl overflow-hidden my-6 animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -256,7 +279,7 @@ export default function EmployeeModal({
               <UserCheck className="w-6 h-6 text-blue-400" />
             </div>
             <div>
-              <h2 className="text-base font-black tracking-tight text-white flex items-center gap-2">
+              <h2 className="text-base font-semibold tracking-tight text-white flex items-center gap-2">
                 {mode === 'create' && 'Tạo Mới Hồ Sơ Nhân Sự Đầy Đủ 7 Mục'}
                 {mode === 'edit' && `Chỉnh Sửa Hồ Sơ Nhân Sự: ${formData.full_name}`}
                 {mode === 'view' && `Chi Tiết Hồ Sơ Nhân Sự: ${formData.full_name}`}
@@ -276,7 +299,7 @@ export default function EmployeeModal({
         </div>
 
         {/* 7 FULL PROFILE TABS NAVIGATION */}
-        <div className="bg-slate-100 p-2 border-b border-slate-200 flex items-center gap-1.5 overflow-x-auto text-xs font-extrabold">
+        <div className="bg-slate-100 p-2 border-b border-slate-200 flex items-center gap-1.5 overflow-x-auto text-xs font-bold">
           <button
             type="button"
             onClick={() => setActiveTab('WORK_INFO')}
@@ -355,7 +378,7 @@ export default function EmployeeModal({
             <div className="space-y-6">
               {/* Section 1.1: Thông tin cá nhân */}
               <div className="space-y-3">
-                <h3 className="text-xs font-black uppercase tracking-wider text-blue-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
                   <User className="w-4 h-4 text-blue-600" /> 1.1 Thông Tin Cá Nhân & Căn Cước Công Dân (CCCD)
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -379,7 +402,7 @@ export default function EmployeeModal({
                       value={formData.full_name || ''}
                       onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                       placeholder="Nguyễn Văn A"
-                      className="w-full px-3 py-2 border rounded-xl font-extrabold text-slate-900"
+                      className="w-full px-3 py-2 border rounded-xl font-bold text-slate-900"
                       required
                     />
                   </div>
@@ -520,7 +543,7 @@ export default function EmployeeModal({
 
               {/* Section 1.2: Thông tin làm việc */}
               <div className="space-y-3 pt-2">
-                <h3 className="text-xs font-black uppercase tracking-wider text-purple-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-purple-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
                   <Briefcase className="w-4 h-4 text-purple-600" /> 1.2 Thông Tin Làm Việc & Hợp Đồng
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -598,7 +621,7 @@ export default function EmployeeModal({
                       disabled={isViewOnly}
                       value={formData.base_salary || 12000000}
                       onChange={(e) => setFormData({ ...formData, base_salary: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-xl font-mono font-black text-emerald-700"
+                      className="w-full px-3 py-2 border rounded-xl font-mono font-semibold text-emerald-700"
                     />
                   </div>
                 </div>
@@ -606,7 +629,7 @@ export default function EmployeeModal({
 
               {/* Section 1.3: Thông tin bảo hiểm */}
               <div className="space-y-3 pt-2">
-                <h3 className="text-xs font-black uppercase tracking-wider text-emerald-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" /> 1.3 Thông Tin Bảo Hiểm (BHXH, BHYT) & Thuế
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -689,14 +712,14 @@ export default function EmployeeModal({
             <div className="space-y-6 text-xs">
               {/* Trình độ học vấn */}
               <div className="space-y-3">
-                <h3 className="font-black uppercase text-purple-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-purple-700 flex items-center gap-1.5 border-b pb-2">
                   <GraduationCap className="w-4 h-4 text-purple-600" /> 2.1 Trình Độ Học Vấn & Bằng Cấp
                 </h3>
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                   {formData.education_history?.map((edu) => (
                     <div key={edu.id} className="p-3 bg-white rounded-xl border flex items-center justify-between">
                       <div>
-                        <span className="font-black text-slate-900 block">{edu.school_name}</span>
+                        <span className="font-semibold text-slate-900 block">{edu.school_name}</span>
                         <span className="text-[11px] text-slate-500 block">{edu.degree_level} · Chuyên ngành: {edu.major} · Tốt nghiệp năm {edu.graduation_year} ({edu.grade})</span>
                       </div>
                     </div>
@@ -706,7 +729,7 @@ export default function EmployeeModal({
 
               {/* Kinh nghiệm làm việc */}
               <div className="space-y-3 pt-2">
-                <h3 className="font-black uppercase text-blue-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-blue-700 flex items-center gap-1.5 border-b pb-2">
                   <Briefcase className="w-4 h-4 text-blue-600" /> 2.2 Kinh Nghiệm Làm Việc Trước Đây
                 </h3>
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
@@ -724,7 +747,7 @@ export default function EmployeeModal({
 
               {/* Chứng chỉ */}
               <div className="space-y-3 pt-2">
-                <h3 className="font-black uppercase text-amber-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-amber-700 flex items-center gap-1.5 border-b pb-2">
                   <Award className="w-4 h-4 text-amber-600" /> 2.3 Chứng Chỉ Nghề Nghiệp & TMĐT
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -745,14 +768,14 @@ export default function EmployeeModal({
           {activeTab === 'FAMILY_INFO' && (
             <div className="space-y-6 text-xs">
               <div className="space-y-3">
-                <h3 className="font-black uppercase text-emerald-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-emerald-700 flex items-center gap-1.5 border-b pb-2">
                   <Users className="w-4 h-4 text-emerald-600" /> 3.1 Thân Nhân & Người Phụ Thuộc (Giảm Trừ Gia Cảnh Tax)
                 </h3>
                 <div className="bg-slate-50 p-4 rounded-2xl border space-y-3">
                   {formData.family_members?.map((fm) => (
                     <div key={fm.id} className="p-3 bg-white rounded-xl border flex items-center justify-between">
                       <div>
-                        <span className="font-black text-slate-900 block">{fm.name} ({fm.relationship})</span>
+                        <span className="font-semibold text-slate-900 block">{fm.name} ({fm.relationship})</span>
                         <span className="text-[11px] text-slate-500 block">Ngày sinh: {fm.date_of_birth} · MST NPT: {fm.tax_code || '—'}</span>
                       </div>
                       {fm.is_dependent && (
@@ -766,7 +789,7 @@ export default function EmployeeModal({
               </div>
 
               <div className="space-y-3 pt-2">
-                <h3 className="font-black uppercase text-red-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-red-700 flex items-center gap-1.5 border-b pb-2">
                   <Phone className="w-4 h-4 text-red-600" /> 3.2 Người Liên Hệ Trong Trường Hợp Khẩn Cấp
                 </h3>
                 <div className="p-4 bg-red-50/50 border border-red-200 rounded-2xl space-y-2">
@@ -781,26 +804,83 @@ export default function EmployeeModal({
           {/* TAB 4: TÚI HỒ SƠ */}
           {activeTab === 'DOCUMENTS_BAG' && (
             <div className="space-y-4 text-xs">
-              <h3 className="font-black uppercase text-amber-700 flex items-center gap-1.5 border-b pb-2">
-                <Paperclip className="w-4 h-4 text-amber-600" /> 4. Túi Hồ Sơ & Giấy Tờ Đính Kèm ({formData.kyc_documents?.length || 0})
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {formData.kyc_documents?.map((doc) => (
-                  <div key={doc.doc_id} className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between">
-                    <div>
-                      <span className="font-bold text-slate-900 block">{doc.doc_name}</span>
-                      <span className="text-[10px] text-slate-400 font-mono block">{doc.file_r2_path}</span>
+              <div className="flex items-center justify-between border-b pb-2">
+                <h3 className="font-semibold uppercase text-amber-700 flex items-center gap-1.5">
+                  <Paperclip className="w-4 h-4 text-amber-600" /> 4. Túi Hồ Sơ & Giấy Tờ Đính Kèm ({formData.kyc_documents?.length || 0})
+                </h3>
+              </div>
+
+              {!isViewOnly && (
+                <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-2xl space-y-3">
+                  <h4 className="font-bold text-amber-900 flex items-center gap-1.5 text-xs">
+                    <Upload className="w-4 h-4 text-amber-600" /> Upload Tải Lên Giấy Tờ Mới Cho Nhân Viên
+                  </h4>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="w-full sm:w-1/2">
+                      <label className="block text-[11px] font-bold text-amber-900 mb-1">Danh Mục Giấy Tờ *</label>
+                      <select
+                        value={newDocCategory}
+                        onChange={(e) => setNewDocCategory(e.target.value)}
+                        className="w-full p-2 bg-white border border-amber-300 rounded-xl font-bold text-slate-800 text-xs"
+                      >
+                        <option value="CCCD_FRONT">🪪 CCCD Mặt Trước</option>
+                        <option value="CCCD_BACK">🪪 CCCD Mặt Sau</option>
+                        <option value="DEGREE">🎓 Bằng Cấp / Chứng Chỉ Khoa Học</option>
+                        <option value="CONTRACT">📜 Hợp Đồng Lao Động Đã Ký</option>
+                        <option value="HEALTH_CERT">🏥 Giấy Khám Sức Khỏe</option>
+                        <option value="CURRICULUM_VITAE">📄 Sơ Yếu Lý Lịch / CV</option>
+                        <option value="OTHER">📎 Giấy Tờ Khác</option>
+                      </select>
                     </div>
-                    <a
-                      href={`https://${doc.file_r2_path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1 bg-blue-600 text-white font-bold rounded-lg text-[10px]"
-                    >
-                      Xem File
-                    </a>
+
+                    <div className="flex-1 flex items-end">
+                      <label className="cursor-pointer w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md shadow-amber-600/20 transition-all active:scale-95">
+                        <Upload className="w-4 h-4" /> Chọn File Từ Máy Tính & Lưu Vào Hồ Sơ
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                          className="hidden"
+                          onChange={handleFileUploadForEmployee}
+                        />
+                      </label>
+                    </div>
                   </div>
-                ))}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {formData.kyc_documents && formData.kyc_documents.length > 0 ? (
+                  formData.kyc_documents.map((doc) => (
+                    <div key={doc.doc_id} className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between hover:bg-slate-100/80 transition-colors">
+                      <div className="min-w-0 pr-2">
+                        <span className="font-bold text-slate-900 block truncate">{doc.doc_name}</span>
+                        <span className="text-[10px] text-slate-500 font-mono block">{doc.uploaded_at || 'Mới tải lên'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={`https://${doc.file_r2_path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px]"
+                        >
+                          Xem File
+                        </a>
+                        {!isViewOnly && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveEmployeeDoc(doc.doc_id)}
+                            className="p-1 text-slate-400 hover:text-red-600 rounded-lg"
+                            title="Xóa tệp này"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="col-span-2 text-center text-slate-400 py-4 italic">Chưa có giấy tờ đính kèm nào trong hồ sơ nhân viên này.</p>
+                )}
               </div>
             </div>
           )}
@@ -808,13 +888,13 @@ export default function EmployeeModal({
           {/* TAB 5: QUÁ TRÌNH LÀM VIỆC */}
           {activeTab === 'WORK_PROCESS' && (
             <div className="space-y-4 text-xs">
-              <h3 className="font-black uppercase text-blue-700 flex items-center gap-1.5 border-b pb-2">
+              <h3 className="font-semibold uppercase text-blue-700 flex items-center gap-1.5 border-b pb-2">
                 <TrendingUp className="w-4 h-4 text-blue-600" /> 5. Lịch Sử Điều Chuyển & Thăng Tiến
               </h3>
               <div className="space-y-3">
                 {formData.work_process?.map((wp) => (
                   <div key={wp.id} className="p-4 bg-blue-50/60 border border-blue-200 rounded-2xl space-y-1">
-                    <div className="flex items-center justify-between font-extrabold text-blue-900">
+                    <div className="flex items-center justify-between font-bold text-blue-900">
                       <span>Quyết Định: {wp.decision_number}</span>
                       <span className="font-mono text-slate-500">{wp.effective_date}</span>
                     </div>
@@ -830,7 +910,7 @@ export default function EmployeeModal({
           {activeTab === 'REWARDS_DISCIPLINE' && (
             <div className="space-y-6 text-xs">
               <div className="space-y-3">
-                <h3 className="font-black uppercase text-amber-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-amber-700 flex items-center gap-1.5 border-b pb-2">
                   <Award className="w-4 h-4 text-amber-600" /> 6.1 Quyết Định Khen Thưởng
                 </h3>
                 {formData.rewards?.map((rw) => (
@@ -845,7 +925,7 @@ export default function EmployeeModal({
               </div>
 
               <div className="space-y-3 pt-2">
-                <h3 className="font-black uppercase text-red-700 flex items-center gap-1.5 border-b pb-2">
+                <h3 className="font-semibold uppercase text-red-700 flex items-center gap-1.5 border-b pb-2">
                   <ShieldAlert className="w-4 h-4 text-red-600" /> 6.2 Lịch Sử Kỷ Luật Lao Động
                 </h3>
                 <p className="text-slate-400 italic">Không có quyết định kỷ luật nào.</p>
@@ -856,7 +936,7 @@ export default function EmployeeModal({
           {/* TAB 7: LỊCH SỬ BẢN THÂN */}
           {activeTab === 'PERSONAL_HISTORY' && (
             <div className="space-y-4 text-xs">
-              <h3 className="font-black uppercase text-indigo-700 flex items-center gap-1.5 border-b pb-2">
+              <h3 className="font-semibold uppercase text-indigo-700 flex items-center gap-1.5 border-b pb-2">
                 <BookOpen className="w-4 h-4 text-indigo-600" /> 7. Sơ Lược Tiểu Sử Bản Thân & Ghi Chú HR
               </h3>
               <div className="p-4 bg-slate-50 border rounded-2xl space-y-3">
@@ -885,7 +965,7 @@ export default function EmployeeModal({
             {!isViewOnly && (
               <button
                 type="submit"
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center gap-1.5"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center gap-1.5"
               >
                 <Save className="w-4 h-4" /> Lưu Hồ Sơ Nhân Sự (7 Mục)
               </button>

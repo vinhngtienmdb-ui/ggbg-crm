@@ -395,7 +395,7 @@ export default function HrmSettingsPage() {
         {activeTab === 'JOB_TITLES' && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95"
+            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" /> Thêm Chức Danh Mới
           </button>
@@ -403,7 +403,7 @@ export default function HrmSettingsPage() {
       </div>
 
       {/* Navigation Tabs (6 Comprehensive HR Settings Tabs) */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-bold">
         <button
           onClick={() => setActiveTab('ORG_CHART')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
@@ -464,7 +464,7 @@ export default function HrmSettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-blue-600" /> Cấu Trúc Cây Tổ Chức Đa Cấp Doanh Nghiệp GGBG
               </h3>
               <p className="text-xs text-slate-500">Ban Giám Đốc → Khối Kinh Doanh / Vận Hành / HR → Phòng Ban → Đội Nhóm → Nhân Viên</p>
@@ -499,7 +499,7 @@ export default function HrmSettingsPage() {
 
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
               >
                 <Plus className="w-4 h-4" /> Thêm Chức Danh Mới
               </button>
@@ -509,7 +509,7 @@ export default function HrmSettingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
+                <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase text-[10.5px]">
                   <th className="p-3">Mã & Tên Chức Danh</th>
                   <th className="p-3">Phòng Ban Trực Thuộc</th>
                   <th className="p-3">Ngạch/Bậc Lương</th>
@@ -523,19 +523,19 @@ export default function HrmSettingsPage() {
                 {filteredTitles.map((t) => (
                   <tr key={t.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3">
-                      <p className="font-extrabold text-slate-900 text-sm">{t.title_name}</p>
+                      <p className="font-bold text-slate-900 text-sm">{t.title_name}</p>
                       <p className="font-mono text-purple-700 text-[11px]">{t.code}</p>
                     </td>
 
                     <td className="p-3 font-bold text-slate-800">{t.department}</td>
 
                     <td className="p-3">
-                      <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-full font-extrabold border border-purple-200 text-[11px]">
+                      <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-full font-bold border border-purple-200 text-[11px]">
                         {t.salary_grade}
                       </span>
                     </td>
 
-                    <td className="p-3 font-mono font-extrabold text-emerald-700">
+                    <td className="p-3 font-mono font-bold text-emerald-700">
                       {new Intl.NumberFormat('vi-VN').format(t.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(t.max_salary)} ₫
                     </td>
 
@@ -588,7 +588,7 @@ export default function HrmSettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
           <div className="flex items-center justify-between border-b pb-4">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-emerald-600" /> Hệ Thống Cấu Hình Ca Làm Việc Đa Ca, Đi Muộn & Bán Kính Chấm Công GPS
               </h3>
               <p className="text-xs text-slate-500 font-normal mt-0.5">
@@ -598,7 +598,7 @@ export default function HrmSettingsPage() {
 
             <button
               onClick={() => showToast('💾 Đã lưu thành công cấu hình ca làm việc đa ca & bán kính GPS!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all active:scale-95"
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all active:scale-95"
             >
               <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công
             </button>
@@ -607,7 +607,7 @@ export default function HrmSettingsPage() {
           {/* SECTION 1: DANH SÁCH CÁC CA LÀM VIỆC ĐA DẠNG (MULTI-SHIFT CONFIGURATION) */}
           <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+              <h4 className="text-emerald-700 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
                 <Clock className="w-4 h-4 text-emerald-600" /> 1. Quản Lý Danh Sách Các Ca Làm Việc Doanh Nghiệp (Multi-Shift)
               </h4>
               <button
@@ -624,7 +624,7 @@ export default function HrmSettingsPage() {
                   setShiftsList([...shiftsList, newShift]);
                   showToast(`⚡ Đã bổ sung ca làm việc mới: ${newShift.name}`);
                 }}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 transition-all"
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-bold flex items-center gap-1 transition-all"
               >
                 <Plus className="w-3.5 h-3.5" /> Thêm Ca Làm Việc
               </button>
@@ -633,7 +633,7 @@ export default function HrmSettingsPage() {
             <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold">
+                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold">
                     <th className="p-3">Tên Ca Làm Việc</th>
                     <th className="p-3">Giờ Bắt Đầu</th>
                     <th className="p-3">Giờ Kết Thúc</th>
@@ -646,21 +646,21 @@ export default function HrmSettingsPage() {
                 <tbody className="divide-y divide-slate-100 font-medium">
                   {shiftsList.map((shift) => (
                     <tr key={shift.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3 font-extrabold text-slate-900 flex items-center gap-2">
+                      <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                         {shift.name}
                       </td>
                       <td className="p-3 font-mono font-bold text-blue-700">{shift.start}</td>
                       <td className="p-3 font-mono font-bold text-blue-700">{shift.end}</td>
                       <td className="p-3 text-slate-600">{shift.lunch}</td>
-                      <td className="p-3 text-center font-mono font-black text-emerald-700">{shift.hours}h</td>
+                      <td className="p-3 text-center font-mono font-semibold text-emerald-700">{shift.hours}h</td>
                       <td className="p-3 text-center">
                         <button
                           onClick={() => {
                             setShiftsList(shiftsList.map(s => s.id === shift.id ? { ...s, active: !s.active } : s));
                             showToast(`⚙️ Đã cập nhật trạng thái ca: ${shift.name}`);
                           }}
-                          className={`px-2.5 py-0.5 rounded-full font-extrabold text-[10px] ${
+                          className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
                             shift.active ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'
                           }`}
                         >
@@ -687,7 +687,7 @@ export default function HrmSettingsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Số Phút Cho Phép Đi Muộn Không Trừ Công (Grace Period)</label>
+                <label className="block text-slate-700 font-bold">Số Phút Cho Phép Đi Muộn Không Trừ Công (Grace Period)</label>
                 <input
                   type="number"
                   value={timekeepingCfg.grace_period_minutes}
@@ -698,7 +698,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Giới Hạn Tăng Ca OT Tối Đa (Giờ / Tháng)</label>
+                <label className="block text-slate-700 font-bold">Giới Hạn Tăng Ca OT Tối Đa (Giờ / Tháng)</label>
                 <input
                   type="number"
                   value={timekeepingCfg.max_ot_monthly_hours}
@@ -714,7 +714,7 @@ export default function HrmSettingsPage() {
           <div className="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
               <div>
-                <h4 className="text-blue-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+                <h4 className="text-blue-900 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-blue-600" /> 2. Danh Sách Địa Điểm Văn Phòng & Bán Kính Chấm Công GPS Geofencing
                 </h4>
                 <p className="text-[11px] text-slate-500 font-normal">Cho phép nhân sự check-in đúng tọa độ GPS của trụ sở được phân công.</p>
@@ -722,7 +722,7 @@ export default function HrmSettingsPage() {
 
               <button
                 onClick={handleFetchCurrentLocation}
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95 shrink-0"
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[11px] font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95 shrink-0"
               >
                 <MapPin className="w-4 h-4" /> 📍 Lấy Tọa Độ GPS Hiện Tại (Browser)
               </button>
@@ -731,7 +731,7 @@ export default function HrmSettingsPage() {
             <div className="overflow-x-auto border border-blue-200 rounded-xl bg-white">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-blue-100/60 border-b border-blue-200 text-blue-900 font-extrabold">
+                  <tr className="bg-blue-100/60 border-b border-blue-200 text-blue-900 font-bold">
                     <th className="p-3">Tên Trụ Sở / Chi Nhánh</th>
                     <th className="p-3">Địa Chỉ Chi Tiết</th>
                     <th className="p-3 font-mono">Tọa Độ GPS (Lat, Long)</th>
@@ -742,7 +742,7 @@ export default function HrmSettingsPage() {
                 <tbody className="divide-y divide-slate-100 font-medium">
                   {locationsList.map((loc) => (
                     <tr key={loc.id} className="hover:bg-blue-50/40 transition-colors">
-                      <td className="p-3 font-extrabold text-slate-900 flex items-center gap-2">
+                      <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
                         {loc.name}
                       </td>
@@ -750,11 +750,11 @@ export default function HrmSettingsPage() {
                       <td className="p-3 font-mono text-[11px] font-bold text-slate-800">
                         {loc.lat}, {loc.long}
                       </td>
-                      <td className="p-3 text-center font-mono font-black text-blue-700">
+                      <td className="p-3 text-center font-mono font-semibold text-blue-700">
                         {loc.radius}m
                       </td>
                       <td className="p-3 text-center">
-                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-extrabold text-[10px]">
+                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-bold text-[10px]">
                           🟢 Đang Hoạt Động
                         </span>
                       </td>
@@ -802,43 +802,43 @@ export default function HrmSettingsPage() {
 
           {/* SECTION 3: HỆ SỐ TÍNH TĂNG CA OT (OVERTIME MULTIPLIER CONFIG) */}
           <div className="p-5 bg-purple-50/40 border border-purple-200/80 rounded-2xl space-y-4">
-            <h4 className="text-purple-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+            <h4 className="text-purple-900 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
               <Clock className="w-4 h-4 text-purple-600" /> 3. Quy Tắc Hệ Số Tính Lương Làm Thêm Giờ (Overtime Multipliers)
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">OT Ngày Thường (Weekday OT Rate)</label>
+                <label className="block text-slate-700 font-bold">OT Ngày Thường (Weekday OT Rate)</label>
                 <input
                   type="number"
                   step={0.1}
                   value={timekeepingCfg.ot_weekday_mult}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekday_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho giờ làm ngoài giờ từ Thứ 2 đến Thứ 6 (x1.5).</p>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">OT Cuối Tuần (Weekend OT Rate)</label>
+                <label className="block text-slate-700 font-bold">OT Cuối Tuần (Weekend OT Rate)</label>
                 <input
                   type="number"
                   step={0.1}
                   value={timekeepingCfg.ot_weekend_mult}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekend_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho ngày nghỉ hằng tuần Thứ 7 & Chủ Nhật (x2.0).</p>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">OT Ngày Lễ Tết (Holiday OT Rate)</label>
+                <label className="block text-slate-700 font-bold">OT Ngày Lễ Tết (Holiday OT Rate)</label>
                 <input
                   type="number"
                   step={0.1}
                   value={timekeepingCfg.ot_holiday_mult}
                   onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_holiday_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho các ngày Lễ Tết quốc gia được hưởng nguyên lương (x3.0).</p>
               </div>
@@ -852,7 +852,7 @@ export default function HrmSettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-8 text-xs font-bold">
           <div className="flex items-center justify-between border-b pb-4">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-amber-600" /> Hệ Thống Cấu Hình Phép Năm, Lịch Nghỉ Lễ & Chế Độ Phúc Lợi Chuyên Sâu
               </h3>
               <p className="text-xs text-slate-500 font-normal mt-0.5">
@@ -862,7 +862,7 @@ export default function HrmSettingsPage() {
 
             <button
               onClick={() => showToast('💾 Đã lưu thành công toàn bộ cấu hình Phép năm, Lịch nghỉ lễ & Phúc lợi!')}
-              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-extrabold shadow-lg shadow-amber-600/30 flex items-center gap-2 transition-all active:scale-95"
+              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold shadow-lg shadow-amber-600/30 flex items-center gap-2 transition-all active:scale-95"
             >
               <Save className="w-4 h-4" /> Lưu Cấu Hình Toàn Bộ
             </button>
@@ -870,13 +870,13 @@ export default function HrmSettingsPage() {
 
           {/* SECTION 1: CẤU HÌNH QUY TẮC PHÉP NĂM & THÂM NIÊN */}
           <div className="p-5 bg-amber-50/40 border border-amber-200/80 rounded-2xl space-y-4">
-            <h4 className="text-amber-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+            <h4 className="text-amber-900 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
               <Calendar className="w-4 h-4 text-amber-600" /> 1. Quy Tắc Cấp Phép Năm, Tích Lũy & Thanh Toán Phép Tồn (Accrual & Encashment)
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Phương Thức Cấp Phép Năm</label>
+                <label className="block text-slate-700 font-bold">Phương Thức Cấp Phép Năm</label>
                 <select
                   value={leavesCfg.accrual_method}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, accrual_method: e.target.value as any })}
@@ -889,23 +889,23 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Định Mức Phép Năm Nhân Viên (Ngày/Năm)</label>
+                <label className="block text-slate-700 font-bold">Định Mức Phép Năm Nhân Viên (Ngày/Năm)</label>
                 <input
                   type="number"
                   value={leavesCfg.annual_leave_default}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, annual_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-black"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho Hợp đồng lao động chính thức từ 1 năm trở lên.</p>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Định Mức Phép Cấp Quản Lý (Ngày/Năm)</label>
+                <label className="block text-slate-700 font-bold">Định Mức Phép Cấp Quản Lý (Ngày/Năm)</label>
                 <input
                   type="number"
                   value={leavesCfg.manager_leave_default}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, manager_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
+                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-semibold"
                 />
                 <p className="text-[10.5px] text-slate-500 font-normal">Dành cho cấp Trưởng phòng, Giám đốc Khối & C-Level.</p>
               </div>
@@ -913,7 +913,7 @@ export default function HrmSettingsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Phép Thâm Niên (+Ngày/Số Năm)</label>
+                <label className="block text-slate-700 font-bold">Phép Thâm Niên (+Ngày/Số Năm)</label>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-slate-600">Cộng</span>
                   <input
@@ -934,7 +934,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Dồn Phép Sang Năm Sau</label>
+                <label className="block text-slate-700 font-bold">Dồn Phép Sang Năm Sau</label>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-slate-600">Tối đa</span>
                   <input
@@ -954,7 +954,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Quy Định Chi Trả Tiền Phép Tồn</label>
+                <label className="block text-slate-700 font-bold">Quy Định Chi Trả Tiền Phép Tồn</label>
                 <select
                   value={leavesCfg.encashment_policy}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, encashment_policy: e.target.value as any })}
@@ -970,12 +970,12 @@ export default function HrmSettingsPage() {
           {/* SECTION 2: QUẢN LÝ LỊCH NGÀY NGHỈ LỄ TẾT QUỐC GIA & CÔNG TY */}
           <div className="p-5 bg-purple-50/40 border border-purple-200/80 rounded-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-purple-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+              <h4 className="text-purple-900 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
                 <Gift className="w-4 h-4 text-purple-600" /> 2. Danh Mục Các Ngày Nghỉ Lễ / Tết Hưởng Nguyên Lương ({holidaysList.length} Dịp)
               </h4>
               <button
                 onClick={() => showToast('➕ Đã thêm dịp Nghỉ Lễ mới vào danh mục')}
-                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 shadow-sm"
+                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" /> Thêm Ngày Nghỉ Lễ Mới
               </button>
@@ -984,7 +984,7 @@ export default function HrmSettingsPage() {
             <div className="overflow-x-auto bg-white rounded-xl border border-purple-100">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-purple-100 bg-purple-50/50 text-purple-900 font-extrabold text-[10.5px]">
+                  <tr className="border-b border-purple-100 bg-purple-50/50 text-purple-900 font-bold text-[10.5px]">
                     <th className="p-3">Tên Dịp Nghỉ Lễ / Tết</th>
                     <th className="p-3">Thời Gian / Ngày Nghỉ</th>
                     <th className="p-3 text-center">Số Ngày Nghỉ Hưởng Lương</th>
@@ -995,11 +995,11 @@ export default function HrmSettingsPage() {
                 <tbody className="divide-y divide-purple-50">
                   {holidaysList.map((h) => (
                     <tr key={h.id} className="hover:bg-purple-50/30 transition-colors">
-                      <td className="p-3 font-extrabold text-slate-900">{h.name}</td>
+                      <td className="p-3 font-bold text-slate-900">{h.name}</td>
                       <td className="p-3 font-mono text-purple-700">{h.date}</td>
-                      <td className="p-3 text-center font-mono font-black text-emerald-700">{h.days} ngày</td>
+                      <td className="p-3 text-center font-mono font-semibold text-emerald-700">{h.days} ngày</td>
                       <td className="p-3">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           h.type === 'Statutory' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-purple-100 text-purple-800 border border-purple-200'
                         }`}>
                           {h.type === 'Statutory' ? '🏛️ Luật Lao Động' : '🏢 Ngày Nghỉ Công Ty'}
@@ -1026,13 +1026,13 @@ export default function HrmSettingsPage() {
 
           {/* SECTION 3: NGHỈ CHẾ ĐỘ ĐẶC BIỆT & THAI SẢN */}
           <div className="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
-            <h4 className="text-blue-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+            <h4 className="text-blue-900 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
               <HeartPulse className="w-4 h-4 text-blue-600" /> 3. Chế Độ Nghỉ Việc Riêng, Tang Chế & Thai Sản (Statutory Leave Policy)
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Kết Hôn Bản Thân</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Nghỉ Kết Hôn Bản Thân</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
@@ -1045,7 +1045,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Kết Hôn Con Cái</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Nghỉ Kết Hôn Con Cái</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
@@ -1058,7 +1058,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Tang Chế (Tứ Thân)</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Nghỉ Tang Chế (Tứ Thân)</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
@@ -1071,7 +1071,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Không Hưởng Lương Max</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Nghỉ Không Hưởng Lương Max</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
@@ -1086,7 +1086,7 @@ export default function HrmSettingsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thai Sản Nữ Lao Động</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Thai Sản Nữ Lao Động</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
@@ -1099,7 +1099,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thai Sản Nam Lao Động (Vợ Sinh)</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Thai Sản Nam Lao Động (Vợ Sinh)</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
@@ -1112,7 +1112,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Trợ Cấp Sinh Con Công Ty Tặng</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Trợ Cấp Sinh Con Công Ty Tặng</label>
                 <input
                   type="number"
                   step={500000}
@@ -1126,13 +1126,13 @@ export default function HrmSettingsPage() {
 
           {/* SECTION 4: CHẾ ĐỘ PHÚC LỢI, THÂM NIÊN & THĂM HỎI HIẾU HỶ */}
           <div className="p-5 bg-emerald-50/40 border border-emerald-200/80 rounded-2xl space-y-4">
-            <h4 className="text-emerald-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
+            <h4 className="text-emerald-900 uppercase font-semibold tracking-wider text-[11.5px] flex items-center gap-2">
               <Gift className="w-4 h-4 text-emerald-600" /> 4. Chế Độ Phúc Lợi, Quà Sinh Nhật, Thâm Niên & Thăm Hỏi Hiếu Hỷ
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Quà Mừng Sinh Nhật Nhân Sự</label>
+                <label className="block text-slate-700 font-bold">Quà Mừng Sinh Nhật Nhân Sự</label>
                 <input
                   type="number"
                   step={100000}
@@ -1144,7 +1144,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Ngân Sách Team Building Hàng Tháng</label>
+                <label className="block text-slate-700 font-bold">Ngân Sách Team Building Hàng Tháng</label>
                 <input
                   type="number"
                   step={100000}
@@ -1156,7 +1156,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Định Mức Khám Sức Khỏe Định Kỳ</label>
+                <label className="block text-slate-700 font-bold">Định Mức Khám Sức Khỏe Định Kỳ</label>
                 <input
                   type="number"
                   step={500000}
@@ -1170,7 +1170,7 @@ export default function HrmSettingsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 1 Năm</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Thưởng Thâm Niên 1 Năm</label>
                 <input
                   type="number"
                   step={500000}
@@ -1181,7 +1181,7 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 3 Năm</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Thưởng Thâm Niên 3 Năm</label>
                 <input
                   type="number"
                   step={1000000}
@@ -1192,13 +1192,13 @@ export default function HrmSettingsPage() {
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 5 Năm (VIP)</label>
+                <label className="block text-slate-700 font-bold text-[11px]">Thưởng Thâm Niên 5 Năm (VIP)</label>
                 <input
                   type="number"
                   step={2000000}
                   value={leavesCfg.seniority_reward_5y}
                   onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_5y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-amber-700 font-black"
+                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-amber-700 font-semibold"
                 />
               </div>
             </div>
@@ -1209,13 +1209,13 @@ export default function HrmSettingsPage() {
       {/* TAB 5: BẢO HIỂM, THUẾ TNCN & QUỸ LƯƠNG P3 */}
       {activeTab === 'PAYROLL_CFG' && (
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
+          <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
             <DollarSign className="w-4 h-4 text-blue-600" /> Tỷ Lệ Trích Nộp BHXH, Thuế TNCN & Quỹ Thưởng Lương P3
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-blue-700 uppercase font-black tracking-wider text-[11px]">1. Tỷ Lệ Đóng BHXH Nhân Viên & Doanh Nghiệp</h4>
+              <h4 className="text-blue-700 uppercase font-semibold tracking-wider text-[11px]">1. Tỷ Lệ Đóng BHXH Nhân Viên & Doanh Nghiệp</h4>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -1254,7 +1254,7 @@ export default function HrmSettingsPage() {
             </div>
 
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11px]">2. Giảm Trừ Thuế TNCN & Quỹ Lương P3</h4>
+              <h4 className="text-emerald-700 uppercase font-semibold tracking-wider text-[11px]">2. Giảm Trừ Thuế TNCN & Quỹ Lương P3</h4>
 
               <div className="space-y-2">
                 <label className="block text-slate-700">Mức Giảm Trừ Bản Thân (VND/tháng)</label>
@@ -1294,7 +1294,7 @@ export default function HrmSettingsPage() {
           <div className="flex items-center justify-end">
             <button
               onClick={() => showToast('💾 Đã lưu thành công định mức tỷ lệ đóng BHXH, Thuế TNCN & Quỹ Lương P3!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
             >
               <Save className="w-4 h-4" /> Lưu Cấu Hình Lương & Thuế
             </button>
@@ -1305,13 +1305,13 @@ export default function HrmSettingsPage() {
       {/* TAB 6: PHÂN QUYỀN & QUY TRÌNH DUYỆT HR */}
       {activeTab === 'APPROVAL_CFG' && (
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
+          <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
             <ShieldCheck className="w-4 h-4 text-indigo-600" /> Phân Quyền Vai Trò & Quy Trình Duyệt Đơn Tự Động
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-indigo-700 uppercase font-black tracking-wider text-[11px]">1. Quy Trình Phê Duyệt Đơn Nghỉ Phép / OT</h4>
+              <h4 className="text-indigo-700 uppercase font-semibold tracking-wider text-[11px]">1. Quy Trình Phê Duyệt Đơn Nghỉ Phép / OT</h4>
 
               <div className="space-y-2">
                 <label className="block text-slate-700">Quy Trình Duyệt Đơn Nghỉ Phép</label>
@@ -1339,7 +1339,7 @@ export default function HrmSettingsPage() {
             </div>
 
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-purple-700 uppercase font-black tracking-wider text-[11px]">2. Nhắc Nhở Tự Động Hệ Thống</h4>
+              <h4 className="text-purple-700 uppercase font-semibold tracking-wider text-[11px]">2. Nhắc Nhở Tự Động Hệ Thống</h4>
 
               <div className="space-y-2">
                 <label className="block text-slate-700">Cảnh Báo Hợp Đồng Sắp Hết Hạn Trước (Ngày)</label>
@@ -1366,7 +1366,7 @@ export default function HrmSettingsPage() {
           <div className="flex items-center justify-end">
             <button
               onClick={() => showToast('💾 Đã lưu thành công quy trình phê duyệt & hệ thống nhắc nhở tự động!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
             >
               <Save className="w-4 h-4" /> Lưu Quy Trình Phê Duyệt
             </button>
@@ -1377,9 +1377,9 @@ export default function HrmSettingsPage() {
       {/* MODAL THÊM CHỨC DANH MỚI */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-purple-600 text-white p-5 flex items-center justify-between">
-              <h3 className="font-extrabold text-base flex items-center gap-2">
+              <h3 className="font-bold text-base flex items-center gap-2">
                 <Award className="w-5 h-5" /> Thêm Chức Danh Công Việc Mới
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
@@ -1434,7 +1434,7 @@ export default function HrmSettingsPage() {
                     step={1000000}
                     value={newTitle.min_salary}
                     onChange={(e) => setNewTitle({ ...newTitle, min_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-black"
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-semibold"
                   />
                 </div>
               </div>
@@ -1483,7 +1483,7 @@ export default function HrmSettingsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30"
+                  className="px-5 py-2 bg-purple-600 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30"
                 >
                   Lưu Chức Danh
                 </button>
@@ -1496,11 +1496,11 @@ export default function HrmSettingsPage() {
       {/* MODAL XEM CHI TIẾT CHỨC DANH (VIEW DETAIL) */}
       {viewingTitle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
             <div className="flex items-center justify-between border-b pb-3">
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-purple-600" />
-                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Chức Danh: {viewingTitle.title_name}</h3>
+                <h3 className="font-bold text-sm text-slate-900">Chi Tiết Chức Danh: {viewingTitle.title_name}</h3>
               </div>
               <button onClick={() => setViewingTitle(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -1521,12 +1521,12 @@ export default function HrmSettingsPage() {
 
               <div>
                 <span className="text-slate-500 font-bold block">Phòng Ban Trực Thuộc:</span>
-                <span className="font-extrabold text-slate-800 text-sm">{viewingTitle.department}</span>
+                <span className="font-bold text-slate-800 text-sm">{viewingTitle.department}</span>
               </div>
 
               <div>
                 <span className="text-slate-500 font-bold block">Dải Lương Cơ Bản (Min - Max):</span>
-                <span className="font-mono font-extrabold text-emerald-700 text-sm">
+                <span className="font-mono font-bold text-emerald-700 text-sm">
                   {new Intl.NumberFormat('vi-VN').format(viewingTitle.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(viewingTitle.max_salary)} ₫
                 </span>
               </div>
@@ -1555,7 +1555,7 @@ export default function HrmSettingsPage() {
             <div className="flex items-center justify-end pt-2">
               <button
                 onClick={() => setViewingTitle(null)}
-                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
+                className="px-5 py-2 bg-slate-900 text-white font-bold rounded-xl"
               >
                 Đóng
               </button>
@@ -1567,9 +1567,9 @@ export default function HrmSettingsPage() {
       {/* MODAL CHỈNH SỬA CHỨC DANH (EDIT) */}
       {editingTitle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900">Chỉnh Sửa Chức Danh: {editingTitle.code}</h3>
+              <h3 className="font-bold text-sm text-slate-900">Chỉnh Sửa Chức Danh: {editingTitle.code}</h3>
               <button onClick={() => setEditingTitle(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
@@ -1691,7 +1691,7 @@ export default function HrmSettingsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-lg shadow-amber-600/30"
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-lg shadow-amber-600/30"
                 >
                   Cập Nhật Chức Danh
                 </button>

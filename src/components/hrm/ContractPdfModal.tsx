@@ -16,7 +16,7 @@ export default function ContractPdfModal({ isOpen, onClose, employee }: Contract
 
   return (
     <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="p-5 bg-blue-50 text-slate-900 border-b border-blue-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">

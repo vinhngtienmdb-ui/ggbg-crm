@@ -161,7 +161,7 @@ export default function EnterpriseProjectsPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 text-xs font-extrabold">
+          <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 text-xs font-bold">
             <button
               onClick={() => setViewMode('GANTT')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
@@ -190,7 +190,7 @@ export default function EnterpriseProjectsPage() {
 
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
           >
             <Plus className="w-4 h-4" /> Khởi Tạo Dự Án Mới
           </button>
@@ -201,13 +201,13 @@ export default function EnterpriseProjectsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-bold">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Tổng Số Dự Án Vận Hành</span>
-          <p className="text-xl font-black text-slate-900">{projects.length} Dự Án Enterprise</p>
+          <p className="text-xl font-semibold text-slate-900">{projects.length} Dự Án Enterprise</p>
           <p className="text-purple-600 font-semibold text-[11px]">🔥 {projects.filter(p => p.status === 'IN_PROGRESS').length} Dự án đang thực hiện</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Tiến Độ Hoàn Thành Trung Bình</span>
-          <p className="text-xl font-black text-emerald-700">{avgProgress}% Progress</p>
+          <p className="text-xl font-semibold text-emerald-700">{avgProgress}% Progress</p>
           <div className="w-full h-2 bg-slate-100 rounded overflow-hidden mt-1">
             <div className="h-full bg-emerald-500 rounded" style={{ width: `${avgProgress}%` }}></div>
           </div>
@@ -215,13 +215,13 @@ export default function EnterpriseProjectsPage() {
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Tổng Ngân Sách Dự Án (Budget)</span>
-          <p className="text-xl font-black text-blue-700">{totalBudget.toLocaleString('vi-VN')} ₫</p>
+          <p className="text-xl font-semibold text-blue-700">{totalBudget.toLocaleString('vi-VN')} ₫</p>
           <p className="text-blue-600 font-semibold text-[11px]">💰 Hạn mức đầu tư phê duyệt</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
           <span className="text-slate-500 uppercase text-[10.5px]">Chi Phí Thực Tế Phát Sinh</span>
-          <p className="text-xl font-black text-amber-700">{totalActual.toLocaleString('vi-VN')} ₫</p>
+          <p className="text-xl font-semibold text-amber-700">{totalActual.toLocaleString('vi-VN')} ₫</p>
           <p className="text-emerald-600 font-semibold text-[11px]">🟢 Trong tầm kiểm soát ngân sách</p>
         </div>
       </div>
@@ -232,7 +232,7 @@ export default function EnterpriseProjectsPage() {
           <div className="flex items-center justify-between border-b pb-4">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-purple-600" />
-              <h3 className="font-extrabold text-sm text-slate-900">Sơ Đồ Tiến Độ Timeline Gantt Chart</h3>
+              <h3 className="font-bold text-sm text-slate-900">Sơ Đồ Tiến Độ Timeline Gantt Chart</h3>
             </div>
             <span className="text-slate-500">Timeline: Tháng 07/2026 — Tháng 11/2026</span>
           </div>
@@ -243,9 +243,9 @@ export default function EnterpriseProjectsPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-purple-700 font-extrabold text-xs">{prj.project_code}</span>
-                      <h4 className="font-extrabold text-slate-900 text-sm">{prj.name}</h4>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                      <span className="font-mono text-purple-700 font-bold text-xs">{prj.project_code}</span>
+                      <h4 className="font-bold text-slate-900 text-sm">{prj.name}</h4>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
                         prj.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
                         prj.status === 'PLANNING' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-100 text-emerald-800'
                       }`}>
@@ -260,7 +260,7 @@ export default function EnterpriseProjectsPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <span className="text-[10.5px] text-slate-500 block">Ngân sách vs Thực tế:</span>
-                      <span className="font-mono text-xs text-slate-900 font-extrabold">
+                      <span className="font-mono text-xs text-slate-900 font-bold">
                         {prj.actual_cost.toLocaleString('vi-VN')} / {prj.budget.toLocaleString('vi-VN')} ₫
                       </span>
                     </div>
@@ -270,7 +270,7 @@ export default function EnterpriseProjectsPage() {
                         setSelectedProject(prj);
                         setIsAddTaskOpen(true);
                       }}
-                      className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 transition-all"
+                      className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[11px] font-bold flex items-center gap-1 transition-all"
                     >
                       <Plus className="w-3.5 h-3.5" /> Thêm Task
                     </button>
@@ -289,7 +289,7 @@ export default function EnterpriseProjectsPage() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs text-slate-700">
                     <span>Thời gian: {prj.start_date} ➔ {prj.end_date}</span>
-                    <span className="font-mono font-black text-purple-700">{prj.progress_pct}% Hoàn Thành</span>
+                    <span className="font-mono font-semibold text-purple-700">{prj.progress_pct}% Hoàn Thành</span>
                   </div>
 
                   <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -311,7 +311,7 @@ export default function EnterpriseProjectsPage() {
                             <p className="font-bold text-slate-900">{t.title}</p>
                             <p className="text-[10.5px] text-slate-500">👤 {t.assignee_name} • Hạn: {t.due_date}</p>
                           </div>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                             t.status === 'DONE' ? 'bg-emerald-100 text-emerald-800' :
                             t.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'
                           }`}>
@@ -344,7 +344,7 @@ export default function EnterpriseProjectsPage() {
             return (
               <div key={colStatus} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 min-h-[400px]">
                 <div className="flex items-center justify-between border-b pb-2">
-                  <span className="font-extrabold text-slate-900 text-xs">{statusNames[colStatus]}</span>
+                  <span className="font-bold text-slate-900 text-xs">{statusNames[colStatus]}</span>
                   <span className="px-2 py-0.5 bg-slate-200 text-slate-800 rounded-full font-mono text-[10.5px]">
                     {allTasks.length}
                   </span>
@@ -353,7 +353,7 @@ export default function EnterpriseProjectsPage() {
                 <div className="space-y-2">
                   {allTasks.map((t) => (
                     <div key={t.id} className="p-3 bg-white border border-slate-200 rounded-xl shadow-sm space-y-1.5 hover:shadow-md transition-all">
-                      <p className="font-extrabold text-slate-900">{t.title}</p>
+                      <p className="font-bold text-slate-900">{t.title}</p>
                       <p className="text-[11px] text-slate-500 font-normal">👤 Phụ trách: <strong>{t.assignee_name}</strong></p>
                       <div className="flex items-center justify-between text-[10.5px] pt-1 border-t border-slate-100">
                         <span className="text-slate-400 font-mono">📅 {t.due_date}</span>
@@ -373,7 +373,7 @@ export default function EnterpriseProjectsPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
           <div className="flex items-center justify-between border-b pb-3">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <FolderKanban className="w-5 h-5 text-purple-600" /> Cấu Hình Tham Số Vận Hành Dự Án Enterprise
               </h3>
               <p className="text-[11px] text-slate-500 font-normal mt-0.5">
@@ -383,7 +383,7 @@ export default function EnterpriseProjectsPage() {
 
             <button
               onClick={() => showToast('💾 Đã lưu thành công cấu hình tham số Quản lý Dự án!')}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all active:scale-95"
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-md shadow-purple-600/30 transition-all active:scale-95"
             >
               <FolderKanban className="w-4 h-4" /> Lưu Cấu Hình Dự Án
             </button>
@@ -391,7 +391,7 @@ export default function EnterpriseProjectsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
+              <h4 className="font-bold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
                 1. Ngưỡng Cảnh Báo Ngân Sách & Tải Công Việc
               </h4>
 
@@ -419,7 +419,7 @@ export default function EnterpriseProjectsPage() {
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
+              <h4 className="font-bold text-slate-900 text-xs text-purple-700 uppercase tracking-wider">
                 2. Quy Tắc Lưu Trữ & Đơn Vị Tiền Tệ
               </h4>
 
@@ -454,9 +454,9 @@ export default function EnterpriseProjectsPage() {
       {/* MODAL KHỞI TẠO DỰ ÁN MỚI */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <FolderKanban className="w-5 h-5 text-purple-600" /> Khởi Tạo Dự Án Mới (Enterprise Project)
               </h3>
               <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
@@ -556,7 +556,7 @@ export default function EnterpriseProjectsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30"
                 >
                   Khởi Tạo Dự Án
                 </button>
@@ -569,9 +569,9 @@ export default function EnterpriseProjectsPage() {
       {/* MODAL THÊM TASK CHO DỰ ÁN */}
       {isAddTaskOpen && selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900">Bổ Sung Task: {selectedProject.name}</h3>
+              <h3 className="font-bold text-sm text-slate-900">Bổ Sung Task: {selectedProject.name}</h3>
               <button onClick={() => setIsAddTaskOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
@@ -611,7 +611,7 @@ export default function EnterpriseProjectsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30"
                 >
                   Bổ Sung Task
                 </button>

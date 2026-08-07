@@ -66,7 +66,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -74,7 +74,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white">Cấu Hình Tiêu Chí Đánh Giá HR & Phân Định Thẩm Quyền</h2>
+              <h2 className="text-base font-bold text-white">Cấu Hình Tiêu Chí Đánh Giá HR & Phân Định Thẩm Quyền</h2>
               <p className="text-xs text-slate-300">
                 Phòng HR thiết lập danh mục tiêu chí & phân công người chấm (Quản lý trực tiếp / Quản lý gián tiếp / HR)
               </p>
@@ -103,7 +103,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
               <span className="font-bold text-slate-700 block">Tổng Trọng Số Đánh Giá:</span>
               <span className="text-slate-500">Quy định tổng trọng số các tiêu chí phải đạt chính xác 100%</span>
             </div>
-            <div className="flex items-center gap-2 font-mono font-black text-sm">
+            <div className="flex items-center gap-2 font-mono font-semibold text-sm">
               <span className={`px-3 py-1 rounded-xl ${totalWeight === 100 ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
                 {totalWeight}%
               </span>
@@ -122,7 +122,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
             {criteria.map((item, idx) => (
               <div key={item.id} className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm hover:border-purple-300 transition-colors">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-800 font-mono font-extrabold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-800 font-mono font-bold text-xs flex items-center justify-center shrink-0">
                     #{idx + 1}
                   </span>
 
@@ -132,7 +132,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
                     value={item.name}
                     onChange={(e) => handleUpdateItem(idx, 'name', e.target.value)}
                     placeholder="Tên tiêu chí đánh giá"
-                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
 
                   <div className="flex items-center gap-1 shrink-0">
@@ -210,7 +210,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+              className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
             >
               <Check className="w-4 h-4" /> Lưu Thiết Lập Tiêu Chí HR
             </button>

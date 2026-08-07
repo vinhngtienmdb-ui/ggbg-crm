@@ -115,7 +115,7 @@ export default function LaborBook({
 
   const handlePrint = () => window.print();
 
-  const thCls = 'p-3 uppercase text-slate-500 font-extrabold tracking-wide text-[10.5px]';
+  const thCls = 'p-3 uppercase text-slate-500 font-bold tracking-wide text-[10.5px]';
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -127,7 +127,7 @@ export default function LaborBook({
               <BookText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-extrabold text-slate-900 text-base">Sổ Quản Lý Lao Động</h2>
+              <h2 className="font-bold text-slate-900 text-base">Sổ Quản Lý Lao Động</h2>
               <p className="text-[11px] text-slate-500">Theo Nghị định 145/2020/NĐ-CP • {filtered.length} lao động</p>
             </div>
           </div>

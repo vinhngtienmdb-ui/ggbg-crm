@@ -1305,7 +1305,7 @@ export default function SystemSettingsPage() {
             {/* Config Audit Logs Table */}
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden space-y-2">
               <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
                   <History className="w-4 h-4 text-blue-600" /> Nhật Ký Thay Đổi Cấu Hình (Config Audit Log)
                 </h3>
                 <span className="text-xs text-slate-500 font-medium">
@@ -1316,7 +1316,7 @@ export default function SystemSettingsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
+                    <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wide text-[10.5px]">
                       <th className="p-4">Thời Gian</th>
                       <th className="p-4">Phân Hệ Cấu Hình</th>
                       <th className="p-4">Người Thực Hiện</th>
@@ -1357,14 +1357,14 @@ export default function SystemSettingsPage() {
         {activeTab === 'COMPANY_IDENTITY' && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6 text-xs font-bold">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-4">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-4">
                 <Building2 className="w-5 h-5 text-emerald-600" /> Cấu Hình Thông Tin Pháp Lý Doanh Nghiệp & Con Dấu Mộc Đỏ
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Box 1: Thông tin Pháp lý */}
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                  <h4 className="font-extrabold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
+                  <h4 className="font-bold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
                     1. Thông Tin Pháp Lý Doanh Nghiệp (Corporate Identity)
                   </h4>
 
@@ -1413,15 +1413,15 @@ export default function SystemSettingsPage() {
 
                 {/* Box 2: Dấu Mộc Đỏ & Chữ Ký */}
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                  <h4 className="font-extrabold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
+                  <h4 className="font-bold text-slate-900 text-xs text-blue-700 uppercase tracking-wider">
                     2. Dấu Mộc Đỏ & Mẫu Chữ Ký Điện Tử
                   </h4>
 
                   <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-2 text-center">
-                    <div className="w-20 h-20 mx-auto rounded-full bg-red-50 border-2 border-red-500 flex items-center justify-center text-red-600 font-black text-xs shadow-md">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-red-50 border-2 border-red-500 flex items-center justify-center text-red-600 font-semibold text-xs shadow-md">
                       MỘC ĐỎ GGBG
                     </div>
-                    <p className="text-emerald-700 font-extrabold text-xs">{companyInfo.seal_status}</p>
+                    <p className="text-emerald-700 font-bold text-xs">{companyInfo.seal_status}</p>
                     <p className="text-[10.5px] text-slate-500 font-normal">Tự động đóng mộc trên Hợp đồng PDF & Công văn chính thức</p>
                   </div>
 
