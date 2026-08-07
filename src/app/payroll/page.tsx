@@ -46,6 +46,10 @@ export default function PayrollPage() {
   const [activeTab, setActiveTab] = useState<'reports' | 'payroll' | 'paystubs' | 'settings'>('reports');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
 
+  // Role Scope Switcher: 'ADMIN' (Quản Trị Hệ Thống) vs 'PERSONAL' (Cá Nhân Xem Phiếu Lương Của Mình)
+  const [viewScopeMode, setViewScopeMode] = useState<'ADMIN' | 'PERSONAL'>('ADMIN');
+  const [myEmployeeCode, setMyEmployeeCode] = useState<string>('NV-00101'); // Mã nhân viên cá nhân (e.g. Trần Văn Hoàng)
+
   // Store states
   const [payrolls, setPayrolls] = useState<PayrollSheet[]>([]);
   const [paySettings, setPaySettings] = useState<PayrollSettings>(() => getPayrollSettings());
@@ -105,14 +109,24 @@ export default function PayrollPage() {
     showToast('⚙️ Đã lưu cấu hình cài đặt Bảng Lương & Phụ Cấp!');
   };
 
+  // Filter payroll data based on View Scope (ADMIN vs PERSONAL)
+  const scopedPayrolls = useMemo(() => {
+    if (viewScopeMode === 'PERSONAL') {
+      // Chế độ Cá Nhân: CHỈ xem phiếu lương của chính nhân sự đang đăng nhập
+      return payrolls.filter((p) => p.employee_code === myEmployeeCode);
+    }
+    // Chế độ Quản Trị Hệ Thống: Xem toàn bộ nhân sự công ty
+    return payrolls;
+  }, [payrolls, viewScopeMode, myEmployeeCode]);
+
   const filteredPayrolls = useMemo(() => {
-    return payrolls.filter(
+    return scopedPayrolls.filter(
       (p) =>
         p.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.payroll_code.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [payrolls, searchTerm]);
+  }, [scopedPayrolls, searchTerm]);
 
   const stats = useMemo(() => {
     const totalNet = payrolls.reduce((acc, curr) => acc + curr.net_salary, 0);
@@ -137,55 +151,94 @@ export default function PayrollPage() {
       )}
 
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <DollarSign className="w-6 h-6 text-emerald-600" />
-            <h1 className="text-xl font-bold text-slate-900">Quản Lý Bảng Lương & Phụ Cấp 3P</h1>
+            <h1 className="text-xl font-bold text-slate-900">
+              {viewScopeMode === 'ADMIN' ? 'Quản Lý Bảng Lương & Phụ Cấp 3P' : 'Phiếu Lương Cá Nhân Của Tôi'}
+            </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-              Module Bảng Lương
+              {viewScopeMode === 'ADMIN' ? 'Quản Trị Hệ Thống' : 'Giao Diện Cá Nhân'}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Tính toán lương P1-P2-P3 tự động, rà soát BHXH, khấu trừ Thuế TNCN & phát hành phiếu lương qua Zalo ZNS/Email
+            {viewScopeMode === 'ADMIN'
+              ? 'Tính toán lương P1-P2-P3 tự động toàn công ty, rà soát BHXH, khấu trừ Thuế TNCN & phát hành phiếu lương qua Zalo ZNS/Email.'
+              : 'Bảo mật 100% - Xem và tra cứu lịch sử chi tiết phiếu lương cá nhân qua các kỳ hàng tháng, tải PDF mã hóa PIN.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={handleCalculatePayroll}
-            className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95"
-          >
-            <RefreshCw className="w-4 h-4 text-emerald-400" /> Tính Lương Tự Động
-          </button>
-          <button
-            onClick={handleBatchSendPaystubs}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95"
-          >
-            <Send className="w-4 h-4" /> Gửi Bảng Lương Hàng Loạt
-          </button>
+          {/* Scope Mode Switcher */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold mr-2">
+            <button
+              onClick={() => {
+                setViewScopeMode('ADMIN');
+                setActiveTab('reports');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                viewScopeMode === 'ADMIN' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-400" /> Quản Trị Hệ Thống
+            </button>
+            <button
+              onClick={() => {
+                setViewScopeMode('PERSONAL');
+                setActiveTab('paystubs');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                viewScopeMode === 'PERSONAL' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <User className="w-3.5 h-3.5 text-emerald-200" /> Phiếu Lương Cá Nhân
+            </button>
+          </div>
+
+          {/* Admin Action Buttons */}
+          {viewScopeMode === 'ADMIN' && (
+            <>
+              <button
+                onClick={handleCalculatePayroll}
+                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <RefreshCw className="w-4 h-4 text-emerald-400" /> Tính Lương Tự Động
+              </button>
+              <button
+                onClick={handleBatchSendPaystubs}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <Send className="w-4 h-4" /> Gửi Bảng Lương Hàng Loạt
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-bold">
-        <button
-          onClick={() => setActiveTab('reports')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <DollarSign className="w-4 h-4 text-emerald-400" /> Báo Cáo
-        </button>
+        {viewScopeMode === 'ADMIN' && (
+          <>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+                activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <DollarSign className="w-4 h-4 text-emerald-400" /> Báo Cáo
+            </button>
 
-        <button
-          onClick={() => setActiveTab('payroll')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'payroll' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <DollarSign className="w-4 h-4 text-blue-400" /> Bảng Lương 3P
-        </button>
+            <button
+              onClick={() => setActiveTab('payroll')}
+              className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+                activeTab === 'payroll' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <DollarSign className="w-4 h-4 text-blue-400" /> Bảng Lương 3P
+            </button>
+          </>
+        )}
 
         <button
           onClick={() => setActiveTab('paystubs')}
@@ -193,17 +246,20 @@ export default function PayrollPage() {
             activeTab === 'paystubs' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Eye className="w-4 h-4 text-purple-400" /> Phiếu Lương ({payrolls.length})
+          <Eye className="w-4 h-4 text-purple-400" />
+          {viewScopeMode === 'PERSONAL' ? 'Phiếu Lương Cá Nhân Của Tôi' : `Sổ Phiếu Lương (${filteredPayrolls.length})`}
         </button>
 
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'settings' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <Settings className="w-4 h-4 text-amber-400" /> Cài Đặt
-        </button>
+        {viewScopeMode === 'ADMIN' && (
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'settings' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Settings className="w-4 h-4 text-amber-400" /> Cài Đặt
+          </button>
+        )}
       </div>
 
       {/* TAB 1: DEDICATED PAYROLL ANALYTICS DASHBOARD */}
@@ -414,7 +470,27 @@ export default function PayrollPage() {
             {/* Filter Bar for Paystubs */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                <span className="font-bold text-slate-600">Lọc Theo Kỳ Lương:</span>
+                {viewScopeMode === 'ADMIN' ? (
+                  <>
+                    <span className="font-bold text-slate-600">Chọn Nhân Sự:</span>
+                    <select
+                      value={myEmployeeCode}
+                      onChange={(e) => setMyEmployeeCode(e.target.value)}
+                      className="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-900 font-bold rounded-xl focus:outline-none"
+                    >
+                      <option value="NV-00101">Trần Văn Hoàng (NV-00101)</option>
+                      <option value="NV-00102">Lê Thị Mai (NV-00102)</option>
+                      <option value="NV-00103">Đặng Kim Anh (NV-00103)</option>
+                      <option value="NV-00104">Nguyễn Quốc Tuấn (NV-00104)</option>
+                    </select>
+                  </>
+                ) : (
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold rounded-xl flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-emerald-600" /> Hồ Sơ Cá Nhân: Trần Văn Hoàng (NV-00101)
+                  </span>
+                )}
+
+                <span className="font-bold text-slate-600 ml-2">Kỳ Lương:</span>
                 <select
                   value={selectedPeriod}
                   onChange={(e) => setSelectedPeriod(e.target.value)}
@@ -432,13 +508,13 @@ export default function PayrollPage() {
                 </select>
               </div>
 
-              <div className="relative w-full sm:w-72">
+              <div className="relative w-full sm:w-64">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Tìm họ tên nhân sự, mã NV, phòng ban..."
+                  placeholder="Tìm theo mã phiếu, phòng ban..."
                   className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl text-xs font-semibold"
                 />
               </div>
