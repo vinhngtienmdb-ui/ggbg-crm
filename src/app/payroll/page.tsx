@@ -30,6 +30,8 @@ import {
 } from '@/types';
 import {
   getPayrollByPeriod,
+  getAllHistoricalPayrolls,
+  AVAILABLE_PAYROLL_PERIODS,
   generateMonthlyPayroll,
   sendPaystubEmail,
   sendBatchPaystubs,
@@ -56,7 +58,11 @@ export default function PayrollPage() {
   const [isPaystubOpen, setIsPaystubOpen] = useState(false);
 
   const reloadData = () => {
-    setPayrolls(getPayrollByPeriod(selectedPeriod));
+    if (selectedPeriod === 'ALL') {
+      setPayrolls(getAllHistoricalPayrolls());
+    } else {
+      setPayrolls(getPayrollByPeriod(selectedPeriod));
+    }
     setPaySettings(getPayrollSettings());
   };
 
@@ -291,8 +297,8 @@ export default function PayrollPage() {
         </div>
       )}
 
-      {/* TAB 1 & 2: PAYROLL TABLE / PAYSTUBS */}
-      {(activeTab === 'payroll' || activeTab === 'paystubs') && (
+      {/* TAB 2: PAYROLL TABLE */}
+      {activeTab === 'payroll' && (
         <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden">
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
@@ -386,6 +392,118 @@ export default function PayrollPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: TRUY XUẤT PHIẾU LƯƠNG CÁ NHÂN HÀNG THÁNG (LỊCH SỬ CÁC KỲ LƯƠNG CŨ) */}
+      {activeTab === 'paystubs' && (
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-3">
+              <div>
+                <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-purple-600" /> Sổ Phiếu Lương Cá Nhân & Truy Xuất Lịch Sử Hàng Tháng
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Tra cứu chi tiết phiếu lương cá nhân theo từng tháng, kiểm tra thu nhập P1-P2-P3, các khoản trích nộp bảo hiểm BHXH, thuế TNCN và tải PDF mã hóa PIN.
+                </p>
+              </div>
+            </div>
+
+            {/* Filter Bar for Paystubs */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <span className="font-bold text-slate-600">Lọc Theo Kỳ Lương:</span>
+                <select
+                  value={selectedPeriod}
+                  onChange={(e) => setSelectedPeriod(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-900 text-white font-bold rounded-xl focus:outline-none"
+                >
+                  <option value="ALL">Tất Cả Các Kỳ (Lịch Sử)</option>
+                  <option value="Tháng 08/2026">Tháng 08/2026</option>
+                  <option value="Tháng 07/2026">Tháng 07/2026</option>
+                  <option value="Tháng 06/2026">Tháng 06/2026</option>
+                  <option value="Tháng 05/2026">Tháng 05/2026</option>
+                  <option value="Tháng 04/2026">Tháng 04/2026</option>
+                  <option value="Tháng 03/2026">Tháng 03/2026</option>
+                  <option value="Tháng 02/2026">Tháng 02/2026</option>
+                  <option value="Tháng 01/2026">Tháng 01/2026</option>
+                </select>
+              </div>
+
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm họ tên nhân sự, mã NV, phòng ban..."
+                  className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl text-xs font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Paystubs Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPayrolls.map((p) => (
+              <div
+                key={p.id}
+                className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center justify-between border-b pb-3">
+                  <div>
+                    <span className="text-[10px] tabular-nums font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 block w-fit">
+                      Kỳ: {p.period}
+                    </span>
+                    <h4 className="font-bold text-sm text-slate-900 mt-1">{p.employee_name}</h4>
+                    <span className="text-[11px] text-slate-500 block">{p.department} · {p.position}</span>
+                  </div>
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center shrink-0">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Mã phiếu lương:</span>
+                    <span className="tabular-nums font-bold text-slate-900">{p.payroll_code}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Lương Gross:</span>
+                    <span className="tabular-nums font-bold text-blue-700">{p.total_gross_income.toLocaleString('vi-VN')} ₫</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Khấu trừ (BHXH & Thuế):</span>
+                    <span className="tabular-nums font-bold text-red-600">-{p.total_deductions.toLocaleString('vi-VN')} ₫</span>
+                  </div>
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between mt-2">
+                    <span className="text-xs font-bold text-emerald-800">Lương Thực Nhận (NET):</span>
+                    <span className="text-sm tabular-nums font-semibold text-emerald-700">
+                      {p.net_salary.toLocaleString('vi-VN')} ₫
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t text-[11px]">
+                  <span className="text-slate-500 font-bold">
+                    {p.status === 'SENT_PAYSTUB' ? '✅ Đã phát hành' : '📝 Bản thảo'}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => {
+                        setSelectedPaystub(p);
+                        setIsPaystubOpen(true);
+                      }}
+                      className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition-all"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> Xem Phiếu
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

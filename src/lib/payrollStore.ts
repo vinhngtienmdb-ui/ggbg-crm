@@ -473,6 +473,18 @@ export function generateMonthlyPayroll(period: string = 'Tháng 07/2026'): Payro
   return generatedSheets;
 }
 
+export const AVAILABLE_PAYROLL_PERIODS = [
+  'Tháng 08/2026',
+  'Tháng 07/2026',
+  'Tháng 06/2026',
+  'Tháng 05/2026',
+  'Tháng 04/2026',
+  'Tháng 03/2026',
+  'Tháng 02/2026',
+  'Tháng 01/2026',
+  'Tháng 12/2025',
+];
+
 export function getPayrollByPeriod(period: string = 'Tháng 07/2026'): PayrollSheet[] {
   const current = loadPayroll();
   const filtered = current.filter((p) => p.period === period);
@@ -480,6 +492,15 @@ export function getPayrollByPeriod(period: string = 'Tháng 07/2026'): PayrollSh
     return generateMonthlyPayroll(period);
   }
   return filtered;
+}
+
+export function getAllHistoricalPayrolls(): PayrollSheet[] {
+  const allPayrolls: PayrollSheet[] = [];
+  AVAILABLE_PAYROLL_PERIODS.forEach((period) => {
+    const sheets = getPayrollByPeriod(period);
+    allPayrolls.push(...sheets);
+  });
+  return allPayrolls;
 }
 
 // ===== 5. GỬI BẢNG LƯƠNG VIA EMAIL / ZNS =====
