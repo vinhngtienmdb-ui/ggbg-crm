@@ -354,7 +354,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'PIPELINE' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <UserPlus className="w-4 h-4 text-amber-400" /> 🎯 1. Tuyển Dụng ({filteredCandidates.length})
+          <UserPlus className="w-4 h-4 text-amber-400" /> Tuyển Dụng ({filteredCandidates.length})
         </button>
 
         <button
@@ -363,7 +363,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'ANALYTICS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <BarChart className="w-4 h-4 text-blue-400" /> 📊 2. Báo Cáo
+          <BarChart className="w-4 h-4 text-blue-400" /> Báo Cáo
         </button>
 
         <button
@@ -372,7 +372,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'ONBOARDING' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <UserCheck className="w-4 h-4 text-purple-400" /> 🚀 3. Onboarding
+          <UserCheck className="w-4 h-4 text-purple-400" /> Onboarding
         </button>
 
         <button
@@ -381,7 +381,7 @@ export default function RecruitmentModulePage() {
             activeTab === 'APPROVAL_PIPELINE' ? 'bg-amber-600 text-white shadow-md' : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
           }`}
         >
-          ⏳ 4. Phê Duyệt
+          Phê Duyệt
           {pendingCount > 0 && (
             <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-semibold rounded-full animate-pulse">
               {pendingCount}

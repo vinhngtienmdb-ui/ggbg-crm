@@ -254,7 +254,7 @@ export default function DocumentsPage() {
               activeTab === 'INBOUND' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Inbox className="w-4 h-4" /> 📥 1. Sổ Công Văn Đến ({totalInbound})
+            <Inbox className="w-4 h-4" /> Công Văn Đến ({totalInbound})
           </button>
 
           <button
@@ -263,7 +263,7 @@ export default function DocumentsPage() {
               activeTab === 'OUTBOUND' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Send className="w-4 h-4" /> 📤 2. Sổ Công Văn Đi ({totalOutbound})
+            <Send className="w-4 h-4" /> Công Văn Đi ({totalOutbound})
           </button>
 
           <button
@@ -272,7 +272,7 @@ export default function DocumentsPage() {
               activeTab === 'INTERNAL_SOP' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <BookOpen className="w-4 h-4" /> 📑 3. Quy Trình SOP Nội Bộ ({totalInternal})
+            <BookOpen className="w-4 h-4" /> Quy Trình Nội Bộ ({totalInternal})
           </button>
 
           <button
@@ -281,7 +281,7 @@ export default function DocumentsPage() {
               activeTab === 'DIRECTIVE_LOG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <MessageSquare className="w-4 h-4 text-amber-400" /> ✍️ 4. Nhật Ký Bút Phê & Chuyển Xử Lý
+            <MessageSquare className="w-4 h-4 text-amber-400" /> Bút Phê & Chuyển Xử Lý
           </button>
 
           <button
@@ -290,7 +290,7 @@ export default function DocumentsPage() {
               activeTab === 'DOC_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Building2 className="w-4 h-4 text-white" /> ⚙️ 5. Cấu Hình Sổ Văn Bản & Ký Số
+            <Building2 className="w-4 h-4 text-white" /> Cấu Hình & Ký Số
           </button>
         </div>
 

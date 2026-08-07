@@ -169,7 +169,7 @@ export default function PayrollPage() {
             activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-emerald-400" /> 1. 📊 Báo Cáo Chi Phí Lương & 3P
+          <DollarSign className="w-4 h-4 text-emerald-400" /> Báo Cáo
         </button>
 
         <button
@@ -178,7 +178,7 @@ export default function PayrollPage() {
             activeTab === 'payroll' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-blue-400" /> 2. Bảng Lương Tổng Hợp 3P
+          <DollarSign className="w-4 h-4 text-blue-400" /> Bảng Lương 3P
         </button>
 
         <button
@@ -187,7 +187,7 @@ export default function PayrollPage() {
             activeTab === 'paystubs' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Eye className="w-4 h-4 text-purple-400" /> 3. Danh Sách Phiếu Lương ({payrolls.length})
+          <Eye className="w-4 h-4 text-purple-400" /> Phiếu Lương ({payrolls.length})
         </button>
 
         <button
@@ -196,7 +196,7 @@ export default function PayrollPage() {
             activeTab === 'settings' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Settings className="w-4 h-4 text-amber-400" /> ⚙️ Cài Đặt Lương & Phụ Cấp
+          <Settings className="w-4 h-4 text-amber-400" /> Cài Đặt
         </button>
       </div>
 

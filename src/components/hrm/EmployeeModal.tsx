@@ -307,7 +307,7 @@ export default function EmployeeModal({
               activeTab === 'WORK_INFO' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <Briefcase className="w-3.5 h-3.5 text-blue-400" /> 1. Thông Tin Làm Việc & Cá Nhân
+            <Briefcase className="w-3.5 h-3.5 text-blue-400" /> 1. Thông Tin Cá Nhân
           </button>
 
           <button
@@ -317,7 +317,7 @@ export default function EmployeeModal({
               activeTab === 'OTHER_INFO' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <GraduationCap className="w-3.5 h-3.5 text-purple-400" /> 2. Thông Tin Khác (Học Vấn/Kinh Nghiệm)
+            <GraduationCap className="w-3.5 h-3.5 text-purple-400" /> 2. Học Vấn & Kinh Nghiệm
           </button>
 
           <button
@@ -327,7 +327,7 @@ export default function EmployeeModal({
               activeTab === 'FAMILY_INFO' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <Users className="w-3.5 h-3.5 text-emerald-400" /> 3. Thông Tin Gia Đình
+            <Users className="w-3.5 h-3.5 text-emerald-400" /> 3. Gia Đình
           </button>
 
           <button
@@ -367,7 +367,7 @@ export default function EmployeeModal({
               activeTab === 'PERSONAL_HISTORY' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> 7. Lịch Sử Bản Thân
+            <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> 7. Tiêu Sử
           </button>
         </div>
 

@@ -215,7 +215,7 @@ export default function PurchasingPage() {
               activeTab === 'ORDERS' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <ShoppingCart className="w-4 h-4" /> 🛒 1. Sổ Đơn Đặt Hàng Mua PO ({orders.length})
+            <ShoppingCart className="w-4 h-4" /> Đơn Mua Hàng ({orders.length})
           </button>
 
           <button
@@ -224,7 +224,7 @@ export default function PurchasingPage() {
               activeTab === 'SUPPLIERS' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Building2 className="w-4 h-4" /> 🏭 2. Danh Mục Nhà Cung Cấp ({suppliers.length})
+            <Building2 className="w-4 h-4" /> Nhà Cung Cấp ({suppliers.length})
           </button>
         </div>
 

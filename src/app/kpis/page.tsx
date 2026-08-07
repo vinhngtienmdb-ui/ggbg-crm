@@ -306,7 +306,7 @@ export default function UnifiedKpisPerformancePage() {
             activeMainTab === 'KPI_LIST' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Target className="w-4 h-4 text-amber-400" /> 🎯 1. Danh Sách KPIs ({filteredKpis.length})
+          <Target className="w-4 h-4 text-amber-400" /> Danh Sách KPIs ({filteredKpis.length})
         </button>
 
         <button
@@ -315,7 +315,7 @@ export default function UnifiedKpisPerformancePage() {
             activeMainTab === 'SCORECARDS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Award className="w-4 h-4 text-blue-400" /> 🏅 2. Chấm Điểm Hiệu Suất 3P ({filteredScorecards.length})
+          <Award className="w-4 h-4 text-blue-400" /> Chấm Điểm 3P ({filteredScorecards.length})
         </button>
 
         <button
@@ -324,7 +324,7 @@ export default function UnifiedKpisPerformancePage() {
             activeMainTab === 'ANALYTICS' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <BarChart3 className="w-4 h-4 text-emerald-400" /> 📊 3. Báo Cáo & Phân Tích Tổng Quan
+          <BarChart3 className="w-4 h-4 text-emerald-400" /> Báo Cáo & Phân Tích
         </button>
 
         <button
@@ -333,7 +333,7 @@ export default function UnifiedKpisPerformancePage() {
             activeMainTab === 'SYNC_ENGINE' ? 'bg-purple-600 text-white shadow-md' : 'text-purple-800 bg-purple-50 hover:bg-purple-100'
           }`}
         >
-          <RefreshCw className="w-4 h-4 text-purple-200" /> 🔄 4. Đồng Bộ KPIs → Hiệu Suất P3
+          <RefreshCw className="w-4 h-4 text-purple-200" /> Đồng Bộ P3
         </button>
       </div>
 

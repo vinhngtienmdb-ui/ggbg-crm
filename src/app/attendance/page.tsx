@@ -197,7 +197,7 @@ export default function AttendancePage() {
             activeTab === 'reports' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Clock className="w-4 h-4 text-blue-400" /> 1. 📊 Báo Cáo Chấm Công
+          <Clock className="w-4 h-4 text-blue-400" /> Báo Cáo
         </button>
 
         <button
@@ -206,7 +206,7 @@ export default function AttendancePage() {
             activeTab === 'daily' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Clock className="w-4 h-4 text-emerald-400" /> 2. Nhật Ký Chấm Công
+          <Clock className="w-4 h-4 text-emerald-400" /> Nhật Ký
         </button>
 
         <button
@@ -215,7 +215,7 @@ export default function AttendancePage() {
             activeTab === 'leaves' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Calendar className="w-4 h-4 text-purple-400" /> 3. Quản Lý Nghỉ Phép ({leaves.length})
+          <Calendar className="w-4 h-4 text-purple-400" /> Nghỉ Phép ({leaves.length})
         </button>
 
         <button
@@ -224,7 +224,7 @@ export default function AttendancePage() {
             activeTab === 'timesheet' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <FileSpreadsheet className="w-4 h-4 text-amber-400" /> 4. Bảng Tổng Hợp Công
+          <FileSpreadsheet className="w-4 h-4 text-amber-400" /> Tổng Hợp Công
         </button>
 
         <button
@@ -233,7 +233,7 @@ export default function AttendancePage() {
             activeTab === 'settings' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Settings className="w-4 h-4 text-indigo-400" /> ⚙️ Cài Đặt Chấm Công
+          <Settings className="w-4 h-4 text-indigo-400" /> Cài Đặt
         </button>
       </div>
 

@@ -410,7 +410,7 @@ export default function HrmSettingsPage() {
             activeTab === 'ORG_CHART' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-4 h-4 text-blue-400" /> 🏛️ 1. Cơ Cấu Tổ Chức & Phòng Ban
+          <Building2 className="w-4 h-4 text-blue-400" /> Cơ Cấu Tổ Chức
         </button>
 
         <button
@@ -419,7 +419,7 @@ export default function HrmSettingsPage() {
             activeTab === 'JOB_TITLES' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Award className="w-4 h-4 text-purple-400" /> 🏅 2. Chức Danh, Ngạch Lương & Phụ Cấp ({jobTitles.length})
+          <Award className="w-4 h-4 text-purple-400" /> Chức Danh & Ngạch Lương ({jobTitles.length})
         </button>
 
         <button
@@ -428,7 +428,7 @@ export default function HrmSettingsPage() {
             activeTab === 'TIMEKEEPING_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Clock className="w-4 h-4 text-emerald-400" /> ⏰ 3. Ca Làm Việc, Chấm Công & GPS
+          <Clock className="w-4 h-4 text-emerald-400" /> Ca Làm Việc & Chấm Công
         </button>
 
         <button
@@ -437,7 +437,7 @@ export default function HrmSettingsPage() {
             activeTab === 'LEAVES_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Calendar className="w-4 h-4 text-amber-400" /> 🌴 4. Phép Năm, Nghỉ Lễ & Phúc Lợi
+          <Calendar className="w-4 h-4 text-amber-400" /> Phép Năm & Phúc Lợi
         </button>
 
         <button
@@ -446,7 +446,7 @@ export default function HrmSettingsPage() {
             activeTab === 'PAYROLL_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-blue-400" /> 💰 5. Tỷ Lệ Bảo Hiểm, Thuế TNCN & Quỹ P3
+          <DollarSign className="w-4 h-4 text-blue-400" /> Bảo Hiểm & Thuế TNCN
         </button>
 
         <button
@@ -455,7 +455,7 @@ export default function HrmSettingsPage() {
             activeTab === 'APPROVAL_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <ShieldCheck className="w-4 h-4 text-indigo-400" /> 🔐 6. Phân Quyền & Quy Trình Duyệt HR
+          <ShieldCheck className="w-4 h-4 text-indigo-400" /> Quy Trình Duyệt
         </button>
       </div>
 

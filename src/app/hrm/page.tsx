@@ -709,7 +709,7 @@ export default function HRMPage() {
             activeTab === 'DASHBOARD' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          📊 1. Báo Cáo & Dashboard HR
+          📊 Báo Cáo
         </button>
 
         <button
@@ -718,10 +718,8 @@ export default function HRMPage() {
             activeTab === 'PROFILE' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          👤 2. Hồ Sơ Nhân Sự ({employees.length})
+          👤 Hồ Sơ Nhân Sự ({employees.length})
         </button>
-
-
 
         <button
           onClick={() => setActiveTab('CONTRACTS')}
@@ -729,7 +727,7 @@ export default function HRMPage() {
             activeTab === 'CONTRACTS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          📄 Quản Lý Hợp Đồng & Lương
+          📄 Hợp Đồng & Lương
         </button>
 
         <button
@@ -738,7 +736,7 @@ export default function HRMPage() {
             activeTab === 'MAP' ? 'bg-indigo-600 text-white shadow-sm' : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100'
           }`}
         >
-          🗺️ Bản Đồ Phân Bổ Nhân Sự
+          🗺️ Bản Đồ Phân Bổ
         </button>
 
         <button
@@ -747,7 +745,7 @@ export default function HRMPage() {
             activeTab === 'CONFIG' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
           }`}
         >
-          ⚙️ Cấu Hình Nhân Sự & BHXH
+          ⚙️ Cấu Hình
         </button>
       </div>
 

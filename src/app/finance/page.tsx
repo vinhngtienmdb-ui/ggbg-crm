@@ -292,7 +292,7 @@ export default function FinancePage() {
             activeTab === 'EXECUTIVE' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <PieChartIcon className="w-4 h-4 text-blue-400" /> 🏛️ 1. Báo Cáo Tổng Quan Tài Chính
+          <PieChartIcon className="w-4 h-4 text-blue-400" /> Tổng Quan
         </button>
 
         <button
@@ -301,7 +301,7 @@ export default function FinancePage() {
             activeTab === 'P_L' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <TrendingUp className="w-4 h-4 text-emerald-400" /> 📊 2. Lợi Nhuận Gộp P&L Theo Hợp Đồng
+          <TrendingUp className="w-4 h-4 text-emerald-400" /> Lợi Nhuận P&L
         </button>
 
         <button
@@ -310,7 +310,7 @@ export default function FinancePage() {
             activeTab === 'DEBT' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <AlertTriangle className="w-4 h-4 text-amber-400" /> 💳 3. Quản Lý Công Nợ & Thu Hồi Nợ
+          <AlertTriangle className="w-4 h-4 text-amber-400" /> Quản Lý Công Nợ
         </button>
 
         <button
@@ -319,7 +319,7 @@ export default function FinancePage() {
             activeTab === 'CASH_FLOW' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Wallet className="w-4 h-4 text-purple-400" /> 🧾 4. Sổ Thu Chi & Dòng Tiền Real-Time
+          <Wallet className="w-4 h-4 text-purple-400" /> Dòng Tiền
         </button>
 
         <button
@@ -328,7 +328,7 @@ export default function FinancePage() {
             activeTab === 'BUDGET_FORECAST' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-indigo-400" /> 🎯 5. Ngân Sách & Dự Báo Tài Chính
+          <DollarSign className="w-4 h-4 text-indigo-400" /> Ngân Sách & Dự Báo
         </button>
 
         <button
@@ -337,7 +337,7 @@ export default function FinancePage() {
             activeTab === 'VAS_BALANCE_SHEET' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-4 h-4 text-emerald-400" /> 🏛️ 6. Bảng Cân Đối Kế Toán VAS
+          <Building2 className="w-4 h-4 text-emerald-400" /> Cân Đối Kế Toán
         </button>
 
         <button
@@ -346,7 +346,7 @@ export default function FinancePage() {
             activeTab === 'FINANCE_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-4 h-4 text-white" /> ⚙️ 7. Cấu Hình Tài Chính & Kế Toán
+          <Building2 className="w-4 h-4 text-white" /> Cấu Hình
         </button>
       </div>
 

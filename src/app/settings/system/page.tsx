@@ -268,7 +268,7 @@ export default function SystemSettingsPage() {
             activeTab === 'MODULE_TOGGLES' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Sliders className="w-4 h-4 text-purple-400" /> 🎛️ Phân Hệ Tính Năng
+          <Sliders className="w-4 h-4 text-purple-400" /> Phân Hệ Tính Năng
         </button>
 
         <button
@@ -277,7 +277,7 @@ export default function SystemSettingsPage() {
             activeTab === 'INFRASTRUCTURE' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Cloud className="w-4 h-4 text-orange-400" /> ☁️ Hạ Tầng Cloud & DB
+          <Cloud className="w-4 h-4 text-orange-400" /> Hạ Tầng Cloud & DB
         </button>
 
         <button
@@ -286,7 +286,7 @@ export default function SystemSettingsPage() {
             activeTab === 'API_KEYS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Key className="w-4 h-4 text-amber-400" /> 🔌 Sàn TMĐT & AI API Keys
+          <Key className="w-4 h-4 text-amber-400" /> API Keys
         </button>
 
         <button
@@ -295,7 +295,7 @@ export default function SystemSettingsPage() {
             activeTab === 'SMTP' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Mail className="w-4 h-4 text-blue-400" /> 📧 Máy Chủ Email SMTP
+          <Mail className="w-4 h-4 text-[#38bdf8]" /> Email SMTP
         </button>
 
         <button
@@ -304,7 +304,7 @@ export default function SystemSettingsPage() {
             activeTab === 'WEBHOOKS' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Bell className="w-4 h-4 text-purple-400" /> 🔔 Webhook & Telegram/Zalo
+          <Bell className="w-4 h-4 text-purple-400" /> Webhook & Thông Báo
         </button>
 
         <button
@@ -313,7 +313,7 @@ export default function SystemSettingsPage() {
             activeTab === 'SECURITY_AUDIT' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <ShieldAlert className="w-4 h-4 text-emerald-400" /> 🛡️ Bảo Mật & Audit Logs
+          <ShieldAlert className="w-4 h-4 text-emerald-400" /> Bảo Mật & Nhật Ký
         </button>
 
         <button
@@ -322,7 +322,7 @@ export default function SystemSettingsPage() {
             activeTab === 'COMPANY_IDENTITY' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-4 h-4 text-emerald-400" /> 🏛️ Pháp Lý & Dấu Mộc Đỏ
+          <Building2 className="w-4 h-4 text-emerald-400" /> Thông Tin Doanh Nghiệp
         </button>
       </div>
 

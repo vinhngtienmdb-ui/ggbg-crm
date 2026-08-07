@@ -226,7 +226,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            <User className="w-4 h-4" /> Thông Tin Hồ Sơ
+            <User className="w-4 h-4" /> Hồ Sơ
           </button>
 
           <button
@@ -254,7 +254,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            <ShieldCheck className="w-4 h-4 text-indigo-600" /> Google Authenticator 2FA
+            <ShieldCheck className="w-4 h-4 text-indigo-600" /> Bảo Mật 2FA
           </button>
         </div>
 
