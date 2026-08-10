@@ -476,54 +476,7 @@ export const INITIAL_PROPOSAL_TEMPLATES: ProposalTemplate[] = [
   },
 ];
 
-export const INITIAL_SUBMISSIONS: ProposalSubmission[] = [
-  {
-    id: 'sub_1',
-    proposal_code: 'PD-2026-0701',
-    template_id: 'tmpl_9',
-    template_title: 'Tờ Trình Tạm Ứng Kinh Phí Công Tác / Mua Sắm',
-    applicant_name: 'Vũ Quốc Anh',
-    applicant_department: 'Khối Kinh Doanh & TMĐT',
-    submitted_date: '2026-07-28',
-    field_values: {
-      purpose_title: 'Tạm ứng kinh phí gặp khách hàng Agency Mỹ Phẩm An An tại TP.HCM',
-      advance_amount: 15000000,
-      expected_settlement_date: '2026-08-15',
-      detailed_reason: 'Công tác 3 ngày ký kết phụ lục hợp đồng ủy quyền Shopee Mall và đặt gian hàng TikTok Live.',
-      quote_attachment: 'Bao-Gia-Ve-May-Bay-Khach-San.pdf',
-    },
-    approval_steps: [
-      { step_order: 1, approver_role: 'Trưởng Phòng Ban', approver_name: 'Đặng Tuấn Tú', status: 'APPROVED', approved_at: '2026-07-28 14:00', comment: 'Đã duyệt trình Kế toán kiểm tra.' },
-      { step_order: 2, approver_role: 'Kế Toán Trưởng', approver_name: 'Trần Thị Mai', status: 'PENDING' },
-      { step_order: 3, approver_role: 'Tổng Giám Đốc (CEO)', approver_name: 'Nguyễn Tiến Vinh', status: 'PENDING' },
-    ],
-    current_step_order: 2,
-    status: 'PENDING',
-  },
-  {
-    id: 'sub_2',
-    proposal_code: 'PD-2026-0702',
-    template_id: 'tmpl_1',
-    template_title: 'Đơn Xin Nghỉ Phép Năm & Nghỉ Việc Riêng',
-    applicant_name: 'Lê Thị Thu Hà',
-    applicant_department: 'Phòng Hành Chính Nhân Sự',
-    submitted_date: '2026-07-29',
-    field_values: {
-      leave_type: 'Phép Năm Hưởng Lương (Quỹ 12 ngày/năm)',
-      duration_mode: 'Cả Ngày (1.0 ngày)',
-      start_date: '2026-08-05',
-      end_date: '2026-08-06',
-      handover_person: 'Phạm Minh Tuấn',
-      reason: 'Giải quyết việc cá nhân gia đình tại quê.',
-    },
-    approval_steps: [
-      { step_order: 1, approver_role: 'Trưởng Phòng Ban', approver_name: 'Trần Thị Mai', status: 'APPROVED', approved_at: '2026-07-29 09:30', comment: 'Đồng ý duyệt cho nghỉ phép năm.' },
-      { step_order: 2, approver_role: 'Trưởng Phòng Nhân Sự (HRM)', approver_name: 'Vũ Quốc Anh', status: 'APPROVED', approved_at: '2026-07-29 10:15', comment: 'Đã cập nhật hệ thống chấm công phép.' },
-    ],
-    current_step_order: 2,
-    status: 'APPROVED',
-  },
-];
+export const INITIAL_SUBMISSIONS: ProposalSubmission[] = [];
 
 let templatesStore: ProposalTemplate[] = [...INITIAL_PROPOSAL_TEMPLATES];
 let submissionsStore: ProposalSubmission[] = [...INITIAL_SUBMISSIONS];
