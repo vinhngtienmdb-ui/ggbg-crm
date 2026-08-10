@@ -33,7 +33,8 @@ import {
   Lock,
   Layers,
   FileSpreadsheet,
-  Award
+  Award,
+  ExternalLink
 } from 'lucide-react';
 import {
   OfficialDocument,
@@ -57,6 +58,8 @@ import {
   deleteDocumentLedger
 } from '@/lib/documentStore';
 import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
+import ExternalSignModal from '@/components/documents/ExternalSignModal';
+import { exportDocumentsToCSV } from '@/lib/excelExportHelper';
 import { useAuth } from '@/context/AuthContext';
 import { canAccessSettings } from '@/lib/permissions';
 
@@ -94,8 +97,20 @@ export default function DocumentsPage() {
   const [selectedDoc, setSelectedDoc] = useState<OfficialDocument | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
+  const [isExternalSignOpen, setIsExternalSignOpen] = useState(false);
   const [directiveInput, setDirectiveInput] = useState('');
   const [assigneeDeptInput, setAssigneeDeptInput] = useState('Khối Kinh Doanh & TMĐT');
+
+  const handleExportExcel = () => {
+    const title =
+      activeTab === 'INBOUND_LEDGER'
+        ? 'So_Van_Ban_Den_2026'
+        : activeTab === 'OUTBOUND_LEDGER'
+        ? 'So_Van_Ban_Di_2026'
+        : 'So_Van_Ban_Noi_Bo_2026';
+    exportDocumentsToCSV(filteredDocs, title);
+    showToast(`📊 Đã xuất thành công dữ liệu Sổ Văn Bản ra tệp Excel CSV chuẩn NĐ 30/2020!`);
+  };
 
   const [attachedFile, setAttachedFile] = useState<{ name: string; size: string } | null>(null);
 
@@ -570,23 +585,43 @@ export default function DocumentsPage() {
           </div>
         )}
 
-        {/* Filter Controls Bar */}
+        {/* Filter Controls Bar & Action Buttons */}
         {activeTab !== 'DOC_CONFIG' && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm số công văn, trích yếu nội dung, nơi gửi..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
-              />
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:w-80">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm số công văn, trích yếu nội dung, nơi gửi..."
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl"
+                />
+              </div>
             </div>
 
-            <span className="text-slate-500 font-bold">
-              Hiển thị <strong className="text-slate-900">{filteredDocs.length}</strong> / {documents.length} văn bản
-            </span>
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                className="px-3.5 py-2 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-xs"
+              >
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Xuất Sổ Excel NĐ 30
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsExternalSignOpen(true)}
+                className="px-3.5 py-2 bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-xs"
+              >
+                <ExternalLink className="w-4 h-4 text-purple-600" /> Trình Ký Đối Tác Ngoại
+              </button>
+
+              <span className="text-slate-500 font-bold ml-2">
+                Hiển thị <strong className="text-slate-900">{filteredDocs.length}</strong> / {documents.length} văn bản
+              </span>
+            </div>
           </div>
         )}
 
@@ -1436,6 +1471,17 @@ export default function DocumentsPage() {
           }}
         />
       )}
+
+      {/* MODAL TRÌNH KÝ HỢP ĐỒNG ĐỐI TÁC NGOẠI & CLOUD STORAGE */}
+      <ExternalSignModal
+        isOpen={isExternalSignOpen}
+        onClose={() => setIsExternalSignOpen(false)}
+        documentCode={selectedDoc ? selectedDoc.document_code : '88/HĐ-GGBG'}
+        documentTitle={selectedDoc ? selectedDoc.title : 'Hợp Đồng Hợp Tác Doanh Nghiệp Mở Rộng 2026'}
+        onSendSuccess={(info) => {
+          showToast(`📩 Đã gửi Link Ký Số bảo mật đến đối tác ${info.partnerName} (${info.partnerEmail}) qua Zalo ZNS & Email!`);
+        }}
+      />
     </div>
   );
 }
