@@ -627,7 +627,7 @@ export default function DocumentsPage() {
 
         {/* TAB CONTENT 1: LIST OF DOCUMENTS (8 TYPES) */}
         {activeTab !== 'DOC_CONFIG' && (
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <div key={activeTab} className="overflow-x-auto rounded-xl border border-slate-200 tab-transition">
             <table className="w-full text-left text-xs border-collapse">
               <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
                 <tr>
@@ -752,7 +752,7 @@ export default function DocumentsPage() {
 
         {/* TAB CONTENT 2: MULTI-LEDGER MANAGEMENT & SYSTEM CONFIGURATION */}
         {activeTab === 'DOC_CONFIG' && canAccessSettings(activeRole) && (
-          <div className="space-y-6">
+          <div key={activeTab} className="space-y-6 tab-transition">
             {/* SUB-SECTION 1: MULTI-LEDGER MANAGEMENT LIST */}
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-3">
