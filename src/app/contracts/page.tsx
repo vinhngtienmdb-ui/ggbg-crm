@@ -28,38 +28,7 @@ interface ContractItem {
   status: 'ACTIVE' | 'PENDING_RENEWAL';
 }
 
-const CONTRACTS_LIST: ContractItem[] = [
-  {
-    id: 'cnt_001',
-    contract_code: 'HD-2026-8801',
-    customer_name: 'Trần Thanh Sơn',
-    company_name: 'Công ty TNHH Vận Tải Hồng Lực',
-    ecom_platform: 'Shopee Mall & TikTok Shop',
-    effective_date: '2026-01-15',
-    expiry_date: '2027-01-15',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'cnt_002',
-    contract_code: 'HD-2026-8802',
-    customer_name: 'Nguyễn Thị Hoa',
-    company_name: 'Hộ Kinh Doanh Thời Trang An An',
-    ecom_platform: 'TikTok Shop Partner (TSP)',
-    effective_date: '2026-02-10',
-    expiry_date: '2027-02-10',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'cnt_003',
-    contract_code: 'HD-2026-8803',
-    customer_name: 'Lê Hoàng Anh',
-    company_name: 'Công ty CP Gia Dụng SmartHome',
-    ecom_platform: 'Amazon Global Direct',
-    effective_date: '2026-03-01',
-    expiry_date: '2026-09-01',
-    status: 'PENDING_RENEWAL',
-  },
-];
+const CONTRACTS_LIST: ContractItem[] = [];
 
 export default function ContractsPage() {
   const [contracts] = useState<ContractItem[]>(CONTRACTS_LIST);

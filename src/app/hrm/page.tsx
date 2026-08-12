@@ -95,81 +95,8 @@ interface OnboardingTask {
   training_completed: boolean;
 }
 
-const INITIAL_CANDIDATES: Candidate[] = [
-  {
-    id: 'cand_1',
-    candidate_code: 'UV-2026/001',
-    name: 'Đỗ Thị Quyên',
-    position: 'Chuyên Viên Marketing',
-    department: 'Phòng Marketing',
-    phone: '0988 111 222',
-    email: 'quyen.do@gmail.com',
-    stage: 'INTERVIEW',
-    applied_date: '2026-07-15',
-    salary_expectation: 18000000,
-    interviewer_name: 'Nguyễn Hải Yến (Leader)',
-    audit_logs: [
-      { id: 'log_1_1', candidate_id: 'cand_1', candidate_name: 'Đỗ Thị Quyên', actor_name: 'Đặng Kim Anh (HR Manager)', action_type: 'CREATE', stage_to: 'APPLIED', note: 'Nộp hồ sơ ứng tuyển từ VietnamWorks', timestamp: '2026-07-15 09:00' },
-      { id: 'log_1_2', candidate_id: 'cand_1', candidate_name: 'Đỗ Thị Quyên', actor_name: 'Đặng Kim Anh (HR Manager)', action_type: 'STAGE_CHANGE', stage_from: 'APPLIED', stage_to: 'INTERVIEW', note: 'Duyệt CV phù hợp, mời phỏng vấn Vòng 1', timestamp: '2026-07-16 14:20' }
-    ]
-  },
-  {
-    id: 'cand_2',
-    candidate_code: 'UV-2026/002',
-    name: 'Nguyễn Văn Minh',
-    position: 'Sale Exec Senior',
-    department: 'Phòng Kinh Doanh 1',
-    phone: '0977 333 444',
-    email: 'minh.nguyen@gmail.com',
-    stage: 'OFFER',
-    applied_date: '2026-07-18',
-    salary_expectation: 22000000,
-    interviewer_name: 'Trần Văn Hoàng (Trưởng Nhóm)',
-    audit_logs: [
-      { id: 'log_2_1', candidate_id: 'cand_2', candidate_name: 'Nguyễn Văn Minh', actor_name: 'Đặng Kim Anh (HR Manager)', action_type: 'CREATE', stage_to: 'APPLIED', note: 'Ứng tuyển qua Referral giới thiệu', timestamp: '2026-07-18 10:00' },
-      { id: 'log_2_2', candidate_id: 'cand_2', candidate_name: 'Nguyễn Văn Minh', actor_name: 'Trần Văn Hoàng (Leader)', action_type: 'STAGE_CHANGE', stage_from: 'APPLIED', stage_to: 'INTERVIEW', note: 'Phỏng vấn đạt 9/10 chuyên môn', timestamp: '2026-07-19 11:30' },
-      { id: 'log_2_3', candidate_id: 'cand_2', candidate_name: 'Nguyễn Văn Minh', actor_name: 'Phạm Minh Đức (Sales Director)', action_type: 'STAGE_CHANGE', stage_from: 'INTERVIEW', stage_to: 'OFFER', note: 'Gửi thư mời nhận việc Offer Lương 22Tr', timestamp: '2026-07-21 16:45' }
-    ]
-  },
-  {
-    id: 'cand_3',
-    candidate_code: 'UV-2026/003',
-    name: 'Trần Thị Thu',
-    position: 'Chuyên Viên CSKH',
-    department: 'Phòng CSKH',
-    phone: '0912 555 666',
-    email: 'thu.tran@gmail.com',
-    stage: 'HIRED',
-    applied_date: '2026-07-10',
-    salary_expectation: 15000000,
-    interviewer_name: 'Đặng Kim Anh (HR Manager)',
-    audit_logs: [
-      { id: 'log_3_1', candidate_id: 'cand_3', candidate_name: 'Trần Thị Thu', actor_name: 'Đặng Kim Anh (HR)', action_type: 'CREATE', stage_to: 'APPLIED', note: 'Nộp CV qua Zalo Hotline', timestamp: '2026-07-10 08:00' },
-      { id: 'log_3_2', candidate_id: 'cand_3', candidate_name: 'Trần Thị Thu', actor_name: 'Đặng Kim Anh (HR)', action_type: 'STAGE_CHANGE', stage_from: 'OFFER', stage_to: 'HIRED', note: 'Ứng viên đã ký hợp đồng nhận việc', timestamp: '2026-07-22 09:30' }
-    ]
-  },
-  {
-    id: 'cand_4',
-    candidate_code: 'UV-2026/004',
-    name: 'Lê Hoàng Nam',
-    position: 'Kỹ Sư Hạ Tầng Cloud',
-    department: 'Phòng Kỹ Thuật',
-    phone: '0933 777 888',
-    email: 'nam.le@gmail.com',
-    stage: 'APPLIED',
-    applied_date: '2026-07-20',
-    salary_expectation: 25000000,
-    audit_logs: [
-      { id: 'log_4_1', candidate_id: 'cand_4', candidate_name: 'Lê Hoàng Nam', actor_name: 'Lê Hoàng Nam', action_type: 'CREATE', stage_to: 'APPLIED', note: 'Ứng tuyển trực tiếp trên Website GGBingoVN', timestamp: '2026-07-20 15:00' }
-    ]
-  },
-];
-
-const INITIAL_ONBOARDING: OnboardingTask[] = [
-  { id: 'onb_1', employee_name: 'Trần Văn Hoàng', position: 'Trưởng Phòng Kinh Doanh', department: 'Phòng Kinh Doanh', joined_date: '2026-07-01', equipment_delivered: true, crm_account_created: true, training_completed: true },
-  { id: 'onb_2', employee_name: 'Nguyễn Quốc Tuấn', position: 'Sale Executive Senior', department: 'Phòng Kinh Doanh', joined_date: '2026-07-10', equipment_delivered: true, crm_account_created: true, training_completed: false },
-  { id: 'onb_3', employee_name: 'Lê Thị Mai', position: 'Chuyên Viên CSKH', department: 'Phòng CSKH', joined_date: '2026-07-15', equipment_delivered: true, crm_account_created: false, training_completed: false },
-];
+const INITIAL_CANDIDATES: Candidate[] = [];
+const INITIAL_ONBOARDING: OnboardingTask[] = [];
 
 import { useAuth } from '@/context/AuthContext';
 import { canAccessSettings } from '@/lib/permissions';

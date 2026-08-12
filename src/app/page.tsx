@@ -64,9 +64,21 @@ function PipelineBar({ label, count, amount, pct, color }: { label: string; coun
   );
 }
 
+import { getEmployees } from '@/lib/hrmStore';
+import { getKPIs } from '@/lib/kpiStore';
+import { getFinancialSummary } from '@/lib/financeStore';
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const kpiPct = 88.5;
+  const employees = getEmployees();
+  const kpis = getKPIs();
+  const finSummary = getFinancialSummary();
+
+  const totalRevenue = finSummary.total_gross_revenue || 0;
+  const totalPayroll = finSummary.total_net_profit || 0;
+  const kpiCount = kpis.length;
+  const passedKpis = kpis.filter(k => (k.progress_percentage || 0) >= 100).length;
+  const kpiPct = kpiCount > 0 ? Math.round((passedKpis / kpiCount) * 100) : 0;
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
@@ -96,7 +108,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3.5 bg-slate-800/80 px-4 py-3 rounded-xl border border-slate-700/80 shrink-0">
             <div className="text-right">
               <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Tiến độ KPI Tháng</p>
-              <p className="text-sm font-bold text-emerald-400 tabular-numbers">{kpiPct}% — Đạt Mục Tiêu</p>
+              <p className="text-sm font-bold text-emerald-400 tabular-numbers">{kpiPct}% — {kpiCount > 0 ? 'Đang Thực Hiện' : 'Sẵn Sàng Nhập Liệu'}</p>
             </div>
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center ring-2 ring-emerald-500/30"
@@ -135,16 +147,16 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           label="Doanh Số Dịch Vụ"
-          value={formatVND(3_480_000_000)}
-          sub={<><ArrowUpRight className="w-3.5 h-3.5" /> +18.4% so tháng trước</>}
+          value={formatVND(totalRevenue)}
+          sub={<><ArrowUpRight className="w-3.5 h-3.5" /> 0đ tháng này</>}
           icon={<DollarSign className="w-4 h-4" />}
           iconBg="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50"
           href="/leads" hrefLabel="Phễu CRM"
         />
         <MetricCard
           label="Nhân Sự & Quy Mô"
-          value="48 Nhân Sự"
-          sub="Active: 94% · Thử việc: 6%"
+          value={`${employees.length} Nhân Sự`}
+          sub={`Super Admin: ${employees.length}`}
           subColor="text-slate-500"
           icon={<Briefcase className="w-4 h-4" />}
           iconBg="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -152,8 +164,8 @@ export default function DashboardPage() {
         />
         <MetricCard
           label="Chỉ Tiêu KPIs"
-          value="7 Chỉ Tiêu"
-          sub="3 KPI Vượt Chỉ Tiêu"
+          value={`${kpiCount} Chỉ Tiêu`}
+          sub={`${passedKpis} KPI Đạt`}
           subColor="text-indigo-600 dark:text-indigo-400"
           icon={<TrendingUp className="w-4 h-4" />}
           iconBg="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50"
@@ -161,8 +173,8 @@ export default function DashboardPage() {
         />
         <MetricCard
           label="Bảng Lương P3 Tháng"
-          value={formatVND(485_000_000)}
-          sub="Đã khóa & gửi Paystub"
+          value={formatVND(totalPayroll)}
+          sub="Chưa phát sinh chi phí"
           subColor="text-emerald-600 dark:text-emerald-400"
           icon={<PieChart className="w-4 h-4" />}
           iconBg="bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50"
@@ -173,7 +185,7 @@ export default function DashboardPage() {
       {/* ── BI Analytics Panel ── */}
       <Card accent="primary">
         <CardHeader
-          actions={<Badge variant="success" dot>Khỏe Mạnh</Badge>}
+          actions={<Badge variant="success" dot>Hệ Thống Sạch</Badge>}
         >
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-indigo-600 text-white shadow-sm">
@@ -184,7 +196,7 @@ export default function DashboardPage() {
                 Executive BI Analytics · Chỉ Số Sức Khỏe Doanh Nghiệp 360°
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-normal mt-0.5">
-                CAC, LTV, Retention Rate & ROI Kênh Marketing
+                CAC, LTV, Retention Rate & ROI Kênh Marketing (Cập nhật real-time khi có giao dịch)
               </p>
             </div>
           </div>
@@ -192,10 +204,10 @@ export default function DashboardPage() {
         <CardBody>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
             {[
-              { label: 'CAC (Chi phí Thu Hái)', value: formatVND(3_250_000), sub: '📉 -12.5% so tháng trước', color: 'text-emerald-600 dark:text-emerald-400' },
-              { label: 'LTV (Giá Trị Trọn Đời)', value: formatVND(185_000_000), sub: '📈 +24.1% YoY', color: 'text-indigo-600 dark:text-indigo-400' },
-              { label: 'Retention / Churn', value: '94.2% / 5.8%', sub: 'Tỷ lệ duy trì KH vượt trội', color: 'text-slate-700 dark:text-slate-300' },
-              { label: 'ROI Quảng Cáo TB', value: '440% ROI', sub: 'Top: Referral (650%)', color: 'text-emerald-600 dark:text-emerald-400' },
+              { label: 'CAC (Chi phí Thu Hái)', value: formatVND(0), sub: 'Chưa có dữ liệu', color: 'text-slate-500' },
+              { label: 'LTV (Giá Trị Trọn Đời)', value: formatVND(0), sub: 'Chưa có dữ liệu', color: 'text-slate-500' },
+              { label: 'Retention / Churn', value: '0% / 0%', sub: 'Chưa phát sinh KH', color: 'text-slate-500' },
+              { label: 'ROI Quảng Cáo TB', value: '0% ROI', sub: 'Chưa phát sinh Ads', color: 'text-slate-500' },
             ].map(({ label, value, sub, color }) => (
               <div key={label} className="p-3.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-lg space-y-1">
                 <span className="text-slate-500 dark:text-slate-400 font-medium uppercase text-[10px] tracking-wide">{label}</span>
@@ -232,10 +244,10 @@ export default function DashboardPage() {
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
-                <PipelineBar label="1. Lead Mới Tiếp Nhận" count={142} amount={formatCompact(850_000_000) + ' ₫'} pct={70} color="text-indigo-600 dark:text-indigo-400" />
-                <PipelineBar label="2. Khảo Sát Gian Hàng" count={86}  amount={formatCompact(1_420_000_000) + ' ₫'} pct={55} color="text-amber-600 dark:text-amber-400" />
-                <PipelineBar label="3. Báo Giá & Kế Hoạch" count={45}  amount={formatCompact(980_000_000) + ' ₫'} pct={40} color="text-indigo-600 dark:text-indigo-400" />
-                <PipelineBar label="4. Chốt HĐ & Vận Hành" count={32}  amount={formatCompact(1_150_000_000) + ' ₫'} pct={85} color="text-emerald-600 dark:text-emerald-400" />
+                <PipelineBar label="1. Lead Mới Tiếp Nhận" count={0} amount="0 ₫" pct={0} color="text-indigo-600 dark:text-indigo-400" />
+                <PipelineBar label="2. Khảo Sát Gian Hàng" count={0}  amount="0 ₫" pct={0} color="text-amber-600 dark:text-amber-400" />
+                <PipelineBar label="3. Báo Giá & Kế Hoạch" count={0}  amount="0 ₫" pct={0} color="text-indigo-600 dark:text-indigo-400" />
+                <PipelineBar label="4. Chốt HĐ & Vận Hành" count={0}  amount="0 ₫" pct={0} color="text-emerald-600 dark:text-emerald-400" />
               </div>
             </CardBody>
           </Card>
@@ -263,25 +275,11 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
-                  {[
-                    { name: 'Thời Trang An An', platform: 'Shopee Mall', service: 'Vận hành Trọn Gói', sale: 'Trần Văn Hoàng', status: 'Đang VH', variant: 'success' as const },
-                    { name: 'Beauty Glow',       platform: 'TikTok Shop', service: 'Livestream & KOC',   sale: 'Lê Thị Mai',    status: 'Khởi Tạo', variant: 'primary' as const },
-                  ].map((row) => (
-                    <tr key={row.name} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                      <td className="px-5 py-3 font-semibold text-slate-900 dark:text-slate-100">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 ${avatarColor(row.name)}`}>
-                            {getInitials(row.name)}
-                          </div>
-                          <span className="truncate max-w-[120px]">{row.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 hidden sm:table-cell">{row.platform}</td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 hidden md:table-cell">{row.service}</td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 hidden lg:table-cell">{row.sale}</td>
-                      <td className="px-5 py-3"><Badge variant={row.variant} dot size="sm">{row.status}</Badge></td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td colSpan={5} className="px-5 py-8 text-center text-slate-400 font-medium">
+                      Chưa có hợp đồng khách hàng nào. Sẵn sàng nhập liệu mới.
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -300,21 +298,8 @@ export default function DashboardPage() {
               </h3>
             </CardHeader>
             <CardBody>
-              <div className="space-y-2">
-                {[
-                  { name: 'Phạm Minh Đức', phone: '0912 **** 889', note: 'Tư vấn gói Shopee', duration: '3:12' },
-                  { name: 'Nguyễn Thị Lan', phone: '0934 **** 112', note: 'Hỗ trợ TikTok Shop', duration: '1:45' },
-                ].map((call) => (
-                  <div key={call.name} className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-xs gap-2">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">{call.name} → {call.phone}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">{call.note} · {call.duration}</p>
-                    </div>
-                    <button className="shrink-0 px-2 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold flex items-center gap-1 text-[10px] transition-colors">
-                      <Play className="w-3 h-3 fill-emerald-600 dark:fill-emerald-400" /> Nghe
-                    </button>
-                  </div>
-                ))}
+              <div className="p-6 text-center text-slate-400 text-xs font-medium">
+                Chưa phát sinh cuộc gọi tư vấn VoIP.
               </div>
             </CardBody>
           </Card>
@@ -328,25 +313,8 @@ export default function DashboardPage() {
               </h3>
             </CardHeader>
             <CardBody>
-              <div className="space-y-2.5">
-                {[
-                  { rank: 1, name: 'Trần Văn Hoàng', team: 'Đội 1', revenue: 620_000_000, pct: 124, badge: 'Top 1' },
-                  { rank: 2, name: 'Lê Thị Mai',     team: 'Đội 3', revenue: 540_000_000, pct: 108, badge: 'Top 2' },
-                  { rank: 3, name: 'Nguyễn Đức Anh', team: 'Đội 2', revenue: 490_000_000, pct: 98,  badge: 'Top 3' },
-                ].map(({ rank, name, team, revenue, pct, badge }) => (
-                  <div key={name} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${rank === 1 ? 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50' : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/60'}`}>
-                    <div className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 shadow-sm ${rank === 1 ? 'bg-amber-500 text-white' : rank === 2 ? 'bg-slate-400 text-white' : 'bg-orange-400 text-white'}`}>
-                      {rank}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">{name} ({team})</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 tabular-numbers">
-                        {formatCompact(revenue)} ₫ · Đạt {pct}%
-                      </p>
-                    </div>
-                    <Badge variant={rank === 1 ? 'warning' : 'default'} size="sm">{badge}</Badge>
-                  </div>
-                ))}
+              <div className="p-6 text-center text-slate-400 text-xs font-medium">
+                Chưa có dữ liệu xếp hạng doanh số tháng này.
               </div>
             </CardBody>
           </Card>
