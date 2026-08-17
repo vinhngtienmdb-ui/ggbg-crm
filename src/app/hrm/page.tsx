@@ -40,7 +40,6 @@ import {
 import { formatCurrency } from '@/lib/formatters';
 import {
   ModuleBanner,
-  ModuleLayoutWithRail,
   ViewModeSwitcher,
   ViewMode,
 } from '@/components/ui';
@@ -141,14 +140,25 @@ function HRMContent() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialTabParam === 'recruitment') {
+    const tab = initialTabParam;
+    if (tab === 'overview') {
+      setActiveTab('DASHBOARD');
+    } else if (tab === 'directory' || tab === 'profile') {
+      setActiveTab('PROFILE');
+    } else if (tab === 'recruitment') {
       setActiveTab('RECRUITMENT');
-    } else if (initialTabParam === 'bhxh') {
-      setActiveTab('BHXH');
-    } else if (initialTabParam === 'shifts') {
+    } else if (tab === 'shifts') {
       setActiveTab('SHIFTS');
-    } else if (initialTabParam === 'documents') {
+    } else if (tab === 'bhxh') {
+      setActiveTab('BHXH');
+    } else if (tab === 'documents') {
       setActiveTab('DOCUMENTS');
+    } else if (tab === 'org_chart' || tab === 'map') {
+      setActiveTab('ORG_GIS');
+    } else if (tab === 'labor_book') {
+      setActiveTab('LABOR_BOOK');
+    } else if (tab === 'onboarding') {
+      setActiveTab('ONBOARDING');
     }
   }, [initialTabParam]);
 
@@ -272,40 +282,8 @@ function HRMContent() {
         }
       />
 
-      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
-      <ModuleLayoutWithRail
-        railTitle="Phân Hệ Nghiệp Vụ HRM"
-        railSubtitle="10 chuyên mục nghiệp vụ nhân sự"
-        activeId={activeTab}
-        onSelect={(id) => setActiveTab(id as HRMTabType)}
-        sections={[
-          {
-            title: 'I. Hồ Sơ & Tổ Chức',
-            items: [
-              { id: 'DASHBOARD', label: '1. Tổng Quan HRM', icon: Sparkles, badge: 'BI', badgeVariant: 'blue' },
-              { id: 'PROFILE', label: '2. Hồ Sơ Nhân Sự 360°', icon: User, badge: employees.length, badgeVariant: 'purple' },
-              { id: 'ORG_GIS', label: '3. Sơ Đồ & Bản Đồ GIS', icon: Building2, badgeVariant: 'slate' },
-              { id: 'LABOR_BOOK', label: '4. Sổ Quản Lý Lao Động', icon: FileCheck, badgeVariant: 'emerald' },
-            ],
-          },
-          {
-            title: 'II. Tuyển Dụng & Hội Nhập',
-            items: [
-              { id: 'RECRUITMENT', label: '5. Tuyển Dụng & Ứng Viên', icon: Users, badge: 'Phễu', badgeVariant: 'emerald' },
-              { id: 'ONBOARDING', label: '6. Checklist Onboarding', icon: Award, badge: `${onboardingList.filter(t => t.equipment_delivered && t.crm_account_created && t.training_completed).length}/${onboardingList.length}`, badgeVariant: 'amber' },
-              { id: 'DOCUMENTS', label: '7. Soạn Thảo & Trình Ký', icon: FileText, badgeVariant: 'blue' },
-            ],
-          },
-          {
-            title: 'III. Chế Độ & Chấm Công',
-            items: [
-              { id: 'SHIFTS', label: '8. Phân Ca & Chấm Công', icon: Clock, badgeVariant: 'amber' },
-              { id: 'COMPENSATION', label: '9. Đãi Ngộ & Lương P1', icon: Wallet, badgeVariant: 'emerald' },
-              { id: 'BHXH', label: '10. Biến Động BHXH & Y Tế', icon: ShieldAlert, badgeVariant: 'rose' },
-            ],
-          },
-        ]}
-      >
+      {/* NỘI DUNG PHÂN HỆ HRM (HIỂN THỊ FULL-WIDTH THEO ĐIỀU HƯỚNG TỪ SIDEBAR CHÍNH) */}
+      <div className="space-y-6">
         {/* TAB 1: DASHBOARD OVERVIEW */}
         {activeTab === 'DASHBOARD' && <HrmDashboard employees={employees} />}
 
@@ -864,7 +842,7 @@ function HRMContent() {
             </div>
           </div>
         )}
-      </ModuleLayoutWithRail>
+      </div>
 
       {/* MODALS */}
       {isEmployeeModalOpen && (

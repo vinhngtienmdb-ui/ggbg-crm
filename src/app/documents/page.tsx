@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import {
   FileText,
   Plus,
@@ -60,17 +60,27 @@ import {
 import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
 import ExternalSignModal from '@/components/documents/ExternalSignModal';
 import { exportDocumentsToCSV } from '@/lib/excelExportHelper';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { canAccessSettings } from '@/lib/permissions';
-import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
+import { ModuleBanner } from '@/components/ui';
 
-export default function DocumentsPage() {
+function DocumentsContent() {
   const { user, simulatedRole } = useAuth();
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+  const searchParams = useSearchParams();
 
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
   const [ledgers, setLedgers] = useState<DocumentLedgerConfig[]>(() => getDocumentLedgers());
   const [activeTab, setActiveTab] = useState<'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP' | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'list' || tab === 'inbound') setActiveTab('INBOUND');
+    else if (tab === 'dispatch' || tab === 'outbound') setActiveTab('OUTBOUND');
+    else if (tab === 'digital_sign' || tab === 'doc_config') setActiveTab('DOC_CONFIG');
+    else if (tab === 'audit_log' || tab === 'directive_log') setActiveTab('DIRECTIVE_LOG');
+    else if (tab === 'internal_sop') setActiveTab('INTERNAL_SOP');
+  }, [searchParams]);
   const [selectedInternalCategory, setSelectedInternalCategory] = useState<DocumentCategory | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -434,35 +444,8 @@ export default function DocumentsPage() {
         }
       />
 
-      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
-      <ModuleLayoutWithRail
-        railTitle="Phân Hệ Sổ Văn Thư"
-        railSubtitle="5 chuyên mục sổ công văn & chỉ đạo"
-        activeId={activeTab}
-        onSelect={(id) => setActiveTab(id as any)}
-        sections={[
-          {
-            title: 'I. Sổ Văn Bản Quản Lý',
-            items: [
-              { id: 'INBOUND', label: '1. Sổ Công Văn Đến', icon: Inbox, badge: totalInbound, badgeVariant: 'blue' },
-              { id: 'OUTBOUND', label: '2. Sổ Công Văn Đi', icon: Send, badge: totalOutbound, badgeVariant: 'purple' },
-              { id: 'INTERNAL_SOP', label: '3. Quy Trình SOP & Quyết Định', icon: BookOpen, badge: totalInternal, badgeVariant: 'emerald' },
-            ],
-          },
-          {
-            title: 'II. Điều Hành & Bút Phê',
-            items: [
-              { id: 'DIRECTIVE_LOG', label: '4. Nhật Ký Bút Phê Chỉ Đạo', icon: MessageSquare, badge: totalPendingDirective > 0 ? `${totalPendingDirective} Chờ` : undefined, badgeVariant: 'amber' },
-            ],
-          },
-          {
-            title: 'III. Cài Đặt Hệ Thống',
-            items: [
-              { id: 'DOC_CONFIG', label: '5. Cấu Hình & Ký Số HSM', icon: Building2, badgeVariant: 'slate' },
-            ],
-          },
-        ]}
-      >
+      {/* NỘI DUNG SỔ VĂN THƯ (HIỂN THỊ FULL-WIDTH THEO ĐIỀU HƯỚNG SIDEBAR CHÍNH) */}
+      <div className="space-y-6">
         {activeTab !== 'DOC_CONFIG' ? (
           <div className="space-y-4">
             {/* Filter Bar */}
@@ -670,71 +653,209 @@ export default function DocumentsPage() {
             </div>
           </div>
         )}
-      </ModuleLayoutWithRail> {/* MODAL TIẾP NHẬN / PHÁT HÀNH CÔNG VĂN MỚI */}
-      {isCreateOpen && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium"> <div className="flex items-center justify-between border-b pb-3"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <FileText className="w-5 h-5 text-blue-600" /> Tiếp Nhận / Phát Hành Văn Bản Mới </h3> <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700"> <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleCreateSubmit} className="space-y-3"> <div> <label className="block text-slate-700 mb-1">Loại Công Văn *</label> <select
+      </div>
+
+      {/* MODAL TIẾP NHẬN / PHÁT HÀNH CÔNG VĂN MỚI */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
+            <div className="flex items-center justify-between border-b pb-3">
+              <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                Tiếp Nhận / Phát Hành Văn Bản Mới
+              </h3>
+              <button onClick={() => setIsCreateOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateSubmit} className="space-y-3">
+              <div>
+                <label className="block text-slate-700 mb-1">Loại Công Văn *</label>
+                <select
                   value={newDoc.category}
                   onChange={(e) => setNewDoc({ ...newDoc, category: e.target.value as DocumentCategory })}
                   className="w-full px-3 py-2 border rounded-xl"
-                > <option value="INBOUND">📥 Công Văn Đến (Gửi từ Cơ quan / Đối tác bên ngoài)</option> <option value="OUTBOUND"> Công Văn Đi (GGBG CRM phát hành ra bên ngoài)</option> <option value="INTERNAL_SOP"> Văn Bản Nội Bộ (Quy chế, Quy trình SOP)</option> </select> </div> <div> <label className="block text-slate-700 mb-1">Số / Mã Ký Hiệu Công Văn *</label> <input
+                >
+                  <option value="INBOUND">📥 Công Văn Đến (Gửi từ Cơ quan / Đối tác bên ngoài)</option>
+                  <option value="OUTBOUND"> Công Văn Đi (GGBG CRM phát hành ra bên ngoài)</option>
+                  <option value="INTERNAL_SOP"> Văn Bản Nội Bộ (Quy chế, Quy trình SOP)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-slate-700 mb-1">Số / Mã Ký Hiệu Công Văn *</label>
+                <input
                   type="text"
                   required
                   placeholder="Ví dụ: 142/CV-BCT hoặc 88/QĐ-GGBG..."
                   value={newDoc.document_code}
                   onChange={(e) => setNewDoc({ ...newDoc, document_code: e.target.value })}
                   className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
-                /> </div> <div> <label className="block text-slate-700 mb-1">Trích Yếu Nội Dung Văn Bản *</label> <textarea
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 mb-1">Trích Yếu Nội Dung Văn Bản *</label>
+                <textarea
                   rows={2}
                   required
                   placeholder="Nhập nội dung trích yếu của công văn..."
                   value={newDoc.title}
                   onChange={(e) => setNewDoc({ ...newDoc, title: e.target.value })}
                   className="w-full px-3 py-2 border rounded-xl"
-                /> </div> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Cơ Quan / Nơi Ban Hành *</label> <input
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Cơ Quan / Nơi Ban Hành *</label>
+                  <input
                     type="text"
                     required
                     value={newDoc.issuer_org}
                     onChange={(e) => setNewDoc({ ...newDoc, issuer_org: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  /> </div> <div> <label className="block text-slate-700 mb-1">Người Ký Văn Bản *</label> <input
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 mb-1">Người Ký Văn Bản *</label>
+                  <input
                     type="text"
                     required
                     value={newDoc.signee_name}
                     onChange={(e) => setNewDoc({ ...newDoc, signee_name: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  /> </div> </div> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Mức Độ Bảo Mật</label> <select
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Mức Độ Bảo Mật</label>
+                  <select
                     value={newDoc.security_level}
                     onChange={(e) => setNewDoc({ ...newDoc, security_level: e.target.value as SecurityLevel })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  > <option value="NORMAL">Thường (Công khai)</option> <option value="CONFIDENTIAL">🔒 Bảo Mật Nội Bộ</option> <option value="SECRET">🔒 Mật</option> </select> </div> <div> <label className="block text-slate-700 mb-1">Mức Độ Ưu Tiên / Khẩn</label> <select
+                  >
+                    <option value="NORMAL">Thường (Công khai)</option>
+                    <option value="CONFIDENTIAL">🔒 Bảo Mật Nội Bộ</option>
+                    <option value="SECRET">🔒 Mật</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 mb-1">Mức Độ Ưu Tiên / Khẩn</label>
+                  <select
                     value={newDoc.urgency_level}
                     onChange={(e) => setNewDoc({ ...newDoc, urgency_level: e.target.value as UrgencyLevel })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  > <option value="NORMAL">Thường</option> <option value="URGENT">Khẩn</option> <option value="HIGHLY_URGENT">⚡ Thượng Khẩn (Trong ngày)</option> </select> </div> </div> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Phòng Ban Phụ Trách *</label> <select
+                  >
+                    <option value="NORMAL">Thường</option>
+                    <option value="URGENT">Khẩn</option>
+                    <option value="HIGHLY_URGENT">⚡ Thượng Khẩn (Trong ngày)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Phòng Ban Phụ Trách *</label>
+                  <select
                     value={newDoc.assigned_department}
                     onChange={(e) => setNewDoc({ ...newDoc, assigned_department: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  > <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option> <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option> <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option> <option value="Ban Giám Đốc">Ban Giám Đốc</option> </select> </div> <div> <label className="block text-slate-700 mb-1">Cán Bộ Chủ Trì *</label> <input
+                  >
+                    <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
+                    <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
+                    <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
+                    <option value="Ban Giám Đốc">Ban Giám Đốc</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 mb-1">Cán Bộ Chủ Trì *</label>
+                  <input
                     type="text"
                     required
                     value={newDoc.assigned_assignee}
                     onChange={(e) => setNewDoc({ ...newDoc, assigned_assignee: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  /> </div> </div> <div className="flex items-center justify-end gap-3 pt-3 border-t"> <button
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                <button
                   type="button"
                   onClick={() => setIsCreateLedgerOpen(false)}
                   className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
-                > Hủy </button> <button
+                >
+                  Hủy
+                </button>
+                <button
                   type="submit"
                   className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30"
-                > Vào Sổ Văn Bản </button> </div> </form> </div> </div> )}
+                >
+                  Vào Sổ Văn Bản
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* MODAL XEM VĂN BẢN, PDF VIEWER & BÚT PHÊ GIÁM ĐỐC */}
-      {isViewOpen && selectedDoc && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-medium max-h-[90vh] overflow-y-auto"> <div className="flex items-center justify-between border-b pb-3"> <div> <span className="font-mono text-xs font-semibold text-blue-700">{selectedDoc.document_code}</span> <h3 className="font-semibold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3> </div> <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700"> <X className="w-5 h-5" /> </button> </div> <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2"> <h4 className="font-semibold text-slate-900 text-sm leading-snug">{selectedDoc.title}</h4> <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80"> <p>Nơi ban hành: <strong className="text-slate-900">{selectedDoc.issuer_org}</strong></p> <p>Người ký: <strong className="text-slate-900">{selectedDoc.signee_name}</strong></p> <p>Đơn vị xử lý: <strong className="text-slate-900">{selectedDoc.assigned_department}</strong></p> <p>Cán bộ chủ trì: <strong className="text-blue-700 font-semibold">{selectedDoc.assigned_assignee}</strong></p> </div> </div> {/* Direct File Attachment Viewer Card */} <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-xl flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-medium"> <Paperclip className="w-5 h-5" /> </div> <div> <p className="font-semibold text-slate-900">{selectedDoc.file_name || 'Văn-Bản-Dinh-Kem.pdf'}</p> <p className="text-[11px] text-slate-500 font-normal">Dung lượng: {selectedDoc.file_size || '2.1 MB'} • Định dạng tệp PDF</p> </div> </div> <a
+      {isViewOpen && selectedDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-medium max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <span className="font-mono text-xs font-semibold text-blue-700">{selectedDoc.document_code}</span>
+                <h3 className="font-semibold text-sm text-slate-900">Chi Tiết Văn Bản & Bút Phê Chỉ Đạo</h3>
+              </div>
+              <button onClick={() => setIsViewOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-semibold text-slate-900 text-sm leading-snug">{selectedDoc.title}</h4>
+              <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium pt-2 border-t border-slate-200/80">
+                <p>Nơi ban hành: <strong className="text-slate-900">{selectedDoc.issuer_org}</strong></p>
+                <p>Người ký: <strong className="text-slate-900">{selectedDoc.signee_name}</strong></p>
+                <p>Đơn vị xử lý: <strong className="text-slate-900">{selectedDoc.assigned_department}</strong></p>
+                <p>Cán bộ chủ trì: <strong className="text-blue-700 font-semibold">{selectedDoc.assigned_assignee}</strong></p>
+              </div>
+            </div>
+            {/* Direct File Attachment Viewer Card */}
+            <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-medium">
+                  <Paperclip className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">{selectedDoc.file_name || 'Văn-Bản-Dinh-Kem.pdf'}</p>
+                  <p className="text-[11px] text-slate-500 font-normal">Dung lượng: {selectedDoc.file_size || '2.1 MB'} • Định dạng tệp PDF</p>
+                </div>
+              </div>
+              <a
                 href={selectedDoc.file_url || '#'}
                 target="_blank"
                 rel="noreferrer"
                 className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-[11px] flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95"
-              > <Download className="w-3.5 h-3.5" /> Xem / Tải File PDF </a> </div> {/* Digital Red Stamp Seal Badge */} <div className="p-4 bg-red-50/60 border border-red-200 rounded-xl flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-full border-2 border-red-600 text-red-600 flex items-center justify-center font-semibold text-xs uppercase tracking-wider rotate-[-12deg] bg-white shadow-sm"> GGBG </div> <div> <p className="font-semibold text-red-900"> {selectedDoc.has_digital_stamp ? '🔴 Dấu Mộc Đỏ Điện Tử: ĐÃ ĐÓNG DẤU CHÍNH THỨC' : '⚪ Dấu Mộc Điện Tử: CHƯA ĐÓNG DẤU MỘC'} </p> <p className="text-[11px] text-slate-500 font-normal"> {selectedDoc.has_digital_stamp ? `Phát hành & xác thực ngày ${selectedDoc.stamped_at || selectedDoc.issued_date}` : 'Văn bản dự thảo chờ Giám đốc đóng dấu mộc'} </p> </div> </div> {!selectedDoc.has_digital_stamp && ( <button
+              >
+                <Download className="w-3.5 h-3.5" />
+                Xem / Tải File PDF
+              </a>
+            </div>
+            {/* Digital Red Stamp Seal Badge */}
+            <div className="p-4 bg-red-50/60 border border-red-200 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-red-600 text-red-600 flex items-center justify-center font-semibold text-xs uppercase tracking-wider rotate-[-12deg] bg-white shadow-sm">
+                  GGBG
+                </div>
+                <div>
+                  <p className="font-semibold text-red-900">
+                    {selectedDoc.has_digital_stamp ? '🔴 Dấu Mộc Đỏ Điện Tử: ĐÃ ĐÓNG DẤU CHÍNH THỨC' : '⚪ Dấu Mộc Điện Tử: CHƯA ĐÓNG DẤU MỘC'}
+                  </p>
+                  <p className="text-[11px] text-slate-500 font-normal">
+                    {selectedDoc.has_digital_stamp ? `Phát hành & xác thực ngày ${selectedDoc.stamped_at || selectedDoc.issued_date}` : 'Văn bản dự thảo chờ Giám đốc đóng dấu mộc'}
+                  </p>
+                </div>
+              </div>
+              {!selectedDoc.has_digital_stamp && (
+                <button
                   onClick={() => {
                     const updated = {
                       ...selectedDoc,
@@ -747,26 +868,67 @@ export default function DocumentsPage() {
                     showToast(`🔴 Đã đóng dấu mộc đỏ điện tử chính thức cho văn bản ${selectedDoc.document_code}`);
                   }}
                   className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-[11px] flex items-center gap-1.5 shadow-md shadow-red-600/30 transition-all active:scale-95 shrink-0"
-                > <FileCheck className="w-3.5 h-3.5" /> Đóng Dấu Mộc Đỏ </button> )} </div> {/* Bút Phê Chỉ Đạo Section */} <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-xl space-y-3"> <h4 className="font-semibold text-amber-900 text-xs flex items-center gap-2"> <MessageSquare className="w-4 h-4 text-amber-600" /> Bút Phê Chỉ Đạo Của Ban Giám Đốc </h4> {selectedDoc.directive_note ? ( <p className="p-3 bg-white border border-amber-200 rounded-xl font-semibold text-amber-900 leading-relaxed text-xs"> {selectedDoc.directive_note} </p> ) : ( <p className="text-slate-500 font-normal text-[11px]">Chưa có bút phê chỉ đạo cho công văn này.</p> )} <form onSubmit={handleAddDirectiveNote} className="space-y-2 pt-2"> <label className="block text-slate-700 font-medium">Cập Nhật Bút Phê Chỉ Đạo Mới (CEO / Director):</label> <div className="flex gap-2"> <input
+                >
+                  <FileCheck className="w-3.5 h-3.5" />
+                  Đóng Dấu Mộc Đỏ
+                </button>
+              )}
+            </div>
+            {/* Bút Phê Chỉ Đạo Section */}
+            <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-xl space-y-3">
+              <h4 className="font-semibold text-amber-900 text-xs flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-amber-600" />
+                Bút Phê Chỉ Đạo Của Ban Giám Đốc
+              </h4>
+              {selectedDoc.directive_note ? (
+                <p className="p-3 bg-white border border-amber-200 rounded-xl font-semibold text-amber-900 leading-relaxed text-xs">
+                  {selectedDoc.directive_note}
+                </p>
+              ) : (
+                <p className="text-slate-500 font-normal text-[11px]">Chưa có bút phê chỉ đạo cho công văn này.</p>
+              )}
+              <form onSubmit={handleAddDirectiveNote} className="space-y-2 pt-2">
+                <label className="block text-slate-700 font-medium">Cập Nhật Bút Phê Chỉ Đạo Mới (CEO / Director):</label>
+                <div className="flex gap-2">
+                  <input
                     type="text"
                     required
                     placeholder="Nhập nội dung chỉ đạo thực hiện và mốc thời gian hoàn thành..."
                     value={directiveInput}
                     onChange={(e) => setDirectiveInput(e.target.value)}
                     className="flex-1 px-3 py-2 bg-white border border-amber-300 rounded-xl"
-                  /> <button
+                  />
+                  <button
                     type="submit"
                     className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl shadow-md shrink-0"
-                  > Lưu Bút Phê </button> </div> </form> </div> <div className="flex items-center justify-between pt-2"> <button
+                  >
+                    Lưu Bút Phê
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+              <button
                 onClick={() => setIsSignModalOpen(true)}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl shadow-md flex items-center gap-1.5 transition-all active:scale-95"
-              > <ShieldCheck className="w-4 h-4" /> Trình Ký Số Điện Tử (E-Sign) </button> <button
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Trình Ký Số Điện Tử (E-Sign)
+              </button>
+              <button
                 onClick={() => setIsViewOpen(false)}
                 className="px-5 py-2 bg-slate-900 text-white font-semibold rounded-xl"
-              > Đóng </button> </div> </div> </div> )}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL TRÌNH KÝ SỐ ĐIỆN TỬ */}
-      {selectedDoc && ( <DigitalSignatureModal
+      {selectedDoc && (
+        <DigitalSignatureModal
           isOpen={isSignModalOpen}
           onClose={() => setIsSignModalOpen(false)}
           documentCode={selectedDoc.document_code}
@@ -809,5 +971,16 @@ export default function DocumentsPage() {
             setDocuments(getOfficialDocuments());
             showToast(` Đã ký số điện tử thành công cho văn bản ${selectedDoc.document_code}! Mã Checksum: ${sig.sha256_hash.slice(0, 18)}...`);
           }}
-        /> )} </div> );
+        />
+      )}
+    </div>
+  );
+}
+
+export default function DocumentsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-xs font-medium text-slate-400">Đang tải phân hệ Quản Lý Văn Bản...</div>}>
+      <DocumentsContent />
+    </Suspense>
+  );
 }

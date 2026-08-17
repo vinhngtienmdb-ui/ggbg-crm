@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Target,
   Plus,
@@ -62,9 +63,10 @@ import ScorecardModal from '@/components/performance/ScorecardModal';
 import FormulaConfigModal from '@/components/performance/FormulaConfigModal';
 import HrCriteriaModal from '@/components/performance/HrCriteriaModal';
 import PerformanceAnalyticsDashboard from '@/components/performance/PerformanceAnalyticsDashboard';
-import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
+import { ModuleBanner } from '@/components/ui';
 
-export default function UnifiedKpisPerformancePage() {
+function KpisContent() {
+  const searchParams = useSearchParams();
   const [activeMainTab, setActiveMainTab] = useState<'ANALYTICS' | 'KPI_LIST' | 'SCORECARDS' | 'SYNC_ENGINE'>('KPI_LIST');
 
   // KPI State
@@ -72,6 +74,26 @@ export default function UnifiedKpisPerformancePage() {
   const [selectedLevelFilter, setSelectedLevelFilter] = useState<string>('ALL');
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>('ALL');
   const [kpiSearchTerm, setKpiSearchTerm] = useState<string>('');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'company') {
+      setActiveMainTab('KPI_LIST');
+      setSelectedLevelFilter('COMPANY');
+    } else if (tab === 'department') {
+      setActiveMainTab('KPI_LIST');
+      setSelectedLevelFilter('DEPARTMENT');
+    } else if (tab === 'individual') {
+      setActiveMainTab('KPI_LIST');
+      setSelectedLevelFilter('INDIVIDUAL');
+    } else if (tab === 'evaluation' || tab === 'scorecards') {
+      setActiveMainTab('SCORECARDS');
+    } else if (tab === 'analytics') {
+      setActiveMainTab('ANALYTICS');
+    } else if (tab === 'sync') {
+      setActiveMainTab('SYNC_ENGINE');
+    }
+  }, [searchParams]);
 
   // Modals KPI
   const [isCreateKpiModalOpen, setIsCreateKpiModalOpen] = useState(false);
@@ -278,29 +300,8 @@ export default function UnifiedKpisPerformancePage() {
         }
       />
 
-      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
-      <ModuleLayoutWithRail
-        railTitle="Phân Hệ Hiệu Suất & KPIs"
-        railSubtitle="4 chuyên mục đánh giá & liên thông"
-        activeId={activeMainTab}
-        onSelect={(id) => setActiveMainTab(id as any)}
-        sections={[
-          {
-            title: 'I. Chỉ Tiêu & Hiệu Suất',
-            items: [
-              { id: 'KPI_LIST', label: '1. Phân Bổ Chỉ Tiêu KPIs', icon: Target, badge: filteredKpis.length, badgeVariant: 'amber' },
-              { id: 'SCORECARDS', label: '2. Chấm Điểm Đánh Giá 3P', icon: Award, badge: filteredScorecards.length, badgeVariant: 'blue' },
-            ],
-          },
-          {
-            title: 'II. Báo Cáo & Liên Thông',
-            items: [
-              { id: 'ANALYTICS', label: '3. Báo Cáo & Xếp Loại Hiệu Suất', icon: BarChart3, badgeVariant: 'emerald' },
-              { id: 'SYNC_ENGINE', label: '4. Đồng Bộ Sang Lương P3', icon: RefreshCw, badgeVariant: 'purple' },
-            ],
-          },
-        ]}
-      >
+      {/* NỘI DUNG HIỆU SUẤT & KPIS FULL-WIDTH */}
+      <div className="space-y-6">
         {/* TAB 1: DANH SÁCH KPIS */}
         {activeMainTab === 'KPI_LIST' && ( <div className="space-y-4 text-xs font-medium"> {/* Filters Bar */} <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4"> <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto"> <div className="relative w-full sm:w-72"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
                   type="text"
@@ -381,46 +382,68 @@ export default function UnifiedKpisPerformancePage() {
                 onClick={handleSyncKpiToPerformance}
                 className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0"
               > <RefreshCw className="w-4 h-4" /> Kích Hoạt Đồng Bộ Real-time </button> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Nhân Sự & Mã NV</th> <th className="p-3">Phòng Ban</th> <th className="p-3 text-center">Tỷ Lệ Hoàn Thành KPIs (%)</th> <th className="p-3 text-center">Quy Đổi Điểm P3 (Thang 100)</th> <th className="p-3 text-center">Trạng Thái Đồng Bộ</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {scorecards.map((sc) => ( <tr key={sc.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-semibold text-slate-900">{sc.employee_name}</p> <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code}</p> </td> <td className="p-3 font-medium text-slate-800">{sc.department}</td> <td className="p-3 text-center font-mono font-semibold text-emerald-700 text-sm"> {sc.kpi_score}% </td> <td className="p-3 text-center font-mono font-semibold text-purple-700 text-sm"> {sc.kpi_score} / 100 Điểm </td> <td className="p-3 text-center"> <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[10.5px] border border-emerald-300"> ⚡ Đã Đồng Bộ Auto </span> </td> </tr> ))} </tbody> </table> </div> </div> )}
-      </ModuleLayoutWithRail>
+      </div>
 
       {/* MODALS */}
-      {isCreateKpiModalOpen && ( <KpiModal
+      {isCreateKpiModalOpen && (
+        <KpiModal
           isOpen={isCreateKpiModalOpen}
           onClose={() => setIsCreateKpiModalOpen(false)}
           onSave={handleSaveKpi}
-        /> )}
+        />
+      )}
 
-      {isEditKpiModalOpen && selectedKpi && ( <KpiModal
+      {isEditKpiModalOpen && selectedKpi && (
+        <KpiModal
           isOpen={isEditKpiModalOpen}
           onClose={() => setIsEditKpiModalOpen(false)}
           onSave={handleSaveKpi}
           initialData={selectedKpi}
-        /> )}
+        />
+      )}
 
-      {isDetailKpiModalOpen && selectedKpi && ( <KpiDetailModal
+      {isDetailKpiModalOpen && selectedKpi && (
+        <KpiDetailModal
           isOpen={isDetailKpiModalOpen}
           onClose={() => setIsDetailKpiModalOpen(false)}
           kpi={selectedKpi}
-        /> )}
+        />
+      )}
 
-      {isScorecardModalOpen && ( <ScorecardModal
+      {isScorecardModalOpen && (
+        <ScorecardModal
           isOpen={isScorecardModalOpen}
           onClose={() => setIsScorecardModalOpen(false)}
           onSave={handleSaveScorecard}
           initialData={selectedScorecard}
           mode={scorecardModalMode}
-        /> )}
+        />
+      )}
 
-      {isFormulaModalOpen && ( <FormulaConfigModal
+      {isFormulaModalOpen && (
+        <FormulaConfigModal
           isOpen={isFormulaModalOpen}
           onClose={() => setIsFormulaModalOpen(false)}
           weights={weights}
           onSave={handleSaveWeights}
-        /> )}
+        />
+      )}
 
-      {isHrCriteriaModalOpen && ( <HrCriteriaModal
+      {isHrCriteriaModalOpen && (
+        <HrCriteriaModal
           isOpen={isHrCriteriaModalOpen}
           onClose={() => setIsHrCriteriaModalOpen(false)}
           onSaveSuccess={reloadAllData}
-        /> )} </div> );
+        />
+      )}
+    </div>
+  );
+}
+
+export default function UnifiedKpisPerformancePage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-xs font-medium text-slate-400">Đang tải phân hệ Quản Lý Hiệu Suất & KPIs...</div>}>
+      <KpisContent />
+    </Suspense>
+  );
 }

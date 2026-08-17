@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import {
   FileCheck,
   Plus,
@@ -60,7 +60,7 @@ import {
 import { getEmployees } from '@/lib/hrmStore';
 import { createLeaveRequest } from '@/lib/payrollStore';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters';
-import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
+import { ModuleBanner } from '@/components/ui';
 
 const CATEGORIES = [
   'Tất Cả Danh Mục',
@@ -160,12 +160,14 @@ function EmployeePickerSelect({
         > <option value="">-- {placeholder || 'Chọn nhân sự từ hệ thống HRM'} --</option> {filteredEmployees.map((emp) => ( <option key={emp.id} value={`${emp.full_name} (${emp.employee_code} - ${emp.position})`}> [{emp.employee_code}] {emp.full_name} - {emp.position} ({emp.department}) </option> ))} </select> </div> {value && ( <div className="text-[11px] text-purple-700 font-medium bg-purple-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-purple-200"> <UserCheck className="w-3.5 h-3.5 text-purple-600" /> Đã chọn nhân sự: <strong className="text-slate-900">{value}</strong> </div> )} </div> );
 }
 
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { canAccessSettings } from '@/lib/permissions';
 
-export default function ProposalsPage() {
+function ProposalsContent() {
   const { user, simulatedRole } = useAuth();
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+  const searchParams = useSearchParams();
 
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
   const [submissions, setSubmissions] = useState<ProposalSubmission[]>(() => getProposalSubmissions());
@@ -177,6 +179,25 @@ export default function ProposalsPage() {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
   const [submissionStatusFilter, setSubmissionStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'pending') {
+      setActiveTab('SUBMISSIONS');
+      setSubmissionStatusFilter('PENDING');
+    } else if (tab === 'all_approved') {
+      setActiveTab('SUBMISSIONS');
+      setSubmissionStatusFilter('APPROVED');
+    } else if (tab === 'my_submissions') {
+      setActiveTab('SUBMISSIONS');
+      setSubmissionStatusFilter('ALL');
+    } else if (tab === 'templates') {
+      setActiveTab('TEMPLATE_CONFIG');
+    } else if (tab === 'create') {
+      setActiveTab('CREATE_NEW');
+      setCreateFormStep('SELECT_TEMPLATE');
+    }
+  }, [searchParams]);
 
   // Form Submission State
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(templates[0]?.id || '');
@@ -489,41 +510,24 @@ export default function ProposalsPage() {
         }
       />
 
-      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
-      <ModuleLayoutWithRail
-        railTitle="Phân Hệ Phê Duyệt & Mẫu Biểu"
-        railSubtitle="3 chuyên mục trình ký & quản trị form"
-        activeId={activeTab}
-        onSelect={(id) => {
-          setActiveTab(id as any);
-          if (id === 'CREATE_NEW') {
-            setCreateFormStep('SELECT_TEMPLATE');
-          }
-        }}
-        sections={[
-          {
-            title: 'I. Nghiệp Vụ Trình Duyệt',
-            items: [
-              { id: 'SUBMISSIONS', label: '1. Sổ Phiếu Phê Duyệt', icon: FileCheck, badge: submissions.length, badgeVariant: 'purple' },
-              { id: 'CREATE_NEW', label: '2. Nộp Phiếu Phê Duyệt Mới', icon: PlusCircle, badgeVariant: 'blue' },
-            ],
-          },
-          {
-            title: 'II. Quản Trị Quy Trình',
-            items: [
-              { id: 'TEMPLATE_CONFIG', label: '3. Quản Lý & Thiết Kế Mẫu Phiếu', icon: Settings, badge: templates.length, badgeVariant: 'indigo' },
-            ],
-          },
-        ]}
-      >
+      {/* NỘI DUNG PHÊ DUYỆT (HIỂN THỊ FULL-WIDTH THEO ĐIỀU HƯỚNG SIDEBAR CHÍNH) */}
+      <div className="space-y-6">
         {/* TAB 1: SUBMISSIONS LIST */}
-        {activeTab === 'SUBMISSIONS' && ( <div className="space-y-4"> <div className="flex flex-col sm:flex-row items-center justify-between gap-3"> <div className="flex items-center gap-2 w-full sm:w-auto"> <div className="relative w-full sm:w-80"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
+        {activeTab === 'SUBMISSIONS' && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Tìm mã phiếu, tên đơn, người nộp..."
                     className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                  /> </div> <select
+                  />
+                </div>
+                <select
                   value={submissionStatusFilter}
                   onChange={(e) => setSubmissionStatusFilter(e.target.value as any)}
                   className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200"
@@ -695,7 +699,7 @@ export default function ProposalsPage() {
                             className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg"
                             title="Xóa Mẫu Phiếu"
                           > <Trash2 className="w-3.5 h-3.5" /> </button> </div> </td> </tr> ))} </tbody> </table> </div> </div> )}
-      </ModuleLayoutWithRail>
+      </div>
 
       {/* MODAL 1: XEM CHI TIẾT CẤU HÌNH LOẠI PHIẾU (SCHEMA PREVIEW) */}
       {isPreviewTmplOpen && previewTemplate && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-medium max-h-[90vh] overflow-y-auto"> <div className="flex items-center justify-between border-b pb-3"> <div> <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-mono text-[10.5px] font-semibold">{previewTemplate.template_code}</span> <h3 className="font-semibold text-sm text-slate-900 mt-1">{previewTemplate.title}</h3> </div> <button onClick={() => setIsPreviewTmplOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700"> <X className="w-5 h-5" /> </button> </div> <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1"> <p className="text-purple-900 font-semibold">{previewTemplate.category_name}</p> <p className="text-purple-800 font-normal text-[11.5px]">{previewTemplate.description}</p> </div> {/* FIELDS SCHEMA LIST */} <div className="space-y-2 pt-2"> <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider text-purple-700"> 📄 Danh Sách {previewTemplate.fields.length} Trường Dữ Liệu Form: </h4> <div className="space-y-2"> {previewTemplate.fields.map((f, idx) => ( <div key={f.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between"> <div> <span className="font-semibold text-slate-900">{idx + 1}. {f.field_label}</span> {f.is_required && <span className="text-red-500 ml-1">* (Bắt buộc)</span>}
@@ -815,4 +819,12 @@ export default function ProposalsPage() {
                 onClick={() => setIsViewSubOpen(false)}
                 className="px-5 py-2 bg-slate-900 text-white font-semibold rounded-xl"
               > Đóng </button> </div> </div> </div> )} </div> );
+}
+
+export default function ProposalsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-xs font-medium text-slate-400">Đang tải phân hệ Quản Lý Phê Duyệt...</div>}>
+      <ProposalsContent />
+    </Suspense>
+  );
 }

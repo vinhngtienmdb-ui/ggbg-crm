@@ -1,6 +1,13 @@
 import { UserRole } from '@/types';
 import { ModuleToggles } from '@/context/ModuleToggleContext';
 
+export interface SubMenuItemDefinition {
+  name: string;
+  href: string;
+  tabKey: string;
+  allowedRoles?: UserRole[];
+}
+
 export interface MenuItemDefinition {
   name: string;
   href: string;
@@ -8,6 +15,7 @@ export interface MenuItemDefinition {
   moduleKey?: keyof ModuleToggles;
   allowedRoles: UserRole[];
   badge?: string;
+  subItems?: SubMenuItemDefinition[];
 }
 
 export interface MenuGroupDefinition {
@@ -41,8 +49,8 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
     ],
   },
   {
-    groupName: 'Tài Chính',
-    groupKey: 'finance',
+    groupName: 'Hành Chính & Văn Phòng',
+    groupKey: 'office_admin',
     items: [
       {
         name: 'Quản Lý Dự Án',
@@ -67,6 +75,12 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'AUDITOR',
           'HR_MANAGER',
         ],
+        subItems: [
+          { name: 'Danh Mục Công Văn', href: '/documents?tab=list', tabKey: 'list' },
+          { name: 'Tiếp Nhận & Phát Hành', href: '/documents?tab=dispatch', tabKey: 'dispatch' },
+          { name: 'Ký Số & Phê Duyệt', href: '/documents?tab=digital_sign', tabKey: 'digital_sign' },
+          { name: 'Nhật Ký Lưu Trữ', href: '/documents?tab=audit_log', tabKey: 'audit_log' },
+        ],
       },
       {
         name: 'Quản Lý Phê Duyệt',
@@ -83,6 +97,12 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
           'CSKH',
           'AUDITOR',
           'HR_MANAGER',
+        ],
+        subItems: [
+          { name: 'Chờ Tôi Duyệt', href: '/proposals?tab=pending', tabKey: 'pending' },
+          { name: 'Đề Xuất Của Tôi', href: '/proposals?tab=my_submissions', tabKey: 'my_submissions' },
+          { name: 'Đã Phê Duyệt', href: '/proposals?tab=all_approved', tabKey: 'all_approved' },
+          { name: 'Mẫu Quy Trình', href: '/proposals?tab=templates', tabKey: 'templates' },
         ],
       },
     ],
@@ -181,6 +201,12 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         iconName: 'PieChart',
         moduleKey: 'finance',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'AUDITOR'],
+        subItems: [
+          { name: 'Tổng Quan Thu Chi', href: '/finance?tab=overview', tabKey: 'overview' },
+          { name: 'Dòng Tiền Doanh Thu', href: '/finance?tab=revenue', tabKey: 'revenue' },
+          { name: 'Chi Phí Doanh Nghiệp', href: '/finance?tab=expenses', tabKey: 'expenses' },
+          { name: 'Báo Cáo Lãi Lỗ (P&L)', href: '/finance?tab=profit_loss', tabKey: 'profit_loss' },
+        ],
       },
       {
         name: 'Hóa Đơn Điện Tử',
@@ -215,6 +241,17 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         iconName: 'Briefcase',
         moduleKey: 'hrm',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER'],
+        subItems: [
+          { name: 'Tổng Quan & Thống Kê', href: '/hrm?tab=overview', tabKey: 'overview' },
+          { name: 'Hồ Sơ Nhân Sự 360°', href: '/hrm?tab=directory', tabKey: 'directory' },
+          { name: 'Tuyển Dụng & Phễu CV', href: '/hrm?tab=recruitment', tabKey: 'recruitment' },
+          { name: 'Phân Ca & Lịch Trực', href: '/hrm?tab=shifts', tabKey: 'shifts' },
+          { name: 'Bảo Hiểm Xã Hội (BHXH)', href: '/hrm?tab=bhxh', tabKey: 'bhxh' },
+          { name: 'Biểu Mẫu & Quyết Định', href: '/hrm?tab=documents', tabKey: 'documents' },
+          { name: 'Sơ Đồ Tổ Chức', href: '/hrm?tab=org_chart', tabKey: 'org_chart' },
+          { name: 'Sổ Quản Lý Lao Động', href: '/hrm?tab=labor_book', tabKey: 'labor_book' },
+          { name: 'Bản Đồ Phân Bổ NV', href: '/hrm?tab=map', tabKey: 'map' },
+        ],
       },
       {
         name: 'Quản Lý Chấm Công',
@@ -229,6 +266,12 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         iconName: 'PieChart',
         moduleKey: 'hrm',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER', 'SALES_MANAGER'],
+        subItems: [
+          { name: 'Báo Cáo Chi Phí Lương', href: '/payroll?tab=reports', tabKey: 'reports' },
+          { name: 'Bảng Lương 3P Tổng Hợp', href: '/payroll?tab=payroll', tabKey: 'payroll' },
+          { name: 'Phiếu Lương Cá Nhân', href: '/payroll?tab=paystubs', tabKey: 'paystubs' },
+          { name: 'Lệnh Chi Ngân Hàng', href: '/payroll?tab=banking', tabKey: 'banking' },
+        ],
       },
       {
         name: 'Quản Lý Hiệu Suất',
@@ -236,6 +279,12 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         iconName: 'TrendingUp',
         moduleKey: 'kpis',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'SALES_MANAGER', 'TEAM_LEADER', 'HR_MANAGER'],
+        subItems: [
+          { name: 'KPI Cá Nhân', href: '/kpis?tab=individual', tabKey: 'individual' },
+          { name: 'KPI Phòng Ban', href: '/kpis?tab=department', tabKey: 'department' },
+          { name: 'OKRs Toàn Công Ty', href: '/kpis?tab=company', tabKey: 'company' },
+          { name: 'Đánh Giá Định Kỳ', href: '/kpis?tab=evaluation', tabKey: 'evaluation' },
+        ],
       },
       {
         name: 'Đánh Giá 360°',
@@ -271,6 +320,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         href: '/settings/system',
         iconName: 'Sliders',
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR'],
+        subItems: [
+          { name: 'Thông Tin & Thương Hiệu', href: '/settings/system?tab=general', tabKey: 'general' },
+          { name: 'Bảo Mật & 2FA', href: '/settings/system?tab=security', tabKey: 'security' },
+          { name: 'Cấu Hình Mail Server', href: '/settings/system?tab=email_smtp', tabKey: 'email_smtp' },
+          { name: 'Tích Hợp API & Webhook', href: '/settings/system?tab=integrations', tabKey: 'integrations' },
+          { name: 'Sao Lưu Dữ Liệu', href: '/settings/system?tab=backup', tabKey: 'backup' },
+        ],
       },
       {
         name: 'Phân Quyền Truy Cập',

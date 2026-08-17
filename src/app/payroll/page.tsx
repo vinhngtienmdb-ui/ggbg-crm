@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   DollarSign,
   FileSpreadsheet,
@@ -77,11 +78,19 @@ import { exportPayrollToXlsx, exportBankBatchToXlsx } from '@/lib/excelExport';
 import PaystubModal from '@/components/payroll/PaystubModal';
 import PayrollAnalyticsDashboard from '@/components/payroll/PayrollAnalyticsDashboard';
 import { formatCurrency } from '@/lib/formatters';
-import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
+import { ModuleBanner } from '@/components/ui';
 
-export default function PayrollPage() {
+function PayrollContent() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'reports' | 'payroll' | 'paystubs' | 'banking'>('reports');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'reports' || tab === 'payroll' || tab === 'paystubs' || tab === 'banking') {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   // Role Scope Switcher: 'ADMIN' (Quản Trị Hệ Thống) vs 'PERSONAL' (Cá Nhân Xem Phiếu Lương Của Mình)
   const [viewScopeMode, setViewScopeMode] = useState<'ADMIN' | 'PERSONAL'>('ADMIN');
@@ -1500,5 +1509,13 @@ export default function PayrollPage() {
         onSendEmail={handleSendSinglePaystub}
       />
     </div>
+  );
+}
+
+export default function PayrollPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-xs font-medium text-slate-400">Đang tải phân hệ Quản Lý Bảng Lương...</div>}>
+      <PayrollContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import {
   DollarSign,
   TrendingUp,
@@ -47,7 +47,8 @@ import {
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
 import { ContractProfitLoss, DebtInvoice, CashFlowTransaction, DepartmentBudget } from '@/types/finance';
-import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
+import { useSearchParams } from 'next/navigation';
+import { ModuleBanner } from '@/components/ui';
 
 // Mock 12-Month Financial Performance Trend Data
 const FINANCIAL_TREND_DATA = [
@@ -83,9 +84,10 @@ const INITIAL_BUDGETS: DepartmentBudget[] = [];
 import { useAuth } from '@/context/AuthContext';
 import { canAccessSettings } from '@/lib/permissions';
 
-export default function FinancePage() {
+function FinanceContent() {
   const { user, simulatedRole } = useAuth();
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+  const searchParams = useSearchParams();
 
   const [plStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
@@ -93,6 +95,16 @@ export default function FinancePage() {
   const [budgets] = useState<DepartmentBudget[]>(INITIAL_BUDGETS);
 
   const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST' | 'VAS_BALANCE_SHEET' | 'FINANCE_CONFIG'>('EXECUTIVE');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'overview' || tab === 'executive') setActiveTab('EXECUTIVE');
+    else if (tab === 'revenue' || tab === 'cash_flow') setActiveTab('CASH_FLOW');
+    else if (tab === 'expenses' || tab === 'budget') setActiveTab('BUDGET_FORECAST');
+    else if (tab === 'profit_loss' || tab === 'p_l') setActiveTab('P_L');
+    else if (tab === 'debt') setActiveTab('DEBT');
+    else if (tab === 'vas') setActiveTab('VAS_BALANCE_SHEET');
+  }, [searchParams]);
 
   // Finance Config State
   const [finConfig, setFinConfig] = useState({
@@ -200,37 +212,8 @@ export default function FinancePage() {
         }
       />
 
-      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
-      <ModuleLayoutWithRail
-        railTitle="Phân Hệ Nghiệp Vụ Tài Chính"
-        railSubtitle="7 chuyên mục P&L, thu chi & kế toán"
-        activeId={activeTab}
-        onSelect={(id) => setActiveTab(id as any)}
-        sections={[
-          {
-            title: 'I. Báo Cáo Tài Chính',
-            items: [
-              { id: 'EXECUTIVE', label: '1. Tổng Quan Doanh Thu & Chi Phí', icon: PieChartIcon, badgeVariant: 'blue' },
-              { id: 'P_L', label: '2. Lợi Nhuận Gộp P&L Hợp Đồng', icon: TrendingUp, badgeVariant: 'emerald' },
-              { id: 'VAS_BALANCE_SHEET', label: '3. Bảng Cân Đối VAS', icon: Building2, badgeVariant: 'slate' },
-            ],
-          },
-          {
-            title: 'II. Thu Chi & Dòng Tiền',
-            items: [
-              { id: 'DEBT', label: '4. Quản Trị Công Nợ & Thu Hồi', icon: AlertTriangle, badge: `${debtInvoices.filter(i => i.payment_status === 'OVERDUE').length} Quá Hạn`, badgeVariant: 'rose' },
-              { id: 'CASH_FLOW', label: '5. Sổ Quỹ & Dòng Tiền Thực', icon: Wallet, badgeVariant: 'purple' },
-            ],
-          },
-          {
-            title: 'III. Ngân Sách & Cài Đặt',
-            items: [
-              { id: 'BUDGET_FORECAST', label: '6. Ngân Sách Phòng Ban', icon: DollarSign, badgeVariant: 'indigo' },
-              { id: 'FINANCE_CONFIG', label: '7. Cấu Hình Tài Chính', icon: Building2, badgeVariant: 'slate' },
-            ],
-          },
-        ]}
-      >
+      {/* NỘI DUNG TÀI CHÍNH FULL-WIDTH */}
+      <div className="space-y-6">
         {/* TAB 1: EXECUTIVE FINANCIAL DASHBOARD */}
       {activeTab === 'EXECUTIVE' && ( <div className="space-y-6 text-xs"> {/* Top 4 Financial KPI Cards */} <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-medium"> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Doanh Thu Tổng (Gross Revenue)</span> <p className="text-2xl font-semibold text-blue-700"> {formatCurrency(summary.total_gross_revenue)} </p> <div className="flex items-center gap-1 text-emerald-600 text-[11px] font-medium"> <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% so với tháng trước </div> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Lợi Nhuận Gộp P&L (Net Profit)</span> <p className="text-2xl font-semibold text-emerald-600"> {formatCurrency(summary.total_net_profit)} </p> <span className="text-slate-500 text-[11px]">Tỷ suất lợi nhuận: <strong className="text-emerald-700 font-semibold">{summary.avg_profit_margin}%</strong></span> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Công Nợ Quá Hạn Phải Thu (AR)</span> <p className="text-2xl font-semibold text-red-600"> {formatCurrency(summary.total_overdue_debt)} </p> <span className="text-red-600 text-[11px] font-medium"> Cần gửi thông báo đòi nợ Zalo/Email</span> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Dòng Tiền Quỹ Thực Có (Cash Balance)</span> <p className="text-2xl font-semibold text-purple-700"> {formatCurrency(850000000)} </p> <span className="text-purple-600 text-[11px] font-medium">Techcombank + Quỹ tiền mặt</span> </div> </div> {/* Charts Section: 12-Month Performance Trend & Cost Breakdown */} <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <div className="flex items-center justify-between"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <TrendingUp className="w-4 h-4 text-blue-600" /> Biểu Đồ Xu Hướng Doanh Thu, Chi Phí & Lợi Nhuận (12 Tháng) </h3> <span className="text-[11px] text-slate-500 font-medium">Đơn vị: Triệu VNĐ</span> </div> <div className="h-72"> <ResponsiveContainer width="100%" height="100%"><BarChart data={FINANCIAL_TREND_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}> <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" /> <XAxis dataKey="month" tick={{ fontSize: 10 }} /> <YAxis tick={{ fontSize: 10 }} /> <Tooltip /> <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} /> <Bar dataKey="revenue" name="Doanh Thu" fill="#3B82F6" radius={[4, 4, 0, 0]} /> <Bar dataKey="cost" name="Chi Phí Vận Hành" fill="#94A3B8" radius={[4, 4, 0, 0]} /> <Bar dataKey="profit" name="Lợi Nhuận Ròng" fill="#10B981" radius={[4, 4, 0, 0]} /> </BarChart></ResponsiveContainer> </div> </div> <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <PieChartIcon className="w-4 h-4 text-purple-600" /> Phân Bổ Cơ Cấu Chi Phí Vận Hành (Cost Allocation) </h3> <div className="h-64 flex items-center justify-center"> <ResponsiveContainer width="100%" height="100%"><PieChart> <Pie data={COST_BREAKDOWN_DATA} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label> {COST_BREAKDOWN_DATA.map((entry, idx) => ( <Cell key={`cell-${idx}`} fill={entry.color} /> ))} </Pie> <Tooltip /> </PieChart></ResponsiveContainer> </div> </div> </div> </div> )}
 
@@ -317,41 +300,112 @@ export default function FinancePage() {
                     onChange={(e) => setFinConfig({ ...finConfig, warning_debt_days: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
                   /> </div> </div> </div> </div> </div> )}
-      </ModuleLayoutWithRail>
+      </div>
 
       {/* MODAL LẬP PHIẾU THU / CHI MỚI */}
-      {isTxModalOpen && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"> <div className="bg-white rounded-xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 text-xs font-medium"> <div className="bg-blue-600 text-white p-5 flex items-center justify-between"> <h3 className="font-semibold text-base flex items-center gap-2"> <Wallet className="w-5 h-5" /> Lập Phiếu Thu / Chi Tài Chính Mới </h3> <button onClick={() => setIsTxModalOpen(false)} className="text-white/80 hover:text-white"> <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleAddTransaction} className="p-6 space-y-4"> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Loại Phiếu *</label> <select
+      {isTxModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 text-xs font-medium">
+            <div className="bg-blue-600 text-white p-5 flex items-center justify-between">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <Wallet className="w-5 h-5" /> Lập Phiếu Thu / Chi Tài Chính Mới
+              </h3>
+              <button onClick={() => setIsTxModalOpen(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddTransaction} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Loại Phiếu *</label>
+                  <select
                     value={newTx.type}
                     onChange={(e) => setNewTx({ ...newTx, type: e.target.value as any })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  > <option value="EXPENSE">🔴 Phiếu Chi (Chi Tiền)</option> <option value="INCOME">🟢 Phiếu Thu (Thu Tiền)</option> </select> </div> <div> <label className="block text-slate-700 mb-1">Danh Mục Thu / Chi *</label> <select
+                  >
+                    <option value="EXPENSE">🔴 Phiếu Chi (Chi Tiền)</option>
+                    <option value="INCOME">🟢 Phiếu Thu (Thu Tiền)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 mb-1">Danh Mục Thu / Chi *</label>
+                  <select
                     value={newTx.category}
                     onChange={(e) => setNewTx({ ...newTx, category: e.target.value as any })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  > <option value="Hợp Đồng Dịch Vụ">Hợp Đồng Dịch Vụ</option> <option value="Chi Lương Nhân Sự">Chi Lương Nhân Sự</option> <option value="Chi Marketing Ads">Chi Marketing Ads</option> <option value="Chi Server & SaaS">Chi Server & SaaS</option> <option value="Chi Tiền Điện Nước VP">Chi Tiền Điện Nước VP</option> <option value="Khác">Khác</option> </select> </div> </div> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Số Tiền (VND) *</label> <input
+                  >
+                    <option value="Hợp Đồng Dịch Vụ">Hợp Đồng Dịch Vụ</option>
+                    <option value="Chi Lương Nhân Sự">Chi Lương Nhân Sự</option>
+                    <option value="Chi Marketing Ads">Chi Marketing Ads</option>
+                    <option value="Chi Server & SaaS">Chi Server & SaaS</option>
+                    <option value="Chi Tiền Điện Nước VP">Chi Tiền Điện Nước VP</option>
+                    <option value="Khác">Khác</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1">Số Tiền (VND) *</label>
+                  <input
                     type="number"
                     step={1000000}
                     required
                     value={newTx.amount}
                     onChange={(e) => setNewTx({ ...newTx, amount: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-semibold text-sm"
-                  /> </div> <div> <label className="block text-slate-700 mb-1">Tài Khoản Giao Dịch *</label> <select
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 mb-1">Tài Khoản Giao Dịch *</label>
+                  <select
                     value={newTx.account}
                     onChange={(e) => setNewTx({ ...newTx, account: e.target.value as any })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  > <option value="Techcombank">Techcombank</option> <option value="Vietcombank">Vietcombank</option> <option value="Quỹ Tiền Mặt">Quỹ Tiền Mặt</option> </select> </div> </div> <div> <label className="block text-slate-700 mb-1">Diễn Giải Nội Dung Giao Dịch *</label> <textarea
+                  >
+                    <option value="Techcombank">Techcombank</option>
+                    <option value="Vietcombank">Vietcombank</option>
+                    <option value="Quỹ Tiền Mặt">Quỹ Tiền Mặt</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-slate-700 mb-1">Diễn Giải Nội Dung Giao Dịch *</label>
+                <textarea
                   rows={3}
                   required
                   value={newTx.description}
                   onChange={(e) => setNewTx({ ...newTx, description: e.target.value })}
                   placeholder="Nhập chi tiết nội dung thu chi..."
                   className="w-full px-3 py-2 border rounded-xl"
-                /> </div> <div className="flex items-center justify-end gap-3 pt-4 border-t"> <button
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <button
                   type="button"
                   onClick={() => setIsTxModalOpen(false)}
                   className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
-                > Hủy </button> <button
+                >
+                  Hủy
+                </button>
+                <button
                   type="submit"
                   className="px-5 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30"
-                > Lưu Phiếu Giao Dịch </button> </div> </form> </div> </div> )} </div> );
+                >
+                  Lưu Phiếu Giao Dịch
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function FinancePage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-xs font-medium text-slate-400">Đang tải phân hệ Báo Cáo Tài Chính...</div>}>
+      <FinanceContent />
+    </Suspense>
+  );
 }

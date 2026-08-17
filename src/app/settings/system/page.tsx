@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Cloud,
   Database,
@@ -40,7 +41,7 @@ import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { useAuth } from '@/context/AuthContext';
 import { useBranding, DEFAULT_BRANDING } from '@/context/BrandingContext';
 import { BrandingConfig } from '@/types';
-import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
+import { ModuleBanner } from '@/components/ui';
 
 interface TestResult {
   service: string;
@@ -50,13 +51,26 @@ interface TestResult {
   tested_at?: string;
 }
 
-export default function SystemSettingsPage() {
+function SystemSettingsContent() {
   const { user, simulatedRole } = useAuth();
   const isAdmin = Boolean(user?.is_super_admin || user?.role === 'SUPER_ADMIN' || simulatedRole === 'SUPER_ADMIN');
   const { branding, updateBranding, resetBranding } = useBranding();
+  const searchParams = useSearchParams();
   const [config, setConfig] = useState<SystemConfig>(getSystemConfig());
   const [saveToast, setSaveToast] = useState('');
   const [activeTab, setActiveTab] = useState<'BRANDING' | 'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT' | 'COMPANY_IDENTITY'>('BRANDING');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'general' || tab === 'branding') setActiveTab('BRANDING');
+    else if (tab === 'security' || tab === 'audit') setActiveTab('SECURITY_AUDIT');
+    else if (tab === 'email_smtp' || tab === 'smtp') setActiveTab('SMTP');
+    else if (tab === 'integrations' || tab === 'api_keys' || tab === 'api') setActiveTab('API_KEYS');
+    else if (tab === 'backup' || tab === 'infrastructure' || tab === 'infra') setActiveTab('INFRASTRUCTURE');
+    else if (tab === 'webhooks') setActiveTab('WEBHOOKS');
+    else if (tab === 'modules' || tab === 'toggles') setActiveTab('MODULE_TOGGLES');
+    else if (tab === 'identity' || tab === 'company') setActiveTab('COMPANY_IDENTITY');
+  }, [searchParams]);
 
   // Form state for branding
   const [brandingForm, setBrandingForm] = useState<BrandingConfig>(config.branding || DEFAULT_BRANDING);
@@ -327,38 +341,8 @@ export default function SystemSettingsPage() {
         }
       />
 
-      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
-      <ModuleLayoutWithRail
-        railTitle="Cấu Hình Quản Trị"
-        railSubtitle="8 phân hệ quản trị & tích hợp"
-        activeId={activeTab}
-        onSelect={(id) => setActiveTab(id as any)}
-        sections={[
-          {
-            title: 'I. Nhận Diện & Phân Hệ',
-            items: [
-              { id: 'BRANDING', label: '1. Thương Hiệu & Logo', icon: Palette, badgeVariant: 'purple' },
-              { id: 'COMPANY_IDENTITY', label: '2. Pháp Lý & Dấu Mộc Đỏ', icon: Building2, badgeVariant: 'slate' },
-              { id: 'MODULE_TOGGLES', label: '3. Bật/Tắt Phân Hệ Module', icon: Sliders, badgeVariant: 'blue' },
-            ],
-          },
-          {
-            title: 'II. Hạ Tầng & Kết Nối',
-            items: [
-              { id: 'INFRASTRUCTURE', label: '4. Hạ Tầng Cloud & DB', icon: Cloud, badgeVariant: 'orange' },
-              { id: 'API_KEYS', label: '5. Cổng Sàn TMĐT & AI Keys', icon: Key, badgeVariant: 'amber' },
-              { id: 'SMTP', label: '6. Email SMTP & Tổng Đài VoIP', icon: Mail, badgeVariant: 'blue' },
-              { id: 'WEBHOOKS', label: '7. Webhooks & Bot Thông Báo', icon: Bell, badgeVariant: 'purple' },
-            ],
-          },
-          {
-            title: 'III. Bảo Mật & Kiểm Toán',
-            items: [
-              { id: 'SECURITY_AUDIT', label: '8. Bảo Mật & Logs Kiểm Toán', icon: ShieldAlert, badgeVariant: 'emerald' },
-            ],
-          },
-        ]}
-      >
+      {/* NỘI DUNG CẤU HÌNH HỆ THỐNG FULL-WIDTH */}
+      <div className="space-y-6">
         <form onSubmit={(e) => (activeTab === 'BRANDING' ? handleSaveBranding(e) : handleSave(e, `Lưu cấu hình tab ${activeTab}`))} className="space-y-6"> {/* ==================== TAB: BRANDING & IDENTITY ==================== */}
         {activeTab === 'BRANDING' && ( <div className="space-y-6 animate-in fade-in duration-200"> {/* System-wide Admin Permission Banner */}
             {isAdmin ? ( <div className="p-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-medium flex items-center justify-between shadow-2xs"> <div className="flex items-center gap-2.5"> <ShieldCheck className="w-5 h-5 text-purple-600 shrink-0" /> <div> <p className="font-medium text-purple-950">Quyền Quản Trị Thương Hiệu (Brand Admin Active)</p> <p className="text-[11px] text-purple-700 mt-0.5"> Thay đổi Tên hệ thống, Logo và Favicon sẽ được áp dụng ngay lập tức trên toàn bộ hệ thống cho tất cả người dùng. </p> </div> </div> <span className="px-2.5 py-1 bg-purple-600 text-white rounded-lg text-[10px] font-medium shrink-0"> SYSTEM-WIDE BRANDING </span> </div> ) : ( <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-medium flex items-center justify-between shadow-2xs"> <div className="flex items-center gap-2.5"> <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" /> <div> <p className="font-medium text-amber-950">Quyền Hạn Hạn Chế (Chỉ Xem)</p> <p className="text-[11px] text-amber-800 mt-0.5"> Chỉ Quản Trị Viên (Admin) mới có quyền thay đổi Tên hệ thống, Logo và Favicon toàn hệ thống. </p> </div> </div> <span className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-medium shrink-0"> READ-ONLY </span> </div> )}
@@ -885,5 +869,23 @@ export default function SystemSettingsPage() {
                       value={companyInfo.chief_accountant}
                       onChange={(e) => setCompanyInfo({ ...companyInfo, chief_accountant: e.target.value })}
                       className="w-full px-3 py-2 border rounded-xl text-slate-900 font-medium"
-                    /> </div> </div> </div> </div> </div> )} </form> </ModuleLayoutWithRail> </div> );
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
+  </div>
+  );
+}
+
+export default function SystemSettingsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-xs font-medium text-slate-400">Đang tải phân hệ Cấu Hình Hệ Thống...</div>}>
+      <SystemSettingsContent />
+    </Suspense>
+  );
 }
