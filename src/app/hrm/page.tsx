@@ -60,6 +60,7 @@ const CompensationHistoryModal = dynamic(() => import('@/components/hrm/Compensa
 const SocialInsuranceTrackingView = dynamic(() => import('@/components/hrm/SocialInsuranceTrackingView'), { ssr: false });
 const ShiftScheduleRoster = dynamic(() => import('@/components/hrm/ShiftScheduleRoster'), { ssr: false });
 const EmailAutomationSettingsModal = dynamic(() => import('@/components/hrm/EmailAutomationSettingsModal'), { ssr: false });
+import ColumnVisibilityPopover, { DEFAULT_VISIBLE_COLUMNS } from '@/components/hrm/ColumnVisibilityPopover';
 
 interface OnboardingTask {
   id: string;
@@ -103,6 +104,27 @@ function HRMContent() {
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [selectedGrade, setSelectedGrade] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+
+  // CUSTOMIZABLE COLUMN VISIBILITY STATE (PERSISTED TO LOCALSTORAGE)
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('ggbg_hrm_visible_columns');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return DEFAULT_VISIBLE_COLUMNS;
+  });
+
+  const handleColumnsChange = (newCols: string[]) => {
+    setVisibleColumns(newCols);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ggbg_hrm_visible_columns', JSON.stringify(newCols));
+    }
+  };
 
   // Modals state
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
@@ -346,14 +368,20 @@ function HRMContent() {
                 </select>
               </div>
 
-              {/* UNIFIED VIEW MODE SWITCHER */}
-              <div className="flex items-center gap-3">
+              {/* UNIFIED VIEW MODE SWITCHER & COLUMN VISIBILITY */}
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <ColumnVisibilityPopover
+                  visibleKeys={visibleColumns}
+                  onChange={handleColumnsChange}
+                />
+
                 <ViewModeSwitcher
                   currentMode={viewMode}
                   onChange={setViewMode}
                   listLabel="Bảng"
                   kanbanLabel="Thẻ (Grid)"
                 />
+
                 <span className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
                   Tổng: <strong className="text-slate-900 dark:text-white">{filteredEmployees.length}</strong> NV
                 </span>
@@ -366,125 +394,260 @@ function HRMContent() {
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200 dark:border-slate-700">
                       <tr>
-                        <th className="p-3.5">Mã & Nhân Viên</th>
-                        <th className="p-3.5">Chức Danh & Phòng Ban</th>
-                        <th className="p-3.5">Ngạch & Bậc Lương</th>
-                        <th className="p-3.5">Lương P1 (Thực Nhận)</th>
-                        <th className="p-3.5">Tài Khoản Ngân Hàng Nhận Lương</th>
-                        <th className="p-3.5">Phụ Cấp Hàng Tháng</th>
-                        <th className="p-3.5">Trạng Thái BHXH</th>
-                        <th className="p-3.5">Trạng Thái</th>
+                        {(visibleColumns.includes('employee_code') || visibleColumns.includes('full_name')) && (
+                          <th className="p-3.5">Mã & Họ Tên</th>
+                        )}
+                        {visibleColumns.includes('gender') && <th className="p-3.5">Giới Tính</th>}
+                        {visibleColumns.includes('date_of_birth') && <th className="p-3.5">Ngày Sinh</th>}
+                        {visibleColumns.includes('position') && <th className="p-3.5">Chức Vụ</th>}
+                        {visibleColumns.includes('job_title') && <th className="p-3.5">Chức Danh</th>}
+                        {visibleColumns.includes('work_phone') && <th className="p-3.5">SĐT Công Việc</th>}
+                        {visibleColumns.includes('work_email') && <th className="p-3.5">Email Công Việc</th>}
+                        {visibleColumns.includes('department') && <th className="p-3.5">Phòng Ban</th>}
+                        {visibleColumns.includes('team') && <th className="p-3.5">Đội / Nhóm</th>}
+                        {visibleColumns.includes('status') && <th className="p-3.5">Trạng Thái</th>}
+                        {visibleColumns.includes('joined_date') && <th className="p-3.5">Ngày Vào Làm</th>}
+                        {visibleColumns.includes('salary_grade') && <th className="p-3.5">Ngạch & Bậc Lương</th>}
+                        {visibleColumns.includes('base_salary') && <th className="p-3.5">Lương P1 (Thực Nhận)</th>}
+                        {visibleColumns.includes('bank_account') && <th className="p-3.5">Tài Khoản Ngân Hàng</th>}
+                        {visibleColumns.includes('allowances') && <th className="p-3.5">Phụ Cấp</th>}
+                        {visibleColumns.includes('bhxh_status') && <th className="p-3.5">BHXH</th>}
+                        {visibleColumns.includes('contract_number') && <th className="p-3.5">Số Hợp Đồng</th>}
                         <th className="p-3.5 text-center">Thao Tác</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                      {filteredEmployees.map((emp) => (
-                        <tr key={emp.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
-                          <td className="p-3.5">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-semibold text-xs flex items-center justify-center border border-purple-200 dark:border-purple-800 shrink-0">
-                                {emp.full_name.charAt(0)}
-                              </div>
-                              <div>
-                                <span className="font-semibold text-slate-900 dark:text-white text-xs">{emp.full_name}</span>
-                                <div className="text-[10px] text-slate-400 flex items-center gap-2">
-                                  <span className="font-semibold text-blue-600 dark:text-blue-400">{emp.employee_code}</span>
-                                  <span>{emp.phone}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-3.5">
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{emp.position}</span>
-                            <div className="text-[10px] text-slate-400">{emp.department}</div>
-                          </td>
-                          <td className="p-3.5">
-                            <span className="px-2 py-1 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 rounded-lg text-[11px] font-semibold border border-blue-200 dark:border-blue-800/60 inline-flex items-center gap-1">
-                              <span>{emp.salary_grade || 'G4'}</span>
-                              <span className="text-slate-400 font-normal">·</span>
-                              <span>Bậc {emp.salary_step_number || 1}</span>
-                            </span>
-                          </td>
-                          <td className="p-3.5 tabular-nums font-semibold text-emerald-600 dark:text-emerald-400">
-                            {formatCurrency(emp.base_salary || 15000000)}
-                          </td>
-                          <td className="p-3.5">
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-semibold text-slate-900 dark:text-white text-xs">{emp.bank_name || 'Techcombank'}</span>
-                                <span className="text-[10px] text-slate-400">({emp.bank_branch || 'CN Hà Nội'})</span>
-                              </div>
-                              <div className="text-[11px] text-blue-700 dark:text-blue-400 font-semibold tabular-nums">
-                                STK: {emp.bank_account || '0988888888'}
-                              </div>
-                              <div className="text-[10px] text-slate-500 uppercase font-medium">
-                                Chủ TK: {emp.bank_account_holder || emp.full_name.toUpperCase()}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-3.5">
-                            {emp.allowances && emp.allowances.length > 0 ? (
-                              <span className="font-medium text-slate-700 dark:text-slate-300 tabular-nums">
-                                {formatCurrency(emp.allowances.reduce((s, a) => s + a.amount, 0))}
-                                <span className="text-[10px] text-slate-400 font-normal ml-1">({emp.allowances.length} khoản)</span>
-                              </span>
-                            ) : (
-                              <span className="text-slate-400 text-[10px]">Chưa thiết lập</span>
-                            )}
-                          </td>
-                          <td className="p-3.5">
-                            <span className="px-2 py-0.5 bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 rounded text-[10px] font-medium border border-purple-200 dark:border-purple-800">
-                              {emp.bhxh_status || 'Đang tham gia'}
-                            </span>
-                          </td>
-                          <td className="p-3.5">
-                            <span className={`px-2.5 py-1 rounded-md text-[10.5px] font-medium border ${
-                              emp.status === 'Active'
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
-                                : emp.status === 'Probation'
-                                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800'
-                                : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
-                            }`}>
-                              {emp.status}
-                            </span>
-                          </td>
-                          <td className="p-3.5 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              <button
-                                onClick={() => handleOpenViewModal(emp)}
-                                className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg transition-colors"
-                                title="Xem Hồ Sơ 360°"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleOpenEditModal(emp)}
-                                className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50 rounded-lg transition-colors"
-                                title="Chỉnh Sửa Hồ Sơ & Lương"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setContractEmployee(emp);
-                                  setIsContractModalOpen(true);
-                                }}
-                                className="p-1.5 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
-                                title="Xem Hợp Đồng Lao Động"
-                              >
-                                <FileText className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}
-                                className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
-                                title="Lưu Trữ / Nghỉ Việc"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
+                      {filteredEmployees.length === 0 ? (
+                        <tr>
+                          <td colSpan={visibleColumns.length + 1} className="p-8 text-center text-slate-400 italic">
+                            Không tìm thấy nhân sự phù hợp với bộ lọc.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        filteredEmployees.map((emp) => (
+                          <tr key={emp.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                            {/* Mã & Họ Tên */}
+                            {(visibleColumns.includes('employee_code') || visibleColumns.includes('full_name')) && (
+                              <td className="p-3.5">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-semibold text-xs flex items-center justify-center border border-purple-200 dark:border-purple-800 shrink-0">
+                                    {emp.full_name.charAt(0)}
+                                  </div>
+                                  <div>
+                                    {visibleColumns.includes('full_name') && (
+                                      <span className="font-semibold text-slate-900 dark:text-white text-xs block">
+                                        {emp.full_name}
+                                      </span>
+                                    )}
+                                    {visibleColumns.includes('employee_code') && (
+                                      <span className="font-semibold text-blue-600 dark:text-blue-400 text-[11px] font-mono">
+                                        {emp.employee_code}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                            )}
+
+                            {/* Giới tính */}
+                            {visibleColumns.includes('gender') && (
+                              <td className="p-3.5">
+                                <span className={`px-2 py-0.5 rounded-md text-[11px] font-semibold border ${
+                                  emp.gender === 'Nữ'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800'
+                                    : emp.gender === 'Nam'
+                                    ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800'
+                                    : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                }`}>
+                                  {emp.gender || 'Nam'}
+                                </span>
+                              </td>
+                            )}
+
+                            {/* Ngày sinh */}
+                            {visibleColumns.includes('date_of_birth') && (
+                              <td className="p-3.5 tabular-nums text-slate-700 dark:text-slate-300 font-medium">
+                                {emp.date_of_birth ? (
+                                  emp.date_of_birth.includes('-')
+                                    ? emp.date_of_birth.split('-').reverse().join('/')
+                                    : emp.date_of_birth
+                                ) : '12/04/1992'}
+                              </td>
+                            )}
+
+                            {/* Chức vụ */}
+                            {visibleColumns.includes('position') && (
+                              <td className="p-3.5">
+                                <span className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                                  {emp.position}
+                                </span>
+                              </td>
+                            )}
+
+                            {/* Chức danh */}
+                            {visibleColumns.includes('job_title') && (
+                              <td className="p-3.5">
+                                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-[11px] font-medium border border-slate-200 dark:border-slate-700">
+                                  {emp.job_title || emp.position}
+                                </span>
+                              </td>
+                            )}
+
+                            {/* SĐT Công Việc */}
+                            {visibleColumns.includes('work_phone') && (
+                              <td className="p-3.5 font-mono text-slate-800 dark:text-slate-200 text-xs">
+                                {emp.phone || '0912 345 678'}
+                              </td>
+                            )}
+
+                            {/* Email Công Việc */}
+                            {visibleColumns.includes('work_email') && (
+                              <td className="p-3.5 font-mono text-blue-600 dark:text-blue-400 text-xs">
+                                {emp.email || `${emp.employee_code.toLowerCase()}@ggbingo.vn`}
+                              </td>
+                            )}
+
+                            {/* Phòng Ban */}
+                            {visibleColumns.includes('department') && (
+                              <td className="p-3.5 text-slate-700 dark:text-slate-300 text-xs">
+                                {emp.department}
+                              </td>
+                            )}
+
+                            {/* Đội / Nhóm */}
+                            {visibleColumns.includes('team') && (
+                              <td className="p-3.5 text-slate-600 dark:text-slate-400 text-xs">
+                                {emp.team || 'Đội 1'}
+                              </td>
+                            )}
+
+                            {/* Trạng Thái */}
+                            {visibleColumns.includes('status') && (
+                              <td className="p-3.5">
+                                <span className={`px-2.5 py-0.5 rounded-md text-[10.5px] font-medium border ${
+                                  emp.status === 'Active'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
+                                    : emp.status === 'Probation'
+                                    ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800'
+                                    : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                }`}>
+                                  {emp.status}
+                                </span>
+                              </td>
+                            )}
+
+                            {/* Ngày vào làm */}
+                            {visibleColumns.includes('joined_date') && (
+                              <td className="p-3.5 tabular-nums text-slate-600 dark:text-slate-400">
+                                {emp.joined_date}
+                              </td>
+                            )}
+
+                            {/* Ngạch & Bậc Lương */}
+                            {visibleColumns.includes('salary_grade') && (
+                              <td className="p-3.5">
+                                <span className="px-2 py-1 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 rounded-lg text-[11px] font-semibold border border-blue-200 dark:border-blue-800/60 inline-flex items-center gap-1">
+                                  <span>{emp.salary_grade || 'G4'}</span>
+                                  <span className="text-slate-400 font-normal">·</span>
+                                  <span>Bậc {emp.salary_step_number || 1}</span>
+                                </span>
+                              </td>
+                            )}
+
+                            {/* Lương P1 */}
+                            {visibleColumns.includes('base_salary') && (
+                              <td className="p-3.5 tabular-nums font-semibold text-emerald-600 dark:text-emerald-400">
+                                {formatCurrency(emp.base_salary || 15000000)}
+                              </td>
+                            )}
+
+                            {/* Tài Khoản Ngân Hàng */}
+                            {visibleColumns.includes('bank_account') && (
+                              <td className="p-3.5">
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-semibold text-slate-900 dark:text-white text-xs">{emp.bank_name || 'Techcombank'}</span>
+                                    <span className="text-[10px] text-slate-400">({emp.bank_branch || 'CN Hà Nội'})</span>
+                                  </div>
+                                  <div className="text-[11px] text-blue-700 dark:text-blue-400 font-semibold tabular-nums">
+                                    STK: {emp.bank_account || '0988888888'}
+                                  </div>
+                                  <div className="text-[10px] text-slate-500 uppercase font-medium">
+                                    Chủ TK: {emp.bank_account_holder || emp.full_name.toUpperCase()}
+                                  </div>
+                                </div>
+                              </td>
+                            )}
+
+                            {/* Phụ Cấp */}
+                            {visibleColumns.includes('allowances') && (
+                              <td className="p-3.5">
+                                {emp.allowances && emp.allowances.length > 0 ? (
+                                  <span className="font-medium text-slate-700 dark:text-slate-300 tabular-nums">
+                                    {formatCurrency(emp.allowances.reduce((s, a) => s + a.amount, 0))}
+                                    <span className="text-[10px] text-slate-400 font-normal ml-1">({emp.allowances.length} khoản)</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-400 text-[10px]">Chưa thiết lập</span>
+                                )}
+                              </td>
+                            )}
+
+                            {/* BHXH */}
+                            {visibleColumns.includes('bhxh_status') && (
+                              <td className="p-3.5">
+                                <span className="px-2 py-0.5 bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 rounded text-[10px] font-medium border border-purple-200 dark:border-purple-800">
+                                  {emp.bhxh_status || 'Đang tham gia'}
+                                </span>
+                              </td>
+                            )}
+
+                            {/* Số Hợp Đồng */}
+                            {visibleColumns.includes('contract_number') && (
+                              <td className="p-3.5 font-mono text-xs text-slate-700 dark:text-slate-300">
+                                {emp.contract_number}
+                              </td>
+                            )}
+
+                            {/* Thao Tác */}
+                            <td className="p-3.5 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button
+                                  onClick={() => handleOpenViewModal(emp)}
+                                  className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg transition-colors"
+                                  title="Xem Hồ Sơ 360°"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleOpenEditModal(emp)}
+                                  className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50 rounded-lg transition-colors"
+                                  title="Chỉnh Sửa Hồ Sơ & Lương"
+                                >
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setContractEmployee(emp);
+                                    setIsContractModalOpen(true);
+                                  }}
+                                  className="p-1.5 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
+                                  title="Xem Hợp Đồng Lao Động"
+                                >
+                                  <FileText className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}
+                                  className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
+                                  title="Lưu Trữ / Nghỉ Việc"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>

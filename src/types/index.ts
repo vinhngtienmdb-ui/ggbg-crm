@@ -624,7 +624,8 @@ export interface EmployeeProfile {
   department: string;
   region?: 'Sale Miền Bắc' | 'Sale Miền Nam' | 'Khối Enterprise';
   team: string;
-  position: string;
+  position: string; // Chức vụ (Trưởng phòng, Giám đốc, Nhân viên...)
+  job_title?: string; // Chức danh nghề nghiệp (Senior Frontend Dev, Kế toán tổng hợp...)
   joined_date: string;
   status: 'Applicant' | 'Probation' | 'Active' | 'Pending_Resign' | 'Resigned' | 'Suspended';
   contract_number: string;
