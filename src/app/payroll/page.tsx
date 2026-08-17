@@ -87,7 +87,9 @@ function PayrollContent() {
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'reports' || tab === 'payroll' || tab === 'paystubs' || tab === 'banking') {
+    if (!tab || tab === 'overview' || tab === 'reports') {
+      setActiveTab('reports');
+    } else if (tab === 'payroll' || tab === 'paystubs' || tab === 'banking') {
       setActiveTab(tab);
     }
   }, [searchParams]);

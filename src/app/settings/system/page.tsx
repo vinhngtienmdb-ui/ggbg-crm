@@ -42,6 +42,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useBranding, DEFAULT_BRANDING } from '@/context/BrandingContext';
 import { BrandingConfig } from '@/types';
 import { ModuleBanner } from '@/components/ui';
+import SystemOverviewDashboard from '@/components/settings/SystemOverviewDashboard';
 
 interface TestResult {
   service: string;
@@ -58,11 +59,12 @@ function SystemSettingsContent() {
   const searchParams = useSearchParams();
   const [config, setConfig] = useState<SystemConfig>(getSystemConfig());
   const [saveToast, setSaveToast] = useState('');
-  const [activeTab, setActiveTab] = useState<'BRANDING' | 'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT' | 'COMPANY_IDENTITY'>('BRANDING');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'BRANDING' | 'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT' | 'COMPANY_IDENTITY'>('OVERVIEW');
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'general' || tab === 'branding') setActiveTab('BRANDING');
+    if (!tab || tab === 'overview') setActiveTab('OVERVIEW');
+    else if (tab === 'general' || tab === 'branding') setActiveTab('BRANDING');
     else if (tab === 'security' || tab === 'audit') setActiveTab('SECURITY_AUDIT');
     else if (tab === 'email_smtp' || tab === 'smtp') setActiveTab('SMTP');
     else if (tab === 'integrations' || tab === 'api_keys' || tab === 'api') setActiveTab('API_KEYS');
@@ -343,8 +345,17 @@ function SystemSettingsContent() {
 
       {/* NỘI DUNG CẤU HÌNH HỆ THỐNG FULL-WIDTH */}
       <div className="space-y-6">
-        <form onSubmit={(e) => (activeTab === 'BRANDING' ? handleSaveBranding(e) : handleSave(e, `Lưu cấu hình tab ${activeTab}`))} className="space-y-6"> {/* ==================== TAB: BRANDING & IDENTITY ==================== */}
-        {activeTab === 'BRANDING' && ( <div className="space-y-6 animate-in fade-in duration-200"> {/* System-wide Admin Permission Banner */}
+        {/* ==================== TAB: OVERVIEW DASHBOARD ==================== */}
+        {activeTab === 'OVERVIEW' && (
+          <SystemOverviewDashboard
+            config={config}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+          />
+        )}
+
+        <form onSubmit={(e) => (activeTab === 'BRANDING' ? handleSaveBranding(e) : handleSave(e, `Lưu cấu hình tab ${activeTab}`))} className="space-y-6">
+          {/* ==================== TAB: BRANDING & IDENTITY ==================== */}
+          {activeTab === 'BRANDING' && ( <div className="space-y-6 animate-in fade-in duration-200"> {/* System-wide Admin Permission Banner */}
             {isAdmin ? ( <div className="p-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-medium flex items-center justify-between shadow-2xs"> <div className="flex items-center gap-2.5"> <ShieldCheck className="w-5 h-5 text-purple-600 shrink-0" /> <div> <p className="font-medium text-purple-950">Quyền Quản Trị Thương Hiệu (Brand Admin Active)</p> <p className="text-[11px] text-purple-700 mt-0.5"> Thay đổi Tên hệ thống, Logo và Favicon sẽ được áp dụng ngay lập tức trên toàn bộ hệ thống cho tất cả người dùng. </p> </div> </div> <span className="px-2.5 py-1 bg-purple-600 text-white rounded-lg text-[10px] font-medium shrink-0"> SYSTEM-WIDE BRANDING </span> </div> ) : ( <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-medium flex items-center justify-between shadow-2xs"> <div className="flex items-center gap-2.5"> <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" /> <div> <p className="font-medium text-amber-950">Quyền Hạn Hạn Chế (Chỉ Xem)</p> <p className="text-[11px] text-amber-800 mt-0.5"> Chỉ Quản Trị Viên (Admin) mới có quyền thay đổi Tên hệ thống, Logo và Favicon toàn hệ thống. </p> </div> </div> <span className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-medium shrink-0"> READ-ONLY </span> </div> )}
 
             {/* Main 2-Column Grid: Form Left, Live Preview Right */} <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"> {/* LEFT COLUMN: BRANDING CONFIG FORM */} <div className="lg:col-span-7 space-y-6"> {/* 1. Tên Hệ Thống & Slogan */} <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-4"> <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3"> <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-medium"> <Palette className="w-4 h-4" /> </div> <div> <h3 className="font-semibold text-xs text-slate-900 uppercase tracking-wider">1. Tên Hệ Thống & Khẩu Hiệu</h3> <p className="text-[11px] text-slate-500">Hiển thị trên toàn bộ Sidebar, Header, Title trình duyệt và Màn hình Đăng nhập</p> </div> </div> <div className="space-y-3"> <div> <label className="block text-xs font-medium text-slate-700 mb-1"> Tên Hệ Thống (System Name) <span className="text-red-500">*</span> </label> <input

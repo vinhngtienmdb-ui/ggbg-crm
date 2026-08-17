@@ -61,6 +61,7 @@ import { getEmployees } from '@/lib/hrmStore';
 import { createLeaveRequest } from '@/lib/payrollStore';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters';
 import { ModuleBanner } from '@/components/ui';
+import ProposalOverviewDashboard from '@/components/proposals/ProposalOverviewDashboard';
 
 const CATEGORIES = [
   'Tất Cả Danh Mục',
@@ -140,28 +141,157 @@ function EmployeePickerSelect({
           className={`px-2.5 py-1 rounded-lg transition-all ${
             filterMode === 'SAME_POS' ? 'bg-purple-600 text-white shadow-xs' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
           }`}
-        > 💼 Cùng Chức Danh </button> <button
+        >
+          💼 Cùng Chức Danh
+        </button>
+        <button
           type="button"
           onClick={() => setFilterMode('DIRECT_MANAGER')}
           className={`px-2.5 py-1 rounded-lg transition-all ${
             filterMode === 'DIRECT_MANAGER' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
           }`}
-        > 👔 Cấp Trên Trực Tiếp </button> </div> {/* Search & Select Dropdown */} <div className="flex flex-col sm:flex-row items-center gap-2"> <input
+        >
+          👔 Cấp Trên Trực Tiếp
+        </button>
+      </div>
+
+      {/* Search & Select Dropdown */}
+      <div className="flex flex-col sm:flex-row items-center gap-2">
+        <input
           type="text"
           value={empSearch}
           onChange={(e) => setEmpSearch(e.target.value)}
           placeholder="Lọc tên, mã NV..."
-          className="w-full sm:w-1/3 px-2.5 py-1.5 bg-slate-50 border rounded-lg text-xs"
-        /> <select
-          required={isRequired}
-          value={value || ''}
+          className="w-full sm:w-48 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-purple-500"
+        />
+        <select
+          value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full sm:w-2/3 px-3 py-1.5 bg-white border rounded-lg font-medium text-slate-900 text-xs"
-        > <option value="">-- {placeholder || 'Chọn nhân sự từ hệ thống HRM'} --</option> {filteredEmployees.map((emp) => ( <option key={emp.id} value={`${emp.full_name} (${emp.employee_code} - ${emp.position})`}> [{emp.employee_code}] {emp.full_name} - {emp.position} ({emp.department}) </option> ))} </select> </div> {value && ( <div className="text-[11px] text-purple-700 font-medium bg-purple-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-purple-200"> <UserCheck className="w-3.5 h-3.5 text-purple-600" /> Đã chọn nhân sự: <strong className="text-slate-900">{value}</strong> </div> )} </div> );
+          required={isRequired}
+          className="w-full flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-purple-500 font-medium"
+        >
+          <option value="">{placeholder || '-- Chọn Nhân Viên Từ HRM --'}</option>
+          {filteredEmployees.map((emp) => (
+            <option key={emp.id} value={`${emp.full_name} (${emp.employee_code} - ${emp.position})`}>
+              [{emp.employee_code}] {emp.full_name} — {emp.department} • {emp.position}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
 }
 
-import { useSearchParams } from 'next/navigation';
+// Smart Dynamic Field Renderer
+function DynamicFormFieldInput({
+  field,
+  value,
+  onChange,
+}: {
+  field: ProposalFormField;
+  value: any;
+  onChange: (val: any) => void;
+}) {
+  const [options] = useState<string[]>(field.options || []);
+
+  if (field.data_type === 'EMPLOYEE_SELECT') {
+    return (
+      <EmployeePickerSelect
+        value={value || ''}
+        onChange={onChange}
+        isRequired={field.is_required}
+        placeholder={field.placeholder}
+      />
+    );
+  }
+
+  if (field.data_type === 'SELECT_DROPDOWN') {
+    return (
+      <select
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        required={field.is_required}
+        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-slate-800"
+      >
+        <option value="">{field.placeholder || '-- Chọn giá trị --'}</option>
+        {options.map((opt, i) => (
+          <option key={i} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  if (field.data_type === 'TEXT_AREA') {
+    return (
+      <textarea
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        required={field.is_required}
+        rows={3}
+        placeholder={field.placeholder || 'Nhập chi tiết...'}
+        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-slate-800"
+      />
+    );
+  }
+
+  if (field.data_type === 'NUMBER_AMOUNT') {
+    return (
+      <div className="relative">
+        <input
+          type="number"
+          value={value || ''}
+          onChange={(e) => onChange(Number(e.target.value))}
+          required={field.is_required}
+          placeholder="0"
+          className="w-full pl-3 pr-12 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-slate-800 font-mono"
+        />
+        <span className="absolute right-3 top-2.5 text-[11px] text-slate-500 font-medium">VNĐ</span>
+      </div>
+    );
+  }
+
+  if (field.data_type === 'DATE_PICKER') {
+    return (
+      <input
+        type="date"
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        required={field.is_required}
+        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-slate-800"
+      />
+    );
+  }
+
+  if (field.data_type === 'CHECKBOX_BOOLEAN') {
+    return (
+      <label className="flex items-center gap-2 cursor-pointer py-1">
+        <input
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={(e) => onChange(e.target.checked)}
+          className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+        />
+        <span className="text-xs text-slate-700 font-medium">{field.placeholder || 'Xác nhận đồng ý'}</span>
+      </label>
+    );
+  }
+
+  return (
+    <input
+      type="text"
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      required={field.is_required}
+      placeholder={field.placeholder || 'Nhập nội dung...'}
+      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-slate-800"
+    />
+  );
+}
+
 import { useAuth } from '@/context/AuthContext';
+import { useSearchParams } from 'next/navigation';
 import { canAccessSettings } from '@/lib/permissions';
 
 function ProposalsContent() {
@@ -171,7 +301,7 @@ function ProposalsContent() {
 
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
   const [submissions, setSubmissions] = useState<ProposalSubmission[]>(() => getProposalSubmissions());
-  const [activeTab, setActiveTab] = useState<'SUBMISSIONS' | 'CREATE_NEW' | 'TEMPLATE_CONFIG'>('SUBMISSIONS');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'SUBMISSIONS' | 'CREATE_NEW' | 'TEMPLATE_CONFIG'>('OVERVIEW');
   const [createFormStep, setCreateFormStep] = useState<'SELECT_TEMPLATE' | 'FILL_FORM'>('SELECT_TEMPLATE');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('Tất Cả Danh Mục');
@@ -182,7 +312,9 @@ function ProposalsContent() {
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'pending') {
+    if (!tab || tab === 'overview') {
+      setActiveTab('OVERVIEW');
+    } else if (tab === 'pending') {
       setActiveTab('SUBMISSIONS');
       setSubmissionStatusFilter('PENDING');
     } else if (tab === 'all_approved') {
@@ -512,6 +644,40 @@ function ProposalsContent() {
 
       {/* NỘI DUNG PHÊ DUYỆT (HIỂN THỊ FULL-WIDTH THEO ĐIỀU HƯỚNG SIDEBAR CHÍNH) */}
       <div className="space-y-6">
+        {/* TAB OVERVIEW: BÁO CÁO TỔNG QUAN PHÊ DUYỆT */}
+        {activeTab === 'OVERVIEW' && (
+          <ProposalOverviewDashboard
+            submissions={submissions}
+            templates={templates}
+            onNavigateTab={(tab) => {
+              if (tab === 'pending') {
+                setActiveTab('SUBMISSIONS');
+                setSubmissionStatusFilter('PENDING');
+              } else if (tab === 'all_approved') {
+                setActiveTab('SUBMISSIONS');
+                setSubmissionStatusFilter('APPROVED');
+              } else if (tab === 'my_submissions') {
+                setActiveTab('SUBMISSIONS');
+                setSubmissionStatusFilter('ALL');
+              } else if (tab === 'create') {
+                setActiveTab('CREATE_NEW');
+                setCreateFormStep('SELECT_TEMPLATE');
+              } else if (tab === 'templates') {
+                setActiveTab('TEMPLATE_CONFIG');
+              }
+            }}
+            onOpenCreateWithTemplate={(tmplId) => {
+              setSelectedTemplateId(tmplId);
+              setCreateFormStep('FILL_FORM');
+              setActiveTab('CREATE_NEW');
+            }}
+            onViewSubmission={(sub) => {
+              setSelectedSub(sub);
+              setIsViewSubOpen(true);
+            }}
+          />
+        )}
+
         {/* TAB 1: SUBMISSIONS LIST */}
         {activeTab === 'SUBMISSIONS' && (
           <div className="space-y-4">

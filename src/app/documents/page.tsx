@@ -59,6 +59,7 @@ import {
 } from '@/lib/documentStore';
 import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
 import ExternalSignModal from '@/components/documents/ExternalSignModal';
+import DocumentOverviewDashboard from '@/components/documents/DocumentOverviewDashboard';
 import { exportDocumentsToCSV } from '@/lib/excelExportHelper';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -71,11 +72,12 @@ function DocumentsContent() {
 
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
   const [ledgers, setLedgers] = useState<DocumentLedgerConfig[]>(() => getDocumentLedgers());
-  const [activeTab, setActiveTab] = useState<'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP' | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP' | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('OVERVIEW');
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'list' || tab === 'inbound') setActiveTab('INBOUND');
+    if (!tab || tab === 'overview') setActiveTab('OVERVIEW');
+    else if (tab === 'list' || tab === 'inbound') setActiveTab('INBOUND');
     else if (tab === 'dispatch' || tab === 'outbound') setActiveTab('OUTBOUND');
     else if (tab === 'digital_sign' || tab === 'doc_config') setActiveTab('DOC_CONFIG');
     else if (tab === 'audit_log' || tab === 'directive_log') setActiveTab('DIRECTIVE_LOG');
@@ -446,7 +448,17 @@ function DocumentsContent() {
 
       {/* NỘI DUNG SỔ VĂN THƯ (HIỂN THỊ FULL-WIDTH THEO ĐIỀU HƯỚNG SIDEBAR CHÍNH) */}
       <div className="space-y-6">
-        {activeTab !== 'DOC_CONFIG' ? (
+        {activeTab === 'OVERVIEW' ? (
+          <DocumentOverviewDashboard
+            documents={documents}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+            onOpenCreate={() => setIsCreateOpen(true)}
+            onViewDoc={(doc) => {
+              setSelectedDoc(doc);
+              setIsViewOpen(true);
+            }}
+          />
+        ) : activeTab !== 'DOC_CONFIG' ? (
           <div className="space-y-4">
             {/* Filter Bar */}
             <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
