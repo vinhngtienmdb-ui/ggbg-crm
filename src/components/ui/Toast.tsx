@@ -131,8 +131,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+const fallbackToast = {
+  success: (_msg: string, _dur?: number) => {},
+  error:   (_msg: string, _dur?: number) => {},
+  warning: (_msg: string, _dur?: number) => {},
+  info:    (_msg: string, _dur?: number) => {},
+};
+
 export function useToast() {
   const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast must be used within ToastProvider');
+  if (!ctx) {
+    return { toast: fallbackToast };
+  }
   return ctx;
 }

@@ -49,10 +49,32 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       /> </div> );
 }
 
+import { ToastProvider } from '@/components/ui/Toast';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return ( <html lang="vi"> <head> <title>GGBingo CRM - Enterprise E-Commerce Platform</title> <meta name="description" content="Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN" /> </head> <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans"> <BrandingProvider> <ThemeProvider> <AuthProvider> <ModuleToggleProvider> <AppLayout>{children}</AppLayout> </ModuleToggleProvider> </AuthProvider> </ThemeProvider> </BrandingProvider> </body> </html> );
+  return (
+    <html lang="vi">
+      <head>
+        <title>GGBingo CRM - Enterprise E-Commerce Platform</title>
+        <meta name="description" content="Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN" />
+      </head>
+      <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans">
+        <BrandingProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <ModuleToggleProvider>
+                <ToastProvider>
+                  <AppLayout>{children}</AppLayout>
+                </ToastProvider>
+              </ModuleToggleProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </BrandingProvider>
+      </body>
+    </html>
+  );
 }

@@ -1,11 +1,10 @@
-import ExcelJS from 'exceljs';
 import { getPayrollByPeriod, getBankPaymentBatches, getBankPaymentBatchByPeriod, generateBankPaymentBatch } from './payrollStore';
 
 const FONT_NAME = 'Times New Roman';
 const DATA_FONT_SIZE = 14;
 
 // Utility trigger download in browser
-async function downloadWorkbook(workbook: ExcelJS.Workbook, filename: string) {
+async function downloadWorkbook(workbook: any, filename: string) {
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -20,14 +19,14 @@ async function downloadWorkbook(workbook: ExcelJS.Workbook, filename: string) {
   window.URL.revokeObjectURL(url);
 }
 
-const thinBorder: Partial<ExcelJS.Borders> = {
+const thinBorder: any = {
   top: { style: 'thin', color: { argb: 'FF94A3B8' } },
   left: { style: 'thin', color: { argb: 'FF94A3B8' } },
   bottom: { style: 'thin', color: { argb: 'FF94A3B8' } },
   right: { style: 'thin', color: { argb: 'FF94A3B8' } },
 };
 
-const doubleBottomBorder: Partial<ExcelJS.Borders> = {
+const doubleBottomBorder: any = {
   top: { style: 'thin', color: { argb: 'FF334155' } },
   left: { style: 'thin', color: { argb: 'FF334155' } },
   bottom: { style: 'double', color: { argb: 'FF334155' } },
@@ -39,6 +38,7 @@ const doubleBottomBorder: Partial<ExcelJS.Borders> = {
  * Áp dụng font Times New Roman + Cỡ chữ 14 + Viền lưới + Định dạng số chuẩn
  */
 export async function exportPayrollToXlsx(period: string = 'Tháng 07/2026'): Promise<void> {
+  const ExcelJS = (await import('exceljs')).default || (await import('exceljs'));
   const payrolls = getPayrollByPeriod(period);
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'GGBingo CRM';
@@ -417,6 +417,7 @@ export async function exportBankBatchToXlsx(
   batchId: string,
   bankFormat: 'VCB' | 'TCB' | 'MBB' | 'GENERAL' = 'GENERAL'
 ): Promise<void> {
+  const ExcelJS = (await import('exceljs')).default || (await import('exceljs'));
   const batches = getBankPaymentBatches();
   const batch = batches.find((b) => b.id === batchId) || batches[0];
   if (!batch) return;
