@@ -96,8 +96,8 @@ export default function LeadsPage() {
   const [stageLogs, setStageLogs] = useState<LeadStageLog[]>(INITIAL_LOGS);
   const [existingCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS_LIST);
 
-  // VIEW MODE TOGGLE (KANBAN VS LIST VIEW - CHUYỂN ĐỔI TỨC THỜI)
-  const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST' | 'REPORTS'>('KANBAN');
+  // VIEW MODE TOGGLE: CHUYỂN ĐỔI TỨC THỜI GIỮA KANBAN VÀ BẢNG TRÊN CÙNG 1 KHUNG NHÌN
+  const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
   const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
   const [isChannelDrawerOpen, setIsChannelDrawerOpen] = useState(false);
@@ -505,147 +505,141 @@ export default function LeadsPage() {
         }
       />
 
-      {/* UNIFIED TOOLBAR: SEARCH, FILTERS & VIEW MODE SWITCHER */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-wrap w-full md:w-auto flex-1">
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm Mã Lead, Tên KH, SĐT, Doanh nghiệp..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
-            />
+      {/* UNIFIED WORKSPACE CONTAINER: CÙNG 1 KHUNG NHÌN CHỨA CẢ TOOLBAR, BỘ LỌC VÀ CHUYỂN ĐỔI KANBAN / LIST */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden p-4 sm:p-5 space-y-4">
+        {/* UNIFIED TOOLBAR: SEARCH, FILTERS & VIEW MODE SWITCHER */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 flex-wrap flex-1">
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Tìm Mã Lead, Tên KH, SĐT, Doanh nghiệp..."
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+              />
+            </div>
+
+            <select
+              value={selectedSourceFilter}
+              onChange={(e) => setSelectedSourceFilter(e.target.value)}
+              className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200"
+            >
+              <option value="ALL">Tất cả Nguồn Lead</option>
+              <option value="Facebook Ads">Facebook Ads</option>
+              <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option>
+              <option value="TikTok Ads">TikTok Ads</option>
+              <option value="TikTok Lead Gen">TikTok Lead Gen</option>
+              <option value="Google Ads">Google Ads</option>
+              <option value="Google Ads Form">Google Ads Form</option>
+              <option value="Zalo OA Form">Zalo OA Form</option>
+              <option value="Hotline Zalo">Hotline Zalo</option>
+              <option value="Website GGBingoVN">Website GGBingoVN</option>
+              <option value="Event / Hội Thảo">Event / Hội Thảo</option>
+              <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
+              <option value="Bulk Import Excel">Bulk Import Excel</option>
+              <option value="Universal Webhook">Universal Webhook API</option>
+            </select>
+
+            <span className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
+              Hiển thị <strong className="text-slate-900 dark:text-white">{filteredLeads.length}</strong> / {leads.length} Lead
+            </span>
           </div>
 
-          <select
-            value={selectedSourceFilter}
-            onChange={(e) => setSelectedSourceFilter(e.target.value)}
-            className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200"
-          >
-            <option value="ALL">Tất cả Nguồn Lead</option>
-            <option value="Facebook Ads">Facebook Ads</option>
-            <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option>
-            <option value="TikTok Ads">TikTok Ads</option>
-            <option value="TikTok Lead Gen">TikTok Lead Gen</option>
-            <option value="Google Ads">Google Ads</option>
-            <option value="Google Ads Form">Google Ads Form</option>
-            <option value="Zalo OA Form">Zalo OA Form</option>
-            <option value="Hotline Zalo">Hotline Zalo</option>
-            <option value="Website GGBingoVN">Website GGBingoVN</option>
-            <option value="Event / Hội Thảo">Event / Hội Thảo</option>
-            <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
-            <option value="Bulk Import Excel">Bulk Import Excel</option>
-            <option value="Universal Webhook">Universal Webhook API</option>
-          </select>
+          {/* VIEW MODE SWITCHER: CHUYỂN ĐỔI TỨC THỜI GIỮA KANBAN VÀ BẢNG TRÊN CÙNG 1 KHUNG NHÌN */}
+          <div className="flex items-center gap-2 self-end md:self-auto">
+            <ViewModeSwitcher
+              currentMode={viewMode === 'LIST' ? 'list' : 'kanban'}
+              onChange={(mode) => setViewMode(mode === 'list' ? 'LIST' : 'KANBAN')}
+              listLabel="Bảng (Danh Sách)"
+              kanbanLabel="Thẻ Kanban (7 Bước)"
+            />
+          </div>
         </div>
 
-        {/* INTEGRATED VIEW MODE SWITCHER */}
-        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-          <ViewModeSwitcher
-            currentMode={viewMode === 'LIST' ? 'list' : viewMode === 'KANBAN' ? 'kanban' : 'insights'}
-            onChange={(mode) => setViewMode(mode === 'list' ? 'LIST' : mode === 'kanban' ? 'KANBAN' : 'REPORTS')}
-            showInsights={true}
-            listLabel="Bảng (Danh Sách)"
-            kanbanLabel="Kanban (7 Bước)"
-            insightsLabel="Báo Cáo Phễu"
-          />
-          <span className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
-            Tổng: <strong className="text-slate-900 dark:text-white">{filteredLeads.length}</strong> Lead
-          </span>
-        </div>
-      </div>
+        {/* DỮ LIỆU HIỂN THỊ: KANBAN BOARD HOẶC BẢNG DANH SÁCH (TRÊN CÙNG 1 KHUNG NHÌN) */}
+        {viewMode === 'KANBAN' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 overflow-x-auto pb-2 touch-scroll sleek-scrollbar">
+            {SEVEN_STAGES.map((col) => {
+              const stageLeads = filteredLeads.filter((l) => l.stage_id === col.id);
 
-      {/* DEDICATED LEAD ANALYTICS DASHBOARD PANEL */}
-      {viewMode === 'REPORTS' && <LeadAnalyticsDashboard leads={leads} />}
-
-      {/* VIEW MODE 1: KANBAN BOARD */}
-      {viewMode === 'KANBAN' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 overflow-x-auto pb-4 touch-scroll sleek-scrollbar">
-          {SEVEN_STAGES.map((col) => {
-            const stageLeads = filteredLeads.filter((l) => l.stage_id === col.id);
-
-            return (
-              <div
-                key={col.id}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, col.id)}
-                className="bg-slate-100/70 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 flex flex-col min-h-[580px] min-w-[200px]"
-              >
-                <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-700/80">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: col.color }}></span>
-                    <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] truncate">{col.name}</h3>
-                  </div>
-                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-[10px] font-semibold shrink-0">
-                    {stageLeads.length}
-                  </span>
-                </div>
-                <div className="space-y-3 flex-1 overflow-y-auto pr-0.5">
-                  {stageLeads.length === 0 ? (
-                    <div className="h-28 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-[10px] text-slate-400 font-medium">
-                      Kéo Lead vào đây
+              return (
+                <div
+                  key={col.id}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, col.id)}
+                  className="bg-slate-100/70 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 flex flex-col min-h-[580px] min-w-[200px]"
+                >
+                  <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-700/80">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: col.color }}></span>
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] truncate">{col.name}</h3>
                     </div>
-                  ) : (
-                    stageLeads.map((lead) => (
-                      <div
-                        key={lead.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, lead.id)}
-                        className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing relative space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono font-semibold text-blue-600 dark:text-blue-400 px-1.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 rounded">
-                            {lead.lead_code}
-                          </span>
-                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-                            lead.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
-                          }`}>
-                            {lead.entity_type === 'ENTERPRISE' ? '🏢 DN' : '👤 CN'}
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-xs truncate">{lead.full_name}</h4>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{lead.company_name}</p>
-                        </div>
-                        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800 text-[10px]">
-                          <span className="text-slate-500 font-semibold flex items-center gap-1">
-                            <Flame className="w-3 h-3 text-orange-500 fill-orange-500" /> Score:
-                          </span>
-                          <span className="font-semibold font-mono text-emerald-600 dark:text-emerald-400">{lead.lead_score}/100</span>
-                        </div>
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-                          <button
-                            onClick={() => handleOpenLeadSpecificLog(lead.lead_code)}
-                            className="px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-[10px] rounded flex items-center gap-1 border border-slate-200 dark:border-slate-700"
-                            title="Xem Lịch Sử Log Riêng Của Lead Này"
-                          >
-                            <History className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                            <span>Log Lead</span>
-                          </button>
-                          <button
-                            onClick={() => handleConvertLeadToVipCustomer(lead)}
-                            className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-[10px] rounded flex items-center gap-1 shadow-xs transition-all active:scale-95"
-                          >
-                            <Crown className="w-3 h-3" />
-                            <span>VIP</span>
-                          </button>
-                        </div>
+                    <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-[10px] font-semibold shrink-0">
+                      {stageLeads.length}
+                    </span>
+                  </div>
+                  <div className="space-y-3 flex-1 overflow-y-auto pr-0.5">
+                    {stageLeads.length === 0 ? (
+                      <div className="h-28 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-[10px] text-slate-400 font-medium">
+                        Kéo Lead vào đây
                       </div>
-                    ))
-                  )}
+                    ) : (
+                      stageLeads.map((lead) => (
+                        <div
+                          key={lead.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, lead.id)}
+                          className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing relative space-y-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-mono font-semibold text-blue-600 dark:text-blue-400 px-1.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 rounded">
+                              {lead.lead_code}
+                            </span>
+                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                              lead.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
+                            }`}>
+                              {lead.entity_type === 'ENTERPRISE' ? '🏢 DN' : '👤 CN'}
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-xs truncate">{lead.full_name}</h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{lead.company_name}</p>
+                          </div>
+                          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800 text-[10px]">
+                            <span className="text-slate-500 font-semibold flex items-center gap-1">
+                              <Flame className="w-3 h-3 text-orange-500 fill-orange-500" /> Score:
+                            </span>
+                            <span className="font-semibold font-mono text-emerald-600 dark:text-emerald-400">{lead.lead_score}/100</span>
+                          </div>
+                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
+                            <button
+                              onClick={() => handleOpenLeadSpecificLog(lead.lead_code)}
+                              className="px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-[10px] rounded flex items-center gap-1 border border-slate-200 dark:border-slate-700"
+                              title="Xem Lịch Sử Log Riêng Của Lead Này"
+                            >
+                              <History className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                              <span>Log Lead</span>
+                            </button>
+                            <button
+                              onClick={() => handleConvertLeadToVipCustomer(lead)}
+                              className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-[10px] rounded flex items-center gap-1 shadow-xs transition-all active:scale-95"
+                            >
+                              <Crown className="w-3 h-3" />
+                              <span>VIP</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* VIEW MODE 2: STRUCTURED LIST TABLE VIEW (CHUYỂN ĐỔI TỨC THỜI) */}
-      {viewMode === 'LIST' && (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
+              );
+            })}
+          </div>
+        ) : (
+          <div className="overflow-x-auto border border-slate-200/80 dark:border-slate-800 rounded-xl">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wide text-[10.5px]">
@@ -732,8 +726,8 @@ export default function LeadsPage() {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* DRAWER / MODAL: NHẬT KÝ CHUYỂN TRẠNG THÁI (LỌC THEO TỪNG LEAD CHI TIẾT) */}
       {isLogDrawerOpen && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"> <History className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-base text-slate-900">Nhật Ký Lịch Sử Chuyển Trạng Thái</h3> <p className="text-xs text-slate-500">Lọc xem nhật ký toàn hệ thống hoặc xem chi tiết theo từng Lead</p> </div> </div> <button
