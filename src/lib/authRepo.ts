@@ -24,13 +24,17 @@ function mapRow(data: Record<string, unknown>): UserAccountWithAuth {
 export async function findUserForAuth(input: string): Promise<UserAccountWithAuth | null> {
   const clean = input.trim().toLowerCase();
   if (isSupabaseEnabled()) {
-    const sb = getSupabaseAdmin();
-    if (sb) {
-      let { data } = await sb.from('app_users').select('*').eq('username', clean).maybeSingle();
-      if (!data) {
-        ({ data } = await sb.from('app_users').select('*').eq('email', clean).maybeSingle());
+    try {
+      const sb = getSupabaseAdmin();
+      if (sb) {
+        let { data, error } = await sb.from('app_users').select('*').eq('username', clean).maybeSingle();
+        if (!data && !error) {
+          ({ data, error } = await sb.from('app_users').select('*').eq('email', clean).maybeSingle());
+        }
+        if (data) return mapRow(data);
       }
-      return data ? mapRow(data) : null;
+    } catch {
+      // Fallback về store in-memory nếu Supabase kết nối thất bại
     }
   }
   return findUserByUsernameOrEmail(clean) || null;
