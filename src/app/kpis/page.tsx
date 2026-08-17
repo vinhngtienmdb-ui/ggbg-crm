@@ -62,6 +62,7 @@ import ScorecardModal from '@/components/performance/ScorecardModal';
 import FormulaConfigModal from '@/components/performance/FormulaConfigModal';
 import HrCriteriaModal from '@/components/performance/HrCriteriaModal';
 import PerformanceAnalyticsDashboard from '@/components/performance/PerformanceAnalyticsDashboard';
+import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
 
 export default function UnifiedKpisPerformancePage() {
   const [activeMainTab, setActiveMainTab] = useState<'ANALYTICS' | 'KPI_LIST' | 'SCORECARDS' | 'SYNC_ENGINE'>('KPI_LIST');
@@ -242,62 +243,66 @@ export default function UnifiedKpisPerformancePage() {
   return ( <div className="space-y-6"> {/* Toast Notification */}
       {toastMsg && ( <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-500/40 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200"> <Sparkles className="w-4 h-4 text-amber-400" /> {toastMsg} </div> )}
 
-      {/* Header Module - Clean White with Colorful Highlights */} <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900 flex items-center justify-center text-amber-600 dark:text-amber-400"> <Target className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Quản Lý Hiệu Suất & KPIs </h1> <span className="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 text-[11px] font-medium border border-amber-200 dark:border-amber-800"> Đánh Giá 3P </span> </div> <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5"> Phân bổ chỉ tiêu KPIs, bảng chấm điểm hiệu suất 3P (P1, P2, P3), xếp loại nhân sự & liên thông bảng lương </p> </div> </div> <div className="flex items-center gap-2"> {activeMainTab === 'KPI_LIST' && ( <button
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Hệ Thống Phân Bổ Chỉ Tiêu & Đánh Giá Hiệu Suất 3P',
+          icon: Target,
+          variant: 'amber',
+        }}
+        title="Quản Lý Hiệu Suất & Đánh Giá KPIs 3P"
+        subtitle="Phân bổ chỉ tiêu KPIs, bảng chấm điểm hiệu suất 3P (P1, P2, P3), xếp loại nhân sự & liên thông bảng lương tự động"
+        kpis={[
+          { label: 'Chỉ Tiêu KPI', value: `${kpis.length} Mục tiêu`, subtext: 'Toàn doanh nghiệp' },
+          { label: 'Phiếu Điểm 3P', value: `${scorecards.length} Phiếu`, subtext: selectedPeriod },
+          { label: 'Hoàn Thành KPI', value: '88.5%', subtext: 'Tỷ lệ bình quân' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href="/hrm-settings?tab=PERFORMANCE_FORMULA"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5"
+              title="Quản lý trọng số hiệu suất tại Cấu Hình Nhân Sự"
+            >
+              <Sliders className="w-3.5 h-3.5 text-amber-600" />
+              <span>Trọng Số 3P</span>
+            </a>
+            <button
               onClick={handleOpenCreateKpiModal}
-              className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-colors"
-            > <Plus className="w-4 h-4" /> + Phân Bổ KPI </button> )}
+              className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Phân Bổ KPI</span>
+            </button>
+          </div>
+        }
+      />
 
-          {activeMainTab === 'SCORECARDS' && ( <div className="flex items-center gap-2"> <button
-                onClick={() => {
-                  setSelectedScorecard(null);
-                  setScorecardModalMode('create');
-                  setIsScorecardModalOpen(true);
-                }}
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-colors"
-              >
-                <Plus className="w-4 h-4" /> + Tạo Phiếu Điểm
-              </button>
-              <a
-                href="/hrm-settings?tab=PERFORMANCE_FORMULA"
-                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5"
-                title="Quản lý trọng số hiệu suất tại Cấu Hình Nhân Sự"
-              >
-                <Sliders className="w-4 h-4 text-amber-600" />
-                <span>⚙️ Cấu Hình Trọng Số 3P</span>
-              </a>
-            </div>
-          )}
-        </div>
-      </div> {/* Navigation Tabs - Responsive Touch Scroll */} <div className="bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-1 overflow-x-auto text-xs font-medium scrollbar-none touch-scroll"> <button
-          onClick={() => setActiveMainTab('KPI_LIST')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeMainTab === 'KPI_LIST'
-              ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Target className="w-3.5 h-3.5 text-amber-600" /> 1. Danh Sách KPIs ({filteredKpis.length}) </button> <button
-          onClick={() => setActiveMainTab('SCORECARDS')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeMainTab === 'SCORECARDS'
-              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Award className="w-3.5 h-3.5 text-blue-600" /> 2. Chấm Điểm 3P ({filteredScorecards.length}) </button> <button
-          onClick={() => setActiveMainTab('ANALYTICS')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeMainTab === 'ANALYTICS'
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <BarChart3 className="w-3.5 h-3.5 text-emerald-600" /> 3. Báo Cáo & Xếp Loại </button> <button
-          onClick={() => setActiveMainTab('SYNC_ENGINE')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeMainTab === 'SYNC_ENGINE'
-              ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <RefreshCw className="w-3.5 h-3.5 text-purple-600" /> 4. Đồng Bộ Sang Lương P3 </button> </div> {/* TAB 1: DANH SÁCH KPIS */}
-      {activeMainTab === 'KPI_LIST' && ( <div className="space-y-4 text-xs font-medium"> {/* Filters Bar */} <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4"> <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto"> <div className="relative w-full sm:w-72"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
+      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
+      <ModuleLayoutWithRail
+        railTitle="Phân Hệ Hiệu Suất & KPIs"
+        railSubtitle="4 chuyên mục đánh giá & liên thông"
+        activeId={activeMainTab}
+        onSelect={(id) => setActiveMainTab(id as any)}
+        sections={[
+          {
+            title: 'I. Chỉ Tiêu & Hiệu Suất',
+            items: [
+              { id: 'KPI_LIST', label: '1. Phân Bổ Chỉ Tiêu KPIs', icon: Target, badge: filteredKpis.length, badgeVariant: 'amber' },
+              { id: 'SCORECARDS', label: '2. Chấm Điểm Đánh Giá 3P', icon: Award, badge: filteredScorecards.length, badgeVariant: 'blue' },
+            ],
+          },
+          {
+            title: 'II. Báo Cáo & Liên Thông',
+            items: [
+              { id: 'ANALYTICS', label: '3. Báo Cáo & Xếp Loại Hiệu Suất', icon: BarChart3, badgeVariant: 'emerald' },
+              { id: 'SYNC_ENGINE', label: '4. Đồng Bộ Sang Lương P3', icon: RefreshCw, badgeVariant: 'purple' },
+            ],
+          },
+        ]}
+      >
+        {/* TAB 1: DANH SÁCH KPIS */}
+        {activeMainTab === 'KPI_LIST' && ( <div className="space-y-4 text-xs font-medium"> {/* Filters Bar */} <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4"> <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto"> <div className="relative w-full sm:w-72"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
                   type="text"
                   value={kpiSearchTerm}
                   onChange={(e) => setKpiSearchTerm(e.target.value)}
@@ -371,11 +376,12 @@ export default function UnifiedKpisPerformancePage() {
       {/* TAB 3: BÁO CÁO & PHÂN TÍCH TỔNG QUAN */}
       {activeMainTab === 'ANALYTICS' && ( <div className="space-y-6"> <KpiAnalyticsDashboard kpis={kpis} /> <PerformanceAnalyticsDashboard scorecards={scorecards} /> </div> )}
 
-      {/* TAB 4: ĐỒNG BỘ KPIS SANG HIỆU SUẤT P3 */}
-      {activeMainTab === 'SYNC_ENGINE' && ( <div className="bg-white p-6 rounded-xl border border-purple-200/80 shadow-sm space-y-6 text-xs font-medium"> <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-purple-50/50 p-5 rounded-xl border border-purple-200"> <div> <h3 className="font-semibold text-sm text-purple-900 flex items-center gap-2"> <RefreshCw className="w-5 h-5 text-purple-600" /> Động Cơ Đồng Bộ Liên Thông Tự Động KPIs → Điểm Số P3 </h3> <p className="text-xs text-slate-600 mt-1"> Kết quả thực hiện KPIs (%) của từng nhân sự sẽ tự động tính toán và đồng bộ trực tiếp sang Điểm P3 (KPI Performance Score) trong Bảng điểm Hiệu suất 3P. </p> </div> <button
-              onClick={handleSyncKpiToPerformance}
-              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0"
-            > <RefreshCw className="w-4 h-4" /> Kích Hoạt Đồng Bộ Real-time </button> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Nhân Sự & Mã NV</th> <th className="p-3">Phòng Ban</th> <th className="p-3 text-center">Tỷ Lệ Hoàn Thành KPIs (%)</th> <th className="p-3 text-center">Quy Đổi Điểm P3 (Thang 100)</th> <th className="p-3 text-center">Trạng Thái Đồng Bộ</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {scorecards.map((sc) => ( <tr key={sc.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-semibold text-slate-900">{sc.employee_name}</p> <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code}</p> </td> <td className="p-3 font-medium text-slate-800">{sc.department}</td> <td className="p-3 text-center font-mono font-semibold text-emerald-700 text-sm"> {sc.kpi_score}% </td> <td className="p-3 text-center font-mono font-semibold text-purple-700 text-sm"> {sc.kpi_score} / 100 Điểm </td> <td className="p-3 text-center"> <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[10.5px] border border-emerald-300"> ⚡ Đã Đồng Bộ Auto </span> </td> </tr> ))} </tbody> </table> </div> </div> )}
+        {/* TAB 4: ĐỒNG BỘ KPIS SANG HIỆU SUẤT P3 */}
+        {activeMainTab === 'SYNC_ENGINE' && ( <div className="bg-white p-6 rounded-xl border border-purple-200/80 shadow-sm space-y-6 text-xs font-medium"> <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-purple-50/50 p-5 rounded-xl border border-purple-200"> <div> <h3 className="font-semibold text-sm text-purple-900 flex items-center gap-2"> <RefreshCw className="w-5 h-5 text-purple-600" /> Động Cơ Đồng Bộ Liên Thông Tự Động KPIs → Điểm Số P3 </h3> <p className="text-xs text-slate-600 mt-1"> Kết quả thực hiện KPIs (%) của từng nhân sự sẽ tự động tính toán và đồng bộ trực tiếp sang Điểm P3 (KPI Performance Score) trong Bảng điểm Hiệu suất 3P. </p> </div> <button
+                onClick={handleSyncKpiToPerformance}
+                className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0"
+              > <RefreshCw className="w-4 h-4" /> Kích Hoạt Đồng Bộ Real-time </button> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Nhân Sự & Mã NV</th> <th className="p-3">Phòng Ban</th> <th className="p-3 text-center">Tỷ Lệ Hoàn Thành KPIs (%)</th> <th className="p-3 text-center">Quy Đổi Điểm P3 (Thang 100)</th> <th className="p-3 text-center">Trạng Thái Đồng Bộ</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {scorecards.map((sc) => ( <tr key={sc.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-semibold text-slate-900">{sc.employee_name}</p> <p className="font-mono text-blue-700 text-[11px]">{sc.employee_code}</p> </td> <td className="p-3 font-medium text-slate-800">{sc.department}</td> <td className="p-3 text-center font-mono font-semibold text-emerald-700 text-sm"> {sc.kpi_score}% </td> <td className="p-3 text-center font-mono font-semibold text-purple-700 text-sm"> {sc.kpi_score} / 100 Điểm </td> <td className="p-3 text-center"> <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[10.5px] border border-emerald-300"> ⚡ Đã Đồng Bộ Auto </span> </td> </tr> ))} </tbody> </table> </div> </div> )}
+      </ModuleLayoutWithRail>
 
       {/* MODALS */}
       {isCreateKpiModalOpen && ( <KpiModal

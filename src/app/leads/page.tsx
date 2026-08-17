@@ -50,6 +50,7 @@ import dynamic from 'next/dynamic';
 const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
 const ChannelAnalyticsDrawer = dynamic(() => import('@/components/leads/ChannelAnalyticsDrawer'), { ssr: false });
 import LeadAnalyticsDashboard from '@/components/leads/LeadAnalyticsDashboard';
+import { ModuleBanner, ViewModeSwitcher } from '@/components/ui';
 
 interface StageDefinition {
   id: string;
@@ -453,57 +454,111 @@ export default function LeadsPage() {
   return ( <div className="space-y-6"> {/* Toast Notification */}
       {successToast && ( <div className="p-4 rounded-xl bg-emerald-500 text-white font-medium text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300"> <div className="flex items-center gap-2"> <CheckCircle2 className="w-5 h-5" /> <span>{successToast}</span> </div> <button onClick={() => setSuccessToast('')} className="p-1 hover:bg-emerald-600 rounded-lg"> <X className="w-4 h-4" /> </button> </div> )}
 
-      {/* Header - Clean White with Colorful Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400"> <UserCheck className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Quản Lý Lead & Phễu Bán Hàng </h1> <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-[11px] font-medium border border-blue-200 dark:border-blue-800"> Phễu 7 Bước </span> </div> <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5"> Quản lý khách hàng tiềm năng, tỷ lệ chuyển đổi và tiến độ phễu bán hàng </p> </div> </div> <div className="flex items-center gap-2 flex-wrap"> <button
-            onClick={() => setIsChannelDrawerOpen(true)}
-            className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-purple-200 dark:border-purple-800 transition-colors"
-          > <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" /> <span>Thống Kê Kênh Lead</span> </button> <button
-            onClick={() => setIsBulkImportModalOpen(true)}
-            className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-800 transition-colors"
-          > <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> <span>Import Excel</span> </button> <button
-            onClick={() => {
-              setSelectedLeadLogFilter('ALL');
-              setIsLogDrawerOpen(true);
-            }}
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
-          > <History className="w-4 h-4 text-blue-600 dark:text-blue-400" /> <span>Nhật Ký ({stageLogs.length})</span> </button> <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-xs transition-colors"
-          > <Plus className="w-4 h-4" /> + Tạo Lead Mới </button> </div> </div> {/* VIEW MODE TOGGLE BUTTONS - Responsive Multi-Device */} <div className="bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-1 overflow-x-auto text-xs font-medium scrollbar-none touch-scroll"> <button
-          onClick={() => setViewMode('REPORTS')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            viewMode === 'REPORTS'
-              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <BarChart3 className="w-3.5 h-3.5 text-blue-600" /> 1. Báo Cáo Phễu </button> <button
-          onClick={() => setViewMode('KANBAN')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            viewMode === 'KANBAN'
-              ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <LayoutGrid className="w-3.5 h-3.5 text-purple-600" /> 2. Thẻ Kanban (7 Bước) </button> <button
-          onClick={() => setViewMode('LIST')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            viewMode === 'LIST'
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <List className="w-3.5 h-3.5 text-emerald-600" /> 3. Danh Sách </button> </div> {/* DEDICATED LEAD ANALYTICS DASHBOARD PANEL */}
-      {viewMode === 'REPORTS' && <LeadAnalyticsDashboard leads={leads} />}
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Hệ Thống Phễu Bán Hàng & Chăm Sóc Lead TMĐT',
+          icon: UserCheck,
+          variant: 'blue',
+        }}
+        title="Quản Lý Lead & Phễu Chuyển Đổi Khách Hàng"
+        subtitle="Quản lý khách hàng tiềm năng, tỷ lệ chốt đơn theo 7 giai đoạn, phân loại nguồn lead và luân chuyển phễu bán hàng"
+        kpis={[
+          { label: 'Tổng Số Lead', value: `${leads.length} Lead`, subtext: 'Trong hệ thống' },
+          { label: 'Đang Khảo Sát', value: `${leads.filter(l => l.stage_id === 'stage_2' || l.stage_id === 'stage_3').length} Gian hàng`, subtext: 'Tư vấn giải pháp' },
+          { label: 'Đã Ký Hợp Đồng', value: `${leads.filter(l => l.stage_id === 'stage_6').length} Chốt đơn`, subtext: 'Chuyển đổi VIP' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setIsChannelDrawerOpen(true)}
+              className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-purple-200 dark:border-purple-800 transition-colors"
+            >
+              <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span>Kênh Lead</span>
+            </button>
+            <button
+              onClick={() => setIsBulkImportModalOpen(true)}
+              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-800 transition-colors"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Import Excel</span>
+            </button>
+            <button
+              onClick={() => {
+                setSelectedLeadLogFilter('ALL');
+                setIsLogDrawerOpen(true);
+              }}
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
+            >
+              <History className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span>Nhật Ký ({stageLogs.length})</span>
+            </button>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Tạo Lead Mới</span>
+            </button>
+          </div>
+        }
+      />
 
-      {/* Filter Bar for Kanban & List */}
-      {viewMode !== 'REPORTS' && ( <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4"> <div className="flex items-center gap-3 flex-wrap w-full md:w-auto"> <div className="relative w-full md:w-64"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm Mã Lead, Tên, SĐT, Shop..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              /> </div> <select
-              value={selectedSourceFilter}
-              onChange={(e) => setSelectedSourceFilter(e.target.value)}
-              className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700"
-            > <option value="ALL">Tất cả Nguồn Lead</option> <option value="Facebook Ads">Facebook Ads</option> <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option> <option value="TikTok Ads">TikTok Ads</option> <option value="TikTok Lead Gen">TikTok Lead Gen</option> <option value="Google Ads">Google Ads</option> <option value="Google Ads Form">Google Ads Form</option> <option value="Zalo OA Form">Zalo OA Form</option> <option value="Hotline Zalo">Hotline Zalo</option> <option value="Website GGBingoVN">Website GGBingoVN</option> <option value="Event / Hội Thảo">Event / Hội Thảo</option> <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option> <option value="Bulk Import Excel">Bulk Import Excel</option> <option value="Universal Webhook">Universal Webhook API</option> </select> </div> </div> )}
+      {/* UNIFIED TOOLBAR: SEARCH, FILTERS & VIEW MODE SWITCHER */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-wrap w-full md:w-auto flex-1">
+          <div className="relative w-full md:w-72">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm Mã Lead, Tên KH, SĐT, Doanh nghiệp..."
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+            />
+          </div>
+
+          <select
+            value={selectedSourceFilter}
+            onChange={(e) => setSelectedSourceFilter(e.target.value)}
+            className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200"
+          >
+            <option value="ALL">Tất cả Nguồn Lead</option>
+            <option value="Facebook Ads">Facebook Ads</option>
+            <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option>
+            <option value="TikTok Ads">TikTok Ads</option>
+            <option value="TikTok Lead Gen">TikTok Lead Gen</option>
+            <option value="Google Ads">Google Ads</option>
+            <option value="Google Ads Form">Google Ads Form</option>
+            <option value="Zalo OA Form">Zalo OA Form</option>
+            <option value="Hotline Zalo">Hotline Zalo</option>
+            <option value="Website GGBingoVN">Website GGBingoVN</option>
+            <option value="Event / Hội Thảo">Event / Hội Thảo</option>
+            <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
+            <option value="Bulk Import Excel">Bulk Import Excel</option>
+            <option value="Universal Webhook">Universal Webhook API</option>
+          </select>
+        </div>
+
+        {/* INTEGRATED VIEW MODE SWITCHER */}
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+          <ViewModeSwitcher
+            currentMode={viewMode === 'REPORTS' ? 'insights' : viewMode === 'KANBAN' ? 'kanban' : 'list'}
+            onChange={(mode) => setViewMode(mode === 'insights' ? 'REPORTS' : mode === 'kanban' ? 'KANBAN' : 'LIST')}
+            showInsights={true}
+            listLabel="Danh Sách"
+            kanbanLabel="Bảng Phễu (7 Bước)"
+            insightsLabel="Báo Cáo Phễu"
+          />
+          <span className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
+            Tổng: <strong className="text-slate-900 dark:text-white">{filteredLeads.length}</strong> Lead
+          </span>
+        </div>
+      </div>
+
+      {/* DEDICATED LEAD ANALYTICS DASHBOARD PANEL */}
+      {viewMode === 'REPORTS' && <LeadAnalyticsDashboard leads={leads} />}
 
       {/* VIEW MODE 1: KANBAN BOARD */}
       {viewMode === 'KANBAN' && ( <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 overflow-x-auto pb-4 touch-scroll sleek-scrollbar"> {SEVEN_STAGES.map((col) => {

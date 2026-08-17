@@ -16,3 +16,12 @@ export { ToastProvider, useToast } from './Toast';
 export type { ToastType, ToastItem } from './Toast';
 
 export { Skeleton, SkeletonMetricCard, SkeletonTable, SkeletonPage, SkeletonListItem } from './Skeleton';
+
+export { ViewModeSwitcher } from './ViewModeSwitcher';
+export type { ViewMode, ViewModeSwitcherProps } from './ViewModeSwitcher';
+
+export { ModuleBanner } from './ModuleBanner';
+export type { ModuleBannerProps, ModuleBannerBadge, ModuleBannerKPI } from './ModuleBanner';
+
+export { ModuleLayoutWithRail } from './ModuleLayoutWithRail';
+export type { ModuleLayoutWithRailProps, ModuleRailSection, ModuleRailItem } from './ModuleLayoutWithRail';

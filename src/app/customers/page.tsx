@@ -47,6 +47,7 @@ import {
 import { Customer, CustomerEntityType, CustomerType, CustomerTier, KycDocument, LifecycleStage } from '@/types';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 import { formatNumber } from '@/lib/formatters';
+import { ModuleBanner } from '@/components/ui';
 
 function maskIdentification(val?: string, showFull: boolean = false): string {
   if (!val) return 'Chưa cập nhật';
@@ -570,16 +571,53 @@ export default function CustomersPage() {
   return ( <div className="space-y-6"> {/* Toast Notification */}
       {toastMessage && ( <div className="p-4 rounded-xl bg-emerald-500 text-white font-medium text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300"> <div className="flex items-center gap-2"> <CheckCircle2 className="w-5 h-5" /> <span>{toastMessage}</span> </div> <button onClick={() => setToastMessage('')} className="p-1 hover:bg-emerald-600 rounded-lg"> <X className="w-4 h-4" /> </button> </div> )}
 
-      {/* Header - Clean White with Colorful Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400"> <Users className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Danh Mục Khách Hàng </h1> <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-[11px] font-medium border border-blue-200 dark:border-blue-800"> {customers.length} Hồ sơ </span> </div> <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5"> Quản lý hồ sơ, lịch sử giao dịch và theo dõi thông tin khách hàng </p> </div> </div> <div className="flex items-center gap-2 flex-wrap"> <button
-            onClick={handleOpenCreateModal}
-            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-xs transition-colors"
-          > <UserPlus className="w-4 h-4" /> + Thêm Khách Hàng </button> {canReveal ? ( <button
-              onClick={() => setShowMaskedData(!showMaskedData)}
-              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
-            > {showMaskedData ? <Eye className="w-4 h-4 text-blue-600" /> : <EyeOff className="w-4 h-4 text-slate-500" />} <span>{showMaskedData ? 'Gỡ Mask Bảo Mật' : 'Ẩn Bảo Mật'}</span> </button> ) : ( <span className="px-3 py-2 bg-slate-50 text-slate-400 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-slate-200"> <EyeOff className="w-4 h-4" /> Đã ẩn PII </span> )} <button
-            onClick={handleExportData}
-            className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
-          > <Download className="w-4 h-4" /> Xuất Excel </button> </div> </div> {/* FLOATING BULK ACTIONS BAR */}
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Hệ Thống Quản Lý Hồ Sơ Khách Hàng & KYC 360°',
+          icon: Users,
+          variant: 'blue',
+        }}
+        title="Danh Mục Hồ Sơ Khách Hàng & KYC"
+        subtitle="Quản lý thông tin thể nhân (DN/Cá nhân), lịch sử tương tác, hồ sơ định danh KYC và bảo mật dữ liệu PII"
+        kpis={[
+          { label: 'Tổng Khách Hàng', value: `${customers.length} Hồ Sơ`, subtext: 'Toàn hệ thống' },
+          { label: 'Doanh Nghiệp', value: `${customers.filter(c => c.entity_type === 'ENTERPRISE').length} DN`, subtext: 'Có MST & GPKD' },
+          { label: 'Cá Nhân', value: `${customers.filter(c => c.entity_type === 'INDIVIDUAL').length} CN`, subtext: 'Có CCCD/Hộ chiếu' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            {canReveal ? (
+              <button
+                onClick={() => setShowMaskedData(!showMaskedData)}
+                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
+              >
+                {showMaskedData ? <Eye className="w-3.5 h-3.5 text-blue-600" /> : <EyeOff className="w-3.5 h-3.5 text-slate-500" />}
+                <span>{showMaskedData ? 'Gỡ Mask PII' : 'Ẩn PII'}</span>
+              </button>
+            ) : (
+              <span className="px-3 py-2 bg-slate-50 text-slate-400 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-slate-200">
+                <EyeOff className="w-3.5 h-3.5" />
+                <span>Đã ẩn PII</span>
+              </span>
+            )}
+            <button
+              onClick={handleExportData}
+              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            >
+              <Download className="w-4 h-4 text-emerald-600" />
+              <span>Xuất Excel</span>
+            </button>
+            <button
+              onClick={handleOpenCreateModal}
+              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>+ Thêm Khách Hàng</span>
+            </button>
+          </div>
+        }
+      /> {/* FLOATING BULK ACTIONS BAR */}
       {selectedIds.length > 0 && ( <div className="p-4 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <span className="w-7 h-7 rounded-lg bg-blue-600 text-white font-semibold flex items-center justify-center text-xs shadow-xs"> {selectedIds.length} </span> <div> <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">Đã chọn {selectedIds.length} khách hàng</p> <p className="text-[11px] text-slate-500">Thao tác nhanh hàng loạt hồ sơ</p> </div> </div> <div className="flex items-center gap-2 flex-wrap"> <button
               onClick={handleBulkAssignCskh}
               className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"

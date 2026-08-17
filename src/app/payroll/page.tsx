@@ -77,6 +77,7 @@ import { exportPayrollToXlsx, exportBankBatchToXlsx } from '@/lib/excelExport';
 import PaystubModal from '@/components/payroll/PaystubModal';
 import PayrollAnalyticsDashboard from '@/components/payroll/PayrollAnalyticsDashboard';
 import { formatCurrency } from '@/lib/formatters';
+import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
 
 export default function PayrollPage() {
   const [activeTab, setActiveTab] = useState<'reports' | 'payroll' | 'paystubs' | 'banking'>('reports');
@@ -305,58 +306,53 @@ export default function PayrollPage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <DollarSign className="w-5 h-5" />
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Hệ Thống Phê Duyệt Quỹ Lương 3P & Chi Trả Ngân Hàng',
+          icon: DollarSign,
+          variant: 'emerald',
+        }}
+        title="Quản Lý Bảng Lương 3P & Chi Trả Tự Động"
+        subtitle="Lập biểu, rà soát C&B, thẩm định GĐ Nhân sự, phê duyệt CEO và xuất lệnh chi ngân hàng tự động"
+        kpis={[
+          { label: 'Tổng Chi Trả NET', value: formatCurrency(stats.totalNet), subtext: `${payrolls.length} Nhân sự` },
+          { label: 'Tổng Quỹ Gross', value: formatCurrency(stats.totalGross), subtext: 'P1 + P2 + P3 + Thưởng' },
+          { label: 'Chi Phí Doanh Nghiệp', value: formatCurrency(stats.totalEmployerCost), subtext: 'Gross + 23.5% BH' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={handleCalculatePayroll}
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Tính Lương 3P</span>
+            </button>
+            <button
+              onClick={handleExportPayrollXlsx}
+              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            >
+              <Download className="w-4 h-4 text-emerald-600" />
+              <span>Xuất Excel (.xlsx)</span>
+            </button>
+            <button
+              onClick={() => setIsFullReportModalOpen(true)}
+              className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            >
+              <Printer className="w-4 h-4 text-blue-600" />
+              <span>In Báo Cáo A4</span>
+            </button>
+            <button
+              onClick={() => setIsLogModalOpen(true)}
+              className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            >
+              <History className="w-4 h-4 text-purple-600" />
+              <span>Lịch Sử Duyệt</span>
+            </button>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                Phê Duyệt Bảng Lương & Chi Trả Ngân Hàng
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-[11px] font-medium border border-emerald-200 dark:border-emerald-800">
-                Quy Trình 5 Cấp
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Lập biểu $\rightarrow$ Chuyên viên HR kiểm tra $\rightarrow$ GĐ Nhân sự duyệt $\rightarrow$ CEO duyệt $\rightarrow$ Kế toán trưởng lập lệnh chuyển khoản tự động
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={handleCalculatePayroll}
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Tính Lương 3P</span>
-          </button>
-          <button
-            onClick={handleExportPayrollXlsx}
-            className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
-          >
-            <Download className="w-4 h-4 text-emerald-600" />
-            <span>Xuất Excel (.xlsx)</span>
-          </button>
-          <button
-            onClick={() => setIsFullReportModalOpen(true)}
-            className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
-          >
-            <Printer className="w-4 h-4 text-blue-600" />
-            <span>In Báo Cáo A4</span>
-          </button>
-          <button
-            onClick={() => setIsLogModalOpen(true)}
-            className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
-          >
-            <History className="w-4 h-4 text-purple-600" />
-            <span>Lịch Sử Duyệt</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 5-STEP APPROVAL PIPELINE INTERACTIVE STEPPER BANNER */}
       <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">

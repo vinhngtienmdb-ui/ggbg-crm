@@ -47,6 +47,7 @@ import {
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
 import { ContractProfitLoss, DebtInvoice, CashFlowTransaction, DepartmentBudget } from '@/types/finance';
+import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
 
 // Mock 12-Month Financial Performance Trend Data
 const FINANCIAL_TREND_DATA = [
@@ -172,59 +173,65 @@ export default function FinancePage() {
   return ( <div className="space-y-6"> {/* Toast Notification */}
       {toastMessage && ( <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-500/40 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200"> <Sparkles className="w-4 h-4 text-blue-400" /> <span>{toastMessage}</span> <button onClick={() => setToastMessage('')} className="ml-2 hover:opacity-80"> <X className="w-4 h-4" /> </button> </div> )}
 
-      {/* Header - Clean White with Colorful Highlights */} <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center text-emerald-600 dark:text-emerald-400"> <PieChartIcon className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Báo Cáo Tài Chính & Quản Trị P&L </h1> <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-[11px] font-medium border border-emerald-200 dark:border-emerald-800"> Tài Chính VAS </span> </div> <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5"> Phân tích tỷ suất lợi nhuận gộp P&L hợp đồng, quản lý công nợ, sổ thu chi & dự báo ngân sách </p> </div> </div> <div className="flex items-center gap-2"> <button
-            onClick={() => setIsTxModalOpen(true)}
-            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-colors"
-          > <Plus className="w-4 h-4" /> Lập Phiếu Thu / Chi </button> </div> </div> {/* Navigation Tabs (7 Financial Management Sub-Modules) - Responsive Touch Scroll */} <div className="bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-1 overflow-x-auto text-xs font-medium scrollbar-none touch-scroll"> <button
-          onClick={() => setActiveTab('EXECUTIVE')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'EXECUTIVE'
-              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <PieChartIcon className="w-3.5 h-3.5 text-blue-600" /> 1. Tổng Quan </button> <button
-          onClick={() => setActiveTab('P_L')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'P_L'
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> 2. Lợi Nhuận P&L </button> <button
-          onClick={() => setActiveTab('DEBT')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'DEBT'
-              ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> 3. Công Nợ </button> <button
-          onClick={() => setActiveTab('CASH_FLOW')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'CASH_FLOW'
-              ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Wallet className="w-3.5 h-3.5 text-purple-600" /> 4. Dòng Tiền & Thu Chi </button> <button
-          onClick={() => setActiveTab('BUDGET_FORECAST')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'BUDGET_FORECAST'
-              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <DollarSign className="w-3.5 h-3.5 text-indigo-600" /> 5. Ngân Sách </button> <button
-          onClick={() => setActiveTab('VAS_BALANCE_SHEET')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'VAS_BALANCE_SHEET'
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Building2 className="w-3.5 h-3.5 text-emerald-600" /> 6. Bảng Cân Đối VAS </button> <button
-          onClick={() => setActiveTab('FINANCE_CONFIG')}
-          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'FINANCE_CONFIG'
-              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Building2 className="w-3.5 h-3.5 text-indigo-600" /> 7. Cấu Hình Tài Chính </button> </div> {/* TAB 1: EXECUTIVE FINANCIAL DASHBOARD */}
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Hệ Thống Quản Trị Tài Chính & Dòng Tiền VAS',
+          icon: PieChartIcon,
+          variant: 'emerald',
+        }}
+        title="Báo Cáo Tài Chính & Quản Trị P&L Doanh Nghiệp"
+        subtitle="Phân tích tỷ suất lợi nhuận gộp P&L hợp đồng, quản lý công nợ phải thu (AR), dòng tiền thực tế & cân đối kế toán VAS"
+        kpis={[
+          { label: 'Doanh Thu Tổng', value: formatCurrency(summary.total_gross_revenue), subtext: '+18.4% so với kỳ trước' },
+          { label: 'Lợi Nhuận Gộp P&L', value: formatCurrency(summary.total_net_profit), subtext: `Margin: ${summary.avg_profit_margin}%` },
+          { label: 'Công Nợ Quá Hạn', value: formatCurrency(summary.total_overdue_debt), subtext: 'Cần gửi nhắc nợ' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setIsTxModalOpen(true)}
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Lập Phiếu Thu / Chi</span>
+            </button>
+          </div>
+        }
+      />
+
+      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
+      <ModuleLayoutWithRail
+        railTitle="Phân Hệ Nghiệp Vụ Tài Chính"
+        railSubtitle="7 chuyên mục P&L, thu chi & kế toán"
+        activeId={activeTab}
+        onSelect={(id) => setActiveTab(id as any)}
+        sections={[
+          {
+            title: 'I. Báo Cáo Tài Chính',
+            items: [
+              { id: 'EXECUTIVE', label: '1. Tổng Quan Doanh Thu & Chi Phí', icon: PieChartIcon, badgeVariant: 'blue' },
+              { id: 'P_L', label: '2. Lợi Nhuận Gộp P&L Hợp Đồng', icon: TrendingUp, badgeVariant: 'emerald' },
+              { id: 'VAS_BALANCE_SHEET', label: '3. Bảng Cân Đối VAS', icon: Building2, badgeVariant: 'slate' },
+            ],
+          },
+          {
+            title: 'II. Thu Chi & Dòng Tiền',
+            items: [
+              { id: 'DEBT', label: '4. Quản Trị Công Nợ & Thu Hồi', icon: AlertTriangle, badge: `${debtInvoices.filter(i => i.payment_status === 'OVERDUE').length} Quá Hạn`, badgeVariant: 'rose' },
+              { id: 'CASH_FLOW', label: '5. Sổ Quỹ & Dòng Tiền Thực', icon: Wallet, badgeVariant: 'purple' },
+            ],
+          },
+          {
+            title: 'III. Ngân Sách & Cài Đặt',
+            items: [
+              { id: 'BUDGET_FORECAST', label: '6. Ngân Sách Phòng Ban', icon: DollarSign, badgeVariant: 'indigo' },
+              { id: 'FINANCE_CONFIG', label: '7. Cấu Hình Tài Chính', icon: Building2, badgeVariant: 'slate' },
+            ],
+          },
+        ]}
+      >
+        {/* TAB 1: EXECUTIVE FINANCIAL DASHBOARD */}
       {activeTab === 'EXECUTIVE' && ( <div className="space-y-6 text-xs"> {/* Top 4 Financial KPI Cards */} <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-medium"> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Doanh Thu Tổng (Gross Revenue)</span> <p className="text-2xl font-semibold text-blue-700"> {formatCurrency(summary.total_gross_revenue)} </p> <div className="flex items-center gap-1 text-emerald-600 text-[11px] font-medium"> <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% so với tháng trước </div> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Lợi Nhuận Gộp P&L (Net Profit)</span> <p className="text-2xl font-semibold text-emerald-600"> {formatCurrency(summary.total_net_profit)} </p> <span className="text-slate-500 text-[11px]">Tỷ suất lợi nhuận: <strong className="text-emerald-700 font-semibold">{summary.avg_profit_margin}%</strong></span> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Công Nợ Quá Hạn Phải Thu (AR)</span> <p className="text-2xl font-semibold text-red-600"> {formatCurrency(summary.total_overdue_debt)} </p> <span className="text-red-600 text-[11px] font-medium"> Cần gửi thông báo đòi nợ Zalo/Email</span> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Dòng Tiền Quỹ Thực Có (Cash Balance)</span> <p className="text-2xl font-semibold text-purple-700"> {formatCurrency(850000000)} </p> <span className="text-purple-600 text-[11px] font-medium">Techcombank + Quỹ tiền mặt</span> </div> </div> {/* Charts Section: 12-Month Performance Trend & Cost Breakdown */} <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <div className="flex items-center justify-between"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <TrendingUp className="w-4 h-4 text-blue-600" /> Biểu Đồ Xu Hướng Doanh Thu, Chi Phí & Lợi Nhuận (12 Tháng) </h3> <span className="text-[11px] text-slate-500 font-medium">Đơn vị: Triệu VNĐ</span> </div> <div className="h-72"> <ResponsiveContainer width="100%" height="100%"><BarChart data={FINANCIAL_TREND_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}> <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" /> <XAxis dataKey="month" tick={{ fontSize: 10 }} /> <YAxis tick={{ fontSize: 10 }} /> <Tooltip /> <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} /> <Bar dataKey="revenue" name="Doanh Thu" fill="#3B82F6" radius={[4, 4, 0, 0]} /> <Bar dataKey="cost" name="Chi Phí Vận Hành" fill="#94A3B8" radius={[4, 4, 0, 0]} /> <Bar dataKey="profit" name="Lợi Nhuận Ròng" fill="#10B981" radius={[4, 4, 0, 0]} /> </BarChart></ResponsiveContainer> </div> </div> <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <PieChartIcon className="w-4 h-4 text-purple-600" /> Phân Bổ Cơ Cấu Chi Phí Vận Hành (Cost Allocation) </h3> <div className="h-64 flex items-center justify-center"> <ResponsiveContainer width="100%" height="100%"><PieChart> <Pie data={COST_BREAKDOWN_DATA} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label> {COST_BREAKDOWN_DATA.map((entry, idx) => ( <Cell key={`cell-${idx}`} fill={entry.color} /> ))} </Pie> <Tooltip /> </PieChart></ResponsiveContainer> </div> </div> </div> </div> )}
 
       {/* TAB 2: CONTRACT P_L STATEMENT ANALYSIS */}
@@ -310,6 +317,7 @@ export default function FinancePage() {
                     onChange={(e) => setFinConfig({ ...finConfig, warning_debt_days: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
                   /> </div> </div> </div> </div> </div> )}
+      </ModuleLayoutWithRail>
 
       {/* MODAL LẬP PHIẾU THU / CHI MỚI */}
       {isTxModalOpen && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"> <div className="bg-white rounded-xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 text-xs font-medium"> <div className="bg-blue-600 text-white p-5 flex items-center justify-between"> <h3 className="font-semibold text-base flex items-center gap-2"> <Wallet className="w-5 h-5" /> Lập Phiếu Thu / Chi Tài Chính Mới </h3> <button onClick={() => setIsTxModalOpen(false)} className="text-white/80 hover:text-white"> <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleAddTransaction} className="p-6 space-y-4"> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Loại Phiếu *</label> <select

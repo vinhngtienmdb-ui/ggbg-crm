@@ -60,6 +60,7 @@ import {
 import { getEmployees } from '@/lib/hrmStore';
 import { createLeaveRequest } from '@/lib/payrollStore';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters';
+import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
 
 const CATEGORIES = [
   'Tất Cả Danh Mục',
@@ -458,37 +459,64 @@ export default function ProposalsPage() {
   return ( <div className="space-y-6"> {/* Toast Notification */}
       {toastMsg && ( <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-500/40 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200"> <Sparkles className="w-4 h-4 text-blue-400" /> {toastMsg} </div> )}
 
-      {/* Header - Clean White with Colorful Highlights */} <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-400"> <ShieldCheck className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Báo Giá & Phê Duyệt Đề Xuất </h1> <span className="px-2.5 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-[11px] font-medium border border-purple-200 dark:border-purple-800"> {templates.length} Mẫu Phiếu </span> </div> <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5"> Hệ thống quản lý phê duyệt đa cấp tích hợp HRM & báo giá dịch vụ </p> </div> </div> <div className="flex items-center gap-2"> <button
-            onClick={() => {
-              setActiveTab('CREATE_NEW');
-              setCreateFormStep('SELECT_TEMPLATE');
-            }}
-            className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-colors shrink-0"
-          > <Plus className="w-4 h-4" /> + Nộp Phiếu Phê Duyệt </button> </div> </div> {/* Main Content Card */} <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6 text-xs font-medium"> {/* Navigation Tabs */} <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 overflow-x-auto"> <button
-            onClick={() => setActiveTab('SUBMISSIONS')}
-            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'SUBMISSIONS'
-                ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-            }`}
-          > <FileCheck className="w-4 h-4 text-purple-600" /> 1. Sổ Phiếu Phê Duyệt ({submissions.length}) </button> <button
-            onClick={() => {
-              setActiveTab('CREATE_NEW');
-              setCreateFormStep('SELECT_TEMPLATE');
-            }}
-            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'CREATE_NEW'
-                ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-            }`}
-          > <PlusCircle className="w-4 h-4 text-purple-600" /> 2. Nộp Phiếu Mới </button> <button
-            onClick={() => setActiveTab('TEMPLATE_CONFIG')}
-            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'TEMPLATE_CONFIG'
-                ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-semibold'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-            }`}
-          > <Settings className="w-4 h-4 text-indigo-600" /> 3. Quản Lý Mẫu Phiếu ({templates.length}) </button> </div> {/* TAB 1: SUBMISSIONS LIST */}
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Hệ Thống Trình Ký, Báo Giá & Phê Duyệt Tự Động',
+          icon: ShieldCheck,
+          variant: 'purple',
+        }}
+        title="Báo Giá & Phê Duyệt Đề Xuất Doanh Nghiệp"
+        subtitle="Quản lý phê duyệt đa cấp tích hợp dữ liệu nhân sự HRM, mẫu biểu tùy biến theo chuẩn & đồng bộ bảng lương tự động"
+        kpis={[
+          { label: 'Tổng Phiếu Đã Nộp', value: `${submissions.length} Phiếu`, subtext: 'Toàn hệ thống' },
+          { label: 'Chờ Phê Duyệt', value: `${submissions.filter(s => s.status === 'PENDING').length} Phiếu`, subtext: 'Cần xử lý ngay' },
+          { label: 'Mẫu Biểu Thiết Kế', value: `${templates.length} Mẫu`, subtext: 'Đã ban hành' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => {
+                setActiveTab('CREATE_NEW');
+                setCreateFormStep('SELECT_TEMPLATE');
+              }}
+              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Nộp Phiếu Phê Duyệt</span>
+            </button>
+          </div>
+        }
+      />
+
+      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
+      <ModuleLayoutWithRail
+        railTitle="Phân Hệ Phê Duyệt & Mẫu Biểu"
+        railSubtitle="3 chuyên mục trình ký & quản trị form"
+        activeId={activeTab}
+        onSelect={(id) => {
+          setActiveTab(id as any);
+          if (id === 'CREATE_NEW') {
+            setCreateFormStep('SELECT_TEMPLATE');
+          }
+        }}
+        sections={[
+          {
+            title: 'I. Nghiệp Vụ Trình Duyệt',
+            items: [
+              { id: 'SUBMISSIONS', label: '1. Sổ Phiếu Phê Duyệt', icon: FileCheck, badge: submissions.length, badgeVariant: 'purple' },
+              { id: 'CREATE_NEW', label: '2. Nộp Phiếu Phê Duyệt Mới', icon: PlusCircle, badgeVariant: 'blue' },
+            ],
+          },
+          {
+            title: 'II. Quản Trị Quy Trình',
+            items: [
+              { id: 'TEMPLATE_CONFIG', label: '3. Quản Lý & Thiết Kế Mẫu Phiếu', icon: Settings, badge: templates.length, badgeVariant: 'indigo' },
+            ],
+          },
+        ]}
+      >
+        {/* TAB 1: SUBMISSIONS LIST */}
         {activeTab === 'SUBMISSIONS' && ( <div className="space-y-4"> <div className="flex flex-col sm:flex-row items-center justify-between gap-3"> <div className="flex items-center gap-2 w-full sm:w-auto"> <div className="relative w-full sm:w-80"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
                     type="text"
                     value={searchTerm}
@@ -666,7 +694,10 @@ export default function ProposalsPage() {
                             onClick={() => handleDeleteTemplate(t.id)}
                             className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg"
                             title="Xóa Mẫu Phiếu"
-                          > <Trash2 className="w-3.5 h-3.5" /> </button> </div> </td> </tr> ))} </tbody> </table> </div> </div> )} </div> {/* MODAL 1: XEM CHI TIẾT CẤU HÌNH LOẠI PHIẾU (SCHEMA PREVIEW) */}
+                          > <Trash2 className="w-3.5 h-3.5" /> </button> </div> </td> </tr> ))} </tbody> </table> </div> </div> )}
+      </ModuleLayoutWithRail>
+
+      {/* MODAL 1: XEM CHI TIẾT CẤU HÌNH LOẠI PHIẾU (SCHEMA PREVIEW) */}
       {isPreviewTmplOpen && previewTemplate && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-6 space-y-4 text-xs font-medium max-h-[90vh] overflow-y-auto"> <div className="flex items-center justify-between border-b pb-3"> <div> <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-mono text-[10.5px] font-semibold">{previewTemplate.template_code}</span> <h3 className="font-semibold text-sm text-slate-900 mt-1">{previewTemplate.title}</h3> </div> <button onClick={() => setIsPreviewTmplOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700"> <X className="w-5 h-5" /> </button> </div> <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1"> <p className="text-purple-900 font-semibold">{previewTemplate.category_name}</p> <p className="text-purple-800 font-normal text-[11.5px]">{previewTemplate.description}</p> </div> {/* FIELDS SCHEMA LIST */} <div className="space-y-2 pt-2"> <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider text-purple-700"> 📄 Danh Sách {previewTemplate.fields.length} Trường Dữ Liệu Form: </h4> <div className="space-y-2"> {previewTemplate.fields.map((f, idx) => ( <div key={f.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between"> <div> <span className="font-semibold text-slate-900">{idx + 1}. {f.field_label}</span> {f.is_required && <span className="text-red-500 ml-1">* (Bắt buộc)</span>}
                       {f.options && ( <p className="text-[10.5px] text-slate-500 mt-0.5">Options: {f.options.join(', ')}</p> )} </div> <span className="px-2.5 py-1 bg-purple-100 text-purple-800 font-mono text-[10.5px] rounded-full font-medium"> {f.data_type} </span> </div> ))} </div> </div> {/* APPROVAL STEPS */} <div className="space-y-2 pt-2"> <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider text-amber-700"> 🔄 Cấu Hình Luồng Duyệt ({previewTemplate.approval_steps.length} Cấp): </h4> <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl font-mono text-purple-900"> {previewTemplate.approval_steps.map((st) => `Bước ${st.step_order}: ${st.approver_role}`).join(' ➔ ')} </div> </div> <div className="flex items-center justify-end pt-3 border-t"> <button
                 onClick={() => setIsPreviewTmplOpen(false)}

@@ -40,6 +40,7 @@ import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { useAuth } from '@/context/AuthContext';
 import { useBranding, DEFAULT_BRANDING } from '@/context/BrandingContext';
 import { BrandingConfig } from '@/types';
+import { ModuleBanner, ModuleLayoutWithRail } from '@/components/ui';
 
 interface TestResult {
   service: string;
@@ -299,74 +300,66 @@ export default function SystemSettingsPage() {
   return ( <div className="space-y-6 max-w-6xl mx-auto"> {/* Toast Notification */}
       {saveToast && ( <div className="p-4 rounded-xl bg-emerald-600 text-white font-medium text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300"> <div className="flex items-center gap-2"> <CheckCircle2 className="w-5 h-5 text-emerald-200" /> <span>{saveToast}</span> </div> </div> )}
 
-      {/* Header Section - Clean White with Colorful Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400"> <Sliders className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Cấu Hình Tích Hợp Hệ Thống </h1> <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-[11px] font-medium border border-blue-200 dark:border-blue-800"> Quản Trị Hệ Thống </span> </div> <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5"> Quản lý tập trung: Hạ Tầng Cloud, Sàn TMĐT & AI, Email SMTP, Webhooks, Bảo Mật & Pháp Lý </p> </div> </div> <button
-          onClick={(e) => handleSave(e, 'Lưu cấu hình hệ thống tổng thể')}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs flex items-center gap-1.5 shadow-xs transition-colors shrink-0"
-        > <Save className="w-4 h-4" /> Lưu Cấu Hình </button> </div> {/* Security Notice */} <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0"> <Lock className="w-4 h-4" /> </div> <div> <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">Chính Sách Bảo Mật & Mã Hóa</h3> <p className="text-[11px] text-slate-500 mt-0.5"> Toàn bộ API Keys, Mật khẩu SMTP, Bot Token và đường dẫn Storage được ẩn an toàn 100%. </p> </div> </div> <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 rounded-md text-[10px] font-medium shrink-0 hidden sm:inline-block"> Đã Mã Hóa An Toàn </span> </div> {/* CONFIGURATION TABS NAVIGATION - Responsive Multi-Device */} <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-x-auto touch-scroll scrollbar-none text-xs font-medium"> <button
-          type="button"
-          onClick={() => setActiveTab('BRANDING')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'BRANDING'
-              ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Palette className="w-3.5 h-3.5 text-purple-600" /> Thương Hiệu </button> <button
-          type="button"
-          onClick={() => setActiveTab('MODULE_TOGGLES')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'MODULE_TOGGLES'
-              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Sliders className="w-3.5 h-3.5 text-blue-600" /> Phân Hệ </button> <button
-          type="button"
-          onClick={() => setActiveTab('INFRASTRUCTURE')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'INFRASTRUCTURE'
-              ? 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Cloud className="w-3.5 h-3.5 text-orange-600" /> Hạ Tầng Cloud </button> <button
-          type="button"
-          onClick={() => setActiveTab('API_KEYS')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'API_KEYS'
-              ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Key className="w-3.5 h-3.5 text-amber-600" /> API Sàn & AI </button> <button
-          type="button"
-          onClick={() => setActiveTab('SMTP')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'SMTP'
-              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Mail className="w-3.5 h-3.5 text-blue-600" /> Email SMTP </button> <button
-          type="button"
-          onClick={() => setActiveTab('WEBHOOKS')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'WEBHOOKS'
-              ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Bell className="w-3.5 h-3.5 text-purple-600" /> Webhooks & Bot </button> <button
-          type="button"
-          onClick={() => setActiveTab('SECURITY_AUDIT')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'SECURITY_AUDIT'
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <ShieldAlert className="w-3.5 h-3.5 text-emerald-600" /> Bảo Mật & Logs </button> <button
-          type="button"
-          onClick={() => setActiveTab('COMPANY_IDENTITY')}
-          className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
-            activeTab === 'COMPANY_IDENTITY'
-              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-semibold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        > <Building2 className="w-3.5 h-3.5 text-indigo-600" /> Pháp Lý & Dấu Mộc </button> </div> <form onSubmit={(e) => (activeTab === 'BRANDING' ? handleSaveBranding(e) : handleSave(e, `Lưu cấu hình tab ${activeTab}`))} className="space-y-6"> {/* ==================== TAB: BRANDING & IDENTITY ==================== */}
+      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
+      <ModuleBanner
+        badge={{
+          label: 'Trung Tâm Cấu Hình & Tích Hợp Hệ Thống',
+          icon: Sliders,
+          variant: 'blue',
+        }}
+        title="Cấu Hình Tích Hợp & Quản Trị Hệ Thống"
+        subtitle="Quản lý tập trung hạ tầng Cloud R2/Supabase, API sàn TMĐT & Gemini AI, Email SMTP, Webhooks và bảo mật cấp doanh nghiệp"
+        kpis={[
+          { label: 'Trạng Thái Cloud', value: '🟢 Hoạt Động', subtext: 'R2 + Supabase Active' },
+          { label: 'Phân Hệ Kích Hoạt', value: '10 / 10 Phân hệ', subtext: 'Đang mở toàn quyền' },
+          { label: 'Bảo Mật Hệ Thống', value: 'AES-256 GCM', subtext: 'Mã hóa PII 100%' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={(e) => handleSave(e, 'Lưu cấu hình hệ thống tổng thể')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 shadow-xs transition-colors shrink-0"
+            >
+              <Save className="w-4 h-4" />
+              <span>Lưu Cấu Hình</span>
+            </button>
+          </div>
+        }
+      />
+
+      {/* MULTI-FUNCTION VERTICAL RAIL (THAY THẾ TAB NGANG DÀN TRẢI) */}
+      <ModuleLayoutWithRail
+        railTitle="Cấu Hình Quản Trị"
+        railSubtitle="8 phân hệ quản trị & tích hợp"
+        activeId={activeTab}
+        onSelect={(id) => setActiveTab(id as any)}
+        sections={[
+          {
+            title: 'I. Nhận Diện & Phân Hệ',
+            items: [
+              { id: 'BRANDING', label: '1. Thương Hiệu & Logo', icon: Palette, badgeVariant: 'purple' },
+              { id: 'COMPANY_IDENTITY', label: '2. Pháp Lý & Dấu Mộc Đỏ', icon: Building2, badgeVariant: 'slate' },
+              { id: 'MODULE_TOGGLES', label: '3. Bật/Tắt Phân Hệ Module', icon: Sliders, badgeVariant: 'blue' },
+            ],
+          },
+          {
+            title: 'II. Hạ Tầng & Kết Nối',
+            items: [
+              { id: 'INFRASTRUCTURE', label: '4. Hạ Tầng Cloud & DB', icon: Cloud, badgeVariant: 'orange' },
+              { id: 'API_KEYS', label: '5. Cổng Sàn TMĐT & AI Keys', icon: Key, badgeVariant: 'amber' },
+              { id: 'SMTP', label: '6. Email SMTP & Tổng Đài VoIP', icon: Mail, badgeVariant: 'blue' },
+              { id: 'WEBHOOKS', label: '7. Webhooks & Bot Thông Báo', icon: Bell, badgeVariant: 'purple' },
+            ],
+          },
+          {
+            title: 'III. Bảo Mật & Kiểm Toán',
+            items: [
+              { id: 'SECURITY_AUDIT', label: '8. Bảo Mật & Logs Kiểm Toán', icon: ShieldAlert, badgeVariant: 'emerald' },
+            ],
+          },
+        ]}
+      >
+        <form onSubmit={(e) => (activeTab === 'BRANDING' ? handleSaveBranding(e) : handleSave(e, `Lưu cấu hình tab ${activeTab}`))} className="space-y-6"> {/* ==================== TAB: BRANDING & IDENTITY ==================== */}
         {activeTab === 'BRANDING' && ( <div className="space-y-6 animate-in fade-in duration-200"> {/* System-wide Admin Permission Banner */}
             {isAdmin ? ( <div className="p-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-medium flex items-center justify-between shadow-2xs"> <div className="flex items-center gap-2.5"> <ShieldCheck className="w-5 h-5 text-purple-600 shrink-0" /> <div> <p className="font-medium text-purple-950">Quyền Quản Trị Thương Hiệu (Brand Admin Active)</p> <p className="text-[11px] text-purple-700 mt-0.5"> Thay đổi Tên hệ thống, Logo và Favicon sẽ được áp dụng ngay lập tức trên toàn bộ hệ thống cho tất cả người dùng. </p> </div> </div> <span className="px-2.5 py-1 bg-purple-600 text-white rounded-lg text-[10px] font-medium shrink-0"> SYSTEM-WIDE BRANDING </span> </div> ) : ( <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-medium flex items-center justify-between shadow-2xs"> <div className="flex items-center gap-2.5"> <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" /> <div> <p className="font-medium text-amber-950">Quyền Hạn Hạn Chế (Chỉ Xem)</p> <p className="text-[11px] text-amber-800 mt-0.5"> Chỉ Quản Trị Viên (Admin) mới có quyền thay đổi Tên hệ thống, Logo và Favicon toàn hệ thống. </p> </div> </div> <span className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-medium shrink-0"> READ-ONLY </span> </div> )}
 
@@ -892,5 +885,5 @@ export default function SystemSettingsPage() {
                       value={companyInfo.chief_accountant}
                       onChange={(e) => setCompanyInfo({ ...companyInfo, chief_accountant: e.target.value })}
                       className="w-full px-3 py-2 border rounded-xl text-slate-900 font-medium"
-                    /> </div> </div> </div> </div> </div> )} </form> </div> );
+                    /> </div> </div> </div> </div> </div> )} </form> </ModuleLayoutWithRail> </div> );
 }
