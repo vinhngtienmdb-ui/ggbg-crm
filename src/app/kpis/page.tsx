@@ -67,7 +67,7 @@ import { ModuleBanner } from '@/components/ui';
 
 function KpisContent() {
   const searchParams = useSearchParams();
-  const [activeMainTab, setActiveMainTab] = useState<'ANALYTICS' | 'KPI_LIST' | 'SCORECARDS' | 'SYNC_ENGINE'>('KPI_LIST');
+  const [activeMainTab, setActiveMainTab] = useState<'ANALYTICS' | 'KPI_LIST' | 'SCORECARDS' | 'SYNC_ENGINE'>('ANALYTICS');
 
   // KPI State
   const [kpis, setKpis] = useState<KPIAssignment[]>([]);
@@ -77,7 +77,12 @@ function KpisContent() {
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'company') {
+    if (!tab || tab === 'analytics') {
+      setActiveMainTab('ANALYTICS');
+    } else if (tab === 'list') {
+      setActiveMainTab('KPI_LIST');
+      setSelectedLevelFilter('ALL');
+    } else if (tab === 'company') {
       setActiveMainTab('KPI_LIST');
       setSelectedLevelFilter('COMPANY');
     } else if (tab === 'department') {
@@ -88,8 +93,6 @@ function KpisContent() {
       setSelectedLevelFilter('INDIVIDUAL');
     } else if (tab === 'evaluation' || tab === 'scorecards') {
       setActiveMainTab('SCORECARDS');
-    } else if (tab === 'analytics') {
-      setActiveMainTab('ANALYTICS');
     } else if (tab === 'sync') {
       setActiveMainTab('SYNC_ENGINE');
     }

@@ -146,16 +146,20 @@ function SidebarNavigation({
           <div className="flex flex-col gap-0.5">
             {cluster.items.map((item: MenuItemDefinition) => {
               const Icon = ICON_MAP[item.iconName] || LayoutDashboard;
-              const isParentActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
+              const isPathMatch = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              const isHeaderExactActive = pathname === item.href && !activeTabParam;
+              const isParentActive = isPathMatch;
               const isExpanded = expandedKeys[item.href] ?? isParentActive;
 
               return (
                 <div key={item.href} className="flex flex-col">
-                  {/* MAIN ITEM ROW */}
+                  {/* MAIN ITEM ROW (HEADER MODULE CHÍNH = BÁO CÁO TỔNG QUAN) */}
                   <div
                     className={`group relative flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${
-                      isParentActive && !hasSubItems
+                      isHeaderExactActive
+                        ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                        : isParentActive && !hasSubItems
                         ? 'bg-blue-600 text-white font-semibold shadow-xs'
                         : isParentActive && hasSubItems
                         ? 'bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200/70 dark:border-blue-800/50'
@@ -165,10 +169,10 @@ function SidebarNavigation({
                     <Link
                       href={item.href}
                       prefetch={true}
+                      title={hasSubItems ? `${item.name} - Báo Cáo Tổng Quan` : item.name}
                       onMouseEnter={() => router.prefetch(item.href)}
                       onClick={() => {
                         if (hasSubItems) {
-                          // Make sure it expands
                           setExpandedKeys((prev) => ({ ...prev, [item.href]: true }));
                         }
                         if (onClose && !hasSubItems) onClose();
@@ -177,7 +181,7 @@ function SidebarNavigation({
                     >
                       <Icon
                         className={`w-4 h-4 shrink-0 transition-colors ${
-                          isParentActive && !hasSubItems
+                          isHeaderExactActive || (isParentActive && !hasSubItems)
                             ? 'text-white'
                             : isParentActive && hasSubItems
                             ? 'text-blue-600 dark:text-blue-400'
@@ -190,19 +194,29 @@ function SidebarNavigation({
                     {/* SUB-ITEMS TOGGLE CHEVRON & BADGE */}
                     {hasSubItems ? (
                       <div className="flex items-center gap-1 shrink-0 ml-1.5">
-                        <span className="text-[9.5px] font-mono px-1.5 py-0.2 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        <span
+                          className={`text-[9.5px] font-mono px-1.5 py-0.2 rounded transition-colors ${
+                            isHeaderExactActive
+                              ? 'bg-blue-700 text-blue-100'
+                              : 'bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
                           {item.subItems!.length}
                         </span>
                         <button
                           type="button"
                           onClick={(e) => toggleExpand(item.href, e)}
-                          className="p-1 hover:bg-slate-200/80 dark:hover:bg-slate-700 rounded transition-colors"
+                          className={`p-1 rounded transition-colors ${
+                            isHeaderExactActive
+                              ? 'hover:bg-blue-700 text-white'
+                              : 'hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400'
+                          }`}
                           title={isExpanded ? 'Thu gọn chức năng' : 'Mở rộng chức năng'}
                         >
                           {isExpanded ? (
-                            <ChevronDown className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                            <ChevronDown className="w-3.5 h-3.5" />
                           ) : (
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                            <ChevronRight className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
@@ -216,8 +230,7 @@ function SidebarNavigation({
                     <div className="ml-4 pl-2.5 border-l-2 border-slate-200/90 dark:border-slate-800/90 flex flex-col gap-0.5 my-1 animate-in fade-in slide-in-from-top-1 duration-150">
                       {item.subItems!.map((sub: SubMenuItemDefinition) => {
                         const isSubActive =
-                          pathname === item.href &&
-                          (activeTabParam === sub.tabKey || (!activeTabParam && sub.tabKey === item.subItems![0].tabKey));
+                          pathname === item.href && activeTabParam === sub.tabKey;
 
                         return (
                           <Link
