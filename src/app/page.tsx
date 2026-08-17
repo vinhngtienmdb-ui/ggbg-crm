@@ -22,6 +22,8 @@ import {
   Award
 } from 'lucide-react';
 import Link from 'next/link';
+import { Card, CardHeader, CardBody, Badge } from '@/components/ui';
+import { formatVND, formatCompact, avatarColor, getInitials } from '@/lib/ui';
 
 export default function DashboardPage() {
   return ( <div className="space-y-6"> {/* Top Banner Header - Clean White with Colorful Metric Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5"> <div className="space-y-1.5"> <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-900"> <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" /> <span>Trung Tâm Điều Hành Tổng Thể GGBingo CRM</span> </div> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Tổng Quan Vận Hành & Khách Hàng </h1> <p className="text-slate-500 dark:text-slate-400 text-xs max-w-2xl leading-relaxed"> Hệ thống điều hành Ủy quyền Vận hành Gian hàng TMĐT, Nhân sự 3P, KPIs & Bảng Lương P3. </p> </div> <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 p-3.5 sm:p-4 rounded-lg border border-slate-200 dark:border-slate-700 w-full lg:w-auto justify-between lg:justify-start"> <div> <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Tiến độ KPI Tháng</p> <p className="text-base font-semibold text-emerald-600 dark:text-emerald-400 tabular-numbers">88.5% (Đạt Mục Tiêu)</p> </div> <div

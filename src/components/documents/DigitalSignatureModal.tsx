@@ -14,6 +14,8 @@ import {
   Check
 } from 'lucide-react';
 
+import { SignatureType } from '@/types';
+
 interface DigitalSignatureModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,12 +23,14 @@ interface DigitalSignatureModalProps {
   documentCode: string;
   signerName?: string;
   signerRole?: string;
+  defaultSignatureType?: SignatureType;
   onSignComplete: (signatureData: {
     signer_name: string;
     signer_role: string;
-    signature_type: 'HANDWRITTEN_CANVAS' | 'PKI_CERTIFICATE';
+    signature_type: SignatureType;
     sha256_hash: string;
     signed_at: string;
+    seal_applied?: boolean;
   }) => void;
 }
 
@@ -37,9 +41,10 @@ export default function DigitalSignatureModal({
   documentCode,
   signerName = 'Nguyễn Tiến Vinh',
   signerRole = 'CEO / Ban Giám Đốc',
+  defaultSignatureType = 'APPROVAL',
   onSignComplete,
 }: DigitalSignatureModalProps) {
-  const [signType, setSignType] = useState<'HANDWRITTEN_CANVAS' | 'PKI_CERTIFICATE'>('HANDWRITTEN_CANVAS');
+  const [signatureType, setSignatureType] = useState<SignatureType>(defaultSignatureType);
   const [pinCode, setPinCode] = useState('123456');
   const [pinError, setPinError] = useState('');
   const [hasDrawn, setHasDrawn] = useState(false);
@@ -48,10 +53,10 @@ export default function DigitalSignatureModal({
   const isDrawingRef = useRef(false);
 
   useEffect(() => {
-    if (isOpen && signType === 'HANDWRITTEN_CANVAS') {
+    if (isOpen) {
       setTimeout(() => initCanvas(), 100);
     }
-  }, [isOpen, signType]);
+  }, [isOpen, signatureType]);
 
   const initCanvas = () => {
     const canvas = canvasRef.current;
@@ -114,8 +119,8 @@ export default function DigitalSignatureModal({
       return;
     }
 
-    if (signType === 'HANDWRITTEN_CANVAS' && !hasDrawn) {
-      setPinError('Vui lòng vẽ chữ ký tay lên khung trước khi xác nhận!');
+    if (signatureType !== 'OFFICIAL_SEAL' && !hasDrawn) {
+      setPinError('Vui lòng vẽ chữ ký tay hoặc chữ ký số lên khung trước khi xác nhận!');
       return;
     }
 
@@ -126,9 +131,10 @@ export default function DigitalSignatureModal({
     onSignComplete({
       signer_name: signerName,
       signer_role: signerRole,
-      signature_type: signType,
+      signature_type: signatureType,
       sha256_hash: `SHA256:${randomHash}`,
       signed_at: signedAt,
+      seal_applied: signatureType === 'OFFICIAL_SEAL',
     });
 
     onClose();

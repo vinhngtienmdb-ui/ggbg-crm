@@ -65,15 +65,45 @@ export default function BulkLeadImportModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setFileName(file.name);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+    setFileName(`${file.name} (${sizeStr})`);
     setIsParsing(true);
+
+    let rowsToValidate: any[] = MOCK_CSV_SAMPLE_ROWS;
+
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      try {
+        const text = await file.text();
+        const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+        if (lines.length > 1) {
+          const parsed = lines.slice(1).map((line) => {
+            const parts = line.split(',').map((p) => p.trim().replace(/^["']|["']$/g, ''));
+            return {
+              full_name: parts[0] || 'Khách Hàng Import',
+              phone: parts[1] || '0900000000',
+              email: parts[2] || '',
+              company_name: parts[3] || 'Doanh Nghiệp Import',
+              source_name: parts[4] || 'Bulk Import CSV',
+              estimated_budget: Number(parts[5]) || 150000000,
+            };
+          }).filter((r) => r.full_name && r.phone);
+
+          if (parsed.length > 0) {
+            rowsToValidate = parsed;
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi parse file CSV:', err);
+      }
+    }
 
     try {
       const res = await fetch('/api/leads/bulk-import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          rows: MOCK_CSV_SAMPLE_ROWS,
+          rows: rowsToValidate,
           existing_phones: existingPhones,
         }),
       });
@@ -83,7 +113,23 @@ export default function BulkLeadImportModal({
         setPreviewRows(data.validated_rows || []);
       }
     } catch {
-      // fallback mock validation
+      // Fallback local validation logic if API route fails
+      const fallbackValidated: BulkImportRow[] = rowsToValidate.map((r, i) => {
+        const isDup = existingPhones.includes(r.phone);
+        return {
+          id: `imp_${i}`,
+          full_name: r.full_name,
+          phone: r.phone,
+          email: r.email,
+          company_name: r.company_name,
+          source_name: r.source_name || 'Bulk Import CSV',
+          entity_type: 'ENTERPRISE' as CustomerEntityType,
+          estimated_budget: r.estimated_budget,
+          is_duplicate: isDup,
+          duplicate_reason: isDup ? 'SĐT đã tồn tại trên CRM' : undefined,
+        };
+      });
+      setPreviewRows(fallbackValidated);
     } finally {
       setIsParsing(false);
     }
@@ -94,10 +140,10 @@ export default function BulkLeadImportModal({
     if (rowsToImport.length === 0) return;
 
     const salesList = [
-      'Trần Văn Hoàng (Đội 1)',
-      'Nguyễn Quốc Tuấn (Đội 2)',
-      'Đỗ Thị Quyên (Đội 3)',
-      'Phạm Minh Đức (Enterprise)',
+      'Trần Văn Hoàng',
+      'Nguyễn Quốc Tuấn',
+      'Đỗ Thị Quyên',
+      'Phạm Minh Đức',
     ];
 
     const newLeads: Lead[] = rowsToImport.map((row, idx) => {

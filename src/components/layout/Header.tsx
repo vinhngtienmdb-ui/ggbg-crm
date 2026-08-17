@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
   Search,
@@ -19,12 +18,17 @@ import {
   Briefcase,
   Headphones,
   FileCheck,
-  KeyRound,
-  Sparkles,
-  User
+  X,
+  Phone,
+  PhoneOff,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  UserCircle,
 } from 'lucide-react';
 import { UserRole } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
+import { useToast } from '@/components/ui/Toast';
 import CommandPaletteModal from './CommandPaletteModal';
 import UserProfileModal from './UserProfileModal';
 
@@ -41,20 +45,64 @@ const ROLE_OPTIONS: { id: UserRole; label: string; icon: React.ReactNode; badgeC
   { id: 'AUDITOR', label: 'System Auditor', icon: <FileCheck className="w-3.5 h-3.5 text-purple-500" />, badgeColor: 'bg-purple-600 text-white font-medium' },
 ];
 
+// Mock notification data — in production connect to Supabase realtime
+const MOCK_NOTIFICATIONS = [
+  { id: '1', type: 'success' as const, title: 'Hợp đồng được ký', body: 'KH Nguyễn Thị Lan vừa ký HĐ #CT-2024-089', time: '2 phút trước', read: false },
+  { id: '2', type: 'info' as const,    title: 'Lead mới từ Shopee', body: '3 lead mới từ chiến dịch Q1 cần phân công', time: '15 phút trước', read: false },
+  { id: '3', type: 'warning' as const, title: 'KPI sắp đến hạn',   body: 'Target doanh số tháng 8 đạt 67% — còn 12 ngày', time: '1 giờ trước', read: false },
+  { id: '4', type: 'info' as const,    title: 'Yêu cầu phê duyệt', body: 'Nguyễn Văn Hùng gửi đề xuất tăng lương cho bạn duyệt', time: '3 giờ trước', read: true },
+  { id: '5', type: 'success' as const, title: 'Nhân viên mới onboard', body: 'Trần Thị Mai đã hoàn thành onboarding thành công', time: 'Hôm qua', read: true },
+];
+
+const NOTI_ICONS = {
+  success: <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />,
+  warning: <AlertCircle  className="w-4 h-4 text-amber-500 shrink-0" />,
+  info:    <Bell         className="w-4 h-4 text-indigo-500 shrink-0" />,
+};
+
 export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: HeaderProps) {
-  const [unreadCount] = useState(5);
   const { user, logout, simulatedRole, setSimulatedRole } = useAuth();
   const { themeMode, toggleTheme, densityMode, toggleDensity } = useTheme();
+  const { toast } = useToast();
+
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
   const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [voipStatus, setVoipStatus] = useState<'available' | 'busy' | 'offline'>('available');
 
-  const activeRoleObj = ROLE_OPTIONS.find(r => r.id === simulatedRole) || ROLE_OPTIONS[0];
+  const notiRef = useRef<HTMLDivElement>(null);
+  const roleRef = useRef<HTMLDivElement>(null);
 
-  const showToast = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3500);
+  const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
+  const activeRoleObj = useMemo(() => ROLE_OPTIONS.find((r) => r.id === simulatedRole) || ROLE_OPTIONS[0], [simulatedRole]);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notiRef.current && !notiRef.current.contains(e.target as Node)) setIsNotiOpen(false);
+      if (roleRef.current && !roleRef.current.contains(e.target as Node)) setIsRoleDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Keyboard shortcut Cmd+K
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCmdPaletteOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    toast.info('Đã đánh dấu tất cả là đã đọc');
   };
 
   return ( <> {/* Toast Notification */}

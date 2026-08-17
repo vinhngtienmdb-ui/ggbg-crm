@@ -14,7 +14,7 @@ interface Review360ModalProps {
 
 export default function Review360Modal({ isOpen, onClose, session, onSubmitted }: Review360ModalProps) {
   const [perspective, setPerspective] = useState<ReviewerPerspective>('PEER');
-  const [reviewerName, setReviewerName] = useState('Nguyễn Văn Minh (Sale Exec)');
+  const [reviewerName, setReviewerName] = useState('Nguyễn Văn Minh');
   const [reviewerRole, setReviewerRole] = useState('Đồng Nghiệp Ngang Cấp');
 
   const [scores, setScores] = useState<Record<string, number>>({});

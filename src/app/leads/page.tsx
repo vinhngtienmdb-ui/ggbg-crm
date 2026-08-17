@@ -78,124 +78,15 @@ export interface LeadStageLog {
   note?: string;
 }
 
-const INITIAL_CUSTOMERS_LIST: Customer[] = [
-  {
-    id: 'c1',
-    customer_code: 'KH-8801',
-    name: 'Phạm Văn Nam',
-    entity_type: 'ENTERPRISE',
-    company_name: 'Công ty TNHH Mỹ Phẩm SunBeauty',
-    tax_code: '0108928374',
-    phone: '0988 123 456',
-    email: 'nam.pham@sunbeauty.vn',
-    address: 'Quận Cầu Giấy, Hà Nội',
-    customer_type: 'B2B_Agency_Service',
-    tier: 'VIP',
-    lifecycle_stage: 'VIP',
-    health_score: 95,
-    ltv_total_spent: 3850000000,
-    ecom_platforms: ['Shopee', 'TikTokShop'],
-    avg_monthly_gmv: 1200000000,
-    owner_name: 'Trần Văn Hoàng (Sale Exec)',
-    kyc_status: 'VERIFIED',
-    tags: ['Doanh số cao'],
-    created_at: '2026-01-15',
-  },
-  {
-    id: 'c2',
-    customer_code: 'KH-8802',
-    name: 'Nguyễn Thị Hoa',
-    entity_type: 'INDIVIDUAL',
-    company_name: 'Hộ Kinh Doanh Thời Trang MiuStore',
-    id_card_number: '001198002345',
-    phone: '0912 345 678',
-    email: 'hoa.miustore@gmail.com',
-    address: 'Quận 1, TP. Hồ Chí Minh',
-    customer_type: 'GGBingoVN_Merchant',
-    tier: 'Gold',
-    lifecycle_stage: 'Regular',
-    health_score: 82,
-    ltv_total_spent: 1250000000,
-    ecom_platforms: ['TikTokShop', 'GGBingoVN'],
-    avg_monthly_gmv: 450000000,
-    owner_name: 'Nguyễn Quốc Tuấn (Sale Senior)',
-    kyc_status: 'VERIFIED',
-    tags: ['GGBingoVN Merchant'],
-    created_at: '2026-02-10',
-  },
-];
-
-const initialLeads: Lead[] = [
-  {
-    id: 'l1',
-    lead_code: 'LD-1029',
-    full_name: 'Phạm Hồng Thái',
-    entity_type: 'ENTERPRISE',
-    phone: '0977 123 888',
-    email: 'thai.pham@sneakerx.vn',
-    company_name: 'Shop Giày Sneaker X',
-    tax_code: '0109283711',
-    shop_link: 'shopee.vn/sneakerx',
-    source_name: 'Facebook Ads',
-    pipeline_id: 'AGENCY',
-    stage_id: 'stage_1',
-    stage_name: '1. Tiếp Nhận Mới',
-    assigned_sale_name: 'Trần Văn Hoàng (Đội 1)',
-    estimated_budget: 150000000,
-    lead_score: 88,
-    status: 'New',
-    created_at: '2026-07-23 08:30',
-  },
-  {
-    id: 'l2',
-    lead_code: 'LD-1030',
-    full_name: 'Vũ Thị Minh',
-    entity_type: 'INDIVIDUAL',
-    phone: '0912 345 678',
-    email: 'minh.vu@miumiusale.com',
-    company_name: 'Thời Trang Nữ Miu Miu',
-    id_card_number: '001198002345',
-    shop_link: 'tiktok.com/@miumiusale',
-    source_name: 'Google Ads',
-    pipeline_id: 'AGENCY',
-    stage_id: 'stage_2',
-    stage_name: '2. Liên Hệ Ban Đầu',
-    assigned_sale_name: 'Lê Thị Mai (Đội 3)',
-    estimated_budget: 200000000,
-    lead_score: 92,
-    status: 'Contacted',
-    created_at: '2026-07-23 09:00',
-  },
-];
-
-const INITIAL_LOGS: LeadStageLog[] = [
-  {
-    id: 'log_1',
-    lead_code: 'LD-1030',
-    lead_name: 'Vũ Thị Minh',
-    from_stage: '1. Tiếp Nhận Mới',
-    to_stage: '2. Liên Hệ Ban Đầu',
-    actor_name: 'Lê Thị Mai (Sale Exec)',
-    timestamp: '2026-07-23 09:05:12',
-    note: 'Đã hoàn thành cuộc gọi trao đổi nhu cầu ban đầu',
-  },
-  {
-    id: 'log_2',
-    lead_code: 'LD-1029',
-    lead_name: 'Phạm Hồng Thái',
-    from_stage: 'Khởi tạo hệ thống',
-    to_stage: '1. Tiếp Nhận Mới',
-    actor_name: 'Trần Văn Hoàng (Sale Exec)',
-    timestamp: '2026-07-23 08:30:00',
-    note: 'Tiếp nhận Lead mới từ Facebook Ads',
-  },
-];
+const INITIAL_CUSTOMERS_LIST: Customer[] = [];
+const initialLeads: Lead[] = [];
+const INITIAL_LOGS: LeadStageLog[] = [];
 
 const SALES_REPS = [
-  'Trần Văn Hoàng (Đội 1)',
-  'Nguyễn Quốc Tuấn (Đội 2)',
-  'Lê Thị Mai (Đội 3)',
-  'Phạm Minh Đức (Đội 1)',
+  'Trần Văn Hoàng',
+  'Nguyễn Quốc Tuấn',
+  'Lê Thị Mai',
+  'Phạm Minh Đức',
 ];
 
 export default function LeadsPage() {

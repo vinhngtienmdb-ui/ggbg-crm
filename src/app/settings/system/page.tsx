@@ -748,7 +748,7 @@ export default function SystemSettingsPage() {
                     value={config.smtp.host}
                     onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, host: e.target.value } })}
                     placeholder="smtp.mailgun.org"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     required
                   /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Port & Mã Hóa *</label> <div className="flex gap-2"> <input
                       type="number"
@@ -763,13 +763,13 @@ export default function SystemSettingsPage() {
                     type="text"
                     value={config.smtp.username}
                     onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, username: e.target.value } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     required
                   /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">SMTP Password (Masked) *</label> <div className="relative"> <input
                       type={showKeys['smtp'] ? 'text' : 'password'}
                       value={config.smtp.password_masked}
                       onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, password_masked: e.target.value } })}
-                      className="w-full p-2.5 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                      className="w-full p-2.5 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                       required
                     /> <button
                       type="button"
@@ -779,7 +779,7 @@ export default function SystemSettingsPage() {
                     type="email"
                     value={config.smtp.sender_email}
                     onChange={(e) => setConfig({ ...config, smtp: { ...config.smtp, sender_email: e.target.value } })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums text-slate-900"
                     required
                   /> </div> <div className="md:col-span-3"> <label className="block text-xs font-medium text-slate-700 mb-1">Tên Người Gửi Hiển Thị (Sender Display Name)</label> <input
                     type="text"

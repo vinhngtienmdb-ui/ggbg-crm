@@ -70,117 +70,10 @@ export interface UploadRow {
   id: string;
   category: string;
   fileName: string;
+  fileSize?: string;
 }
 
-const INITIAL_CUSTOMERS: ExtendedCustomer[] = [
-  {
-    id: 'c1',
-    customer_code: 'KH-8801',
-    name: 'Phạm Văn Nam',
-    entity_type: 'ENTERPRISE',
-    company_name: 'Công ty TNHH Mỹ Phẩm SunBeauty',
-    tax_code: '0108928374',
-    representative_name: 'Phạm Văn Nam',
-    phone: '0988 123 456',
-    email: 'nam.pham@sunbeauty.vn',
-    address: 'Số 18 Nguyễn Chánh, Quận Cầu Giấy, Hà Nội',
-    customer_type: 'B2B_Agency_Service',
-    tier: 'VIP',
-    lifecycle_stage: 'VIP',
-    health_score: 95,
-    ltv_total_spent: 3850000000,
-    ecom_platforms: ['Shopee', 'TikTokShop', 'Lazada'],
-    avg_monthly_gmv: 1200000000,
-    owner_name: 'Trần Văn Hoàng (Sale Exec)',
-    ops_manager_name: 'Đỗ Thị Quyên (Ops Leader)',
-    contract_r2_file: 'HDLD_KH8801.pdf',
-    kyc_status: 'VERIFIED',
-    kyc_documents: [
-      {
-        doc_id: 'doc_1',
-        doc_type: 'GPKD',
-        doc_name: 'Giay_Phep_Kinh_Doanh_SunBeauty.pdf',
-        file_r2_path: 'storage.ggbingo.vn/kyc/gpkd_8801.pdf',
-        uploaded_at: '2026-01-16 10:00',
-        status: 'VALID',
-      },
-    ],
-    bank_account: '1903888999001',
-    bank_name: 'Techcombank - CN Cầu Giấy',
-    credit_limit: 500000000,
-    notes: 'Khách hàng VIP agency ưu tiên hỗ trợ 24/7',
-    tags: ['Doanh số cao', 'Hợp đồng 2 năm'],
-    created_at: '2026-01-15',
-  },
-  {
-    id: 'c2',
-    customer_code: 'KH-8802',
-    name: 'Nguyễn Thị Hoa',
-    entity_type: 'INDIVIDUAL',
-    company_name: 'Hộ Kinh Doanh Thời Trang MiuStore',
-    id_card_number: '001198002345',
-    id_card_issue_date: '2021-05-10',
-    id_card_issue_place: 'Cục Cảnh Sát QLHC về Trật Tự Xã Hội',
-    phone: '0912 345 678',
-    email: 'hoa.miustore@gmail.com',
-    address: 'Đường Lê Lai, Quận 1, TP. Hồ Chí Minh',
-    customer_type: 'GGBingoVN_Merchant',
-    tier: 'Gold',
-    lifecycle_stage: 'Regular',
-    health_score: 82,
-    ltv_total_spent: 1250000000,
-    ecom_platforms: ['TikTokShop', 'GGBingoVN'],
-    avg_monthly_gmv: 450000000,
-    owner_name: 'Nguyễn Quốc Tuấn (Sale Senior)',
-    ops_manager_name: 'Phạm Minh Đức (Ops Specialist)',
-    contract_r2_file: 'HDLD_KH8802.pdf',
-    kyc_status: 'VERIFIED',
-    kyc_documents: [
-      {
-        doc_id: 'doc_2',
-        doc_type: 'CCCD_FRONT',
-        doc_name: 'CCCD_Mat_Truoc_NguyenThiHoa.jpg',
-        file_r2_path: 'storage.ggbingo.vn/kyc/cccd_front_8802.jpg',
-        uploaded_at: '2026-02-11 14:20',
-        status: 'VALID',
-      },
-    ],
-    bank_account: '0071000988776',
-    bank_name: 'Vietcombank - CN Sài Gòn',
-    credit_limit: 200000000,
-    notes: 'Gian hàng hot trên GGBingoVN Platform',
-    tags: ['GGBingoVN Merchant'],
-    created_at: '2026-02-10',
-  },
-  {
-    id: 'c3',
-    customer_code: 'KH-8803',
-    name: 'Lê Hoàng Anh',
-    entity_type: 'ENTERPRISE',
-    company_name: 'Công ty CP Gia Dụng SmartHome',
-    tax_code: '0314928172',
-    representative_name: 'Lê Hoàng Anh',
-    phone: '0977 888 999',
-    email: 'hoanganh@smarthome.vn',
-    address: 'Quận Hai Bà Trưng, Hà Nội',
-    customer_type: 'B2B_Agency_Service',
-    tier: 'Silver',
-    lifecycle_stage: 'At-Risk',
-    health_score: 38,
-    ltv_total_spent: 680000000,
-    ecom_platforms: ['Shopee', 'Amazon'],
-    avg_monthly_gmv: 280000000,
-    owner_name: 'Lê Thị Mai (Sale Exec)',
-    ops_manager_name: 'Nguyễn Văn Bình (Ops Specialist)',
-    contract_r2_file: 'HDLD_KH8803.pdf',
-    kyc_status: 'PENDING',
-    bank_account: '112000888999',
-    bank_name: 'VietinBank - CN Hai Bà Trưng',
-    credit_limit: 150000000,
-    tags: ['Nguy cơ rời bỏ', 'Giảm GMV tháng trước'],
-    created_at: '2026-03-01',
-  },
-];
+const INITIAL_CUSTOMERS: ExtendedCustomer[] = [];
 
 export default function CustomersPage() {
   const router = useRouter();
@@ -284,7 +177,7 @@ export default function CustomersPage() {
     tier: 'Standard',
     lifecycle_stage: 'Prospect',
     avg_monthly_gmv: '0',
-    owner_name: 'Trần Văn Hoàng (Sale Exec)',
+    owner_name: 'Trần Văn Hoàng',
     bank_account: '',
     bank_name: '',
     credit_limit: '0',
@@ -330,7 +223,7 @@ export default function CustomersPage() {
       tier: 'Standard',
       lifecycle_stage: 'Prospect',
       avg_monthly_gmv: '0',
-      owner_name: 'Trần Văn Hoàng (Sale Exec)',
+      owner_name: 'Trần Văn Hoàng',
       bank_account: '',
       bank_name: '',
       credit_limit: '0',
@@ -369,7 +262,7 @@ export default function CustomersPage() {
       ltv_total_spent: 0,
       ecom_platforms: (createForm.ecom_platforms.length > 0 ? createForm.ecom_platforms : ['Shopee']) as any,
       avg_monthly_gmv: Number(createForm.avg_monthly_gmv) || 0,
-      owner_name: createForm.owner_name || 'Trần Văn Hoàng (Sale Exec)',
+      owner_name: createForm.owner_name || 'Trần Văn Hoàng',
       kyc_status: 'PENDING',
       bank_account: createForm.bank_account.trim(),
       bank_name: createForm.bank_name.trim(),
@@ -491,7 +384,7 @@ export default function CustomersPage() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  // MULTI-FILE UPLOAD ROW MANAGEMENT (+ BUTTON)
+  // MULTI-FILE UPLOAD ROW MANAGEMENT (+ BUTTON & FILE PICKER)
   const handleAddUploadRow = () => {
     const newRow: UploadRow = {
       id: `row_${Date.now()}`,
@@ -512,6 +405,50 @@ export default function CustomersPage() {
 
   const handleRowFileNameChange = (rowId: string, fileName: string) => {
     setUploadRows(uploadRows.map((r) => (r.id === rowId ? { ...r, fileName } : r)));
+  };
+
+  const handleRowFileSelect = (rowId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+    setUploadRows(
+      uploadRows.map((r) =>
+        r.id === rowId
+          ? { ...r, fileName: file.name, fileSize: sizeStr }
+          : r
+      )
+    );
+  };
+
+  const handleBatchFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newRows: UploadRow[] = Array.from(files).map((file, idx) => {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+      const nameUpper = file.name.toUpperCase();
+      let category = 'OTHER';
+      if (nameUpper.includes('GPKD') || nameUpper.includes('BUSINESS')) category = 'GPKD';
+      else if (nameUpper.includes('CCCD') && nameUpper.includes('SAU')) category = 'CCCD_BACK';
+      else if (nameUpper.includes('CCCD') || nameUpper.includes('CMND')) category = 'CCCD_FRONT';
+      else if (nameUpper.includes('THUE') || nameUpper.includes('TAX')) category = 'TAX_DOC';
+      else if (nameUpper.includes('HOPDONG') || nameUpper.includes('CONTRACT')) category = 'CONTRACT';
+
+      return {
+        id: `row_${Date.now()}_${idx}`,
+        category,
+        fileName: file.name,
+        fileSize: sizeStr,
+      };
+    });
+
+    if (uploadRows.length === 1 && !uploadRows[0].fileName) {
+      setUploadRows(newRows);
+    } else {
+      setUploadRows([...uploadRows, ...newRows]);
+    }
   };
 
   const handleMultiFileUploadSubmit = (e: React.FormEvent) => {
@@ -829,7 +766,7 @@ export default function CustomersPage() {
                         /> </div> {uploadRows.length > 1 && ( <button
                           type="button"
                           onClick={() => handleRemoveUploadRow(row.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors self-end md:self-center"
                           title="Xóa dòng này"
                         > <Trash2 className="w-4 h-4" /> </button> )} </div> ))} </div> <div className="flex items-center justify-end pt-2"> <button
                     type="submit"

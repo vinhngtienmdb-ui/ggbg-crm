@@ -56,6 +56,8 @@ import {
 } from '@/types';
 import {
   getPayrollByPeriod,
+  getAllHistoricalPayrolls,
+  AVAILABLE_PAYROLL_PERIODS,
   generateMonthlyPayroll,
   sendPaystubEmail,
   sendBatchPaystubs,
@@ -79,6 +81,10 @@ import { formatCurrency } from '@/lib/formatters';
 export default function PayrollPage() {
   const [activeTab, setActiveTab] = useState<'reports' | 'payroll' | 'paystubs' | 'banking'>('reports');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Tháng 07/2026');
+
+  // Role Scope Switcher: 'ADMIN' (Quản Trị Hệ Thống) vs 'PERSONAL' (Cá Nhân Xem Phiếu Lương Của Mình)
+  const [viewScopeMode, setViewScopeMode] = useState<'ADMIN' | 'PERSONAL'>('ADMIN');
+  const [myEmployeeCode, setMyEmployeeCode] = useState<string>('NV-00101'); // Mã nhân viên cá nhân (e.g. Trần Văn Hoàng)
 
   // Store states
   const [payrolls, setPayrolls] = useState<PayrollSheet[]>([]);
@@ -108,7 +114,11 @@ export default function PayrollPage() {
   const [sourceBank, setSourceBank] = useState<'TCB' | 'MBB' | 'VCB'>('TCB');
 
   const reloadData = () => {
-    setPayrolls(getPayrollByPeriod(selectedPeriod));
+    if (selectedPeriod === 'ALL') {
+      setPayrolls(getAllHistoricalPayrolls());
+    } else {
+      setPayrolls(getPayrollByPeriod(selectedPeriod));
+    }
     setPaySettings(getPayrollSettings());
     setApprovalInfo(getPayrollApprovalPeriod(selectedPeriod));
     setBankBatch(getBankPaymentBatchByPeriod(selectedPeriod));
@@ -204,14 +214,24 @@ export default function PayrollPage() {
     showToast(`🚀 ${res.message}`);
   };
 
+  // Filter payroll data based on View Scope (ADMIN vs PERSONAL)
+  const scopedPayrolls = useMemo(() => {
+    if (viewScopeMode === 'PERSONAL') {
+      // Chế độ Cá Nhân: CHỈ xem phiếu lương của chính nhân sự đang đăng nhập
+      return payrolls.filter((p) => p.employee_code === myEmployeeCode);
+    }
+    // Chế độ Quản Trị Hệ Thống: Xem toàn bộ nhân sự công ty
+    return payrolls;
+  }, [payrolls, viewScopeMode, myEmployeeCode]);
+
   const filteredPayrolls = useMemo(() => {
-    return payrolls.filter(
+    return scopedPayrolls.filter(
       (p) =>
         p.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.payroll_code.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [payrolls, searchTerm]);
+  }, [scopedPayrolls, searchTerm]);
 
   const filteredBankItems = useMemo(() => {
     if (!bankBatch) return [];

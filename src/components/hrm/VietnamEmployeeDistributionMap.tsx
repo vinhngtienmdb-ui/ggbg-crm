@@ -242,7 +242,7 @@ export default function VietnamEmployeeDistributionMap({
                 setSelectedLocation(null);
               }}
               className={`px-3.5 py-1.5 rounded-xl transition-all ${
-                groupingLevel === 'PROVINCE' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                groupingLevel === 'PROVINCE' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'
               }`}
             > 🏢 Theo Tỉnh / Thành Phố </button> <button
               onClick={() => {
@@ -250,7 +250,7 @@ export default function VietnamEmployeeDistributionMap({
                 setSelectedLocation(null);
               }}
               className={`px-3.5 py-1.5 rounded-xl transition-all ${
-                groupingLevel === 'WARD' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                groupingLevel === 'WARD' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'
               }`}
             > 📍 Theo Phường / Xã (2025) </button> </div> </div> {/* Filters Grid */} <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs"> <div className="flex flex-wrap items-center gap-2"> <span className="font-medium text-slate-400 flex items-center gap-1"> <Filter className="w-3.5 h-3.5" /> Lọc Theo: </span> {/* Department Filter */} <select
               value={selectedDepartment}

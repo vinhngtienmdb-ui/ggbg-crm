@@ -27,38 +27,69 @@ import {
   Save,
   X,
   FileCheck,
-  Download
+  Download,
+  QrCode,
+  SlidersHorizontal,
+  Lock,
+  Layers,
+  FileSpreadsheet,
+  Award,
+  ExternalLink
 } from 'lucide-react';
 import {
   OfficialDocument,
   DocumentCategory,
   SecurityLevel,
   UrgencyLevel,
-  DocProcessStatus
+  DocProcessStatus,
+  DocumentLedgerConfig,
+  LedgerResetFrequency,
+  LedgerRetentionPeriod,
+  AssignmentTargetType
 } from '@/types';
 import {
   getOfficialDocuments,
   addOfficialDocument,
   updateOfficialDocument,
-  deleteOfficialDocument
+  deleteOfficialDocument,
+  getDocumentLedgers,
+  addDocumentLedger,
+  updateDocumentLedger,
+  deleteDocumentLedger
 } from '@/lib/documentStore';
 import DigitalSignatureModal from '@/components/documents/DigitalSignatureModal';
+import ExternalSignModal from '@/components/documents/ExternalSignModal';
+import { exportDocumentsToCSV } from '@/lib/excelExportHelper';
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
 
 export default function DocumentsPage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
-  const [activeTab, setActiveTab] = useState<DocumentCategory | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
+  const [ledgers, setLedgers] = useState<DocumentLedgerConfig[]>(() => getDocumentLedgers());
+  const [activeTab, setActiveTab] = useState<'INBOUND_LEDGER' | 'OUTBOUND_LEDGER' | 'INTERNAL_LEDGER' | 'PENDING_DIRECTIVE' | 'DIGITAL_STAMP' | 'DOC_CONFIG'>('INBOUND_LEDGER');
+  const [selectedInternalCategory, setSelectedInternalCategory] = useState<DocumentCategory | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // Configuration State
+  // Configuration State for 8 Document Types
   const [docConfig, setDocConfig] = useState({
-    outbound_prefix: 'QĐ-GGBG',
-    inbound_prefix: 'CV-GGBG',
+    inbound_prefix: 'CV-BCT',
+    outbound_prefix: 'CV-GGBG',
+    decision_prefix: 'QĐ-GGBG',
+    submission_prefix: 'TTr-GGBG',
+    announcement_prefix: 'TB-GGBG',
+    sop_prefix: 'QC-GGBG',
+    contract_prefix: 'BB-GGBG',
+    report_prefix: 'BC-GGBG',
     reset_yearly: true,
     urgent_sla_hours: 24,
     express_sla_hours: 4,
-    cert_provider: 'VNPT-CA / Viettel-CA Enterprise Root',
+    cert_provider: 'VNPT-CA / Viettel-CA Enterprise Root Cloud HSM',
     auto_digital_seal: true,
+    confidential_roles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER'],
   });
 
   // Modals
@@ -66,7 +97,22 @@ export default function DocumentsPage() {
   const [selectedDoc, setSelectedDoc] = useState<OfficialDocument | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
+  const [isExternalSignOpen, setIsExternalSignOpen] = useState(false);
   const [directiveInput, setDirectiveInput] = useState('');
+  const [assigneeDeptInput, setAssigneeDeptInput] = useState('Khối Kinh Doanh & TMĐT');
+
+  const handleExportExcel = () => {
+    const title =
+      activeTab === 'INBOUND_LEDGER'
+        ? 'So_Van_Ban_Den_2026'
+        : activeTab === 'OUTBOUND_LEDGER'
+        ? 'So_Van_Ban_Di_2026'
+        : 'So_Van_Ban_Noi_Bo_2026';
+    exportDocumentsToCSV(filteredDocs, title);
+    showToast(`📊 Đã xuất thành công dữ liệu Sổ Văn Bản ra tệp Excel CSV chuẩn NĐ 30/2020!`);
+  };
+
+  const [attachedFile, setAttachedFile] = useState<{ name: string; size: string } | null>(null);
 
   const [newDoc, setNewDoc] = useState({
     title: '',
@@ -84,14 +130,86 @@ export default function DocumentsPage() {
     directive_note: '',
   });
 
+  const [isCreateLedgerOpen, setIsCreateLedgerOpen] = useState(false);
+  const [newLedger, setNewLedger] = useState<{
+    ledger_name: string;
+    ledger_type: 'INBOUND' | 'OUTBOUND' | 'INTERNAL';
+    prefix: string;
+    suffix: string;
+    current_number: number;
+    number_padding: number;
+    reset_frequency: LedgerResetFrequency;
+    retention_period: LedgerRetentionPeriod;
+  }>({
+    ledger_name: 'Sổ Công Văn Mới 2026',
+    ledger_type: 'INBOUND',
+    prefix: 'CV-NEW',
+    suffix: '/2026',
+    current_number: 1,
+    number_padding: 3,
+    reset_frequency: 'YEARLY',
+    retention_period: '10_YEARS',
+  });
+
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3500);
   };
 
+  const handleCreateLedgerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const created: DocumentLedgerConfig = {
+      id: `ledger_${Date.now()}`,
+      ledger_name: newLedger.ledger_name,
+      ledger_type: newLedger.ledger_type,
+      prefix: newLedger.prefix,
+      suffix: newLedger.suffix,
+      current_number: newLedger.current_number,
+      number_padding: newLedger.number_padding,
+      reset_frequency: newLedger.reset_frequency,
+      retention_period: newLedger.retention_period,
+      allowed_categories: newLedger.ledger_type === 'INBOUND' ? ['INBOUND'] : newLedger.ledger_type === 'OUTBOUND' ? ['OUTBOUND'] : ['DECISION', 'SUBMISSION_STATEMENT', 'ANNOUNCEMENT'],
+      is_active: true,
+      created_at: new Date().toISOString().split('T')[0],
+    };
+    const updatedLedgers = addDocumentLedger(created);
+    setLedgers([...updatedLedgers]);
+    setIsCreateLedgerOpen(false);
+    showToast(`📚 Đã tạo thành công sổ văn bản mới: "${newLedger.ledger_name}"!`);
+  };
+
+  const handleDocFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${(file.size / 1024).toFixed(1)} KB`;
+    setAttachedFile({
+      name: file.name,
+      size: sizeStr,
+    });
+    showToast(`📎 Đã chọn tệp đính kèm: ${file.name} (${sizeStr})`);
+  };
+
+  const getPrefixForCategory = (cat: DocumentCategory) => {
+    switch (cat) {
+      case 'INBOUND': return docConfig.inbound_prefix;
+      case 'OUTBOUND': return docConfig.outbound_prefix;
+      case 'DECISION': return docConfig.decision_prefix;
+      case 'SUBMISSION_STATEMENT': return docConfig.submission_prefix;
+      case 'ANNOUNCEMENT': return docConfig.announcement_prefix;
+      case 'INTERNAL_SOP': return docConfig.sop_prefix;
+      case 'CONTRACT_MINUTES': return docConfig.contract_prefix;
+      case 'PERIODIC_REPORT': return docConfig.report_prefix;
+      default: return 'CV-GGBG';
+    }
+  };
+
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const docCode = newDoc.document_code || `${documents.length + 101}/CV-GGBG`;
+    const prefix = getPrefixForCategory(newDoc.category);
+    const docCode = newDoc.document_code || `${documents.length + 101}/${prefix}`;
+    const finalFileName = attachedFile ? attachedFile.name : `Van-Ban-${docCode.replace(/\//g, '-')}.pdf`;
+    const finalFileSize = attachedFile ? attachedFile.size : '2.1 MB';
 
     const doc: OfficialDocument = {
       id: `doc_${Date.now()}`,
@@ -109,10 +227,14 @@ export default function DocumentsPage() {
       assigned_department: newDoc.assigned_department,
       assigned_assignee: newDoc.assigned_assignee,
       directive_note: newDoc.directive_note,
-      file_name: `Van-Ban-${docCode.replace(/\//g, '-')}.pdf`,
+      sla_deadline: '2026-08-15 17:00',
+      file_name: finalFileName,
       file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-      file_size: '2.1 MB',
+      file_size: finalFileSize,
       comments: [],
+      process_logs: [
+        { id: `l_${Date.now()}`, actor_name: 'Phạm Thị Lan', actor_role: 'Văn Thư', action: 'TIẾP NHẬN', note: 'Đã vào sổ văn thư điện tử', timestamp: new Date().toLocaleString('vi-VN') }
+      ],
       created_at: new Date().toISOString().slice(0, 10),
     };
 
@@ -122,13 +244,31 @@ export default function DocumentsPage() {
     showToast(` Đã vào sổ công văn mới thành công: Số ${doc.document_code}`);
   };
 
+  const [assignTargetType, setAssignTargetType] = useState<AssignmentTargetType>('DEPARTMENT');
+  const [primaryAssigneeInput, setPrimaryAssigneeInput] = useState('Khối Kinh Doanh & TMĐT');
+  const [coopAssigneesInput, setCoopAssigneesInput] = useState('Phòng Kế Toán & Tài Chính, Ban Tech');
+  const [infoAssigneesInput, setInfoAssigneesInput] = useState('Khối Nhân Sự (HRM), Văn Thư');
+
   const handleAddDirectiveNote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDoc || !directiveInput) return;
 
+    const assignmentMeta = {
+      target_type: assignTargetType,
+      primary_dept: assignTargetType === 'DEPARTMENT' ? primaryAssigneeInput : 'Khối Kinh Doanh & TMĐT',
+      primary_assignee: assignTargetType === 'DIRECT_EMPLOYEE' ? primaryAssigneeInput : 'Đặng Tuấn Tú',
+      coop_depts: assignTargetType === 'DEPARTMENT' ? coopAssigneesInput.split(',').map(s => s.trim()) : ['Phòng Kế Toán'],
+      coop_assignees: assignTargetType === 'DIRECT_EMPLOYEE' ? coopAssigneesInput.split(',').map(s => s.trim()) : ['Vũ Thị Hằng'],
+      info_depts: assignTargetType === 'DEPARTMENT' ? infoAssigneesInput.split(',').map(s => s.trim()) : ['Khối Nhân Sự'],
+      info_assignees: assignTargetType === 'DIRECT_EMPLOYEE' ? infoAssigneesInput.split(',').map(s => s.trim()) : ['Phạm Thị Lan'],
+    };
+
     const updatedDoc: OfficialDocument = {
       ...selectedDoc,
       directive_note: directiveInput,
+      assigned_department: primaryAssigneeInput,
+      assigned_assignee: assignTargetType === 'DIRECT_EMPLOYEE' ? primaryAssigneeInput : 'Đặng Tuấn Tú',
+      assignment_meta: assignmentMeta,
       status: 'IN_PROCESSING',
       comments: [
         ...(selectedDoc.comments || []),
@@ -136,10 +276,21 @@ export default function DocumentsPage() {
           id: `c_${Date.now()}`,
           author_name: 'Nguyễn Tiến Vinh',
           author_role: 'CEO / Ban Giám Đốc',
-          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput}`,
+          comment: `[Bút Phê Chỉ Đạo]: ${directiveInput} | 🔴 Xử lý chính: ${primaryAssigneeInput} | 🟡 Phối hợp: ${coopAssigneesInput} | 🔵 Nhận để biết: ${infoAssigneesInput}`,
           created_at: new Date().toLocaleString('vi-VN'),
         },
       ],
+      process_logs: [
+        ...(selectedDoc.process_logs || []),
+        {
+          id: `l_${Date.now()}`,
+          actor_name: 'Nguyễn Tiến Vinh',
+          actor_role: 'CEO / Ban Giám Đốc',
+          action: 'BÚT PHÊ & PHÂN CÔNG 3 VAI TRÒ',
+          note: `${directiveInput} (🔴 Xử lý chính: ${primaryAssigneeInput} | 🟡 Phối hợp: ${coopAssigneesInput} | 🔵 Nhận để biết: ${infoAssigneesInput})`,
+          timestamp: new Date().toLocaleString('vi-VN'),
+        }
+      ]
     };
 
     const updated = updateOfficialDocument(updatedDoc);
@@ -155,17 +306,97 @@ export default function DocumentsPage() {
     showToast('🗑 Đã lưu trữ / xóa công văn khỏi sổ');
   };
 
+  const handleSaveDocConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    showToast('⚙️ Đã lưu cấu hình Tiền Tố Mã Công Văn, Định Mức SLA & Cổng Ký Số Cloud HSM!');
+  };
+
   const filteredDocs = documents.filter((d) => {
     const q = searchTerm.toLowerCase();
     const matchesSearch = !q || d.title.toLowerCase().includes(q) || d.document_code.toLowerCase().includes(q) || d.issuer_org.toLowerCase().includes(q);
-    const matchesTab = activeTab === 'DIRECTIVE_LOG' || d.category === activeTab;
+
+    let matchesTab = true;
+    if (activeTab === 'INBOUND_LEDGER') {
+      matchesTab = d.category === 'INBOUND';
+    } else if (activeTab === 'OUTBOUND_LEDGER') {
+      matchesTab = d.category === 'OUTBOUND';
+    } else if (activeTab === 'INTERNAL_LEDGER') {
+      // Sổ Văn Bản Nội Bộ bao gồm Quyết Định, Tờ Trình, Thông Báo, SOP, Biên Bản, Báo Cáo
+      const internalCategories: DocumentCategory[] = [
+        'DECISION',
+        'SUBMISSION_STATEMENT',
+        'ANNOUNCEMENT',
+        'INTERNAL_SOP',
+        'CONTRACT_MINUTES',
+        'PERIODIC_REPORT',
+      ];
+      const isInternal = internalCategories.includes(d.category);
+      const matchesSubCat = selectedInternalCategory === 'ALL' || d.category === selectedInternalCategory;
+      matchesTab = isInternal && matchesSubCat;
+    } else if (activeTab === 'PENDING_DIRECTIVE') {
+      matchesTab = d.status === 'PENDING_DIRECTIVE';
+    } else if (activeTab === 'DIGITAL_STAMP') {
+      matchesTab = !!d.has_digital_stamp;
+    }
+
     return matchesSearch && matchesTab;
   });
 
   const totalInbound = documents.filter((d) => d.category === 'INBOUND').length;
   const totalOutbound = documents.filter((d) => d.category === 'OUTBOUND').length;
-  const totalInternal = documents.filter((d) => d.category === 'INTERNAL_SOP').length;
+  const totalInternal = documents.filter((d) =>
+    ['DECISION', 'SUBMISSION_STATEMENT', 'ANNOUNCEMENT', 'INTERNAL_SOP', 'CONTRACT_MINUTES', 'PERIODIC_REPORT'].includes(d.category)
+  ).length;
   const totalPendingDirective = documents.filter((d) => d.status === 'PENDING_DIRECTIVE').length;
+  const totalStamped = documents.filter((d) => d.has_digital_stamp).length;
+
+  const renderCategoryLabel = (cat: DocumentCategory) => {
+    switch (cat) {
+      case 'INBOUND': return 'Công Văn Đến';
+      case 'OUTBOUND': return 'Công Văn Đi';
+      case 'DECISION': return 'Quyết Định Ban Hành';
+      case 'SUBMISSION_STATEMENT': return 'Tờ Trình Nội Bộ';
+      case 'ANNOUNCEMENT': return 'Thông Báo Doanh Nghiệp';
+      case 'INTERNAL_SOP': return 'Quy Chế & SOP';
+      case 'CONTRACT_MINUTES': return 'Hợp Đồng & Biên Bản';
+      case 'PERIODIC_REPORT': return 'Báo Cáo Chuyên Đề';
+      default: return cat;
+    }
+  };
+
+  const renderCategoryBadge = (cat: DocumentCategory) => {
+    switch (cat) {
+      case 'INBOUND':
+        return <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[11px]">📩 Công Văn Đến</span>;
+      case 'OUTBOUND':
+        return <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-bold text-[11px]">📤 Công Văn Đi</span>;
+      case 'DECISION':
+        return <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold text-[11px]">📜 Quyết Định</span>;
+      case 'SUBMISSION_STATEMENT':
+        return <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold text-[11px]">📋 Tờ Trình</span>;
+      case 'ANNOUNCEMENT':
+        return <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold text-[11px]">📢 Thông Báo</span>;
+      case 'INTERNAL_SOP':
+        return <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[11px]">📑 Quy Chế SOP</span>;
+      case 'CONTRACT_MINUTES':
+        return <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 font-bold text-[11px]">🤝 Hợp Đồng/BB</span>;
+      case 'PERIODIC_REPORT':
+        return <span className="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[11px]">📊 Báo Cáo</span>;
+    }
+  };
+
+  const renderUrgencyBadge = (urg: UrgencyLevel) => {
+    switch (urg) {
+      case 'EXPRESS':
+        return <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 font-bold text-[10px]">🔥 HỎA TỐC</span>;
+      case 'HIGHLY_URGENT':
+        return <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-[10px]">⚡ THƯỢNG KHẨN</span>;
+      case 'URGENT':
+        return <span className="px-2 py-0.5 rounded bg-orange-100 text-orange-800 font-bold text-[10px]">⚠️ KHẨN</span>;
+      default:
+        return <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold text-[10px]">THƯỜNG</span>;
+    }
+  };
 
   return ( <div className="space-y-6"> {/* Toast Notification */}
       {toastMsg && ( <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-500/40 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200"> <Sparkles className="w-4 h-4 text-blue-400" /> {toastMsg} </div> )}
@@ -322,7 +553,7 @@ export default function DocumentsPage() {
                     className="w-full px-3 py-2 border rounded-xl"
                   /> </div> </div> <div className="flex items-center justify-end gap-3 pt-3 border-t"> <button
                   type="button"
-                  onClick={() => setIsCreateOpen(false)}
+                  onClick={() => setIsCreateLedgerOpen(false)}
                   className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
                 > Hủy </button> <button
                   type="submit"
@@ -351,7 +582,7 @@ export default function DocumentsPage() {
                 > <FileCheck className="w-3.5 h-3.5" /> Đóng Dấu Mộc Đỏ </button> )} </div> {/* Bút Phê Chỉ Đạo Section */} <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-xl space-y-3"> <h4 className="font-semibold text-amber-900 text-xs flex items-center gap-2"> <MessageSquare className="w-4 h-4 text-amber-600" /> Bút Phê Chỉ Đạo Của Ban Giám Đốc </h4> {selectedDoc.directive_note ? ( <p className="p-3 bg-white border border-amber-200 rounded-xl font-semibold text-amber-900 leading-relaxed text-xs"> {selectedDoc.directive_note} </p> ) : ( <p className="text-slate-500 font-normal text-[11px]">Chưa có bút phê chỉ đạo cho công văn này.</p> )} <form onSubmit={handleAddDirectiveNote} className="space-y-2 pt-2"> <label className="block text-slate-700 font-medium">Cập Nhật Bút Phê Chỉ Đạo Mới (CEO / Director):</label> <div className="flex gap-2"> <input
                     type="text"
                     required
-                    placeholder="Nhập nội dung chỉ đạo phòng ban thực hiện..."
+                    placeholder="Nhập nội dung chỉ đạo thực hiện và mốc thời gian hoàn thành..."
                     value={directiveInput}
                     onChange={(e) => setDirectiveInput(e.target.value)}
                     className="flex-1 px-3 py-2 bg-white border border-amber-300 rounded-xl"
@@ -374,13 +605,37 @@ export default function DocumentsPage() {
           documentTitle={selectedDoc.title}
           signerName="Nguyễn Tiến Vinh"
           signerRole="CEO / Ban Giám Đốc"
+          defaultSignatureType="APPROVAL"
           onSignComplete={(sig) => {
-            const updated = {
-              ...selectedDoc,
-              has_digital_stamp: true,
-              stamped_at: sig.signed_at,
-              directive_note: (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') + `[Chữ ký số: ${sig.signature_type} • ${sig.sha256_hash.slice(0, 16)}...]`,
+            const sigTypeLabel =
+              sig.signature_type === 'MARGINAL'
+                ? 'Ký Nháy (Marginal)'
+                : sig.signature_type === 'SUBMISSION'
+                ? 'Ký Trình (Submission)'
+                : sig.signature_type === 'APPROVAL'
+                ? 'Ký Phê Duyệt (Executive Approval)'
+                : 'Ký Đóng Dấu Mộc Đỏ (Official Seal)';
+
+            const newLog = {
+              id: `l_${Date.now()}`,
+              actor_name: sig.signer_name,
+              actor_role: sig.signer_role,
+              action: `KÝ SỐ: ${sigTypeLabel}`,
+              note: `Đã đóng chữ ký số điện tử. Hash SHA-256: ${sig.sha256_hash.slice(0, 20)}...`,
+              timestamp: sig.signed_at,
             };
+
+            const updated: OfficialDocument = {
+              ...selectedDoc,
+              has_digital_stamp: sig.seal_applied || selectedDoc.has_digital_stamp,
+              stamped_at: sig.seal_applied ? sig.signed_at : selectedDoc.stamped_at,
+              qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedDoc.document_code)}`,
+              directive_note:
+                (selectedDoc.directive_note ? selectedDoc.directive_note + ' | ' : '') +
+                `[Chữ ký số: ${sigTypeLabel} • ${sig.sha256_hash.slice(0, 16)}...]`,
+              process_logs: [...(selectedDoc.process_logs || []), newLog],
+            };
+
             updateOfficialDocument(updated);
             setSelectedDoc(updated);
             setDocuments(getOfficialDocuments());

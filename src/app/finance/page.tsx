@@ -73,95 +73,19 @@ const COST_BREAKDOWN_DATA = [
   { name: 'Chi Phí Quản Lý Khác', value: 5, color: '#64748B' },
 ];
 
-// Mock Cash Flow Ledger
-const INITIAL_TRANSACTIONS: CashFlowTransaction[] = [
-  {
-    id: 'tx_001',
-    code: 'PT-2026-0701',
-    date: '2026-07-28',
-    type: 'INCOME',
-    category: 'Hợp Đồng Dịch Vụ',
-    amount: 38250000,
-    account: 'Techcombank',
-    description: 'Thanh toán phí dịch vụ vận hành Shopee Mall T7 - Công ty Hồng Lực',
-    approval_status: 'APPROVED',
-  },
-  {
-    id: 'tx_002',
-    code: 'PC-2026-0702',
-    date: '2026-07-25',
-    type: 'EXPENSE',
-    category: 'Chi Lương Nhân Sự',
-    amount: 145000000,
-    account: 'Vietcombank',
-    description: 'Chi trả bảng lương kỳ tháng 7 cho Khối Kinh Doanh & Vận Hành',
-    approval_status: 'APPROVED',
-  },
-  {
-    id: 'tx_003',
-    code: 'PC-2026-0703',
-    date: '2026-07-20',
-    type: 'EXPENSE',
-    category: 'Chi Marketing Ads',
-    amount: 25000000,
-    account: 'Techcombank',
-    description: 'Thanh toán ngân sách Ads TikTok Shop Partner & KOC Booking',
-    approval_status: 'APPROVED',
-  },
-  {
-    id: 'tx_004',
-    code: 'PC-2026-0704',
-    date: '2026-07-15',
-    type: 'EXPENSE',
-    category: 'Chi Server & SaaS',
-    amount: 12000000,
-    account: 'Techcombank',
-    description: 'Gia hạn Server Cloud R2 & Phần mềm quản lý gian hàng đa sàn',
-    approval_status: 'APPROVED',
-  },
-];
+// Cash Flow Ledger
+const INITIAL_TRANSACTIONS: CashFlowTransaction[] = [];
 
-// Mock Department Budgets
-const INITIAL_BUDGETS: DepartmentBudget[] = [
-  {
-    id: 'bgt_1',
-    department_name: 'Khối Kinh Doanh (Sales)',
-    allocated_budget: 300000000,
-    spent_amount: 210000000,
-    remaining_amount: 90000000,
-    utilization_pct: 70,
-    status: 'SAFE',
-  },
-  {
-    id: 'bgt_2',
-    department_name: 'Khối Vận Hành TMĐT (Ops)',
-    allocated_budget: 250000000,
-    spent_amount: 235000000,
-    remaining_amount: 15000000,
-    utilization_pct: 94,
-    status: 'WARNING',
-  },
-  {
-    id: 'bgt_3',
-    department_name: 'Khối Marketing & Media',
-    allocated_budget: 200000000,
-    spent_amount: 215000000,
-    remaining_amount: -15000000,
-    utilization_pct: 107.5,
-    status: 'OVER_BUDGET',
-  },
-  {
-    id: 'bgt_4',
-    department_name: 'Khối Nhân Sự & Hành Chính (HRM)',
-    allocated_budget: 150000000,
-    spent_amount: 95000000,
-    remaining_amount: 55000000,
-    utilization_pct: 63.3,
-    status: 'SAFE',
-  },
-];
+// Department Budgets
+const INITIAL_BUDGETS: DepartmentBudget[] = [];
+
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
 
 export default function FinancePage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [plStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
   const [transactions, setTransactions] = useState<CashFlowTransaction[]>(INITIAL_TRANSACTIONS);

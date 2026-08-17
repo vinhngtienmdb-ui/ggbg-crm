@@ -195,7 +195,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
             }}
             className={`px-4 py-2.5 rounded-t-xl font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'PROFILE'
-                ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-900'
+                ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           > <User className="w-4 h-4" /> 📋 Thông Tin Hồ Sơ </button> <button
@@ -205,7 +205,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
             }}
             className={`px-4 py-2.5 rounded-t-xl font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'PASSWORD'
-                ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-900'
+                ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           > <KeyRound className="w-4 h-4 text-amber-500" /> 🔑 Đổi Mật Khẩu </button> <button
@@ -215,7 +215,7 @@ export default function UserProfileModal({ isOpen, onClose, onSuccessToast }: Us
             }}
             className={`px-4 py-2.5 rounded-t-xl font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === '2FA'
-                ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-900'
+                ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           > <ShieldCheck className="w-4 h-4 text-purple-600" /> Google Authenticator 2FA </button> </div> {/* Modal Body Content */} <div className="p-6 overflow-y-auto space-y-4 flex-1 sleek-scrollbar"> {errorMsg && ( <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium"> {errorMsg} </div> )}

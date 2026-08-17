@@ -21,9 +21,18 @@ import {
   ShoppingBag,
   ShieldAlert,
   FileText,
+  Truck,
+  ShoppingCart,
+  FileSpreadsheet,
+  FolderKanban,
+  FileCheck,
+  UserPlus,
+  Clock,
   X,
   Lock,
-  Sparkles
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 
 import { useModuleToggles } from '@/context/ModuleToggleContext';
@@ -34,6 +43,8 @@ import { getFilteredMenuClusters, MenuItemDefinition } from '@/lib/permissions';
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -52,9 +63,34 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   ShieldAlert,
   ShieldCheck,
   Settings,
+  Truck,
+  ShoppingCart,
+  FileSpreadsheet,
+  FolderKanban,
+  FileCheck,
+  UserPlus,
+  Clock,
 };
 
-export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+// Role badge color mapping
+const ROLE_COLORS: Record<string, string> = {
+  SUPER_ADMIN: 'bg-amber-500 text-slate-950',
+  DIRECTOR: 'bg-indigo-600 text-white',
+  SALES_MANAGER: 'bg-blue-600 text-white',
+  SALES_REP: 'bg-sky-600 text-white',
+  SALE_EXEC: 'bg-cyan-600 text-white',
+  TEAM_LEADER: 'bg-violet-600 text-white',
+  CSKH: 'bg-emerald-600 text-white',
+  AUDITOR: 'bg-purple-600 text-white',
+  HR_MANAGER: 'bg-rose-600 text-white',
+};
+
+export default function Sidebar({
+  isOpen = false,
+  onClose,
+  isCollapsed = false,
+  onToggleCollapse,
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { toggles } = useModuleToggles();
@@ -63,6 +99,8 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
   const activeRole = simulatedRole || user?.role || 'SUPER_ADMIN';
   const filteredClusters = getFilteredMenuClusters(activeRole, toggles);
+  const avatarInitials = user ? user.username.substring(0, 2).toUpperCase() : 'SA';
+  const roleColor = ROLE_COLORS[activeRole] || 'bg-indigo-600 text-white';
 
   return ( <> {/* Mobile Backdrop Overlay */}
       {isOpen && ( <div

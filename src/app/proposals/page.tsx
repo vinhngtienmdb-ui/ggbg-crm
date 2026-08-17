@@ -159,7 +159,13 @@ function EmployeePickerSelect({
         > <option value="">-- {placeholder || 'Chọn nhân sự từ hệ thống HRM'} --</option> {filteredEmployees.map((emp) => ( <option key={emp.id} value={`${emp.full_name} (${emp.employee_code} - ${emp.position})`}> [{emp.employee_code}] {emp.full_name} - {emp.position} ({emp.department}) </option> ))} </select> </div> {value && ( <div className="text-[11px] text-purple-700 font-medium bg-purple-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-purple-200"> <UserCheck className="w-3.5 h-3.5 text-purple-600" /> Đã chọn nhân sự: <strong className="text-slate-900">{value}</strong> </div> )} </div> );
 }
 
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
+
 export default function ProposalsPage() {
+  const { user, simulatedRole } = useAuth();
+  const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
+
   const [templates, setTemplates] = useState<ProposalTemplate[]>(() => getProposalTemplates());
   const [submissions, setSubmissions] = useState<ProposalSubmission[]>(() => getProposalSubmissions());
   const [activeTab, setActiveTab] = useState<'SUBMISSIONS' | 'CREATE_NEW' | 'TEMPLATE_CONFIG'>('SUBMISSIONS');

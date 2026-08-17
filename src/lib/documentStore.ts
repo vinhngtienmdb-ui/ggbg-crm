@@ -1,79 +1,68 @@
-import { OfficialDocument } from '@/types';
+import { OfficialDocument, DocumentLedgerConfig } from '@/types';
 
-export const INITIAL_DOCUMENTS: OfficialDocument[] = [
+export const INITIAL_DOCUMENTS: OfficialDocument[] = [];
+
+export const INITIAL_LEDGERS: DocumentLedgerConfig[] = [
   {
-    id: 'doc_1',
-    document_code: '142/CV-BCT',
-    title: 'V/v Hướng dẫn đăng ký Gian hàng TMĐT Xuyên Biên Giới & Kiểm soát Thuế e-Commerce 2026',
-    category: 'INBOUND',
-    issuer_org: 'Bộ Công Thương - Cục Thương Mại Điện Tử',
-    recipient_org: 'Ban Giám Đốc GGBG CRM',
-    issued_date: '2026-07-20',
-    received_date: '2026-07-21',
-    signee_name: 'Thứ Trưởng Trần Quốc Khánh',
-    security_level: 'NORMAL',
-    urgency_level: 'HIGHLY_URGENT',
-    status: 'IN_PROCESSING',
-    assigned_department: 'Khối Kinh Doanh & TMĐT',
-    assigned_assignee: 'Đặng Tuấn Tú',
-    directive_note: 'Giao Trưởng phòng Vận hành TMĐT cập nhật đúng quy trình khai báo thuế cho 100% gian hàng merchant trước 15/08.',
-    file_name: 'Cong-Van-142-Cuc-TMDT-Bo-Cong-Thuong.pdf',
-    file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    file_size: '2.4 MB',
-    comments: [
-      { id: 'c1', author_name: 'Nguyễn Tiến Vinh', author_role: 'CEO', comment: 'Phê duyệt bút phê chuyển Khối KD triển khai ngay.', created_at: '2026-07-21 09:30' },
-    ],
-    created_at: '2026-07-21',
+    id: 'ledger_inbound_2026',
+    ledger_name: 'Sổ Công Văn Đến Năm 2026',
+    ledger_type: 'INBOUND',
+    prefix: 'CV-BCT',
+    suffix: '/2026',
+    current_number: 142,
+    number_padding: 3,
+    reset_frequency: 'YEARLY',
+    retention_period: '10_YEARS',
+    allowed_categories: ['INBOUND'],
+    is_active: true,
+    created_at: '2026-01-01',
   },
   {
-    id: 'doc_2',
-    document_code: '88/QĐ-GGBG',
-    title: 'Quyết Định Ban Hành Quy Trình Thao Tác Chuẩn SOP Quản Lý Lead & Chăm Sóc Khách Hàng Agency',
-    category: 'OUTBOUND',
-    issuer_org: 'Ban Giám Đốc GGBG CRM',
-    recipient_org: 'Toàn thể Cán bộ Nhân viên GGBG',
-    issued_date: '2026-07-15',
-    received_date: '2026-07-15',
-    signee_name: 'CEO Nguyễn Tiến Vinh',
-    security_level: 'CONFIDENTIAL',
-    urgency_level: 'URGENT',
-    status: 'COMPLETED',
-    assigned_department: 'Phòng Kinh Doanh 1',
-    assigned_assignee: 'Nguyễn Văn Minh',
-    directive_note: 'Phổ biến toàn bộ 100% nhân viên tư vấn áp dụng chuẩn khung thông tin khách hàng và 2 cấp địa chỉ hành chính.',
-    file_name: 'Quyet-Dinh-88-SOP-Lead-Intake.pdf',
-    file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    file_size: '1.8 MB',
-    has_digital_stamp: true,
-    stamped_at: '2026-07-15 10:00:00',
-    comments: [],
-    created_at: '2026-07-15',
+    id: 'ledger_outbound_2026',
+    ledger_name: 'Sổ Công Văn Đi Doanh Nghiệp',
+    ledger_type: 'OUTBOUND',
+    prefix: 'CV-GGBG',
+    suffix: '/GGBG',
+    current_number: 315,
+    number_padding: 3,
+    reset_frequency: 'YEARLY',
+    retention_period: '10_YEARS',
+    allowed_categories: ['OUTBOUND'],
+    is_active: true,
+    created_at: '2026-01-01',
   },
   {
-    id: 'doc_3',
-    document_code: '05/QC-GGBG',
-    title: 'Quy Chế Quản Lý & Trích Lập Quỹ Lương Hiệu Suất 3P Doanh Nghiệp Năm 2026',
-    category: 'INTERNAL_SOP',
-    issuer_org: 'Khối Nhân Sự (HRM)',
-    recipient_org: 'Tất cả các Khối / Phòng Ban',
-    issued_date: '2026-06-01',
-    received_date: '2026-06-01',
-    signee_name: 'CHRO Nguyễn Thị Bích Ngọc',
-    security_level: 'CONFIDENTIAL',
-    urgency_level: 'NORMAL',
-    status: 'COMPLETED',
-    assigned_department: 'Khối Nhân Sự (HRM)',
-    assigned_assignee: 'Đỗ Thị Hương',
-    directive_note: 'Áp dụng liên thông tự động từ tỷ lệ KPI sang Điểm P3 đánh giá xếp loại nhân sự ABCD.',
-    file_name: 'Quy-Che-Luong-3P-GGBG-2026.pdf',
-    file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    file_size: '3.1 MB',
-    comments: [],
-    created_at: '2026-06-01',
+    id: 'ledger_internal_decisions',
+    ledger_name: 'Sổ Quyết Định & Tờ Trình Ban Giám Đốc',
+    ledger_type: 'INTERNAL',
+    prefix: 'QĐ-GGBG',
+    suffix: '/QĐ-2026',
+    current_number: 88,
+    number_padding: 3,
+    reset_frequency: 'YEARLY',
+    retention_period: 'PERMANENT',
+    allowed_categories: ['DECISION', 'SUBMISSION_STATEMENT', 'ANNOUNCEMENT'],
+    is_active: true,
+    created_at: '2026-01-01',
+  },
+  {
+    id: 'ledger_internal_sop',
+    ledger_name: 'Sổ Quy Chế SOP & Biên Bản HĐQT',
+    ledger_type: 'INTERNAL',
+    prefix: 'QC-GGBG',
+    suffix: '/SOP',
+    current_number: 15,
+    number_padding: 3,
+    reset_frequency: 'NEVER',
+    retention_period: 'PERMANENT',
+    allowed_categories: ['INTERNAL_SOP', 'CONTRACT_MINUTES', 'PERIODIC_REPORT'],
+    is_active: true,
+    created_at: '2026-01-01',
   },
 ];
 
 let docStore: OfficialDocument[] = [...INITIAL_DOCUMENTS];
+let ledgerStore: DocumentLedgerConfig[] = [...INITIAL_LEDGERS];
 
 export function getOfficialDocuments(): OfficialDocument[] {
   return docStore;
@@ -92,4 +81,23 @@ export function updateOfficialDocument(updated: OfficialDocument): OfficialDocum
 export function deleteOfficialDocument(id: string): OfficialDocument[] {
   docStore = docStore.filter(d => d.id !== id);
   return docStore;
+}
+
+export function getDocumentLedgers(): DocumentLedgerConfig[] {
+  return ledgerStore;
+}
+
+export function addDocumentLedger(ledger: DocumentLedgerConfig): DocumentLedgerConfig[] {
+  ledgerStore = [ledger, ...ledgerStore];
+  return ledgerStore;
+}
+
+export function updateDocumentLedger(updated: DocumentLedgerConfig): DocumentLedgerConfig[] {
+  ledgerStore = ledgerStore.map(l => l.id === updated.id ? updated : l);
+  return ledgerStore;
+}
+
+export function deleteDocumentLedger(id: string): DocumentLedgerConfig[] {
+  ledgerStore = ledgerStore.filter(l => l.id !== id);
+  return ledgerStore;
 }

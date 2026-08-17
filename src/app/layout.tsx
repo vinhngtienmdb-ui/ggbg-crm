@@ -1,10 +1,5 @@
-'use client';
-
-import React, { useState } from 'react';
+import type { Metadata } from 'next';
 import './globals.css';
-import dynamic from 'next/dynamic';
-import Sidebar from '@/components/layout/Sidebar';
-import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ModuleToggleProvider } from '@/context/ModuleToggleContext';

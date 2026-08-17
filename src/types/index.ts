@@ -1084,7 +1084,16 @@ export interface EnterpriseProject {
   tasks: ProjectTask[];
 }
 
-export type DocumentCategory = 'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP';
+export type DocumentCategory =
+  | 'INBOUND'
+  | 'OUTBOUND'
+  | 'DECISION'
+  | 'SUBMISSION_STATEMENT'
+  | 'ANNOUNCEMENT'
+  | 'INTERNAL_SOP'
+  | 'CONTRACT_MINUTES'
+  | 'PERIODIC_REPORT';
+
 export type SecurityLevel = 'NORMAL' | 'CONFIDENTIAL' | 'SECRET' | 'TOP_SECRET';
 export type UrgencyLevel = 'NORMAL' | 'URGENT' | 'HIGHLY_URGENT' | 'EXPRESS';
 export type DocProcessStatus = 'PENDING_DIRECTIVE' | 'IN_PROCESSING' | 'COMPLETED' | 'ARCHIVED';
@@ -1095,6 +1104,59 @@ export interface DocumentComment {
   author_role: string;
   comment: string;
   created_at: string;
+}
+
+export interface DocumentProcessLog {
+  id: string;
+  actor_name: string;
+  actor_role: string;
+  action: string;
+  note: string;
+  timestamp: string;
+}
+
+export type SignatureType = 'MARGINAL' | 'SUBMISSION' | 'APPROVAL' | 'OFFICIAL_SEAL';
+
+export interface DigitalSignatureRecord {
+  id: string;
+  signature_type: SignatureType;
+  signer_name: string;
+  signer_role: string;
+  signed_at: string;
+  ca_provider: string;
+  sha256_hash: string;
+  seal_applied?: boolean;
+}
+
+export type LedgerResetFrequency = 'NEVER' | 'YEARLY' | 'QUARTERLY' | 'MONTHLY';
+export type LedgerRetentionPeriod = 'PERMANENT' | '10_YEARS' | '5_YEARS' | 'CUSTOM';
+
+export interface DocumentLedgerConfig {
+  id: string;
+  ledger_name: string;
+  ledger_type: 'INBOUND' | 'OUTBOUND' | 'INTERNAL';
+  prefix: string;
+  suffix: string;
+  current_number: number;
+  number_padding: number;
+  reset_frequency: LedgerResetFrequency;
+  retention_period: LedgerRetentionPeriod;
+  retention_years?: number;
+  allowed_categories: DocumentCategory[];
+  is_active: boolean;
+  created_at: string;
+}
+
+export type AssignmentTargetType = 'DEPARTMENT' | 'DIRECT_EMPLOYEE';
+
+export interface DocumentAssignmentMeta {
+  target_type: AssignmentTargetType;
+  primary_dept?: string;
+  primary_assignee?: string;
+  coop_depts?: string[];
+  coop_assignees?: string[];
+  info_depts?: string[];
+  info_assignees?: string[];
 }
 
 export interface OfficialDocument {
@@ -1112,13 +1174,24 @@ export interface OfficialDocument {
   status: DocProcessStatus;
   assigned_department: string;
   assigned_assignee: string;
+  assignment_meta?: DocumentAssignmentMeta;
   directive_note?: string;
   file_name?: string;
   file_url?: string;
   file_size?: string;
   has_digital_stamp?: boolean;
   stamped_at?: string;
+  sla_deadline?: string;
+  qr_code_url?: string;
+  digital_signature_meta?: {
+    signed_by: string;
+    signed_at: string;
+    ca_provider: string;
+    seal_applied: boolean;
+  };
+  signatures?: DigitalSignatureRecord[];
   comments?: DocumentComment[];
+  process_logs?: DocumentProcessLog[];
   created_at: string;
 }
 

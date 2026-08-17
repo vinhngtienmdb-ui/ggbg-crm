@@ -164,7 +164,7 @@ export default function EmployeeModal({
     education_history: [
       {
         id: 'edu_1',
-        school_name: 'Đại Học Kinh Tế Quốc Dân (NEU)',
+        school_name: 'Đại Học Kinh Tế Quốc Dân',
         major: 'Quản Trị Kinh Doanh TMĐT',
         degree_level: 'Cử Nhân',
         graduation_year: '2017',
@@ -206,12 +206,12 @@ export default function EmployeeModal({
         effective_date: '2024-01-01',
         decision_number: 'QĐ-2024/001-GGBG',
         old_position: 'Chuyên Viên Sale',
-        new_position: 'Trưởng Nhóm Sale (Team Lead)',
+        new_position: 'Trưởng Nhóm Kinh Doanh',
         old_department: 'Phòng Kinh Doanh 1',
         new_department: 'Phòng Kinh Doanh 1',
         old_salary: 12000000,
         new_salary: 18000000,
-        approved_by: 'Tổng Giám Đốc (Giám Đốc Nhân Sự)',
+        approved_by: 'Tổng Giám Đốc',
       },
     ],
     rewards: [
@@ -230,10 +230,34 @@ export default function EmployeeModal({
     special_notes: 'Lao động có năng lực lãnh đạo tốt, tác phong chuyên nghiệp, đủ điều kiện quy hoạch Trưởng Phòng Kinh Doanh.',
   });
 
-  // Dynamic File Upload Rows
-  const [uploadRows, setUploadRows] = useState<UploadRow[]>([
-    { id: 'row_1', category: 'CCCD_FRONT', fileName: '' },
-  ]);
+  // Dynamic File Upload State
+  const [newDocCategory, setNewDocCategory] = useState<string>('CCCD_FRONT');
+
+  const handleFileUploadForEmployee = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const newDocItem = {
+      doc_id: `doc_${Date.now()}`,
+      doc_type: newDocCategory as any,
+      doc_name: file.name,
+      file_r2_path: `storage.ggbingo.vn/hrm/docs/${file.name}`,
+      uploaded_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'VALID' as const,
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      kyc_documents: [...(prev.kyc_documents || []), newDocItem],
+    }));
+  };
+
+  const handleRemoveEmployeeDoc = (docId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      kyc_documents: (prev.kyc_documents || []).filter((d) => d.doc_id !== docId),
+    }));
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -245,7 +269,6 @@ export default function EmployeeModal({
         contract_number: `HĐLĐ-2026/${String(Math.floor(Math.random() * 900) + 100)}`,
       }));
     }
-    setUploadRows([{ id: `row_${Date.now()}`, category: 'CCCD_FRONT', fileName: '' }]);
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
@@ -306,7 +329,7 @@ export default function EmployeeModal({
               activeTab === 'PERSONAL_HISTORY' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> 7. Lịch Sử Bản Thân
+            <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> 7. Tiêu Sử
           </button>
           <button
             type="button"
