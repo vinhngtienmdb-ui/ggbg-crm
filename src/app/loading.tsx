@@ -1,4 +1,5 @@
 import React from 'react';
+import { Loader2 } from 'lucide-react';
 import { SkeletonPage } from '@/components/ui/Skeleton';
 
 export default function GlobalLoading() {

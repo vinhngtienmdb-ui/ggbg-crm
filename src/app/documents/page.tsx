@@ -69,7 +69,7 @@ export default function DocumentsPage() {
 
   const [documents, setDocuments] = useState<OfficialDocument[]>(() => getOfficialDocuments());
   const [ledgers, setLedgers] = useState<DocumentLedgerConfig[]>(() => getDocumentLedgers());
-  const [activeTab, setActiveTab] = useState<'INBOUND_LEDGER' | 'OUTBOUND_LEDGER' | 'INTERNAL_LEDGER' | 'PENDING_DIRECTIVE' | 'DIGITAL_STAMP' | 'DOC_CONFIG'>('INBOUND_LEDGER');
+  const [activeTab, setActiveTab] = useState<'INBOUND' | 'OUTBOUND' | 'INTERNAL_SOP' | 'DIRECTIVE_LOG' | 'DOC_CONFIG'>('INBOUND');
   const [selectedInternalCategory, setSelectedInternalCategory] = useState<DocumentCategory | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -103,9 +103,9 @@ export default function DocumentsPage() {
 
   const handleExportExcel = () => {
     const title =
-      activeTab === 'INBOUND_LEDGER'
+      activeTab === 'INBOUND'
         ? 'So_Van_Ban_Den_2026'
-        : activeTab === 'OUTBOUND_LEDGER'
+        : activeTab === 'OUTBOUND'
         ? 'So_Van_Ban_Di_2026'
         : 'So_Van_Ban_Noi_Bo_2026';
     exportDocumentsToCSV(filteredDocs, title);
@@ -316,11 +316,11 @@ export default function DocumentsPage() {
     const matchesSearch = !q || d.title.toLowerCase().includes(q) || d.document_code.toLowerCase().includes(q) || d.issuer_org.toLowerCase().includes(q);
 
     let matchesTab = true;
-    if (activeTab === 'INBOUND_LEDGER') {
+    if (activeTab === 'INBOUND') {
       matchesTab = d.category === 'INBOUND';
-    } else if (activeTab === 'OUTBOUND_LEDGER') {
+    } else if (activeTab === 'OUTBOUND') {
       matchesTab = d.category === 'OUTBOUND';
-    } else if (activeTab === 'INTERNAL_LEDGER') {
+    } else if (activeTab === 'INTERNAL_SOP') {
       // Sổ Văn Bản Nội Bộ bao gồm Quyết Định, Tờ Trình, Thông Báo, SOP, Biên Bản, Báo Cáo
       const internalCategories: DocumentCategory[] = [
         'DECISION',
@@ -333,10 +333,8 @@ export default function DocumentsPage() {
       const isInternal = internalCategories.includes(d.category);
       const matchesSubCat = selectedInternalCategory === 'ALL' || d.category === selectedInternalCategory;
       matchesTab = isInternal && matchesSubCat;
-    } else if (activeTab === 'PENDING_DIRECTIVE') {
-      matchesTab = d.status === 'PENDING_DIRECTIVE';
-    } else if (activeTab === 'DIGITAL_STAMP') {
-      matchesTab = !!d.has_digital_stamp;
+    } else if (activeTab === 'DIRECTIVE_LOG') {
+      matchesTab = d.status === 'PENDING_DIRECTIVE' || !!d.directive_note;
     }
 
     return matchesSearch && matchesTab;

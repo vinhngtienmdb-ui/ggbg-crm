@@ -45,6 +45,7 @@ export default function DigitalSignatureModal({
   onSignComplete,
 }: DigitalSignatureModalProps) {
   const [signatureType, setSignatureType] = useState<SignatureType>(defaultSignatureType);
+  const [signType, setSignType] = useState<'HANDWRITTEN_CANVAS' | 'PKI_CERTIFICATE'>('HANDWRITTEN_CANVAS');
   const [pinCode, setPinCode] = useState('123456');
   const [pinError, setPinError] = useState('');
   const [hasDrawn, setHasDrawn] = useState(false);

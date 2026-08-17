@@ -25,6 +25,7 @@ import {
   AlertCircle,
   Clock,
   UserCircle,
+  Sparkles,
 } from 'lucide-react';
 import { UserRole } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
@@ -64,6 +65,12 @@ export default function Header({ onOpenPhoneModal, onToggleMobileSidebar }: Head
   const { user, logout, simulatedRole, setSimulatedRole } = useAuth();
   const { themeMode, toggleTheme, densityMode, toggleDensity } = useTheme();
   const { toast } = useToast();
+
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
 
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isNotiOpen, setIsNotiOpen] = useState(false);

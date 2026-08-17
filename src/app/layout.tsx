@@ -1,10 +1,15 @@
-import type { Metadata } from 'next';
+'use client';
+
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
 import { BrandingProvider } from '@/context/BrandingContext';
 import { usePathname } from 'next/navigation';
+import Sidebar from '@/components/layout/Sidebar';
+import Header from '@/components/layout/Header';
 
 const VoIPCallModal = dynamic(() => import('@/components/telephony/VoIPCallModal'), { ssr: false });
 
