@@ -8,6 +8,7 @@ import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ModuleToggleProvider } from '@/context/ModuleToggleContext';
+import { BrandingProvider } from '@/context/BrandingContext';
 import { usePathname } from 'next/navigation';
 
 const VoIPCallModal = dynamic(() => import('@/components/telephony/VoIPCallModal'), { ssr: false });
@@ -34,32 +35,18 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   const isAllowed = isRouteAllowedForRole(pathname, activeRole, toggles);
 
-  return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
-      <Sidebar
+  return ( <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans"> <Sidebar
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
-      />
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        <Header
+      /> <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden"> <Header
           onOpenPhoneModal={() => setIsPhoneModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-        />
-        <main className="flex-1 overflow-y-auto p-3 sm:p-6 pb-20 md:pb-6 bg-slate-50 touch-scroll">
-          {isAllowed ? children : <AccessDeniedGuard />}
-        </main>
-      </div>
-
-      <MobileBottomNav
+        /> <main className="flex-1 overflow-y-auto p-3 sm:p-6 pb-20 md:pb-6 bg-slate-50 touch-scroll"> {isAllowed ? children : <AccessDeniedGuard />} </main> </div> <MobileBottomNav
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-      />
-
-      <VoIPCallModal
+      /> <VoIPCallModal
         isOpen={isPhoneModalOpen}
         onClose={() => setIsPhoneModalOpen(false)}
-      />
-    </div>
-  );
+      /> </div> );
 }
 
 export default function RootLayout({
@@ -67,21 +54,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="vi">
-      <head>
-        <title>GGBingo CRM - Enterprise E-Commerce Platform</title>
-        <meta name="description" content="Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN" />
-      </head>
-      <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans">
-        <ThemeProvider>
-          <AuthProvider>
-            <ModuleToggleProvider>
-              <AppLayout>{children}</AppLayout>
-            </ModuleToggleProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+  return ( <html lang="vi"> <head> <title>GGBingo CRM - Enterprise E-Commerce Platform</title> <meta name="description" content="Hệ thống CRM quản lý khách hàng, lead, dịch vụ vận hành gian hàng TMĐT và nền tảng GGBingoVN" /> </head> <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans"> <BrandingProvider> <ThemeProvider> <AuthProvider> <ModuleToggleProvider> <AppLayout>{children}</AppLayout> </ModuleToggleProvider> </AuthProvider> </ThemeProvider> </BrandingProvider> </body> </html> );
 }

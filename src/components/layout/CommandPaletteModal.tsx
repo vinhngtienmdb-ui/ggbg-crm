@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   DollarSign
 } from 'lucide-react';
+import { useBranding } from '@/context/BrandingContext';
 
 interface CommandPaletteModalProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ interface CommandItem {
 
 export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: CommandPaletteModalProps) {
   const router = useRouter();
+  const { branding } = useBranding();
   const [query, setQuery] = useState('');
 
   // Keyboard shortcut Ctrl+K or Cmd+K
@@ -83,7 +85,7 @@ export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: Com
     },
     {
       id: 'a_new_sub',
-      title: '✍️ Nộp Phiếu Phê Duyệt Mới',
+      title: ' Nộp Phiếu Phê Duyệt Mới',
       category: 'Thao Tác Nhanh',
       icon: <FileCheck className="w-4 h-4 text-purple-600" />,
       action: () => {
@@ -117,66 +119,18 @@ export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: Com
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl overflow-hidden space-y-0 text-xs font-bold">
-        {/* Search Input Bar */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-850">
-          <Search className="w-5 h-5 text-purple-600 shrink-0" />
-          <input
+  return ( <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-200"> <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl overflow-hidden space-y-0 text-xs font-medium"> {/* Search Input Bar */} <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-850"> <Search className="w-5 h-5 text-purple-600 shrink-0" /> <input
             type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Gõ tên trang, tính năng hoặc thao tác (ví dụ: Lead, Phê duyệt, Khách hàng)..."
-            className="w-full bg-transparent border-none focus:outline-none text-slate-900 dark:text-slate-100 font-extrabold text-sm placeholder-slate-400"
-          />
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Command Results List */}
-        <div className="max-h-80 overflow-y-auto p-3 space-y-1 sleek-scrollbar">
-          {filteredCommands.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 font-medium">
-              Không tìm thấy kết quả phù hợp cho "<strong className="text-slate-800 dark:text-slate-200">{query}</strong>"
-            </div>
-          ) : (
-            filteredCommands.map((cmd) => (
-              <div
+            className="w-full bg-transparent border-none focus:outline-none text-slate-900 dark:text-slate-100 font-semibold text-sm placeholder-slate-400"
+          /> <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"> <X className="w-5 h-5" /> </button> </div> {/* Command Results List */} <div className="max-h-80 overflow-y-auto p-3 space-y-1 sleek-scrollbar"> {filteredCommands.length === 0 ? ( <div className="p-8 text-center text-slate-500 font-medium"> Không tìm thấy kết quả phù hợp cho "<strong className="text-slate-800 dark:text-slate-200">{query}</strong>" </div> ) : (
+            filteredCommands.map((cmd) => ( <div
                 key={cmd.id}
                 onClick={() => handleSelectCommand(cmd)}
-                className="p-3 rounded-2xl hover:bg-purple-50 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between transition-all group border border-transparent hover:border-purple-200/60"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40 transition-colors">
-                    {cmd.icon}
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 dark:text-slate-100 text-xs group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
-                      {cmd.title}
-                    </h4>
-                    <p className="text-[10.5px] text-slate-400 font-medium">{cmd.category}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Đi tới <ArrowRight className="w-3 h-3 inline ml-0.5" />
-                  </span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Footer Hint */}
-        <div className="p-3 bg-slate-100/70 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-medium px-4">
-          <span>Dùng phím <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] font-mono">↑↓</kbd> để di chuyển, <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] font-mono">Enter</kbd> để chọn</span>
-          <span className="font-mono text-purple-600 font-bold">GGBingo Command Palette</span>
-        </div>
-      </div>
-    </div>
-  );
+                className="p-3 rounded-xl hover:bg-purple-50 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between transition-all group border border-transparent hover:border-purple-200/60"
+              > <div className="flex items-center gap-3"> <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40 transition-colors"> {cmd.icon} </div> <div> <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-xs group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors"> {cmd.title} </h4> <p className="text-[10.5px] text-slate-400 font-medium">{cmd.category}</p> </div> </div> <div className="flex items-center gap-2"> <span className="text-[10px] font-mono font-medium text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"> Đi tới <ArrowRight className="w-3 h-3 inline ml-0.5" /> </span> </div> </div> ))
+          )} </div> {/* Footer Hint */} <div className="p-3 bg-slate-100/70 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-medium px-4"> <span>Dùng phím <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] font-mono">↑↓</kbd> để di chuyển, <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border text-[10px] font-mono">Enter</kbd> để chọn</span> <span className="font-mono text-purple-600 font-medium">{branding.systemName} Command Palette</span> </div> </div> </div> );
 }

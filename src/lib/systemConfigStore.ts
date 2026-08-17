@@ -3,8 +3,10 @@ import {
   SmtpConfig,
   WebhookConfig,
   SecuritySystemConfig,
-  ConfigAuditLog
+  ConfigAuditLog,
+  BrandingConfig
 } from '@/types';
+import { DEFAULT_BRANDING } from '@/context/BrandingContext';
 
 export interface SystemConfig {
   r2: {
@@ -35,10 +37,12 @@ export interface SystemConfig {
   smtp: SmtpConfig;
   webhook: WebhookConfig;
   security: SecuritySystemConfig;
+  branding: BrandingConfig;
   audit_logs: ConfigAuditLog[];
 }
 
 const DEFAULT_CONFIG: SystemConfig = {
+  branding: DEFAULT_BRANDING,
   r2: {
     account_id: '8f920a14b302e912384756c9a0123456',
     access_key_id: 'r2_access_ggbingo_prod_2026',
@@ -125,14 +129,24 @@ let currentConfig: SystemConfig = { ...DEFAULT_CONFIG };
 export function getSystemConfig(): SystemConfig {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('ggbg_system_config');
+    let conf = currentConfig;
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        return { ...DEFAULT_CONFIG, ...parsed };
+        conf = { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
       } catch {
-        return currentConfig;
+        conf = currentConfig;
       }
     }
+    // Check if separate branding key exists and merge
+    const savedBranding = localStorage.getItem('ggbg_branding_config');
+    if (savedBranding) {
+      try {
+        conf.branding = { ...DEFAULT_BRANDING, ...JSON.parse(savedBranding) };
+      } catch {
+        // ignore
+      }
+    }
+    return conf;
   }
   return currentConfig;
 }
@@ -157,6 +171,11 @@ export function saveSystemConfig(newConfig: SystemConfig, actorName: string = 'S
 
   if (typeof window !== 'undefined') {
     localStorage.setItem('ggbg_system_config', JSON.stringify(updatedConfig));
+    if (newConfig.branding) {
+      localStorage.setItem('ggbg_branding_config', JSON.stringify(newConfig.branding));
+      window.dispatchEvent(new Event('ggbg_branding_updated'));
+    }
   }
   return currentConfig;
 }
+

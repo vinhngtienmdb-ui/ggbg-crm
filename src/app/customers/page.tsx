@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { Customer, CustomerEntityType, CustomerType, CustomerTier, KycDocument, LifecycleStage } from '@/types';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
+import { formatNumber } from '@/lib/formatters';
 
 function maskIdentification(val?: string, showFull: boolean = false): string {
   if (!val) return 'Chưa cập nhật';
@@ -194,8 +195,7 @@ export default function CustomersPage() {
   const { user, simulatedRole } = useAuth();
   const canReveal = canViewPII(simulatedRole || user?.role, user?.is_super_admin);
   const revealPII = canReveal && !showMaskedData;
-  const maskPhoneVal = (p?: string) =>
-    p ? `${p.substring(0, 4)} **** ${p.substring(p.length - 2)}` : '—';
+  const maskPhoneVal = (p?: string) => p ? `${p.substring(0, 4)} **** ${p.substring(p.length - 2)}` : '—';
 
   // SELECTION CHECKBOX STATE
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -343,7 +343,7 @@ export default function CustomersPage() {
   const handleSaveCreateCustomer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!createForm.name.trim() || !createForm.phone.trim()) {
-      setToastMessage('⚠️ Vui lòng nhập đầy đủ Tên khách hàng và Số điện thoại!');
+      setToastMessage(' Vui lòng nhập đầy đủ Tên khách hàng và Số điện thoại!');
       setTimeout(() => setToastMessage(''), 4000);
       return;
     }
@@ -463,8 +463,7 @@ export default function CustomersPage() {
     e.preventDefault();
     if (!editForm.id) return;
 
-    setCustomers((prev) =>
-      prev.map((c) => {
+    setCustomers((prev) => prev.map((c) => {
         if (c.id === editForm.id) {
           return {
             ...c,
@@ -521,7 +520,7 @@ export default function CustomersPage() {
 
     const validRows = uploadRows.filter((r) => r.fileName.trim().length > 0);
     if (validRows.length === 0) {
-      setToastMessage('⚠️ Vui lòng nhập hoặc chọn ít nhất 1 tệp tin chứng từ!');
+      setToastMessage(' Vui lòng nhập hoặc chọn ít nhất 1 tệp tin chứng từ!');
       setTimeout(() => setToastMessage(''), 4000);
       return;
     }
@@ -568,8 +567,7 @@ export default function CustomersPage() {
   const handleBulkAssignCskh = () => {
     if (selectedIds.length === 0) return;
 
-    setCustomers((prev) =>
-      prev.map((c) => {
+    setCustomers((prev) => prev.map((c) => {
         if (selectedIds.includes(c.id)) {
           return {
             ...c,
@@ -588,8 +586,7 @@ export default function CustomersPage() {
   const handleBulkUpdateLifecycle = () => {
     if (selectedIds.length === 0) return;
 
-    setCustomers((prev) =>
-      prev.map((c) => {
+    setCustomers((prev) => prev.map((c) => {
         if (selectedIds.includes(c.id)) {
           return {
             ...c,
@@ -614,8 +611,7 @@ export default function CustomersPage() {
       ['Mã KH,Loại Thể Nhân,Tên KH,Doanh Nghiệp / MST / CCCD,SĐT,Lifecycle,Health Score %,LTV (VNĐ)']
         .concat(
           targetList.map(
-            (c) =>
-              `${c.customer_code},${c.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'},"${c.name}","${
+            (c) => `${c.customer_code},${c.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'},"${c.name}","${
                 c.entity_type === 'ENTERPRISE' ? c.company_name + ' (MST:' + c.tax_code + ')' : 'CCCD:' + (c.id_card_number || '')
               }",${c.phone},${c.lifecycle_stage},${c.health_score}%,${c.ltv_total_spent}`
           )
@@ -634,1006 +630,336 @@ export default function CustomersPage() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="p-4 rounded-2xl bg-emerald-500 text-white font-bold text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5" />
-            <span>{toastMessage}</span>
-          </div>
-          <button onClick={() => setToastMessage('')} className="p-1 hover:bg-emerald-600 rounded-lg">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+  return ( <div className="space-y-6"> {/* Toast Notification */}
+      {toastMessage && ( <div className="p-4 rounded-xl bg-emerald-500 text-white font-medium text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300"> <div className="flex items-center gap-2"> <CheckCircle2 className="w-5 h-5" /> <span>{toastMessage}</span> </div> <button onClick={() => setToastMessage('')} className="p-1 hover:bg-emerald-600 rounded-lg"> <X className="w-4 h-4" /> </button> </div> )}
 
-      {/* Header */}
-      <div className="gg-hero p-5 md:p-6 relative overflow-hidden">
-        <div className="absolute -right-16 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(46,92,230,0.12),transparent_70%)] pointer-events-none"></div>
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-[10.5px] font-bold mb-2.5">
-            <Users className="w-3 h-3 text-blue-600" />
-            <span>Hồ Sơ Khách Hàng 360°</span>
-          </div>
-          <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700 flex items-center gap-2">
-            Danh Mục Khách Hàng 360°
-          </h1>
-          <p className="text-slate-500 text-xs mt-1 max-w-2xl leading-relaxed">
-            Quản lý hồ sơ và theo dõi thông tin khách hàng
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          <button
+      {/* Header - Clean White with Colorful Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400"> <Users className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Danh Mục Khách Hàng </h1> <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-[11px] font-medium border border-blue-200 dark:border-blue-800"> {customers.length} Hồ sơ </span> </div> <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5"> Quản lý hồ sơ, lịch sử giao dịch và theo dõi thông tin khách hàng </p> </div> </div> <div className="flex items-center gap-2 flex-wrap"> <button
             onClick={handleOpenCreateModal}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all active:scale-95 cursor-pointer"
-          >
-            <UserPlus className="w-4 h-4" />
-            Tạo Khách Hàng Mới
-          </button>
-
-          {canReveal ? (
-            <button
+            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-xs transition-colors"
+          > <UserPlus className="w-4 h-4" /> + Thêm Khách Hàng </button> {canReveal ? ( <button
               onClick={() => setShowMaskedData(!showMaskedData)}
-              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors"
-            >
-              {showMaskedData ? <Eye className="w-4 h-4 text-blue-600" /> : <EyeOff className="w-4 h-4 text-slate-500" />}
-              <span>{showMaskedData ? 'Gỡ Mask SĐT / MST / CCCD' : 'Ẩn Bảo Mật Thông Tin'}</span>
-            </button>
-          ) : (
-            <span className="px-3.5 py-2 bg-slate-50 text-slate-400 rounded-xl text-xs font-semibold flex items-center gap-2 border border-slate-200" title="Vai trò của bạn không được phép xem đầy đủ dữ liệu nhạy cảm">
-              <EyeOff className="w-4 h-4" /> Dữ liệu nhạy cảm đã ẩn
-            </span>
-          )}
-
-          <button
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
+            > {showMaskedData ? <Eye className="w-4 h-4 text-blue-600" /> : <EyeOff className="w-4 h-4 text-slate-500" />} <span>{showMaskedData ? 'Gỡ Mask Bảo Mật' : 'Ẩn Bảo Mật'}</span> </button> ) : ( <span className="px-3 py-2 bg-slate-50 text-slate-400 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-slate-200"> <EyeOff className="w-4 h-4" /> Đã ẩn PII </span> )} <button
             onClick={handleExportData}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all active:scale-95"
-          >
-            <Download className="w-4 h-4" />
-            Export File Excel
-          </button>
-        </div>
-        </div>
-      </div>
-
-      {/* FLOATING BULK ACTIONS BAR */}
-      {selectedIds.length > 0 && (
-        <div className="p-4 rounded-2xl bg-white text-slate-900 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top duration-200">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs shadow-sm">
-              {selectedIds.length}
-            </span>
-            <div>
-              <p className="font-bold text-sm text-slate-900">Đã chọn {selectedIds.length} khách hàng trong danh sách</p>
-              <p className="text-[11px] text-slate-500">Thao tác nhanh cho hàng loạt hồ sơ cùng lúc</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
+            className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
+          > <Download className="w-4 h-4" /> Xuất Excel </button> </div> </div> {/* FLOATING BULK ACTIONS BAR */}
+      {selectedIds.length > 0 && ( <div className="p-4 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <span className="w-7 h-7 rounded-lg bg-blue-600 text-white font-semibold flex items-center justify-center text-xs shadow-xs"> {selectedIds.length} </span> <div> <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">Đã chọn {selectedIds.length} khách hàng</p> <p className="text-[11px] text-slate-500">Thao tác nhanh hàng loạt hồ sơ</p> </div> </div> <div className="flex items-center gap-2 flex-wrap"> <button
               onClick={handleBulkAssignCskh}
-              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
-            >
-              <PhoneCall className="w-3.5 h-3.5" /> Chuyển CSKH Tái Chăm Sóc
-            </button>
-
-            <button
+              className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
+            > <PhoneCall className="w-3.5 h-3.5" /> Giao Task CSKH </button> <button
               onClick={() => setBulkLifecycleModalOpen(true)}
-              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
-            >
-              <Sliders className="w-3.5 h-3.5" /> Đổi Trạng Thái Vòng Đời
-            </button>
-
-            <button
+              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
+            > <Sliders className="w-3.5 h-3.5" /> Đổi Trạng Thái </button> <button
               onClick={handleExportData}
-              className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs flex items-center gap-1.5 border border-blue-100"
-            >
-              <Download className="w-3.5 h-3.5" /> Export Đã Chọn
-            </button>
-
-            <button
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5"
+            > <Download className="w-3.5 h-3.5" /> Xuất Đã Chọn </button> <button
               onClick={() => setSelectedIds([])}
-              className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
+              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
               title="Bỏ chọn tất cả"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+            > <X className="w-4 h-4" /> </button> </div> </div> )}
 
-      {/* Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
-        <div className="flex items-center gap-2">
-          <button
+      {/* Filter Bar */} <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm"> <div className="flex items-center gap-1.5 flex-wrap"> <button
             onClick={() => setSelectedEntityFilter('ALL')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-              selectedEntityFilter === 'ALL' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              selectedEntityFilter === 'ALL'
+                ? 'bg-blue-600 text-white font-semibold'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
             }`}
-          >
-            Tất Cả Khách Hàng ({customers.length})
-          </button>
-          <button
+          > Tất Cả ({customers.length}) </button> <button
             onClick={() => setSelectedEntityFilter('ENTERPRISE')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              selectedEntityFilter === 'ENTERPRISE' ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-100'
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              selectedEntityFilter === 'ENTERPRISE'
+                ? 'bg-blue-600 text-white font-semibold'
+                : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
             }`}
-          >
-            <Building2 className="w-3.5 h-3.5" /> 🏢 Doanh Nghiệp
-          </button>
-          <button
+          > <Building2 className="w-3.5 h-3.5" /> Doanh Nghiệp </button> <button
             onClick={() => setSelectedEntityFilter('INDIVIDUAL')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              selectedEntityFilter === 'INDIVIDUAL' ? 'bg-purple-600 text-white shadow-sm' : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100'
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              selectedEntityFilter === 'INDIVIDUAL'
+                ? 'bg-purple-600 text-white font-semibold'
+                : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
             }`}
-          >
-            <User className="w-3.5 h-3.5" /> 👤 Cá Nhân
-          </button>
-        </div>
-
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
+          > <User className="w-3.5 h-3.5" /> Cá Nhân </button> </div> <div className="relative w-full md:w-80"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tìm Mã KH, Tên, MST, Số CCCD, SĐT..."
-            className="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-          />
-        </div>
-      </div>
-
-      {/* Main Customers Table with Full Action Buttons */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
-                <th className="p-4 w-10 text-center">
-                  <input
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+          /> </div> </div> {/* Main Customers Table with Full Action Buttons */} <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden"> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse text-xs"> <thead> <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold uppercase tracking-wider text-[10px]"> <th className="p-3.5 w-10 text-center"> <input
                     type="checkbox"
                     checked={isAllSelected}
                     onChange={toggleSelectAll}
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                  />
-                </th>
-                <th className="p-4">Loại & Mã KH</th>
-                <th className="p-4">Tên & Doanh Nghiệp / Cá Nhân</th>
-                <th className="p-4">Mã Số Thuế (MST) / Số CCCD</th>
-                <th className="p-4">Số Điện Thoại</th>
-                <th className="p-4">Tổng LTV Chi Tiêu</th>
-                <th className="p-4 text-center">Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredCustomers.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400 italic">
-                    Không tìm thấy khách hàng phù hợp.
-                  </td>
-                </tr>
-              ) : (
+                  /> </th> <th className="p-3.5">Loại & Mã KH</th> <th className="p-3.5">Tên & Doanh Nghiệp / Cá Nhân</th> <th className="p-3.5">Mã Số Thuế (MST) / Số CCCD</th> <th className="p-3.5">Số Điện Thoại</th> <th className="p-3.5">Tổng LTV Chi Tiêu</th> <th className="p-3.5 text-center">Thao Tác</th> </tr> </thead> <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium"> {filteredCustomers.length === 0 ? ( <tr> <td colSpan={7} className="p-8 text-center text-slate-400 italic"> Không tìm thấy khách hàng phù hợp. </td> </tr> ) : (
                 filteredCustomers.map((cust) => {
                   const isChecked = selectedIds.includes(cust.id);
-                  return (
-                    <tr
+                  return ( <tr
                       key={cust.id}
-                      className={`hover:bg-slate-50/80 transition-colors ${isChecked ? 'bg-blue-50/50' : ''}`}
-                    >
-                      <td className="p-4 text-center">
-                        <input
+                      className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors ${isChecked ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''}`}
+                    > <td className="p-3.5 text-center"> <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => toggleSelectOne(cust.id)}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                        />
-                      </td>
-
-                      <td className="p-4">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
-                          cust.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-purple-100 text-purple-800 border border-purple-200'
-                        }`}>
-                          {cust.entity_type === 'ENTERPRISE' ? '🏢 Doanh Nghiệp' : '👤 Cá Nhân'}
-                        </span>
-                        <p className="font-mono text-slate-500 font-bold text-[11px] mt-1">{cust.customer_code}</p>
-                      </td>
-
-                      <td className="p-4">
-                        <p className="font-bold text-slate-900 text-sm">{cust.name}</p>
-                        <p className="text-slate-500 text-[11px] font-medium">{cust.company_name || 'Cá Nhân Độc Lập'}</p>
-                      </td>
-
-                      <td className="p-4 font-mono font-bold">
-                        {cust.entity_type === 'ENTERPRISE' ? (
-                          <span className="text-blue-700">MST: {maskIdentification(cust.tax_code, revealPII)}</span>
-                        ) : (
-                          <span className="text-purple-700">CCCD: {maskIdentification(cust.id_card_number, revealPII)}</span>
-                        )}
-                      </td>
-
-                      <td className="p-4 font-mono font-semibold text-slate-800">
-                        {revealPII ? cust.phone : maskPhoneVal(cust.phone)}
-                      </td>
-
-                      <td className="p-4 font-mono font-extrabold text-emerald-700 text-sm">
-                        {(cust.ltv_total_spent / 1000000).toLocaleString('vi-VN')} Tr ₫
-                      </td>
-
-                      {/* ACTION BUTTONS: XEM + SỬA + UPLOAD + TẠO LEAD */}
-                      <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                          {/* NÚT XEM CHI TIẾT */}
-                          <button
+                        /> </td> <td className="p-3.5"> <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                          cust.entity_type === 'ENTERPRISE' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200'
+                        }`}> {cust.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'} </span> <p className="font-mono text-slate-500 text-[11px] mt-0.5">{cust.customer_code}</p> </td> <td className="p-3.5"> <p className="font-semibold text-slate-900 dark:text-slate-100 text-xs">{cust.name}</p> <p className="text-slate-500 text-[11px]">{cust.company_name || 'Cá Nhân Độc Lập'}</p> </td> <td className="p-3.5 font-mono"> {cust.entity_type === 'ENTERPRISE' ? ( <span className="text-blue-700 dark:text-blue-400">MST: {maskIdentification(cust.tax_code, revealPII)}</span> ) : ( <span className="text-purple-700 dark:text-purple-400">CCCD: {maskIdentification(cust.id_card_number, revealPII)}</span> )} </td> <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300"> {revealPII ? cust.phone : maskPhoneVal(cust.phone)} </td> <td className="p-3.5 font-mono font-semibold text-emerald-600 dark:text-emerald-400"> {formatNumber(cust.ltv_total_spent / 1000000)} Tr ₫ </td> {/* ACTION BUTTONS: XEM + SỬA + UPLOAD + TẠO LEAD */} <td className="p-3.5 text-center"> <div className="flex items-center justify-center gap-1.5 flex-wrap"> {/* NÚT XEM CHI TIẾT */} <button
                             onClick={() => handleOpenViewDetailModal(cust)}
-                            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-[11px] flex items-center gap-1 transition-all"
+                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-md text-[11px] font-medium flex items-center gap-1 transition-colors"
                             title="Xem Thông Tin Chi Tiết Hồ Sơ Khách Hàng"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-blue-600" /> Xem
-                          </button>
-
-                          {/* NÚT SỬA THÔNG TIN */}
-                          <button
+                          > <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" /> Xem </button> {/* NÚT SỬA THÔNG TIN */} <button
                             onClick={() => handleOpenEditModal(cust)}
-                            className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl text-[11px] flex items-center gap-1 transition-all"
+                            className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium rounded-xl text-[11px] flex items-center gap-1 transition-all"
                             title="Chỉnh Sửa Hồ Sơ Khách Hàng"
-                          >
-                            <Edit3 className="w-3.5 h-3.5 text-amber-600" /> Sửa
-                          </button>
-
-                          {/* NÚT UPLOAD FILE */}
-                          <button
+                          > <Edit3 className="w-3.5 h-3.5 text-amber-600" /> Sửa </button> {/* NÚT UPLOAD FILE */} <button
                             onClick={() => {
                               setSelectedCustomer(cust);
                               setIsKycModalOpen(true);
                             }}
-                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-[11px] flex items-center gap-1 transition-all"
+                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-[11px] flex items-center gap-1 transition-all"
                             title="Upload Chứng Từ"
-                          >
-                            <Upload className="w-3.5 h-3.5" /> Upload
-                          </button>
-
-                          {/* NÚT TẠO LEAD */}
-                          <button
+                          > <Upload className="w-3.5 h-3.5" /> Upload </button> {/* NÚT TẠO LEAD */} <button
                             onClick={() => handleCreateLeadFromCustomer(cust)}
-                            className="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-[11px] flex items-center gap-1 shadow-sm transition-all active:scale-95"
+                            className="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl text-[11px] flex items-center gap-1 shadow-sm transition-all active:scale-95"
                             title="Tạo Lead từ Khách Hàng"
-                          >
-                            <UserPlus className="w-3.5 h-3.5" /> Lead
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
+                          > <UserPlus className="w-3.5 h-3.5" /> Lead </button> </div> </td> </tr> );
                 })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* MODAL 1: XEM CHI TIẾT HỒ SƠ KHÁCH HÀNG 360° (NÚT XEM) */}
-      {isViewDetailModalOpen && selectedViewCustomer && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                  <BadgeCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-base text-slate-900">{selectedViewCustomer.name}</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
-                      {selectedViewCustomer.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Mã KH: {selectedViewCustomer.customer_code} • Phân loại: {selectedViewCustomer.tier}
-                  </p>
-                </div>
-              </div>
-              <button
+              )} </tbody> </table> </div> </div> {/* MODAL 1: XEM CHI TIẾT HỒ SƠ KHÁCH HÀNG 360° (NÚT XEM) */}
+      {isViewDetailModalOpen && selectedViewCustomer && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"> <BadgeCheck className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h3 className="font-semibold text-base text-slate-900">{selectedViewCustomer.name}</h3> <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-blue-100 text-blue-700 border border-blue-200"> {selectedViewCustomer.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'} </span> </div> <p className="text-xs text-slate-500 mt-0.5"> Mã KH: {selectedViewCustomer.customer_code} • Phân loại: {selectedViewCustomer.tier} </p> </div> </div> <button
                 onClick={() => setIsViewDetailModalOpen(false)}
                 className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
-              {/* Top Overview Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200">
-                  <p className="text-slate-500 font-semibold flex items-center gap-1">
-                    <Coins className="w-4 h-4 text-emerald-600" /> Tổng LTV Tích Lũy:
-                  </p>
-                  <p className="text-lg font-black font-mono text-emerald-700 mt-1">
-                    {(selectedViewCustomer.ltv_total_spent / 1000000).toLocaleString('vi-VN')} Tr ₫
-                  </p>
-                </div>
-
-                <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200">
-                  <p className="text-slate-500 font-semibold flex items-center gap-1">
-                    <ShoppingBag className="w-4 h-4 text-blue-600" /> GMV Trung Bình/Tháng:
-                  </p>
-                  <p className="text-lg font-black font-mono text-blue-700 mt-1">
-                    {((selectedViewCustomer.avg_monthly_gmv || 0) / 1000000).toLocaleString('vi-VN')} Tr ₫
-                  </p>
-                </div>
-
-                <div className="p-4 bg-purple-50 rounded-2xl border border-purple-200">
-                  <p className="text-slate-500 font-semibold flex items-center gap-1">
-                    <ShieldCheck className="w-4 h-4 text-purple-600" /> Health Score Vòng Đời:
-                  </p>
-                  <p className="text-lg font-black font-mono text-purple-700 mt-1">
-                    {selectedViewCustomer.health_score}/100 ({selectedViewCustomer.lifecycle_stage})
-                  </p>
-                </div>
-              </div>
-
-              {/* General Information */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                <h4 className="font-bold text-slate-900 text-xs border-b border-slate-200 pb-2">Thông Tin Định Danh & Liên Hệ</h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-slate-500">Họ và Tên Đại Diện:</p>
-                    <p className="font-bold text-slate-900">{selectedViewCustomer.name}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Tên Doanh Nghiệp / Cửa Hàng:</p>
-                    <p className="font-bold text-slate-900">{selectedViewCustomer.company_name || 'Cá Nhân'}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Mã Số Thuế / CCCD Định Danh:</p>
-                    <p className="font-bold font-mono text-blue-700">
-                      {selectedViewCustomer.entity_type === 'ENTERPRISE'
+              > <X className="w-5 h-5" /> </button> </div> <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs"> {/* Top Overview Cards */} <div className="grid grid-cols-1 md:grid-cols-3 gap-3"> <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200"> <p className="text-slate-500 font-semibold flex items-center gap-1"> <Coins className="w-4 h-4 text-emerald-600" /> Tổng LTV Tích Lũy: </p> <p className="text-lg font-semibold font-mono text-emerald-700 mt-1"> {formatNumber(selectedViewCustomer.ltv_total_spent / 1000000)} Tr ₫ </p> </div> <div className="p-4 bg-blue-50 rounded-xl border border-blue-200"> <p className="text-slate-500 font-semibold flex items-center gap-1"> <ShoppingBag className="w-4 h-4 text-blue-600" /> GMV Trung Bình/Tháng: </p> <p className="text-lg font-semibold font-mono text-blue-700 mt-1"> {formatNumber((selectedViewCustomer.avg_monthly_gmv || 0) / 1000000)} Tr ₫ </p> </div> <div className="p-4 bg-purple-50 rounded-xl border border-purple-200"> <p className="text-slate-500 font-semibold flex items-center gap-1"> <ShieldCheck className="w-4 h-4 text-purple-600" /> Health Score Vòng Đời: </p> <p className="text-lg font-semibold font-mono text-purple-700 mt-1"> {selectedViewCustomer.health_score}/100 ({selectedViewCustomer.lifecycle_stage}) </p> </div> </div> {/* General Information */} <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3"> <h4 className="font-semibold text-slate-900 text-xs border-b border-slate-200 pb-2">Thông Tin Định Danh & Liên Hệ</h4> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <p className="text-slate-500">Họ và Tên Đại Diện:</p> <p className="font-medium text-slate-900">{selectedViewCustomer.name}</p> </div> <div> <p className="text-slate-500">Tên Doanh Nghiệp / Cửa Hàng:</p> <p className="font-medium text-slate-900">{selectedViewCustomer.company_name || 'Cá Nhân'}</p> </div> <div> <p className="text-slate-500">Mã Số Thuế / CCCD Định Danh:</p> <p className="font-medium font-mono text-blue-700"> {selectedViewCustomer.entity_type === 'ENTERPRISE'
                         ? `MST: ${maskIdentification(selectedViewCustomer.tax_code, revealPII)}`
-                        : `CCCD: ${maskIdentification(selectedViewCustomer.id_card_number, revealPII)}`}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Số Điện Thoại:</p>
-                    <p className="font-bold font-mono text-slate-900">{revealPII ? selectedViewCustomer.phone : maskPhoneVal(selectedViewCustomer.phone)}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Email:</p>
-                    <p className="font-bold text-slate-900">{selectedViewCustomer.email}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Địa Chỉ Trụ Sở / Thường Trú:</p>
-                    <p className="font-bold text-slate-900">{selectedViewCustomer.address}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Financial & Banking Information */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                <h4 className="font-bold text-slate-900 text-xs border-b border-slate-200 pb-2">Tài Khoản Ngân Hàng & Hạn Mức Tín Dụng</h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-slate-500">Số Tài Khoản Ngân Hàng:</p>
-                    <p className="font-bold font-mono text-slate-900">{revealPII ? (selectedViewCustomer.bank_account || 'Chưa cập nhật') : (selectedViewCustomer.bank_account ? '•••• ' + selectedViewCustomer.bank_account.slice(-4) : 'Chưa cập nhật')}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Tên Ngân Hàng & Chi Nhánh:</p>
-                    <p className="font-bold text-slate-900">{selectedViewCustomer.bank_name || 'Chưa cập nhật'}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-500">Hạn Mức Tín Dụng Công Nợ:</p>
-                    <p className="font-bold font-mono text-emerald-700">
-                      {((selectedViewCustomer.credit_limit || 0) / 1000000).toLocaleString('vi-VN')} Tr ₫
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Documents Vault */}
-              <div>
-                <h4 className="font-bold text-slate-900 text-xs mb-2">Tập Chứng Từ Đã Lưu ({selectedViewCustomer.kyc_documents?.length || 0})</h4>
-                {(!selectedViewCustomer.kyc_documents || selectedViewCustomer.kyc_documents.length === 0) ? (
-                  <p className="text-slate-400 italic">Chưa có chứng từ nào được lưu.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {selectedViewCustomer.kyc_documents.map((doc) => (
-                      <div key={doc.doc_id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <FileCheck className="w-4 h-4 text-emerald-600" />
-                          <span className="font-bold text-slate-800">{doc.doc_name}</span>
-                        </div>
-                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-bold text-[10px]">✓ Đã Lưu</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                        : `CCCD: ${maskIdentification(selectedViewCustomer.id_card_number, revealPII)}`} </p> </div> <div> <p className="text-slate-500">Số Điện Thoại:</p> <p className="font-medium font-mono text-slate-900">{revealPII ? selectedViewCustomer.phone : maskPhoneVal(selectedViewCustomer.phone)}</p> </div> <div> <p className="text-slate-500">Email:</p> <p className="font-medium text-slate-900">{selectedViewCustomer.email}</p> </div> <div> <p className="text-slate-500">Địa Chỉ Trụ Sở / Thường Trú:</p> <p className="font-medium text-slate-900">{selectedViewCustomer.address}</p> </div> </div> </div> {/* Financial & Banking Information */} <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3"> <h4 className="font-semibold text-slate-900 text-xs border-b border-slate-200 pb-2">Tài Khoản Ngân Hàng & Hạn Mức Tín Dụng</h4> <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <p className="text-slate-500">Số Tài Khoản Ngân Hàng:</p> <p className="font-medium font-mono text-slate-900">{revealPII ? (selectedViewCustomer.bank_account || 'Chưa cập nhật') : (selectedViewCustomer.bank_account ? '•••• ' + selectedViewCustomer.bank_account.slice(-4) : 'Chưa cập nhật')}</p> </div> <div> <p className="text-slate-500">Tên Ngân Hàng & Chi Nhánh:</p> <p className="font-medium text-slate-900">{selectedViewCustomer.bank_name || 'Chưa cập nhật'}</p> </div> <div> <p className="text-slate-500">Hạn Mức Tín Dụng Công Nợ:</p> <p className="font-medium font-mono text-emerald-700"> {formatNumber((selectedViewCustomer.credit_limit || 0) / 1000000)} Tr ₫ </p> </div> </div> </div> {/* Documents Vault */} <div> <h4 className="font-semibold text-slate-900 text-xs mb-2">Tập Chứng Từ Đã Lưu ({selectedViewCustomer.kyc_documents?.length || 0})</h4> {(!selectedViewCustomer.kyc_documents || selectedViewCustomer.kyc_documents.length === 0) ? ( <p className="text-slate-400 italic">Chưa có chứng từ nào được lưu.</p> ) : ( <div className="space-y-2"> {selectedViewCustomer.kyc_documents.map((doc) => ( <div key={doc.doc_id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between"> <div className="flex items-center gap-2"> <FileCheck className="w-4 h-4 text-emerald-600" /> <span className="font-medium text-slate-800">{doc.doc_name}</span> </div> <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-medium text-[10px]">✓ Đã Lưu</span> </div> ))} </div> )} </div> </div> </div> </div> )}
 
       {/* MODAL 2: CHỈNH SỬA THÔNG TIN KHÁCH HÀNG (NÚT SỬA ĐÃ FIX 100%) */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
-                  <Edit3 className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-base text-slate-900">Chỉnh Sửa Thông Tin Hồ Sơ Khách Hàng</h3>
-                  <p className="text-xs text-slate-500">Mã KH: {editForm.customer_code} • Cập nhật thông tin chi tiết</p>
-                </div>
-              </div>
-              <button
+      {isEditModalOpen && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600"> <Edit3 className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-base text-slate-900">Chỉnh Sửa Thông Tin Hồ Sơ Khách Hàng</h3> <p className="text-xs text-slate-500">Mã KH: {editForm.customer_code} • Cập nhật thông tin chi tiết</p> </div> </div> <button
                 onClick={() => setIsEditModalOpen(false)}
                 className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEditCustomer} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Loại Thể Nhân *</label>
-                  <select
+              > <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleSaveEditCustomer} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"> <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Loại Thể Nhân *</label> <select
                     value={editForm.entity_type}
                     onChange={(e) => setEditForm({ ...editForm, entity_type: e.target.value as CustomerEntityType })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
-                  >
-                    <option value="ENTERPRISE">🏢 Doanh Nghiệp (B2B)</option>
-                    <option value="INDIVIDUAL">👤 Cá Nhân (B2C)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Họ và Tên Đại Diện *</label>
-                  <input
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
+                  > <option value="ENTERPRISE">🏢 Doanh Nghiệp (B2B)</option> <option value="INDIVIDUAL">👤 Cá Nhân (B2C)</option> </select> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Họ và Tên Đại Diện *</label> <input
                     type="text"
                     required
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  />
-                </div>
-              </div>
-
-              {editForm.entity_type === 'ENTERPRISE' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Tên Doanh Nghiệp</label>
-                    <input
+                  /> </div> </div> {editForm.entity_type === 'ENTERPRISE' ? ( <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Tên Doanh Nghiệp</label> <input
                       type="text"
                       value={editForm.company_name || ''}
                       onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })}
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Mã Số Thuế (MST)</label>
-                    <input
+                    /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Mã Số Thuế (MST)</label> <input
                       type="text"
                       value={editForm.tax_code || ''}
                       onChange={(e) => setEditForm({ ...editForm, tax_code: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-blue-700"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Số CCCD / CMND Định Danh</label>
-                    <input
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-blue-700"
+                    /> </div> </div> ) : ( <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Số CCCD / CMND Định Danh</label> <input
                       type="text"
                       value={editForm.id_card_number || ''}
                       onChange={(e) => setEditForm({ ...editForm, id_card_number: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-purple-700"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Ngày & Nơi Cấp CCCD</label>
-                    <input
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-purple-700"
+                    /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Ngày & Nơi Cấp CCCD</label> <input
                       type="text"
                       value={editForm.id_card_issue_date || ''}
                       onChange={(e) => setEditForm({ ...editForm, id_card_issue_date: e.target.value })}
                       placeholder="2021-05-10 • Cục QLHC"
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại *</label>
-                  <input
+                    /> </div> </div> )} <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Số Điện Thoại *</label> <input
                     type="text"
                     required
                     value={editForm.phone || ''}
                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Liên Hệ</label>
-                  <input
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900"
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Email Liên Hệ</label> <input
                     type="email"
                     value={editForm.email || ''}
                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Địa Chỉ Thường Trú / ĐKKD</label>
-                <input
+                  /> </div> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Địa Chỉ Thường Trú / ĐKKD</label> <input
                   type="text"
                   value={editForm.address || ''}
                   onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Số Tài Khoản Ngân Hàng</label>
-                  <input
+                /> </div> <div className="grid grid-cols-1 sm:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Số Tài Khoản Ngân Hàng</label> <input
                     type="text"
                     value={editForm.bank_account || ''}
                     onChange={(e) => setEditForm({ ...editForm, bank_account: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Tên Ngân Hàng & CN</label>
-                  <input
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900"
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Tên Ngân Hàng & CN</label> <input
                     type="text"
                     value={editForm.bank_name || ''}
                     onChange={(e) => setEditForm({ ...editForm, bank_name: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Hạn Mức Tín Dụng (VNĐ)</label>
-                  <input
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Hạn Mức Tín Dụng (VNĐ)</label> <input
                     type="number"
                     value={editForm.credit_limit ?? 0}
                     onChange={(e) => setEditForm({ ...editForm, credit_limit: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-emerald-700"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-emerald-700"
+                  /> </div> </div> <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3"> <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
-                >
-                  Hủy Bỏ
-                </button>
-                <button
+                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs"
+                > Hủy Bỏ </button> <button
                   type="submit"
-                  className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-amber-600/30 flex items-center gap-1.5"
-                >
-                  <Save className="w-4 h-4" /> Lưu Thay Đổi Hồ Sơ
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                  className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl text-xs shadow-lg shadow-amber-600/30 flex items-center gap-1.5"
+                > <Save className="w-4 h-4" /> Lưu Thay Đổi Hồ Sơ </button> </div> </form> </div> </div> )}
 
       {/* MODAL 3: UPLOAD NHIỀU FILE VỚI NÚT + */}
-      {isKycModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                  <FolderPlus className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-base text-slate-900">{selectedCustomer.name}</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
-                      {selectedCustomer.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Mã KH: {selectedCustomer.customer_code} • Upload Nhiều Tệp Chứng Từ
-                  </p>
-                </div>
-              </div>
-              <button
+      {isKycModalOpen && selectedCustomer && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"> <FolderPlus className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h3 className="font-semibold text-base text-slate-900">{selectedCustomer.name}</h3> <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-blue-100 text-blue-700 border border-blue-200"> {selectedCustomer.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : 'Cá Nhân'} </span> </div> <p className="text-xs text-slate-500 mt-0.5"> Mã KH: {selectedCustomer.customer_code} • Upload Nhiều Tệp Chứng Từ </p> </div> </div> <button
                 onClick={() => setIsKycModalOpen(false)}
                 className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto space-y-6 flex-1">
-              <form onSubmit={handleMultiFileUploadSubmit} className="p-5 bg-blue-50/70 rounded-2xl border border-blue-200 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-                    <Upload className="w-4 h-4 text-blue-600" /> Upload Nhiều Tệp Chứng Từ Hàng Loạt
-                  </h4>
-
-                  <button
+              > <X className="w-5 h-5" /> </button> </div> <div className="p-6 overflow-y-auto space-y-6 flex-1"> <form onSubmit={handleMultiFileUploadSubmit} className="p-5 bg-blue-50/70 rounded-xl border border-blue-200 space-y-4"> <div className="flex items-center justify-between"> <h4 className="font-semibold text-xs text-blue-900 flex items-center gap-1.5"> <Upload className="w-4 h-4 text-blue-600" /> Upload Nhiều Tệp Chứng Từ Hàng Loạt </h4> <button
                     type="button"
                     onClick={handleAddUploadRow}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-blue-600/20 transition-all active:scale-95"
-                  >
-                    <Plus className="w-4 h-4" /> Thêm Dòng File Mới
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {uploadRows.map((row, idx) => (
-                    <div key={row.id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center gap-3 text-xs shadow-xs animate-in fade-in duration-200">
-                      <span className="font-bold text-slate-400 text-[11px] w-5 text-center">{idx + 1}.</span>
-
-                      <div className="w-1/3">
-                        <select
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-blue-600/20 transition-all active:scale-95"
+                  > <Plus className="w-4 h-4" /> Thêm Dòng File Mới </button> </div> <div className="space-y-3"> {uploadRows.map((row, idx) => ( <div key={row.id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center gap-3 text-xs shadow-xs animate-in fade-in duration-200"> <span className="font-medium text-slate-400 text-[11px] w-5 text-center">{idx + 1}.</span> <div className="w-1/3"> <select
                           value={row.category}
                           onChange={(e) => handleRowCategoryChange(row.id, e.target.value)}
                           className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800 text-xs"
-                        >
-                          <option value="GPKD">GPKD Doanh Nghiệp</option>
-                          <option value="CCCD_FRONT">CCCD Mặt Trước</option>
-                          <option value="CCCD_BACK">CCCD Mặt Sau</option>
-                          <option value="AUTHORIZATION">Giấy Ủy Quyền</option>
-                          <option value="CONTRACT">Hợp Đồng Nguyên Tắc</option>
-                          <option value="TAX_DOC">Báo Cáo Tài Chính/Thuế</option>
-                          <option value="BANK_DOC">Xác Nhận Ngân Hàng</option>
-                          <option value="OTHER">Chứng Từ Khác</option>
-                        </select>
-                      </div>
-
-                      <div className="flex-1">
-                        <input
+                        > <option value="GPKD">GPKD Doanh Nghiệp</option> <option value="CCCD_FRONT">CCCD Mặt Trước</option> <option value="CCCD_BACK">CCCD Mặt Sau</option> <option value="AUTHORIZATION">Giấy Ủy Quyền</option> <option value="CONTRACT">Hợp Đồng Nguyên Tắc</option> <option value="TAX_DOC">Báo Cáo Tài Chính/Thuế</option> <option value="BANK_DOC">Xác Nhận Ngân Hàng</option> <option value="OTHER">Chứng Từ Khác</option> </select> </div> <div className="flex-1"> <input
                           type="text"
                           required
                           value={row.fileName}
                           onChange={(e) => handleRowFileNameChange(row.id, e.target.value)}
                           placeholder="Tên tệp tin (VD: GPKD_2026.pdf, CCCD_2026.jpg...)"
                           className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono"
-                        />
-                      </div>
-
-                      {uploadRows.length > 1 && (
-                        <button
+                        /> </div> {uploadRows.length > 1 && ( <button
                           type="button"
                           onClick={() => handleRemoveUploadRow(row.id)}
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                           title="Xóa dòng này"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-end pt-2">
-                  <button
+                        > <Trash2 className="w-4 h-4" /> </button> )} </div> ))} </div> <div className="flex items-center justify-end pt-2"> <button
                     type="submit"
-                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95"
-                  >
-                    <Upload className="w-4 h-4" /> Upload & Lưu Tất Cả ({uploadRows.filter((r) => r.fileName.trim()).length} File)
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95"
+                  > <Upload className="w-4 h-4" /> Upload & Lưu Tất Cả ({uploadRows.filter((r) => r.fileName.trim()).length} File) </button> </div> </form> </div> </div> </div> )}
 
       {/* MODAL 4: TẠO MỚI KHÁCH HÀNG (CREATE CUSTOMER MODAL) */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                  <UserPlus className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-base text-slate-900">Tạo Mới Hồ Sơ Khách Hàng 360°</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Nhập thông tin khách hàng Doanh Nghiệp hoặc Cá Nhân mới vào hệ thống CRM
-                  </p>
-                </div>
-              </div>
-              <button
+      {isCreateModalOpen && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"> <UserPlus className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-base text-slate-900">Tạo Mới Hồ Sơ Khách Hàng 360°</h3> <p className="text-xs text-slate-500 mt-0.5"> Nhập thông tin khách hàng Doanh Nghiệp hoặc Cá Nhân mới vào hệ thống CRM </p> </div> </div> <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
                 className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveCreateCustomer} className="p-6 overflow-y-auto space-y-6 flex-1">
-              {/* Entity Type Toggle */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">Loại Thể Nhân Khách Hàng *</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
+              > <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleSaveCreateCustomer} className="p-6 overflow-y-auto space-y-6 flex-1"> {/* Entity Type Toggle */} <div> <label className="block text-xs font-medium text-slate-700 mb-2">Loại Thể Nhân Khách Hàng *</label> <div className="grid grid-cols-2 gap-3"> <button
                     type="button"
                     onClick={() => setCreateForm({ ...createForm, entity_type: 'ENTERPRISE' })}
-                    className={`p-3.5 rounded-2xl border font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+                    className={`p-3.5 rounded-xl border font-medium text-xs flex items-center justify-center gap-2 transition-all ${
                       createForm.entity_type === 'ENTERPRISE'
                         ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
-                  >
-                    <Building2 className="w-4 h-4" /> 🏢 Khách Hàng Doanh Nghiệp (B2B)
-                  </button>
-
-                  <button
+                  > <Building2 className="w-4 h-4" /> 🏢 Khách Hàng Doanh Nghiệp (B2B) </button> <button
                     type="button"
                     onClick={() => setCreateForm({ ...createForm, entity_type: 'INDIVIDUAL' })}
-                    className={`p-3.5 rounded-2xl border font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+                    className={`p-3.5 rounded-xl border font-medium text-xs flex items-center justify-center gap-2 transition-all ${
                       createForm.entity_type === 'INDIVIDUAL'
                         ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-600/20'
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
-                  >
-                    <User className="w-4 h-4" /> 👤 Khách Hàng Cá Nhân (Merchant/B2C)
-                  </button>
-                </div>
-              </div>
-
-              {/* General Info Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Mã Khách Hàng</label>
-                  <input
+                  > <User className="w-4 h-4" /> 👤 Khách Hàng Cá Nhân (Merchant/B2C) </button> </div> </div> {/* General Info Grid */} <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Mã Khách Hàng</label> <input
                     type="text"
                     required
                     value={createForm.customer_code}
                     onChange={(e) => setCreateForm({ ...createForm, customer_code: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-blue-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Họ & Tên Đại Diện / Chủ Thể <span className="text-red-500">*</span>
-                  </label>
-                  <input
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-blue-700"
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1"> Họ & Tên Đại Diện / Chủ Thể <span className="text-red-500">*</span> </label> <input
                     type="text"
                     required
                     placeholder="VD: Nguyễn Văn A..."
                     value={createForm.name}
                     onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Số Điện Thoại Liên Hệ <span className="text-red-500">*</span>
-                  </label>
-                  <input
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1"> Số Điện Thoại Liên Hệ <span className="text-red-500">*</span> </label> <input
                     type="text"
                     required
                     placeholder="VD: 0988 123 456"
                     value={createForm.phone}
                     onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
-                  />
-                </div>
-              </div>
-
-              {/* Entity Specific Section */}
-              {createForm.entity_type === 'ENTERPRISE' ? (
-                <div className="p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl space-y-4 animate-in fade-in duration-200">
-                  <h4 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-                    <Building2 className="w-4 h-4 text-blue-600" /> Thông Tin Pháp Lý Doanh Nghiệp
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Tên Công Ty / Doanh Nghiệp</label>
-                      <input
+                  /> </div> </div> {/* Entity Specific Section */}
+              {createForm.entity_type === 'ENTERPRISE' ? ( <div className="p-4 bg-blue-50/60 border border-blue-200/80 rounded-xl space-y-4 animate-in fade-in duration-200"> <h4 className="font-semibold text-xs text-blue-900 flex items-center gap-1.5"> <Building2 className="w-4 h-4 text-blue-600" /> Thông Tin Pháp Lý Doanh Nghiệp </h4> <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <div className="md:col-span-2"> <label className="block text-xs font-medium text-slate-700 mb-1">Tên Công Ty / Doanh Nghiệp</label> <input
                         type="text"
                         placeholder="VD: Công ty TNHH SunBeauty Vietnam..."
                         value={createForm.company_name}
                         onChange={(e) => setCreateForm({ ...createForm, company_name: e.target.value })}
                         className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Mã Số Thuế (MST)</label>
-                      <input
+                      /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Mã Số Thuế (MST)</label> <input
                         type="text"
                         placeholder="VD: 0108928374"
                         value={createForm.tax_code}
                         onChange={(e) => setCreateForm({ ...createForm, tax_code: e.target.value })}
                         className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4 bg-purple-50/60 border border-purple-200/80 rounded-2xl space-y-4 animate-in fade-in duration-200">
-                  <h4 className="font-bold text-xs text-purple-900 flex items-center gap-1.5">
-                    <User className="w-4 h-4 text-purple-600" /> Thông Tin Thẻ CCCD / Định Danh Cá Nhân
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Số CCCD / CMND</label>
-                      <input
+                      /> </div> </div> </div> ) : ( <div className="p-4 bg-purple-50/60 border border-purple-200/80 rounded-xl space-y-4 animate-in fade-in duration-200"> <h4 className="font-semibold text-xs text-purple-900 flex items-center gap-1.5"> <User className="w-4 h-4 text-purple-600" /> Thông Tin Thẻ CCCD / Định Danh Cá Nhân </h4> <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Số CCCD / CMND</label> <input
                         type="text"
                         placeholder="VD: 001198002345"
                         value={createForm.id_card_number}
                         onChange={(e) => setCreateForm({ ...createForm, id_card_number: e.target.value })}
                         className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Ngày Cấp</label>
-                      <input
+                      /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Ngày Cấp</label> <input
                         type="date"
                         value={createForm.id_card_issue_date}
                         onChange={(e) => setCreateForm({ ...createForm, id_card_issue_date: e.target.value })}
                         className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Nơi Cấp</label>
-                      <input
+                      /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Nơi Cấp</label> <input
                         type="text"
                         placeholder="VD: Cục Cảnh Sát QLHC..."
                         value={createForm.id_card_issue_place}
                         onChange={(e) => setCreateForm({ ...createForm, id_card_issue_place: e.target.value })}
                         className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+                      /> </div> </div> </div> )}
 
-              {/* Contact & Classification */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Hộp Thư</label>
-                  <input
+              {/* Contact & Classification */} <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Email Hộp Thư</label> <input
                     type="email"
                     placeholder="VD: contact@brand.com"
                     value={createForm.email}
                     onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  />
-                </div>
-
-                {/* Vietnam Administrative Units Address Picker (Post-01/07/2025 Standard) */}
-                <div className="md:col-span-3">
-                  <VietnamAddressPicker
+                  /> </div> {/* Vietnam Administrative Units Address Picker */} <div className="md:col-span-3"> <VietnamAddressPicker
                     value={createAddressData}
                     onChange={setCreateAddressData}
                     required
-                    label="Địa Chỉ Trụ Sở / Liên Hệ (Chuẩn Mới Sau 01/07/2025)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Phân Loại Dịch Vụ</label>
-                  <select
+                    label="Địa Chỉ Trụ Sở / Liên Hệ"
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Phân Loại Dịch Vụ</label> <select
                     value={createForm.customer_type}
                     onChange={(e) => setCreateForm({ ...createForm, customer_type: e.target.value as CustomerType })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900"
-                  >
-                    <option value="B2B_Agency_Service">Dịch Vụ Agency Vận Hành TMĐT</option>
-                    <option value="GGBingoVN_Merchant">Gian Hàng GGBingoVN Platform</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Hạng Khách Hàng (Tier)</label>
-                  <select
+                  > <option value="B2B_Agency_Service">Dịch Vụ Agency Vận Hành TMĐT</option> <option value="GGBingoVN_Merchant">Gian Hàng GGBingoVN Platform</option> </select> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Hạng Khách Hàng (Tier)</label> <select
                     value={createForm.tier}
                     onChange={(e) => setCreateForm({ ...createForm, tier: e.target.value as CustomerTier })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
-                  >
-                    <option value="Standard">Standard</option>
-                    <option value="Silver">Silver</option>
-                    <option value="Gold">Gold</option>
-                    <option value="VIP">VIP</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Lifecycle Stage, Finance & Owner */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Trạng Thái Vòng Đời</label>
-                  <select
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                  > <option value="Standard">Standard</option> <option value="Silver">Silver</option> <option value="Gold">Gold</option> <option value="VIP">VIP</option> </select> </div> </div> {/* Lifecycle Stage, Finance & Owner */} <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Trạng Thái Vòng Đời</label> <select
                     value={createForm.lifecycle_stage}
                     onChange={(e) => setCreateForm({ ...createForm, lifecycle_stage: e.target.value as LifecycleStage })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
-                  >
-                    <option value="Prospect">Prospect (Mới/Tiềm năng)</option>
-                    <option value="Regular">Regular (Đã phát sinh GD)</option>
-                    <option value="VIP">VIP (Doanh số lớn)</option>
-                    <option value="At-Risk">At-Risk (Nguy cơ rời bỏ)</option>
-                    <option value="Churned">Churned (Ngừng hoạt động)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">GMV Dự Kiến Tháng (VNĐ)</label>
-                  <input
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                  > <option value="Prospect">Prospect (Mới/Tiềm năng)</option> <option value="Regular">Regular (Đã phát sinh GD)</option> <option value="VIP">VIP (Doanh số lớn)</option> <option value="At-Risk">At-Risk (Nguy cơ rời bỏ)</option> <option value="Churned">Churned (Ngừng hoạt động)</option> </select> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">GMV Dự Kiến Tháng (VNĐ)</label> <input
                     type="number"
                     placeholder="VD: 500000000"
                     value={createForm.avg_monthly_gmv}
                     onChange={(e) => setCreateForm({ ...createForm, avg_monthly_gmv: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Hạn Mức Công Nợ (VNĐ)</label>
-                  <input
+                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Hạn Mức Công Nợ (VNĐ)</label> <input
                     type="number"
                     placeholder="VD: 200000000"
                     value={createForm.credit_limit}
                     onChange={(e) => setCreateForm({ ...createForm, credit_limit: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900"
-                  />
-                </div>
-              </div>
-
-              {/* Address */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Địa Chỉ Đăng Ký Kinh Doanh / Thường Trú</label>
-                <input
+                  /> </div> </div> {/* Address */} <div> <label className="block text-xs font-medium text-slate-700 mb-1">Địa Chỉ Đăng Ký Kinh Doanh / Thường Trú</label> <input
                   type="text"
                   placeholder="VD: Số 18 Nguyễn Chánh, Cầu Giấy, Hà Nội"
                   value={createForm.address}
                   onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                />
-              </div>
-
-              {/* E-commerce platforms */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">Sàn TMĐT Đang Kinh Doanh</label>
-                <div className="flex items-center gap-4 flex-wrap">
-                  {['Shopee', 'TikTokShop', 'Lazada', 'Amazon', 'GGBingoVN'].map((platform) => {
+                /> </div> {/* E-commerce platforms */} <div> <label className="block text-xs font-medium text-slate-700 mb-2">Sàn TMĐT Đang Kinh Doanh</label> <div className="flex items-center gap-4 flex-wrap"> {['Shopee', 'TikTokShop', 'Lazada', 'Amazon', 'GGBingoVN'].map((platform) => {
                     const isChecked = createForm.ecom_platforms.includes(platform);
-                    return (
-                      <label
+                    return ( <label
                         key={platform}
-                        className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                        className={`px-3 py-2 rounded-xl border text-xs font-medium flex items-center gap-2 cursor-pointer transition-all ${
                           isChecked
                             ? 'bg-blue-50 border-blue-300 text-blue-800'
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                         }`}
-                      >
-                        <input
+                      > <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={(e) => {
@@ -1647,46 +973,19 @@ export default function CustomersPage() {
                             }
                           }}
                           className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
-                        />
-                        <span>{platform}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Ghi Chú Ban Đầu</label>
-                <textarea
+                        /> <span>{platform}</span> </label> );
+                  })} </div> </div> {/* Notes */} <div> <label className="block text-xs font-medium text-slate-700 mb-1">Ghi Chú Ban Đầu</label> <textarea
                   rows={2}
                   placeholder="Nhập thông tin yêu cầu đặc biệt, lưu ý CSKH..."
                   value={createForm.notes}
                   onChange={(e) => setCreateForm({ ...createForm, notes: e.target.value })}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                />
-              </div>
-
-              {/* Form Footer Action */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
+                /> </div> {/* Form Footer Action */} <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3"> <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
-                >
-                  Hủy Bỏ
-                </button>
-                <button
+                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs"
+                > Hủy Bỏ </button> <button
                   type="submit"
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
-                >
-                  <UserPlus className="w-4 h-4" /> Tạo Hồ Sơ Khách Hàng
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+                > <UserPlus className="w-4 h-4" /> Tạo Hồ Sơ Khách Hàng </button> </div> </form> </div> </div> )} </div> );
 }

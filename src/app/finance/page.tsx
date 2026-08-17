@@ -44,6 +44,7 @@ import {
   Line,
   Legend
 } from 'recharts';
+import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
 import { ContractProfitLoss, DebtInvoice, CashFlowTransaction, DepartmentBudget } from '@/types/finance';
 
@@ -209,9 +210,7 @@ export default function FinancePage() {
 
       const data = await res.json();
       if (data.success) {
-        setDebtInvoices((prev) =>
-          prev.map((item) =>
-            item.id === inv.id
+        setDebtInvoices((prev) => prev.map((item) => item.id === inv.id
               ? {
                   ...item,
                   reminder_sent_count: item.reminder_sent_count + 1,
@@ -243,855 +242,184 @@ export default function FinancePage() {
     };
     setTransactions([item, ...transactions]);
     setIsTxModalOpen(false);
-    showToast(`✅ Đã lập thành công Phiếu ${newTx.type === 'INCOME' ? 'Thu' : 'Chi'} ${item.code}`);
+    showToast(` Đã lập thành công Phiếu ${newTx.type === 'INCOME' ? 'Thu' : 'Chi'} ${item.code}`);
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-blue-500/40 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200">
-          <Sparkles className="w-4 h-4 text-blue-400" />
-          <span>{toastMessage}</span>
-          <button onClick={() => setToastMessage('')} className="ml-2 hover:opacity-80">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+  return ( <div className="space-y-6"> {/* Toast Notification */}
+      {toastMessage && ( <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-500/40 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200"> <Sparkles className="w-4 h-4 text-blue-400" /> <span>{toastMessage}</span> <button onClick={() => setToastMessage('')} className="ml-2 hover:opacity-80"> <X className="w-4 h-4" /> </button> </div> )}
 
-      {/* Header Hero */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <PieChartIcon className="w-6 h-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-slate-900">Báo Cáo Tài Chính & Quản Trị P&L Doanh Nghiệp</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-              Financial Management Suite
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Phân tích tỷ suất lợi nhuận gộp P&L từng hợp đồng gian hàng TMĐT, Quản lý công nợ tự động Zalo/Email/SMS, Sổ thu chi & Dự báo ngân sách.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
+      {/* Header - Clean White with Colorful Highlights */} <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center text-emerald-600 dark:text-emerald-400"> <PieChartIcon className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Báo Cáo Tài Chính & Quản Trị P&L </h1> <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-[11px] font-medium border border-emerald-200 dark:border-emerald-800"> Tài Chính VAS </span> </div> <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5"> Phân tích tỷ suất lợi nhuận gộp P&L hợp đồng, quản lý công nợ, sổ thu chi & dự báo ngân sách </p> </div> </div> <div className="flex items-center gap-2"> <button
             onClick={() => setIsTxModalOpen(true)}
-            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all active:scale-95"
-          >
-            <Plus className="w-4 h-4" /> Lập Phiếu Thu / Chi Mới
-          </button>
-        </div>
-      </div>
-
-      {/* Navigation Tabs (5 Financial Management Sub-Modules) */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
-        <button
+            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-colors"
+          > <Plus className="w-4 h-4" /> Lập Phiếu Thu / Chi </button> </div> </div> {/* Navigation Tabs (7 Financial Management Sub-Modules) - Responsive Touch Scroll */} <div className="bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-1 overflow-x-auto text-xs font-medium scrollbar-none touch-scroll"> <button
           onClick={() => setActiveTab('EXECUTIVE')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'EXECUTIVE' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'EXECUTIVE'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <PieChartIcon className="w-4 h-4 text-blue-400" /> 🏛️ 1. Báo Cáo Tổng Quan Tài Chính
-        </button>
-
-        <button
+        > <PieChartIcon className="w-3.5 h-3.5 text-blue-600" /> 1. Tổng Quan </button> <button
           onClick={() => setActiveTab('P_L')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'P_L' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'P_L'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <TrendingUp className="w-4 h-4 text-emerald-400" /> 📊 2. Lợi Nhuận Gộp P&L Theo Hợp Đồng
-        </button>
-
-        <button
+        > <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> 2. Lợi Nhuận P&L </button> <button
           onClick={() => setActiveTab('DEBT')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'DEBT' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'DEBT'
+              ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <AlertTriangle className="w-4 h-4 text-amber-400" /> 💳 3. Quản Lý Công Nợ & Thu Hồi Nợ
-        </button>
-
-        <button
+        > <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> 3. Công Nợ </button> <button
           onClick={() => setActiveTab('CASH_FLOW')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'CASH_FLOW' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'CASH_FLOW'
+              ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <Wallet className="w-4 h-4 text-purple-400" /> 🧾 4. Sổ Thu Chi & Dòng Tiền Real-Time
-        </button>
-
-        <button
+        > <Wallet className="w-3.5 h-3.5 text-purple-600" /> 4. Dòng Tiền & Thu Chi </button> <button
           onClick={() => setActiveTab('BUDGET_FORECAST')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'BUDGET_FORECAST' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'BUDGET_FORECAST'
+              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <DollarSign className="w-4 h-4 text-indigo-400" /> 🎯 5. Ngân Sách & Dự Báo Tài Chính
-        </button>
-
-        <button
+        > <DollarSign className="w-3.5 h-3.5 text-indigo-600" /> 5. Ngân Sách </button> <button
           onClick={() => setActiveTab('VAS_BALANCE_SHEET')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'VAS_BALANCE_SHEET' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'VAS_BALANCE_SHEET'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <Building2 className="w-4 h-4 text-emerald-400" /> 🏛️ 6. Bảng Cân Đối Kế Toán VAS
-        </button>
-
-        <button
+        > <Building2 className="w-3.5 h-3.5 text-emerald-600" /> 6. Bảng Cân Đối VAS </button> <button
           onClick={() => setActiveTab('FINANCE_CONFIG')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'FINANCE_CONFIG' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'FINANCE_CONFIG'
+              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
-        >
-          <Building2 className="w-4 h-4 text-white" /> ⚙️ 7. Cấu Hình Tài Chính & Kế Toán
-        </button>
-      </div>
-
-      {/* TAB 1: EXECUTIVE FINANCIAL DASHBOARD */}
-      {activeTab === 'EXECUTIVE' && (
-        <div className="space-y-6 text-xs">
-          {/* Top 4 Financial KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-bold">
-            <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-              <span className="text-slate-500 uppercase text-[10.5px]">Doanh Thu Tổng (Gross Revenue)</span>
-              <p className="text-2xl font-black text-blue-700">
-                {new Intl.NumberFormat('vi-VN').format(summary.total_gross_revenue)} ₫
-              </p>
-              <div className="flex items-center gap-1 text-emerald-600 text-[11px] font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% so với tháng trước
-              </div>
-            </div>
-
-            <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-              <span className="text-slate-500 uppercase text-[10.5px]">Lợi Nhuận Gộp P&L (Net Profit)</span>
-              <p className="text-2xl font-black text-emerald-600">
-                {new Intl.NumberFormat('vi-VN').format(summary.total_net_profit)} ₫
-              </p>
-              <span className="text-slate-500 text-[11px]">Tỷ suất lợi nhuận: <strong className="text-emerald-700 font-extrabold">{summary.avg_profit_margin}%</strong></span>
-            </div>
-
-            <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-              <span className="text-slate-500 uppercase text-[10.5px]">Công Nợ Quá Hạn Phải Thu (AR)</span>
-              <p className="text-2xl font-black text-red-600">
-                {new Intl.NumberFormat('vi-VN').format(summary.total_overdue_debt)} ₫
-              </p>
-              <span className="text-red-600 text-[11px] font-bold">⚠️ Cần gửi thông báo đòi nợ Zalo/Email</span>
-            </div>
-
-            <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-1">
-              <span className="text-slate-500 uppercase text-[10.5px]">Dòng Tiền Quỹ Thực Có (Cash Balance)</span>
-              <p className="text-2xl font-black text-purple-700">
-                {new Intl.NumberFormat('vi-VN').format(850000000)} ₫
-              </p>
-              <span className="text-purple-600 text-[11px] font-bold">Techcombank + Quỹ tiền mặt</span>
-            </div>
-          </div>
-
-          {/* Charts Section: 12-Month Performance Trend & Cost Breakdown */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-blue-600" /> Biểu Đồ Xu Hướng Doanh Thu, Chi Phí & Lợi Nhuận (12 Tháng)
-                </h3>
-                <span className="text-[11px] text-slate-500 font-bold">Đơn vị: Triệu VNĐ</span>
-              </div>
-
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={FINANCIAL_TREND_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                    <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                    <Bar dataKey="revenue" name="Doanh Thu" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="cost" name="Chi Phí Vận Hành" fill="#94A3B8" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="profit" name="Lợi Nhuận Ròng" fill="#10B981" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-purple-600" /> Phân Bổ Cơ Cấu Chi Phí Vận Hành (Cost Allocation)
-              </h3>
-
-              <div className="h-64 flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={COST_BREAKDOWN_DATA} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
-                      {COST_BREAKDOWN_DATA.map((entry, idx) => (
-                        <Cell key={`cell-${idx}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        > <Building2 className="w-3.5 h-3.5 text-indigo-600" /> 7. Cấu Hình Tài Chính </button> </div> {/* TAB 1: EXECUTIVE FINANCIAL DASHBOARD */}
+      {activeTab === 'EXECUTIVE' && ( <div className="space-y-6 text-xs"> {/* Top 4 Financial KPI Cards */} <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-medium"> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Doanh Thu Tổng (Gross Revenue)</span> <p className="text-2xl font-semibold text-blue-700"> {formatCurrency(summary.total_gross_revenue)} </p> <div className="flex items-center gap-1 text-emerald-600 text-[11px] font-medium"> <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% so với tháng trước </div> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Lợi Nhuận Gộp P&L (Net Profit)</span> <p className="text-2xl font-semibold text-emerald-600"> {formatCurrency(summary.total_net_profit)} </p> <span className="text-slate-500 text-[11px]">Tỷ suất lợi nhuận: <strong className="text-emerald-700 font-semibold">{summary.avg_profit_margin}%</strong></span> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Công Nợ Quá Hạn Phải Thu (AR)</span> <p className="text-2xl font-semibold text-red-600"> {formatCurrency(summary.total_overdue_debt)} </p> <span className="text-red-600 text-[11px] font-medium"> Cần gửi thông báo đòi nợ Zalo/Email</span> </div> <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1"> <span className="text-slate-500 uppercase text-[10.5px]">Dòng Tiền Quỹ Thực Có (Cash Balance)</span> <p className="text-2xl font-semibold text-purple-700"> {formatCurrency(850000000)} </p> <span className="text-purple-600 text-[11px] font-medium">Techcombank + Quỹ tiền mặt</span> </div> </div> {/* Charts Section: 12-Month Performance Trend & Cost Breakdown */} <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <div className="flex items-center justify-between"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <TrendingUp className="w-4 h-4 text-blue-600" /> Biểu Đồ Xu Hướng Doanh Thu, Chi Phí & Lợi Nhuận (12 Tháng) </h3> <span className="text-[11px] text-slate-500 font-medium">Đơn vị: Triệu VNĐ</span> </div> <div className="h-72"> <ResponsiveContainer width="100%" height="100%"><BarChart data={FINANCIAL_TREND_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}> <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" /> <XAxis dataKey="month" tick={{ fontSize: 10 }} /> <YAxis tick={{ fontSize: 10 }} /> <Tooltip /> <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} /> <Bar dataKey="revenue" name="Doanh Thu" fill="#3B82F6" radius={[4, 4, 0, 0]} /> <Bar dataKey="cost" name="Chi Phí Vận Hành" fill="#94A3B8" radius={[4, 4, 0, 0]} /> <Bar dataKey="profit" name="Lợi Nhuận Ròng" fill="#10B981" radius={[4, 4, 0, 0]} /> </BarChart></ResponsiveContainer> </div> </div> <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <PieChartIcon className="w-4 h-4 text-purple-600" /> Phân Bổ Cơ Cấu Chi Phí Vận Hành (Cost Allocation) </h3> <div className="h-64 flex items-center justify-center"> <ResponsiveContainer width="100%" height="100%"><PieChart> <Pie data={COST_BREAKDOWN_DATA} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label> {COST_BREAKDOWN_DATA.map((entry, idx) => ( <Cell key={`cell-${idx}`} fill={entry.color} /> ))} </Pie> <Tooltip /> </PieChart></ResponsiveContainer> </div> </div> </div> </div> )}
 
       {/* TAB 2: CONTRACT P_L STATEMENT ANALYSIS */}
-      {activeTab === 'P_L' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs font-medium">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-600" /> Báo Cáo Phân Tích Lợi Nhuận Gộp (P&L) Từng Hợp Đồng Gian Hàng TMĐT
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">Theo dõi tỷ suất lợi nhuận gộp thực tế sau khi trừ chi phí nhân sự C&B, KOC Livestream & phí sàn.</p>
-            </div>
-
-            <button
+      {activeTab === 'P_L' && ( <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs font-medium"> <div className="flex flex-col sm:flex-row items-center justify-between gap-4"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <TrendingUp className="w-4 h-4 text-emerald-600" /> Báo Cáo Phân Tích Lợi Nhuận Gộp (P&L) Từng Hợp Đồng Gian Hàng TMĐT </h3> <p className="text-xs text-slate-500 mt-0.5">Theo dõi tỷ suất lợi nhuận gộp thực tế sau khi trừ chi phí nhân sự C&B, KOC Livestream & phí sàn.</p> </div> <button
               onClick={() => showToast('📥 Đã xuất báo cáo P&L định dạng Excel thành công!')}
-              className="px-3.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-extrabold rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-all"
-            >
-              <FileSpreadsheet className="w-4 h-4" /> Xuất Báo Cáo P&L Excel
-            </button>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
-                  <th className="p-3">Mã Hợp Đồng & Khách Hàng</th>
-                  <th className="p-3">Sàn TMĐT</th>
-                  <th className="p-3">GMV Hàng Tháng</th>
-                  <th className="p-3">Doanh Thu Phí (%)</th>
-                  <th className="p-3">Chi Phí Vận Hành & KOC</th>
-                  <th className="p-3">Lợi Nhuận Gộp P&L (₫)</th>
-                  <th className="p-3 text-center">Tỷ Suất Margin (%)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {plStatements.map((pl) => (
-                  <tr key={pl.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <p className="font-extrabold text-slate-900">{pl.company_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{pl.contract_code} · Đại diện: {pl.customer_name}</p>
-                    </td>
-
-                    <td className="p-3 font-bold text-slate-800">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-full text-[11px]">{pl.ecom_platform}</span>
-                    </td>
-
-                    <td className="p-3 font-mono font-bold text-slate-800">
-                      {new Intl.NumberFormat('vi-VN').format(pl.monthly_gmv)} ₫
-                    </td>
-
-                    <td className="p-3 font-mono font-bold text-blue-700">
-                      {new Intl.NumberFormat('vi-VN').format(pl.gross_revenue)} ₫ ({pl.commission_rate_percent}%)
-                    </td>
-
-                    <td className="p-3 font-mono text-[11px]">
-                      <p className="text-slate-700">C&B Nhân sự: <strong>{new Intl.NumberFormat('vi-VN').format(pl.ops_cost)} ₫</strong></p>
-                      <p className="text-slate-500">KOC Ads: <strong>{new Intl.NumberFormat('vi-VN').format(pl.livestream_koc_cost)} ₫</strong></p>
-                    </td>
-
-                    <td className="p-3 font-mono font-black text-emerald-700 text-sm">
-                      {new Intl.NumberFormat('vi-VN').format(pl.net_profit)} ₫
-                    </td>
-
-                    <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-black text-[11px] ${
+              className="px-3.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-all"
+            > <FileSpreadsheet className="w-4 h-4" /> Xuất Báo Cáo P&L Excel </button> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Mã Hợp Đồng & Khách Hàng</th> <th className="p-3">Sàn TMĐT</th> <th className="p-3">GMV Hàng Tháng</th> <th className="p-3">Doanh Thu Phí (%)</th> <th className="p-3">Chi Phí Vận Hành & KOC</th> <th className="p-3">Lợi Nhuận Gộp P&L (₫)</th> <th className="p-3 text-center">Tỷ Suất Margin (%)</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {plStatements.map((pl) => ( <tr key={pl.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-semibold text-slate-900">{pl.company_name}</p> <p className="font-mono text-blue-700 text-[11px]">{pl.contract_code} · Đại diện: {pl.customer_name}</p> </td> <td className="p-3 font-medium text-slate-800"> <span className="px-2.5 py-1 bg-slate-100 rounded-full text-[11px]">{pl.ecom_platform}</span> </td> <td className="p-3 font-mono font-medium text-slate-800"> {formatCurrency(pl.monthly_gmv)} </td> <td className="p-3 font-mono font-medium text-blue-700"> {formatCurrency(pl.gross_revenue)} ({pl.commission_rate_percent}%) </td> <td className="p-3 font-mono text-[11px]"> <p className="text-slate-700">C&B Nhân sự: <strong>{formatCurrency(pl.ops_cost)}</strong></p> <p className="text-slate-500">KOC Ads: <strong>{formatCurrency(pl.livestream_koc_cost)}</strong></p> </td> <td className="p-3 font-mono font-semibold text-emerald-700 text-sm"> {formatCurrency(pl.net_profit)} </td> <td className="p-3 text-center"> <span className={`px-2.5 py-1 rounded-full font-semibold text-[11px] ${
                         pl.profit_margin_percent >= 40
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : pl.profit_margin_percent >= 25
                           ? 'bg-amber-100 text-amber-800 border border-amber-300'
                           : 'bg-red-100 text-red-800 border border-red-300'
-                      }`}>
-                        {pl.profit_margin_percent}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                      }`}> {pl.profit_margin_percent}% </span> </td> </tr> ))} </tbody> </table> </div> </div> )}
 
       {/* TAB 3: ACCOUNTS RECEIVABLE & DEBT COLLECTION */}
-      {activeTab === 'DEBT' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-6 text-xs font-medium">
-          <div>
-            <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600" /> Sổ Quản Lý Công Nợ Hóa Đơn & Đòi Nợ Tự Động Multi-Channel
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Tự động gửi thông báo nhắc nợ kỳ thu phí dịch vụ qua Zalo ZNS, Email tự động & SMS Brandname.</p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
-                  <th className="p-3">Mã Hóa Đơn & Khách Hàng</th>
-                  <th className="p-3">Kỳ Thu Phí & Hợp Đồng</th>
-                  <th className="p-3">Số Tiền Phải Thu</th>
-                  <th className="p-3">Hạn Thanh Toán</th>
-                  <th className="p-3 text-center">Trạng Thái Thắng Nợ</th>
-                  <th className="p-3 text-center">Gửi Đòi Nợ Tự Động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {debtInvoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <p className="font-extrabold text-slate-900">{inv.customer_name}</p>
-                      <p className="font-mono text-blue-700 text-[11px]">{inv.invoice_code}</p>
-                    </td>
-
-                    <td className="p-3">
-                      <p className="font-bold text-slate-800">{inv.billing_period}</p>
-                      <p className="font-mono text-slate-500 text-[11px]">{inv.contract_code}</p>
-                    </td>
-
-                    <td className="p-3 font-mono font-black text-slate-900 text-sm">
-                      {new Intl.NumberFormat('vi-VN').format(inv.amount_due)} ₫
-                    </td>
-
-                    <td className="p-3 font-mono text-slate-700">{inv.due_date}</td>
-
-                    <td className="p-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10.5px] ${
+      {activeTab === 'DEBT' && ( <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-6 text-xs font-medium"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <AlertTriangle className="w-4 h-4 text-amber-600" /> Sổ Quản Lý Công Nợ Hóa Đơn & Đòi Nợ Tự Động Multi-Channel </h3> <p className="text-xs text-slate-500 mt-0.5">Tự động gửi thông báo nhắc nợ kỳ thu phí dịch vụ qua Zalo ZNS, Email tự động & SMS Brandname.</p> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Mã Hóa Đơn & Khách Hàng</th> <th className="p-3">Kỳ Thu Phí & Hợp Đồng</th> <th className="p-3">Số Tiền Phải Thu</th> <th className="p-3">Hạn Thanh Toán</th> <th className="p-3 text-center">Trạng Thái Thắng Nợ</th> <th className="p-3 text-center">Gửi Đòi Nợ Tự Động</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {debtInvoices.map((inv) => ( <tr key={inv.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-semibold text-slate-900">{inv.customer_name}</p> <p className="font-mono text-blue-700 text-[11px]">{inv.invoice_code}</p> </td> <td className="p-3"> <p className="font-medium text-slate-800">{inv.billing_period}</p> <p className="font-mono text-slate-500 text-[11px]">{inv.contract_code}</p> </td> <td className="p-3 font-mono font-semibold text-slate-900 text-sm"> {formatCurrency(inv.amount_due)} </td> <td className="p-3 font-mono text-slate-700">{inv.due_date}</td> <td className="p-3 text-center"> <span className={`px-2.5 py-1 rounded-full font-medium text-[10.5px] ${
                         inv.payment_status === 'PAID'
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : inv.payment_status === 'UNPAID'
                           ? 'bg-amber-100 text-amber-800 border border-amber-300'
                           : 'bg-red-100 text-red-800 border border-red-300 animate-pulse'
-                      }`}>
-                        {inv.payment_status === 'PAID' ? '✅ Đã Thanh Toán' : inv.payment_status === 'UNPAID' ? '⏳ Chờ Thanh Toán' : '⚠️ Nợ Quá Hạn'}
-                      </span>
-                    </td>
-
-                    <td className="p-3 text-center">
-                      {inv.payment_status !== 'PAID' ? (
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
+                      }`}> {inv.payment_status === 'PAID' ? ' Đã Thanh Toán' : inv.payment_status === 'UNPAID' ? '⏳ Chờ Thanh Toán' : ' Nợ Quá Hạn'} </span> </td> <td className="p-3 text-center"> {inv.payment_status !== 'PAID' ? ( <div className="flex items-center justify-center gap-1.5"> <button
                             onClick={() => handleSendReminder(inv, 'Zalo ZNS')}
-                            className="px-2.5 py-1 bg-blue-50 text-blue-700 font-extrabold rounded-lg hover:bg-blue-100 transition-all border border-blue-200"
+                            className="px-2.5 py-1 bg-blue-50 text-blue-700 font-semibold rounded-lg hover:bg-blue-100 transition-all border border-blue-200"
                             title="Gửi Zalo ZNS"
-                          >
-                            📱 Zalo
-                          </button>
-
-                          <button
+                          > Zalo </button> <button
                             onClick={() => handleSendReminder(inv, 'Email')}
-                            className="px-2.5 py-1 bg-purple-50 text-purple-700 font-extrabold rounded-lg hover:bg-purple-100 transition-all border border-purple-200"
+                            className="px-2.5 py-1 bg-purple-50 text-purple-700 font-semibold rounded-lg hover:bg-purple-100 transition-all border border-purple-200"
                             title="Gửi Email"
-                          >
-                            📧 Email
-                          </button>
-
-                          <button
+                          > 📧 Email </button> <button
                             onClick={() => handleSendReminder(inv, 'SMS')}
-                            className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-extrabold rounded-lg hover:bg-emerald-100 transition-all border border-emerald-200"
+                            className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-semibold rounded-lg hover:bg-emerald-100 transition-all border border-emerald-200"
                             title="Gửi SMS Brandname"
-                          >
-                            💬 SMS
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-slate-400 font-bold text-[11px]">Không cần nhắc</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                          > SMS </button> </div> ) : ( <span className="text-slate-400 font-medium text-[11px]">Không cần nhắc</span> )} </td> </tr> ))} </tbody> </table> </div> </div> )}
 
       {/* TAB 4: CASH FLOW & TRANSACTION LEDGER */}
-      {activeTab === 'CASH_FLOW' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs font-medium">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-purple-600" /> Sổ Nhật Ký Giao Dịch Thu / Chi Dòng Tiền Real-Time
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">Theo dõi lịch sử biến động dòng tiền thực tế qua các tài khoản ngân hàng và quỹ tiền mặt.</p>
-            </div>
-
-            <button
+      {activeTab === 'CASH_FLOW' && ( <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs font-medium"> <div className="flex flex-col sm:flex-row items-center justify-between gap-4"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <Wallet className="w-4 h-4 text-purple-600" /> Sổ Nhật Ký Giao Dịch Thu / Chi Dòng Tiền Real-Time </h3> <p className="text-xs text-slate-500 mt-0.5">Theo dõi lịch sử biến động dòng tiền thực tế qua các tài khoản ngân hàng và quỹ tiền mặt.</p> </div> <button
               onClick={() => setIsTxModalOpen(true)}
-              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1.5 transition-all"
-            >
-              <Plus className="w-4 h-4" /> Tạo Phiếu Thu / Chi Mới
-            </button>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
-                  <th className="p-3">Mã Phiếu & Ngày</th>
-                  <th className="p-3">Loại Giao Dịch</th>
-                  <th className="p-3">Danh Mục Thu / Chi</th>
-                  <th className="p-3">Số Tiền (₫)</th>
-                  <th className="p-3">Tài Khoản / Quỹ</th>
-                  <th className="p-3">Nội Dung Diễn Giải</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <p className="font-mono font-bold text-blue-700">{tx.code}</p>
-                      <p className="text-slate-500 text-[11px]">{tx.date}</p>
-                    </td>
-
-                    <td className="p-3">
-                      <span className={`px-2.5 py-0.5 rounded-full font-black text-[10.5px] ${
+              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl shadow-md flex items-center gap-1.5 transition-all"
+            > <Plus className="w-4 h-4" /> Tạo Phiếu Thu / Chi Mới </button> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Mã Phiếu & Ngày</th> <th className="p-3">Loại Giao Dịch</th> <th className="p-3">Danh Mục Thu / Chi</th> <th className="p-3">Số Tiền (₫)</th> <th className="p-3">Tài Khoản / Quỹ</th> <th className="p-3">Nội Dung Diễn Giải</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {transactions.map((tx) => ( <tr key={tx.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-mono font-medium text-blue-700">{tx.code}</p> <p className="text-slate-500 text-[11px]">{tx.date}</p> </td> <td className="p-3"> <span className={`px-2.5 py-0.5 rounded-full font-semibold text-[10.5px] ${
                         tx.type === 'INCOME' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'
-                      }`}>
-                        {tx.type === 'INCOME' ? '🟢 PHIẾU THU' : '🔴 PHIẾU CHI'}
-                      </span>
-                    </td>
-
-                    <td className="p-3 font-bold text-slate-800">{tx.category}</td>
-
-                    <td className={`p-3 font-mono font-black text-sm ${tx.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {tx.type === 'INCOME' ? '+' : '-'}{new Intl.NumberFormat('vi-VN').format(tx.amount)} ₫
-                    </td>
-
-                    <td className="p-3 font-bold text-slate-700">{tx.account}</td>
-
-                    <td className="p-3 text-slate-600 font-normal">{tx.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                      }`}> {tx.type === 'INCOME' ? '🟢 PHIẾU THU' : '🔴 PHIẾU CHI'} </span> </td> <td className="p-3 font-medium text-slate-800">{tx.category}</td> <td className={`p-3 font-mono font-semibold text-sm ${tx.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}> {tx.type === 'INCOME' ? '+' : '-'}{formatCurrency(tx.amount)} </td> <td className="p-3 font-medium text-slate-700">{tx.account}</td> <td className="p-3 text-slate-600 font-normal">{tx.description}</td> </tr> ))} </tbody> </table> </div> </div> )}
 
       {/* TAB 5: DEPARTMENTAL BUDGETING & FORECAST */}
-      {activeTab === 'BUDGET_FORECAST' && (
-        <div className="space-y-6 text-xs font-bold">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-            <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-indigo-600" /> Quản Lý Định Mức Ngân Sách Dự Chi Theo Khối / Phòng Ban
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {budgets.map((b) => (
-                <div key={b.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="font-black text-sm text-slate-900">{b.department_name}</p>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-black ${
+      {activeTab === 'BUDGET_FORECAST' && ( <div className="space-y-6 text-xs font-medium"> <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4"> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <DollarSign className="w-4 h-4 text-indigo-600" /> Quản Lý Định Mức Ngân Sách Dự Chi Theo Khối / Phòng Ban </h3> <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {budgets.map((b) => ( <div key={b.id} className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3"> <div className="flex items-center justify-between"> <p className="font-semibold text-sm text-slate-900">{b.department_name}</p> <span className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold ${
                       b.status === 'SAFE'
                         ? 'bg-emerald-100 text-emerald-800'
                         : b.status === 'WARNING'
                         ? 'bg-amber-100 text-amber-800'
                         : 'bg-red-100 text-red-800 animate-pulse'
-                    }`}>
-                      {b.status === 'SAFE' ? '🟢 An Toàn' : b.status === 'WARNING' ? '🟡 Sắp Hết Ngân Sách' : '🔴 Vượt Ngân Sách'}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
-                    <div>
-                      <span className="text-slate-500 font-normal block">Hạn Mức Cấp:</span>
-                      <strong className="text-slate-900">{new Intl.NumberFormat('vi-VN').format(b.allocated_budget)} ₫</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-normal block">Đã Chi Tiêu:</span>
-                      <strong className="text-purple-700">{new Intl.NumberFormat('vi-VN').format(b.spent_amount)} ₫</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-normal block">Còn Lại:</span>
-                      <strong className={b.remaining_amount >= 0 ? 'text-emerald-700' : 'text-red-700'}>
-                        {new Intl.NumberFormat('vi-VN').format(b.remaining_amount)} ₫
-                      </strong>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[10.5px]">
-                      <span className="text-slate-500 font-semibold">Tỷ lệ tiêu dùng:</span>
-                      <span className="font-black text-slate-900">{b.utilization_pct}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                      <div
+                    }`}> {b.status === 'SAFE' ? '🟢 An Toàn' : b.status === 'WARNING' ? '🟡 Sắp Hết Ngân Sách' : '🔴 Vượt Ngân Sách'} </span> </div> <div className="grid grid-cols-3 gap-2 text-[11px] font-mono"> <div> <span className="text-slate-500 font-normal block">Hạn Mức Cấp:</span> <strong className="text-slate-900">{formatCurrency(b.allocated_budget)}</strong> </div> <div> <span className="text-slate-500 font-normal block">Đã Chi Tiêu:</span> <strong className="text-purple-700">{formatCurrency(b.spent_amount)}</strong> </div> <div> <span className="text-slate-500 font-normal block">Còn Lại:</span> <strong className={b.remaining_amount >= 0 ? 'text-emerald-700' : 'text-red-700'}> {formatCurrency(b.remaining_amount)} </strong> </div> </div> {/* Progress Bar */} <div className="space-y-1"> <div className="flex items-center justify-between text-[10.5px]"> <span className="text-slate-500 font-semibold">Tỷ lệ tiêu dùng:</span> <span className="font-semibold text-slate-900">{b.utilization_pct}%</span> </div> <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden"> <div
                         className={`h-full transition-all ${
                           b.utilization_pct > 100 ? 'bg-red-600' : b.utilization_pct > 85 ? 'bg-amber-500' : 'bg-emerald-600'
                         }`}
                         style={{ width: `${Math.min(b.utilization_pct, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+                      /> </div> </div> </div> ))} </div> </div> </div> )}
 
       {/* TAB 6: VAS BALANCE SHEET & DOUBLE-ENTRY GENERAL LEDGER */}
-      {activeTab === 'VAS_BALANCE_SHEET' && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-4">
-              <div>
-                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-emerald-600" /> Bảng Cân Đối Kế Toán Chuẩn VAS (Thông tư 200/2014/TT-BTC)
-                </h3>
-                <p className="text-xs text-slate-500 font-normal mt-0.5">
-                  Báo cáo cân đối Tổng Tài Sản = Tổng Nguồn Vốn (Tiền mặt, Hàng tồn kho, Tài sản cố định, Công nợ & Vốn chủ sở hữu).
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full font-mono text-xs border border-emerald-200">
-                  ⚖️ Trạng Thái: Cân Bằng (0 ₫ chênh lệch)
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* CỘT TÀI SẢN (ASSETS) */}
-              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h4 className="font-extrabold text-slate-900 text-sm">A. TỔNG TÀI SẢN (ASSETS)</h4>
-                  <span className="font-mono text-emerald-700 text-sm font-black">4.412.300.000 ₫</span>
-                </div>
-
-                <div className="space-y-3 font-medium">
-                  <div>
-                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
-                      <span>I. TÀI SẢN NGẮN HẠN</span>
-                      <span className="font-mono text-slate-900">4.055.000.000 ₫</span>
-                    </div>
-                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
-                      <li className="flex justify-between">
-                        <span>1. Tiền & các khoản tương đương tiền (TK 111, 112)</span>
-                        <span className="font-mono font-bold text-slate-900">3.450.000.000 ₫</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>2. Phải thu ngắn hạn khách hàng (TK 131)</span>
-                        <span className="font-mono font-bold text-slate-900">485.000.000 ₫</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>3. Hàng tồn kho kho vận (TK 156)</span>
-                        <span className="font-mono font-bold text-slate-900">120.000.000 ₫</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
-                      <span>II. TÀI SẢN DÀI HẠN</span>
-                      <span className="font-mono text-slate-900">357.300.000 ₫</span>
-                    </div>
-                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
-                      <li className="flex justify-between">
-                        <span>1. Nguyên giá Tài sản cố định hữu hình (TK 211)</span>
-                        <span className="font-mono font-bold text-slate-900">398.500.000 ₫</span>
-                      </li>
-                      <li className="flex justify-between text-purple-700">
-                        <span>2. Giá trị hao mòn lũy kế (TK 214)</span>
-                        <span className="font-mono font-bold">-41.200.000 ₫</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* CỘT NGUỒN VỐN (LIABILITIES & EQUITY) */}
-              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h4 className="font-extrabold text-slate-900 text-sm">B. TỔNG NGUỒN VỐN (EQUITY & LIABILITIES)</h4>
-                  <span className="font-mono text-blue-700 text-sm font-black">4.412.300.000 ₫</span>
-                </div>
-
-                <div className="space-y-3 font-medium">
-                  <div>
-                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
-                      <span>I. NỢ PHẢI TRẢ (LIABILITIES)</span>
-                      <span className="font-mono text-slate-900">498.000.000 ₫</span>
-                    </div>
-                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
-                      <li className="flex justify-between">
-                        <span>1. Phải trả người bán ngắn hạn (TK 331)</span>
-                        <span className="font-mono font-bold text-slate-900">245.000.000 ₫</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>2. Thuế & các khoản phải nộp Nhà nước (TK 333)</span>
-                        <span className="font-mono font-bold text-slate-900">68.000.000 ₫</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>3. Phải trả người lao động Lương 3P (TK 334)</span>
-                        <span className="font-mono font-bold text-slate-900">185.000.000 ₫</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between font-extrabold text-slate-800 border-b pb-1">
-                      <span>II. VỐN CHỦ SỞ HỮU (OWNER'S EQUITY)</span>
-                      <span className="font-mono text-slate-900">3.914.300.000 ₫</span>
-                    </div>
-                    <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]">
-                      <li className="flex justify-between">
-                        <span>1. Vốn góp của chủ sở hữu (TK 411)</span>
-                        <span className="font-mono font-bold text-slate-900">3.500.000.000 ₫</span>
-                      </li>
-                      <li className="flex justify-between text-emerald-700">
-                        <span>2. Lợi nhuận sau thuế chưa phân phối (TK 421)</span>
-                        <span className="font-mono font-bold">414.300.000 ₫</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SỔ CÁI BÚT TOÁN ĐỊNH KHOẢN ĐÚP */}
-            <div className="pt-4 border-t space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                <FileSpreadsheet className="w-4 h-4 text-purple-600" /> Sổ Nhật Ký Bút Toán Định Khoản Đúp (General Ledger Entries)
-              </h4>
-
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-slate-100 border-b font-extrabold uppercase text-[10.5px]">
-                      <th className="p-2.5">Ngày Bút Toán</th>
-                      <th className="p-2.5">Mã Chứng Từ</th>
-                      <th className="p-2.5">Diễn Giải Nghiệp Vụ</th>
-                      <th className="p-2.5 font-mono text-center">Nợ (Debit TK)</th>
-                      <th className="p-2.5 font-mono text-center">Có (Credit TK)</th>
-                      <th className="p-2.5 font-mono text-right">Số Tiền (VND)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
-                    <tr className="hover:bg-slate-50">
-                      <td className="p-2.5 font-mono">2026-07-28</td>
-                      <td className="p-2.5 font-mono font-bold text-blue-700">PT-2026-0701</td>
-                      <td className="p-2.5">Thu tiền dịch vụ hợp đồng Agency Hồng Lực</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-emerald-700">TK 112 (TGNH)</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-blue-700">TK 511 (Doanh Thu)</td>
-                      <td className="p-2.5 text-right font-mono font-black text-slate-900">38.250.000 ₫</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50">
-                      <td className="p-2.5 font-mono">2026-07-25</td>
-                      <td className="p-2.5 font-mono font-bold text-red-700">PC-2026-0702</td>
-                      <td className="p-2.5">Thanh toán lương 3P tháng 7 cho nhân sự</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-purple-700">TK 334 (Phải Trả Lương)</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-emerald-700">TK 112 (TGNH)</td>
-                      <td className="p-2.5 text-right font-mono font-black text-slate-900">145.000.000 ₫</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50">
-                      <td className="p-2.5 font-mono">2026-07-01</td>
-                      <td className="p-2.5 font-mono font-bold text-purple-700">KH-2026-0701</td>
-                      <td className="p-2.5">Trích khấu hao tài sản cố định máy tính Server</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-slate-700">TK 642 (Chi Phí QLDN)</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-purple-700">TK 214 (Hao Mòn TSCD)</td>
-                      <td className="p-2.5 text-right font-mono font-black text-slate-900">1.250.000 ₫</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {activeTab === 'VAS_BALANCE_SHEET' && ( <div className="space-y-6"> <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-medium"> <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-4"> <div> <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2"> <Building2 className="w-5 h-5 text-emerald-600" /> Bảng Cân Đối Kế Toán Chuẩn VAS (Thông tư 200/2014/TT-BTC) </h3> <p className="text-xs text-slate-500 font-normal mt-0.5"> Báo cáo cân đối Tổng Tài Sản = Tổng Nguồn Vốn (Tiền mặt, Hàng tồn kho, Tài sản cố định, Công nợ & Vốn chủ sở hữu). </p> </div> <div className="flex items-center gap-2"> <span className="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full font-mono text-xs border border-emerald-200"> ⚖ Trạng Thái: Cân Bằng (0 ₫ chênh lệch) </span> </div> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* CỘT TÀI SẢN (ASSETS) */} <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4"> <div className="flex items-center justify-between border-b pb-2"> <h4 className="font-semibold text-slate-900 text-sm">A. TỔNG TÀI SẢN (ASSETS)</h4> <span className="font-mono text-emerald-700 text-sm font-semibold">4,412,300,000 ₫</span> </div> <div className="space-y-3 font-medium"> <div> <div className="flex justify-between font-semibold text-slate-800 border-b pb-1"> <span>I. TÀI SẢN NGẮN HẠN</span> <span className="font-mono text-slate-900">4,055,000,000 ₫</span> </div> <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]"> <li className="flex justify-between"> <span>1. Tiền & các khoản tương đương tiền (TK 111, 112)</span> <span className="font-mono font-medium text-slate-900">3,450,000,000 ₫</span> </li> <li className="flex justify-between"> <span>2. Phải thu ngắn hạn khách hàng (TK 131)</span> <span className="font-mono font-medium text-slate-900">485,000,000 ₫</span> </li> <li className="flex justify-between"> <span>3. Hàng tồn kho kho vận (TK 156)</span> <span className="font-mono font-medium text-slate-900">120,000,000 ₫</span> </li> </ul> </div> <div> <div className="flex justify-between font-semibold text-slate-800 border-b pb-1"> <span>II. TÀI SẢN DÀI HẠN</span> <span className="font-mono text-slate-900">357,300,000 ₫</span> </div> <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]"> <li className="flex justify-between"> <span>1. Nguyên giá Tài sản cố định hữu hình (TK 211)</span> <span className="font-mono font-medium text-slate-900">398,500,000 ₫</span> </li> <li className="flex justify-between text-purple-700"> <span>2. Giá trị hao mòn lũy kế (TK 214)</span> <span className="font-mono font-medium">-41,200,000 ₫</span> </li> </ul> </div> </div> </div> {/* CỘT NGUỒN VỐN (LIABILITIES & EQUITY) */} <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4"> <div className="flex items-center justify-between border-b pb-2"> <h4 className="font-semibold text-slate-900 text-sm">B. TỔNG NGUỒN VỐN (EQUITY & LIABILITIES)</h4> <span className="font-mono text-blue-700 text-sm font-semibold">4,412,300,000 ₫</span> </div> <div className="space-y-3 font-medium"> <div> <div className="flex justify-between font-semibold text-slate-800 border-b pb-1"> <span>I. NỢ PHẢI TRẢ (LIABILITIES)</span> <span className="font-mono text-slate-900">498,000,000 ₫</span> </div> <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]"> <li className="flex justify-between"> <span>1. Phải trả người bán ngắn hạn (TK 331)</span> <span className="font-mono font-medium text-slate-900">245,000,000 ₫</span> </li> <li className="flex justify-between"> <span>2. Thuế & các khoản phải nộp Nhà nước (TK 333)</span> <span className="font-mono font-medium text-slate-900">68,000,000 ₫</span> </li> <li className="flex justify-between"> <span>3. Phải trả người lao động Lương 3P (TK 334)</span> <span className="font-mono font-medium text-slate-900">185,000,000 ₫</span> </li> </ul> </div> <div> <div className="flex justify-between font-semibold text-slate-800 border-b pb-1"> <span>II. VỐN CHỦ SỞ HỮU (OWNER'S EQUITY)</span> <span className="font-mono text-slate-900">3,914,300,000 ₫</span> </div> <ul className="pl-3 mt-1 space-y-1 text-slate-600 text-[11.5px]"> <li className="flex justify-between"> <span>1. Vốn góp của chủ sở hữu (TK 411)</span> <span className="font-mono font-medium text-slate-900">3,500,000,000 ₫</span> </li> <li className="flex justify-between text-emerald-700"> <span>2. Lợi nhuận sau thuế chưa phân phối (TK 421)</span> <span className="font-mono font-medium">414,300,000 ₫</span> </li> </ul> </div> </div> </div> </div> {/* SỔ CÁI BÚT TOÁN ĐỊNH KHOẢN ĐÚP */} <div className="pt-4 border-t space-y-3"> <h4 className="font-semibold text-slate-900 text-sm flex items-center gap-2"> <FileSpreadsheet className="w-4 h-4 text-purple-600" /> Sổ Nhật Ký Bút Toán Định Khoản Đúp (General Ledger Entries) </h4> <div className="overflow-x-auto border border-slate-200 rounded-xl"> <table className="w-full text-left border-collapse text-xs"> <thead> <tr className="bg-slate-100 border-b font-semibold uppercase text-[10.5px]"> <th className="p-2.5">Ngày Bút Toán</th> <th className="p-2.5">Mã Chứng Từ</th> <th className="p-2.5">Diễn Giải Nghiệp Vụ</th> <th className="p-2.5 font-mono text-center">Nợ (Debit TK)</th> <th className="p-2.5 font-mono text-center">Có (Credit TK)</th> <th className="p-2.5 font-mono text-right">Số Tiền (VND)</th> </tr> </thead> <tbody className="divide-y divide-slate-100 font-medium"> <tr className="hover:bg-slate-50"> <td className="p-2.5 font-mono">2026-07-28</td> <td className="p-2.5 font-mono font-medium text-blue-700">PT-2026-0701</td> <td className="p-2.5">Thu tiền dịch vụ hợp đồng Agency Hồng Lực</td> <td className="p-2.5 text-center font-mono font-medium text-emerald-700">TK 112 (TGNH)</td> <td className="p-2.5 text-center font-mono font-medium text-blue-700">TK 511 (Doanh Thu)</td> <td className="p-2.5 text-right font-mono font-semibold text-slate-900">38,250,000 ₫</td> </tr> <tr className="hover:bg-slate-50"> <td className="p-2.5 font-mono">2026-07-25</td> <td className="p-2.5 font-mono font-medium text-red-700">PC-2026-0702</td> <td className="p-2.5">Thanh toán lương 3P tháng 7 cho nhân sự</td> <td className="p-2.5 text-center font-mono font-medium text-purple-700">TK 334 (Phải Trả Lương)</td> <td className="p-2.5 text-center font-mono font-medium text-emerald-700">TK 112 (TGNH)</td> <td className="p-2.5 text-right font-mono font-semibold text-slate-900">145,000,000 ₫</td> </tr> <tr className="hover:bg-slate-50"> <td className="p-2.5 font-mono">2026-07-01</td> <td className="p-2.5 font-mono font-medium text-purple-700">KH-2026-0701</td> <td className="p-2.5">Trích khấu hao tài sản cố định máy tính Server</td> <td className="p-2.5 text-center font-mono font-medium text-slate-700">TK 642 (Chi Phí QLDN)</td> <td className="p-2.5 text-center font-mono font-medium text-purple-700">TK 214 (Hao Mòn TSCD)</td> <td className="p-2.5 text-right font-mono font-semibold text-slate-900">1,250,000 ₫</td> </tr> </tbody> </table> </div> </div> </div> </div> )}
 
       {/* TAB 7: FINANCE MODULE CONFIGURATION PANEL */}
-      {activeTab === 'FINANCE_CONFIG' && (
-        <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6 text-xs font-bold">
-          <div className="flex items-center justify-between border-b pb-3">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-indigo-600" /> Cấu Hình Tham Số Kế Toán, Thuế & Công Nợ
-              </h3>
-              <p className="text-[11px] text-slate-500 font-normal mt-0.5">
-                Thiết lập quy tắc nhảy số chứng từ thu chi tự động, thuế suất GTGT & ngưỡng cảnh báo nợ quá hạn.
-              </p>
-            </div>
-
-            <button
+      {activeTab === 'FINANCE_CONFIG' && ( <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-6 text-xs font-medium"> <div className="flex items-center justify-between border-b pb-3"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <Building2 className="w-5 h-5 text-indigo-600" /> Cấu Hình Tham Số Kế Toán, Thuế & Công Nợ </h3> <p className="text-[11px] text-slate-500 font-normal mt-0.5"> Thiết lập quy tắc nhảy số chứng từ thu chi tự động, thuế suất GTGT & ngưỡng cảnh báo nợ quá hạn. </p> </div> <button
               onClick={() => showToast('💾 Đã lưu thành công cấu hình tham số Kế toán & Tài chính!')}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
-            >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Tài Chính
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Box 1: Quy tắc Đánh Số Chứng Từ */}
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
-                1. Tiền Tố Đánh Số Chứng Từ Thu / Chi
-              </h4>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Tiền tố Phiếu Thu *</label>
-                  <input
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all active:scale-95"
+            > <Save className="w-4 h-4" /> Lưu Cấu Hình Tài Chính </button> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Box 1: Quy tắc Đánh Số Chứng Từ */} <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-3"> <h4 className="font-semibold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider"> 1. Tiền Tố Đánh Số Chứng Từ Thu / Chi </h4> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Tiền tố Phiếu Thu *</label> <input
                     type="text"
                     value={finConfig.receipt_prefix}
                     onChange={(e) => setFinConfig({ ...finConfig, receipt_prefix: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Tiền tố Phiếu Chi *</label>
-                  <input
+                  /> </div> <div> <label className="block text-slate-700 mb-1">Tiền tố Phiếu Chi *</label> <input
                     type="text"
                     value={finConfig.payment_prefix}
                     onChange={(e) => setFinConfig({ ...finConfig, payment_prefix: e.target.value })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-red-700"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Box 2: Thuế Suất & Tuổi Nợ SLA */}
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
-              <h4 className="font-extrabold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider">
-                2. Thuế Suất & Ngưỡng Nợ Xấu (Ngày)
-              </h4>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Thuế Suất GTGT VAT (%) *</label>
-                  <input
+                  /> </div> </div> </div> {/* Box 2: Thuế Suất & Tuổi Nợ SLA */} <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-3"> <h4 className="font-semibold text-slate-900 text-xs text-indigo-700 uppercase tracking-wider"> 2. Thuế Suất & Ngưỡng Nợ Xấu (Ngày) </h4> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Thuế Suất GTGT VAT (%) *</label> <input
                     type="number"
                     value={finConfig.vat_rate}
                     onChange={(e) => setFinConfig({ ...finConfig, vat_rate: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Cảnh Báo Nợ Quá Hạn (Ngày) *</label>
-                  <input
+                  /> </div> <div> <label className="block text-slate-700 mb-1">Cảnh Báo Nợ Quá Hạn (Ngày) *</label> <input
                     type="number"
                     value={finConfig.warning_debt_days}
                     onChange={(e) => setFinConfig({ ...finConfig, warning_debt_days: Number(e.target.value) })}
                     className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                  /> </div> </div> </div> </div> </div> )}
 
       {/* MODAL LẬP PHIẾU THU / CHI MỚI */}
-      {isTxModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 text-xs font-bold">
-            <div className="bg-blue-600 text-white p-5 flex items-center justify-between">
-              <h3 className="font-extrabold text-base flex items-center gap-2">
-                <Wallet className="w-5 h-5" /> Lập Phiếu Thu / Chi Tài Chính Mới
-              </h3>
-              <button onClick={() => setIsTxModalOpen(false)} className="text-white/80 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddTransaction} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Loại Phiếu *</label>
-                  <select
+      {isTxModalOpen && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"> <div className="bg-white rounded-xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 text-xs font-medium"> <div className="bg-blue-600 text-white p-5 flex items-center justify-between"> <h3 className="font-semibold text-base flex items-center gap-2"> <Wallet className="w-5 h-5" /> Lập Phiếu Thu / Chi Tài Chính Mới </h3> <button onClick={() => setIsTxModalOpen(false)} className="text-white/80 hover:text-white"> <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleAddTransaction} className="p-6 space-y-4"> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Loại Phiếu *</label> <select
                     value={newTx.type}
                     onChange={(e) => setNewTx({ ...newTx, type: e.target.value as any })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  >
-                    <option value="EXPENSE">🔴 Phiếu Chi (Chi Tiền)</option>
-                    <option value="INCOME">🟢 Phiếu Thu (Thu Tiền)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Danh Mục Thu / Chi *</label>
-                  <select
+                  > <option value="EXPENSE">🔴 Phiếu Chi (Chi Tiền)</option> <option value="INCOME">🟢 Phiếu Thu (Thu Tiền)</option> </select> </div> <div> <label className="block text-slate-700 mb-1">Danh Mục Thu / Chi *</label> <select
                     value={newTx.category}
                     onChange={(e) => setNewTx({ ...newTx, category: e.target.value as any })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  >
-                    <option value="Hợp Đồng Dịch Vụ">Hợp Đồng Dịch Vụ</option>
-                    <option value="Chi Lương Nhân Sự">Chi Lương Nhân Sự</option>
-                    <option value="Chi Marketing Ads">Chi Marketing Ads</option>
-                    <option value="Chi Server & SaaS">Chi Server & SaaS</option>
-                    <option value="Chi Tiền Điện Nước VP">Chi Tiền Điện Nước VP</option>
-                    <option value="Khác">Khác</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Số Tiền (VND) *</label>
-                  <input
+                  > <option value="Hợp Đồng Dịch Vụ">Hợp Đồng Dịch Vụ</option> <option value="Chi Lương Nhân Sự">Chi Lương Nhân Sự</option> <option value="Chi Marketing Ads">Chi Marketing Ads</option> <option value="Chi Server & SaaS">Chi Server & SaaS</option> <option value="Chi Tiền Điện Nước VP">Chi Tiền Điện Nước VP</option> <option value="Khác">Khác</option> </select> </div> </div> <div className="grid grid-cols-2 gap-3"> <div> <label className="block text-slate-700 mb-1">Số Tiền (VND) *</label> <input
                     type="number"
                     step={1000000}
                     required
                     value={newTx.amount}
                     onChange={(e) => setNewTx({ ...newTx, amount: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-black text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Tài Khoản Giao Dịch *</label>
-                  <select
+                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-semibold text-sm"
+                  /> </div> <div> <label className="block text-slate-700 mb-1">Tài Khoản Giao Dịch *</label> <select
                     value={newTx.account}
                     onChange={(e) => setNewTx({ ...newTx, account: e.target.value as any })}
                     className="w-full px-3 py-2 border rounded-xl"
-                  >
-                    <option value="Techcombank">Techcombank</option>
-                    <option value="Vietcombank">Vietcombank</option>
-                    <option value="Quỹ Tiền Mặt">Quỹ Tiền Mặt</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1">Diễn Giải Nội Dung Giao Dịch *</label>
-                <textarea
+                  > <option value="Techcombank">Techcombank</option> <option value="Vietcombank">Vietcombank</option> <option value="Quỹ Tiền Mặt">Quỹ Tiền Mặt</option> </select> </div> </div> <div> <label className="block text-slate-700 mb-1">Diễn Giải Nội Dung Giao Dịch *</label> <textarea
                   rows={3}
                   required
                   value={newTx.description}
                   onChange={(e) => setNewTx({ ...newTx, description: e.target.value })}
                   placeholder="Nhập chi tiết nội dung thu chi..."
                   className="w-full px-3 py-2 border rounded-xl"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                <button
+                /> </div> <div className="flex items-center justify-end gap-3 pt-4 border-t"> <button
                   type="button"
                   onClick={() => setIsTxModalOpen(false)}
                   className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
-                >
-                  Hủy
-                </button>
-                <button
+                > Hủy </button> <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30"
-                >
-                  Lưu Phiếu Giao Dịch
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+                  className="px-5 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30"
+                > Lưu Phiếu Giao Dịch </button> </div> </form> </div> </div> )} </div> );
 }

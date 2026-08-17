@@ -28,6 +28,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { EmployeeProfile } from '@/types';
+import { formatCurrency, formatNumber } from '@/lib/formatters';
 
 const PALETTE = ['#2E5CE6', '#7C3AED', '#1F7A33', '#D97706', '#C22F35', '#0E7490'];
 
@@ -42,10 +43,9 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_ORDER = ['Active', 'Probation', 'Pending_Resign', 'Suspended', 'Resigned', 'Applicant'];
 
-const formatVND = (n: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(n || 0);
+const formatVND = (n: number) => formatCurrency(n || 0);
 
-const formatCompact = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n || 0));
+const formatCompact = (n: number) => formatNumber(Math.round(n || 0));
 
 function daysBetween(from: Date, to: Date) {
   return Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
@@ -161,215 +161,12 @@ export default function HrmDashboard({ employees }: { employees: EmployeeProfile
   ];
 
   const cardCls = 'bg-white border border-slate-200 rounded-xl p-4 shadow-sm';
-  const labelCls = 'text-[10.5px] font-extrabold tracking-wide text-slate-500 uppercase';
+  const labelCls = 'text-[10.5px] font-semibold tracking-wide text-slate-500 uppercase';
 
   const renderPieLabel = (entry: any) => `${entry.name}: ${entry.value}`;
 
-  return (
-    <div className="space-y-6">
-      {/* Hàng thẻ KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-        {kpiCards.map((c) => {
+  return ( <div className="space-y-6"> {/* Hàng thẻ KPI */} <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3"> {kpiCards.map((c) => {
           const Icon = c.icon;
-          return (
-            <div key={c.label} className={cardCls}>
-              <div className="flex items-center justify-between mb-2">
-                <span className={labelCls}>{c.label}</span>
-                <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center ${c.color}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-              </div>
-              <p className={`font-extrabold text-slate-900 ${c.small ? 'text-base' : 'text-2xl'}`}>{c.value}</p>
-              {c.sub && <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Cảnh báo hợp đồng */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white border border-red-200 rounded-xl p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
-              <AlertTriangle className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="font-extrabold text-slate-900 text-sm">HĐ Đã Hết Hạn</p>
-              <p className="text-[11px] text-slate-500">{contractAlerts.expired.length} hợp đồng cần xử lý gấp</p>
-            </div>
-          </div>
-          {contractAlerts.expired.length === 0 ? (
-            <p className="text-xs text-slate-400 italic">Không có hợp đồng nào đã hết hạn.</p>
-          ) : (
-            <div className="space-y-1.5">
-              {contractAlerts.expired.map((e) => (
-                <div key={e.id} className="flex items-center justify-between text-xs bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                  <span className="font-bold text-slate-900">{e.full_name} <span className="font-mono text-red-600 font-normal">({e.employee_code})</span></span>
-                  <span className="font-semibold text-red-700">{e.contract_end_date}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white border border-amber-200 rounded-xl p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
-              <CalendarClock className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="font-extrabold text-slate-900 text-sm">HĐ Sắp Hết Hạn (60 ngày)</p>
-              <p className="text-[11px] text-slate-500">{contractAlerts.expiringSoon.length} hợp đồng cần gia hạn</p>
-            </div>
-          </div>
-          {contractAlerts.expiringSoon.length === 0 ? (
-            <p className="text-xs text-slate-400 italic">Không có hợp đồng nào sắp hết hạn.</p>
-          ) : (
-            <div className="space-y-1.5">
-              {contractAlerts.expiringSoon.map((e) => (
-                <div key={e.id} className="flex items-center justify-between text-xs bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                  <span className="font-bold text-slate-900">{e.full_name} <span className="font-mono text-amber-700 font-normal">({e.employee_code})</span></span>
-                  <span className="font-semibold text-amber-700">{e.contract_end_date}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Biểu đồ cơ cấu */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Cơ cấu loại hợp đồng */}
-        <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Loại Hợp Đồng</h3>
-          <p className="text-[11px] text-slate-500 mb-3">Phân bổ theo loại hợp đồng lao động</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={contractTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={renderPieLabel}>
-                {contractTypeData.map((_, i) => (
-                  <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Cơ cấu giới tính - Donut */}
-        <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Giới Tính</h3>
-          <p className="text-[11px] text-slate-500 mb-3">Tỷ lệ nam / nữ / khác</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={genderData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={2} label={renderPieLabel}>
-                {genderData.map((_, i) => (
-                  <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Cơ cấu trình độ chuyên môn */}
-        <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Trình Độ Chuyên Môn</h3>
-          <p className="text-[11px] text-slate-500 mb-3">Trình độ chuyên môn kỹ thuật (CMKT)</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={educationData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} />
-              <Tooltip />
-              <Bar dataKey="value" name="Số lao động" radius={[6, 6, 0, 0]}>
-                {educationData.map((_, i) => (
-                  <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Cơ cấu thâm niên */}
-        <div className={cardCls}>
-          <h3 className="font-extrabold text-slate-900 text-sm mb-1">Cơ Cấu Thâm Niên</h3>
-          <p className="text-[11px] text-slate-500 mb-3">Số năm công tác tính từ ngày vào làm</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={seniorityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} />
-              <Tooltip />
-              <Bar dataKey="value" name="Số lao động" radius={[6, 6, 0, 0]}>
-                {seniorityData.map((_, i) => (
-                  <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Phân bổ trạng thái theo phòng ban - stacked */}
-      <div className={cardCls}>
-        <h3 className="font-extrabold text-slate-900 text-sm mb-1">Phân Bổ Trạng Thái Lao Động Theo Phòng Ban</h3>
-        <p className="text-[11px] text-slate-500 mb-3">Số lượng nhân sự theo trạng thái làm việc tại từng phòng ban</p>
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={deptStatusData.rows} margin={{ bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-            <XAxis dataKey="department" tick={{ fontSize: 10, fill: '#64748b' }} interval={0} angle={-8} textAnchor="end" height={60} />
-            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} />
-            <Tooltip />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-            {deptStatusData.statuses.map((s, i) => (
-              <Bar key={s} dataKey={s} stackId="status" name={STATUS_LABELS[s] || s} fill={PALETTE[i % PALETTE.length]} radius={i === deptStatusData.statuses.length - 1 ? [6, 6, 0, 0] : [0, 0, 0, 0]} />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Khối thời giờ làm việc & nghỉ ngơi */}
-      <div>
-        <h3 className="font-extrabold text-slate-900 text-sm mb-3 flex items-center gap-2">
-          <CalendarDays className="w-4 h-4 text-blue-600" /> Thời Giờ Làm Việc & Nghỉ Ngơi
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className={cardCls}>
-            <div className="flex items-center gap-2 mb-1">
-              <CalendarDays className="w-4 h-4 text-blue-600" />
-              <span className={labelCls}>Tổng Ngày Phép</span>
-            </div>
-            <p className="font-extrabold text-slate-900 text-2xl">{formatCompact(timeStats.totalLeave)}</p>
-            <p className="text-[11px] text-slate-500">ngày phép năm</p>
-          </div>
-          <div className={cardCls}>
-            <div className="flex items-center gap-2 mb-1">
-              <Plane className="w-4 h-4 text-amber-600" />
-              <span className={labelCls}>Đã Nghỉ</span>
-            </div>
-            <p className="font-extrabold text-slate-900 text-2xl">{formatCompact(timeStats.takenLeave)}</p>
-            <p className="text-[11px] text-slate-500">ngày đã sử dụng</p>
-          </div>
-          <div className={cardCls}>
-            <div className="flex items-center gap-2 mb-1">
-              <CalendarDays className="w-4 h-4 text-emerald-600" />
-              <span className={labelCls}>Còn Lại</span>
-            </div>
-            <p className="font-extrabold text-emerald-600 text-2xl">{formatCompact(timeStats.remainingLeave)}</p>
-            <p className="text-[11px] text-slate-500">ngày phép còn lại</p>
-          </div>
-          <div className={cardCls}>
-            <div className="flex items-center gap-2 mb-1">
-              <Timer className="w-4 h-4 text-red-600" />
-              <span className={labelCls}>Tổng Giờ OT</span>
-            </div>
-            <p className="font-extrabold text-slate-900 text-2xl">{formatCompact(timeStats.totalOT)}</p>
-            <p className="text-[11px] text-slate-500">giờ làm thêm lũy kế</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+          return ( <div key={c.label} className={cardCls}> <div className="flex items-center justify-between mb-2"> <span className={labelCls}>{c.label}</span> <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center ${c.color}`}> <Icon className="w-4 h-4" /> </div> </div> <p className={`font-semibold text-slate-900 ${c.small ? 'text-base' : 'text-2xl'}`}>{c.value}</p> {c.sub && <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>} </div> );
+        })} </div> {/* Cảnh báo hợp đồng */} <div className="grid grid-cols-1 lg:grid-cols-2 gap-4"> <div className="bg-white border border-red-200 rounded-xl p-4 shadow-sm"> <div className="flex items-center gap-2 mb-3"> <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600"> <AlertTriangle className="w-4 h-4" /> </div> <div> <p className="font-semibold text-slate-900 text-sm">HĐ Đã Hết Hạn</p> <p className="text-[11px] text-slate-500">{contractAlerts.expired.length} hợp đồng cần xử lý gấp</p> </div> </div> {contractAlerts.expired.length === 0 ? ( <p className="text-xs text-slate-400 italic">Không có hợp đồng nào đã hết hạn.</p> ) : ( <div className="space-y-1.5"> {contractAlerts.expired.map((e) => ( <div key={e.id} className="flex items-center justify-between text-xs bg-red-50 border border-red-100 rounded-lg px-3 py-2"> <span className="font-medium text-slate-900">{e.full_name} <span className="font-mono text-red-600 font-normal">({e.employee_code})</span></span> <span className="font-semibold text-red-700">{e.contract_end_date}</span> </div> ))} </div> )} </div> <div className="bg-white border border-amber-200 rounded-xl p-4 shadow-sm"> <div className="flex items-center gap-2 mb-3"> <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600"> <CalendarClock className="w-4 h-4" /> </div> <div> <p className="font-semibold text-slate-900 text-sm">HĐ Sắp Hết Hạn (60 ngày)</p> <p className="text-[11px] text-slate-500">{contractAlerts.expiringSoon.length} hợp đồng cần gia hạn</p> </div> </div> {contractAlerts.expiringSoon.length === 0 ? ( <p className="text-xs text-slate-400 italic">Không có hợp đồng nào sắp hết hạn.</p> ) : ( <div className="space-y-1.5"> {contractAlerts.expiringSoon.map((e) => ( <div key={e.id} className="flex items-center justify-between text-xs bg-amber-50 border border-amber-100 rounded-lg px-3 py-2"> <span className="font-medium text-slate-900">{e.full_name} <span className="font-mono text-amber-700 font-normal">({e.employee_code})</span></span> <span className="font-semibold text-amber-700">{e.contract_end_date}</span> </div> ))} </div> )} </div> </div> {/* Biểu đồ cơ cấu */} <div className="grid grid-cols-1 lg:grid-cols-2 gap-4"> {/* Cơ cấu loại hợp đồng */} <div className={cardCls}> <h3 className="font-semibold text-slate-900 text-sm mb-1">Cơ Cấu Loại Hợp Đồng</h3> <p className="text-[11px] text-slate-500 mb-3">Phân bổ theo loại hợp đồng lao động</p> <ResponsiveContainer width="100%" height={260}><PieChart> <Pie data={contractTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={renderPieLabel}> {contractTypeData.map((_, i) => ( <Cell key={i} fill={PALETTE[i % PALETTE.length]} /> ))} </Pie> <Tooltip /> <Legend wrapperStyle={{ fontSize: 11 }} /> </PieChart></ResponsiveContainer> </div> {/* Cơ cấu giới tính - Donut */} <div className={cardCls}> <h3 className="font-semibold text-slate-900 text-sm mb-1">Cơ Cấu Giới Tính</h3> <p className="text-[11px] text-slate-500 mb-3">Tỷ lệ nam / nữ / khác</p> <ResponsiveContainer width="100%" height={260}><PieChart> <Pie data={genderData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={2} label={renderPieLabel}> {genderData.map((_, i) => ( <Cell key={i} fill={PALETTE[i % PALETTE.length]} /> ))} </Pie> <Tooltip /> <Legend wrapperStyle={{ fontSize: 11 }} /> </PieChart></ResponsiveContainer> </div> {/* Cơ cấu trình độ chuyên môn */} <div className={cardCls}> <h3 className="font-semibold text-slate-900 text-sm mb-1">Cơ Cấu Trình Độ Chuyên Môn</h3> <p className="text-[11px] text-slate-500 mb-3">Trình độ chuyên môn kỹ thuật (CMKT)</p> <ResponsiveContainer width="100%" height={260}><BarChart data={educationData}> <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} /> <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} /> <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} /> <Tooltip /> <Bar dataKey="value" name="Số lao động" radius={[6, 6, 0, 0]}> {educationData.map((_, i) => ( <Cell key={i} fill={PALETTE[i % PALETTE.length]} /> ))} </Bar> </BarChart></ResponsiveContainer> </div> {/* Cơ cấu thâm niên */} <div className={cardCls}> <h3 className="font-semibold text-slate-900 text-sm mb-1">Cơ Cấu Thâm Niên</h3> <p className="text-[11px] text-slate-500 mb-3">Số năm công tác tính từ ngày vào làm</p> <ResponsiveContainer width="100%" height={260}><BarChart data={seniorityData}> <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} /> <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} /> <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} /> <Tooltip /> <Bar dataKey="value" name="Số lao động" radius={[6, 6, 0, 0]}> {seniorityData.map((_, i) => ( <Cell key={i} fill={PALETTE[i % PALETTE.length]} /> ))} </Bar> </BarChart></ResponsiveContainer> </div> </div> {/* Phân bổ trạng thái theo phòng ban - stacked */} <div className={cardCls}> <h3 className="font-semibold text-slate-900 text-sm mb-1">Phân Bổ Trạng Thái Lao Động Theo Phòng Ban</h3> <p className="text-[11px] text-slate-500 mb-3">Số lượng nhân sự theo trạng thái làm việc tại từng phòng ban</p> <ResponsiveContainer width="100%" height={320}><BarChart data={deptStatusData.rows} margin={{ bottom: 10 }}> <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} /> <XAxis dataKey="department" tick={{ fontSize: 10, fill: '#64748b' }} interval={0} angle={-8} textAnchor="end" height={60} /> <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} /> <Tooltip /> <Legend wrapperStyle={{ fontSize: 11 }} /> {deptStatusData.statuses.map((s, i) => ( <Bar key={s} dataKey={s} stackId="status" name={STATUS_LABELS[s] || s} fill={PALETTE[i % PALETTE.length]} radius={i === deptStatusData.statuses.length - 1 ? [6, 6, 0, 0] : [0, 0, 0, 0]} /> ))} </BarChart></ResponsiveContainer> </div> {/* Khối thời giờ làm việc & nghỉ ngơi */} <div> <h3 className="font-semibold text-slate-900 text-sm mb-3 flex items-center gap-2"> <CalendarDays className="w-4 h-4 text-blue-600" /> Thời Giờ Làm Việc & Nghỉ Ngơi </h3> <div className="grid grid-cols-2 md:grid-cols-4 gap-3"> <div className={cardCls}> <div className="flex items-center gap-2 mb-1"> <CalendarDays className="w-4 h-4 text-blue-600" /> <span className={labelCls}>Tổng Ngày Phép</span> </div> <p className="font-semibold text-slate-900 text-2xl">{formatCompact(timeStats.totalLeave)}</p> <p className="text-[11px] text-slate-500">ngày phép năm</p> </div> <div className={cardCls}> <div className="flex items-center gap-2 mb-1"> <Plane className="w-4 h-4 text-amber-600" /> <span className={labelCls}>Đã Nghỉ</span> </div> <p className="font-semibold text-slate-900 text-2xl">{formatCompact(timeStats.takenLeave)}</p> <p className="text-[11px] text-slate-500">ngày đã sử dụng</p> </div> <div className={cardCls}> <div className="flex items-center gap-2 mb-1"> <CalendarDays className="w-4 h-4 text-emerald-600" /> <span className={labelCls}>Còn Lại</span> </div> <p className="font-semibold text-emerald-600 text-2xl">{formatCompact(timeStats.remainingLeave)}</p> <p className="text-[11px] text-slate-500">ngày phép còn lại</p> </div> <div className={cardCls}> <div className="flex items-center gap-2 mb-1"> <Timer className="w-4 h-4 text-red-600" /> <span className={labelCls}>Tổng Giờ OT</span> </div> <p className="font-semibold text-slate-900 text-2xl">{formatCompact(timeStats.totalOT)}</p> <p className="text-[11px] text-slate-500">giờ làm thêm lũy kế</p> </div> </div> </div> </div> );
 }

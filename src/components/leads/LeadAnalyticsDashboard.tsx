@@ -23,7 +23,7 @@ interface LeadAnalyticsDashboardProps {
 
 const CHANNEL_COLORS: Record<string, string> = {
   Shopee: '#EE4D2D',
-  TikTokShop: '#000000',
+  TikTokShop: '#1E293B',
   FacebookAds: '#1877F2',
   Website: '#10B981',
   Hotline: '#8B5CF6',
@@ -76,38 +76,45 @@ export default function LeadAnalyticsDashboard({ leads }: LeadAnalyticsDashboard
   const conversionRate = leads.length > 0 ? Math.round((convertedCount / leads.length) * 100) : 0;
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
       {/* Title */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-bold mb-1">
-            <UserCheck className="w-3.5 h-3.5 text-blue-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-900 text-[11px] font-semibold mb-1">
+            <UserCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <span>Phân Tích Báo Cáo CRM & Lead Intake</span>
           </div>
-          <h2 className="text-lg font-black text-white">Dashboard Báo Cáo Phễu Chuyển Đổi Lead & Doanh Số Dự Kiến</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Dashboard Báo Cáo Phễu Chuyển Đổi Lead & Doanh Số Dự Kiến</h2>
         </div>
-        <div className="text-right">
-          <span className="text-xs text-slate-400 font-medium block">Tỷ Lệ Chốt Hợp Đồng Thành Công:</span>
-          <span className="font-mono font-black text-emerald-400 text-lg">{conversionRate}%</span>
+        <div className="text-left sm:text-right">
+          <span className="text-xs text-slate-500 font-medium block">Tỷ Lệ Chốt Hợp Đồng Thành Công:</span>
+          <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400 text-lg">{conversionRate}%</span>
         </div>
       </div>
 
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Status Funnel Bar Chart */}
-        <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-blue-400" /> Phễu Chuyển Đổi Lead Theo Giai Đoạn Vận Hành
+        <div className="lg:col-span-2 bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            Phễu Chuyển Đổi Lead Theo Giai Đoạn Vận Hành
           </h3>
-
           <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={statusFunnelData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 10 }} />
-                <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis stroke="#64748b" tick={{ fontSize: 11, fill: '#64748b' }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
                 <Bar dataKey="count" fill="#3B82F6" radius={[6, 6, 0, 0]} name="Số Lead" />
               </BarChart>
@@ -116,11 +123,11 @@ export default function LeadAnalyticsDashboard({ leads }: LeadAnalyticsDashboard
         </div>
 
         {/* Chart 2: Channel Intake Pie Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <PieIcon className="w-4 h-4 text-purple-400" /> Phân Bổ Lead Theo Kênh Tiếp Nhận
+        <div className="bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <PieIcon className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            Phân Bổ Lead Theo Kênh Tiếp Nhận
           </h3>
-
           <div className="h-44 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -138,20 +145,26 @@ export default function LeadAnalyticsDashboard({ leads }: LeadAnalyticsDashboard
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-
-          <div className="space-y-1 pt-1 border-t border-slate-700/60 text-[11px]">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-[11px]">
             {channelPieData.map((st) => (
               <div key={st.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
+                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-white">{st.value} Lead</span>
+                <span className="font-mono font-semibold text-slate-900 dark:text-white">{st.value} Lead</span>
               </div>
             ))}
           </div>

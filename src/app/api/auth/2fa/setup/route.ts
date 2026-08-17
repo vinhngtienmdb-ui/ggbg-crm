@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     const isValid = verifyTOTPCode(secret, totp_code);
     if (!isValid) {
       return NextResponse.json(
-        { success: false, message: '❌ Mã 6 chữ số Google Authenticator không chính xác hoặc đã hết hạn (30s). Vui lòng thử lại.' },
+        { success: false, message: ' Mã 6 chữ số Google Authenticator không chính xác hoặc đã hết hạn (30s). Vui lòng thử lại.' },
         { status: 400 }
       );
     }

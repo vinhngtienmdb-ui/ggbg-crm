@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       if (!is2FaValid) {
         registerFailure(key);
         return NextResponse.json(
-          { success: false, message: '❌ Mã xác thực 2FA 6 chữ số không chính xác hoặc đã hết hạn.' },
+          { success: false, message: ' Mã xác thực 2FA 6 chữ số không chính xác hoặc đã hết hạn.' },
           { status: 401 }
         );
       }

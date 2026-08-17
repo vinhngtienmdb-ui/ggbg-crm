@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { DollarSign, PieChart as PieIcon, TrendingUp, ShieldCheck, Building2, CreditCard } from 'lucide-react';
 import { PayrollSheet } from '@/types';
+import { formatCurrency } from '@/lib/formatters';
 
 interface PayrollAnalyticsDashboardProps {
   payrolls: PayrollSheet[];
@@ -42,7 +43,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
     const p1 = Math.round(p.p1_calculated_salary / 1000000); // Millions
     const p2 = Math.round(p.p2_allowances / 1000000);
     const p3 = Math.round(p.p3_performance_salary / 1000000);
-    const ot = Math.round((p.ot_salary + p.bonus_amount) / 1000000);
+    const ot = Math.round(((p.ot_salary || 0) + (p.bonus_amount || 0)) / 1000000);
     const net = Math.round(p.net_salary / 1000000);
 
     deptMap[dept].p1 += p1;
@@ -54,7 +55,7 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
     totalP1 += p.p1_calculated_salary;
     totalP2 += p.p2_allowances;
     totalP3 += p.p3_performance_salary;
-    totalOT += p.ot_salary + p.bonus_amount;
+    totalOT += (p.ot_salary || 0) + (p.bonus_amount || 0);
     totalInsurance += p.bhxh_deduction + p.bhyt_deduction + p.bhtn_deduction;
     totalTax += p.personal_income_tax;
     totalNet += p.net_salary;
@@ -70,26 +71,26 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
 
   // Deductions & Payout Pie Data
   const deductionsPieData = [
-    { name: '💰 Lương Thực Nhận (NET)', value: Math.round(totalNet / 1000000), color: '#10B981' },
-    { name: '🛡️ Bảo Hiểm (BHXH/Y/TN)', value: Math.round(totalInsurance / 1000000), color: '#8B5CF6' },
-    { name: '🏛️ Thuế TNCN Khấu Trừ', value: Math.round(totalTax / 1000000), color: '#F59E0B' },
+    { name: ' Lương Thực Nhận (NET)', value: Math.round(totalNet / 1000000), color: '#10B981' },
+    { name: ' Bảo Hiểm (BHXH/Y/TN)', value: Math.round(totalInsurance / 1000000), color: '#8B5CF6' },
+    { name: ' Thuế TNCN Khấu Trừ', value: Math.round(totalTax / 1000000), color: '#F59E0B' },
   ].filter((d) => d.value > 0);
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold mb-1">
-            <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 text-[11px] font-semibold mb-1">
+            <DollarSign className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Phân Tích Báo Cáo Tài Chính Nhân Sự</span>
           </div>
-          <h2 className="text-lg font-black text-white">Dashboard Phân Tích Cơ Cấu Bảng Lương 3P & Chi Phí Nhân Sự</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Dashboard Phân Tích Cơ Cấu Bảng Lương 3P & Chi Phí Nhân Sự</h2>
         </div>
-        <div className="text-right">
-          <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương NET Chi Trả:</span>
-          <span className="font-mono font-black text-emerald-400 text-lg">
-            {totalNet.toLocaleString('vi-VN')} ₫
+        <div className="text-left sm:text-right">
+          <span className="text-xs text-slate-500 font-medium block">Tổng Quỹ Lương NET Chi Trả:</span>
+          <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400 text-lg">
+            {formatCurrency(totalNet)}
           </span>
         </div>
       </div>
@@ -97,19 +98,26 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: 3P Income Component Breakdown Bar Chart */}
-        <div className="lg:col-span-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-emerald-400" /> Cơ Cấu Thu Nhập 3P (P1 + P2 + P3 + OT) Theo Phòng Ban (Tr VNĐ)
+        <div className="lg:col-span-2 bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            Cơ Cấu Thu Nhập 3P (P1 + P2 + P3 + OT) Theo Phòng Ban (Tr VNĐ)
           </h3>
-
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={deptChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 11, fill: '#64748b' }} />
+                <YAxis stroke="#64748b" tick={{ fontSize: 11, fill: '#64748b' }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="LươngP1" stackId="a" fill="#3B82F6" name="P1 (Cứng)" />
@@ -122,11 +130,11 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
         </div>
 
         {/* Chart 2: Net vs Deductions Pie Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <PieIcon className="w-4 h-4 text-emerald-400" /> Tỷ Lệ Lương Thực Nhận vs Khấu Trừ
+        <div className="bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <PieIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            Tỷ Lệ Lương Thực Nhận vs Khấu Trừ
           </h3>
-
           <div className="h-48 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -144,20 +152,26 @@ export default function PayrollAnalyticsDashboard({ payrolls }: PayrollAnalytics
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-
-          <div className="space-y-1.5 pt-2 border-t border-slate-700/60 text-[11px]">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-[11px]">
             {deductionsPieData.map((st) => (
               <div key={st.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-white">{st.value} Tr VNĐ</span>
+                <span className="font-mono font-semibold text-slate-900 dark:text-white">{st.value} Tr VNĐ</span>
               </div>
             ))}
           </div>

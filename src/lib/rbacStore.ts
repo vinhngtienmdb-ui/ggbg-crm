@@ -126,7 +126,7 @@ export function getRoleMatrix(): RoleMatrixDefinition[] {
   try {
     const jobTitles = getJobTitles();
     const empPositions = INITIAL_EMPLOYEES.map((e) => e.position);
-    const allPositions = Array.from(new Set([...jobTitles.map((j) => j.name), ...empPositions]));
+    const allPositions = Array.from(new Set([...jobTitles.map((j: { name: string }) => j.name), ...empPositions]));
     syncRolesFromHrmPositions(allPositions);
   } catch (e) {
     // Fallback if hrmStore is not fully initialized

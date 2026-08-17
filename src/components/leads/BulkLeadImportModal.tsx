@@ -15,6 +15,7 @@ import {
   Filter
 } from 'lucide-react';
 import { Lead, BulkImportRow, CustomerEntityType, LeadSource } from '@/types';
+import { formatCurrency } from '@/lib/formatters';
 
 interface BulkLeadImportModalProps {
   isOpen: boolean;
@@ -131,159 +132,29 @@ export default function BulkLeadImportModal({
   const validRowsCount = previewRows.filter((r) => !r.is_duplicate).length;
   const duplicateRowsCount = previewRows.filter((r) => r.is_duplicate).length;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8">
-        {/* Header */}
-        <div className="bg-slate-50 border-b border-slate-200 p-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold">
-              <FileSpreadsheet className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-base text-slate-900">Nhập Lead Hàng Loạt Từ File Excel / CSV</h3>
-              <p className="text-xs text-slate-500">
-                Kiểm tra trùng lặp SĐT tự động & Phân bổ Lead xoay vòng cho Sales Exec
-              </p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6 max-h-[78vh] overflow-y-auto">
-          {/* Top Actions: Template Download & File Selector */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-              <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-                <Download className="w-4 h-4 text-blue-600" /> Tải Mẫu File Chuẩn (Template CSV)
-              </h4>
-              <p className="text-[11px] text-slate-500">
-                File mẫu bao gồm các cột chuẩn: Họ tên, SĐT, Email, Tên công ty, Ngân sách.
-              </p>
-              <button
+  return ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in duration-200 my-8"> {/* Header */} <div className="bg-slate-50 border-b border-slate-200 p-5 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-medium"> <FileSpreadsheet className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-base text-slate-900">Nhập Lead Hàng Loạt Từ File Excel / CSV</h3> <p className="text-xs text-slate-500"> Kiểm tra trùng lặp SĐT tự động & Phân bổ Lead xoay vòng cho Sales Exec </p> </div> </div> <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"> <X className="w-5 h-5" /> </button> </div> {/* Content */} <div className="p-6 space-y-6 max-h-[78vh] overflow-y-auto"> {/* Top Actions: Template Download & File Selector */} <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2"> <h4 className="font-semibold text-xs text-slate-900 flex items-center gap-1.5"> <Download className="w-4 h-4 text-blue-600" /> Tải Mẫu File Chuẩn (Template CSV) </h4> <p className="text-[11px] text-slate-500"> File mẫu bao gồm các cột chuẩn: Họ tên, SĐT, Email, Tên công ty, Ngân sách. </p> <button
                 type="button"
                 onClick={handleDownloadTemplate}
-                className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs transition-all"
-              >
-                <Download className="w-3.5 h-3.5 text-blue-600" /> Tải File Lead_Import_Template.csv
-              </button>
-            </div>
-
-            <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
-              <h4 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-                <Upload className="w-4 h-4 text-blue-600" /> Chọn File Excel / CSV Tải Lên
-              </h4>
-              <input
+                className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-800 font-medium text-xs rounded-xl flex items-center gap-1.5 shadow-xs transition-all"
+              > <Download className="w-3.5 h-3.5 text-blue-600" /> Tải File Lead_Import_Template.csv </button> </div> <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-xl space-y-2"> <h4 className="font-semibold text-xs text-blue-900 flex items-center gap-1.5"> <Upload className="w-4 h-4 text-blue-600" /> Chọn File Excel / CSV Tải Lên </h4> <input
                 type="file"
                 accept=".csv, .xlsx, .xls"
                 onChange={handleSimulateFileUpload}
-                className="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
-              />
-              {fileName && (
-                <p className="text-[11px] font-mono text-blue-800 font-bold">
-                  📁 File đã chọn: {fileName}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Validation & Preview Section */}
-          {isParsing ? (
-            <div className="p-8 text-center space-y-2 bg-slate-50 rounded-2xl border border-slate-200">
-              <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="font-bold text-xs text-slate-700">Đang kiểm tra trùng lặp SĐT & định dạng dữ liệu...</p>
-            </div>
-          ) : previewRows.length > 0 ? (
-            <div className="space-y-4">
-              {/* Validation Summary Bar */}
-              <div className="p-4 bg-slate-50 text-slate-900 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-4">
-                  <span className="font-bold text-blue-700">Tổng số: {previewRows.length} Dòng</span>
-                  <span className="font-bold text-emerald-600">✓ Hợp lệ: {validRowsCount}</span>
-                  {duplicateRowsCount > 0 && (
-                    <span className="font-bold text-red-600">⚠️ Trùng SĐT: {duplicateRowsCount}</span>
-                  )}
-                </div>
-
-                <label className="flex items-center gap-2 cursor-pointer text-slate-500">
-                  <input
+                className="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+              /> {fileName && ( <p className="text-[11px] font-mono text-blue-800 font-medium"> 📁 File đã chọn: {fileName} </p> )} </div> </div> {/* Validation & Preview Section */}
+          {isParsing ? ( <div className="p-8 text-center space-y-2 bg-slate-50 rounded-xl border border-slate-200"> <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div> <p className="font-medium text-xs text-slate-700">Đang kiểm tra trùng lặp SĐT & định dạng dữ liệu...</p> </div> ) : previewRows.length > 0 ? ( <div className="space-y-4"> {/* Validation Summary Bar */} <div className="p-4 bg-slate-50 text-slate-900 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs"> <div className="flex items-center gap-4"> <span className="font-medium text-blue-700">Tổng số: {previewRows.length} Dòng</span> <span className="font-medium text-emerald-600">✓ Hợp lệ: {validRowsCount}</span> {duplicateRowsCount > 0 && ( <span className="font-medium text-red-600"> Trùng SĐT: {duplicateRowsCount}</span> )} </div> <label className="flex items-center gap-2 cursor-pointer text-slate-500"> <input
                     type="checkbox"
                     checked={skipDuplicates}
                     onChange={(e) => setSkipDuplicates(e.target.checked)}
                     className="w-4 h-4 accent-blue-500 rounded"
-                  />
-                  <span className="font-semibold text-[11px]">Bỏ qua các dòng bị trùng SĐT</span>
-                </label>
-              </div>
-
-              {/* Preview Table */}
-              <div className="border border-slate-200 rounded-2xl overflow-hidden">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wide text-[10.5px]">
-                      <th className="p-3">Họ Và Tên</th>
-                      <th className="p-3">Số Điện Thoại</th>
-                      <th className="p-3">Công Ty / Email</th>
-                      <th className="p-3">Ngân Sách</th>
-                      <th className="p-3">Trạng Thái Validation</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {previewRows.map((row) => (
-                      <tr key={row.id} className={row.is_duplicate ? 'bg-red-50/60' : 'hover:bg-slate-50'}>
-                        <td className="p-3 font-bold text-slate-900">{row.full_name}</td>
-                        <td className="p-3 font-mono font-bold text-blue-700">{row.phone}</td>
-                        <td className="p-3">
-                          <p className="font-semibold text-slate-800">{row.company_name}</p>
-                          <p className="text-slate-400 text-[10px]">{row.email}</p>
-                        </td>
-                        <td className="p-3 font-mono font-extrabold text-emerald-700">
-                          {row.estimated_budget.toLocaleString('vi-VN')} ₫
-                        </td>
-                        <td className="p-3">
-                          {row.is_duplicate ? (
-                            <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded font-bold text-[10px] flex items-center gap-1 w-fit">
-                              ⚠️ {row.duplicate_reason}
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded font-bold text-[10px] flex items-center gap-1 w-fit">
-                              ✓ Sẵn Sàng Import
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : null}
-        </div>
-
-        {/* Footer Actions */}
-        <div className="p-5 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-          <button
+                  /> <span className="font-semibold text-[11px]">Bỏ qua các dòng bị trùng SĐT</span> </label> </div> {/* Preview Table */} <div className="border border-slate-200 rounded-xl overflow-hidden"> <table className="w-full text-left border-collapse text-xs"> <thead> <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wide text-[10.5px]"> <th className="p-3">Họ Và Tên</th> <th className="p-3">Số Điện Thoại</th> <th className="p-3">Công Ty / Email</th> <th className="p-3">Ngân Sách</th> <th className="p-3">Trạng Thái Validation</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {previewRows.map((row) => ( <tr key={row.id} className={row.is_duplicate ? 'bg-red-50/60' : 'hover:bg-slate-50'}> <td className="p-3 font-medium text-slate-900">{row.full_name}</td> <td className="p-3 font-mono font-medium text-blue-700">{row.phone}</td> <td className="p-3"> <p className="font-semibold text-slate-800">{row.company_name}</p> <p className="text-slate-400 text-[10px]">{row.email}</p> </td> <td className="p-3 font-mono font-semibold text-emerald-700"> {formatCurrency(row.estimated_budget)} </td> <td className="p-3"> {row.is_duplicate ? ( <span className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded font-medium text-[10px] flex items-center gap-1 w-fit"> {row.duplicate_reason} </span> ) : ( <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded font-medium text-[10px] flex items-center gap-1 w-fit"> ✓ Sẵn Sàng Import </span> )} </td> </tr> ))} </tbody> </table> </div> </div> ) : null} </div> {/* Footer Actions */} <div className="p-5 border-t border-slate-200 bg-slate-50 flex items-center justify-between"> <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all"
-          >
-            Hủy
-          </button>
-
-          <button
+            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-xs rounded-xl transition-all"
+          > Hủy </button> <button
             type="button"
             disabled={previewRows.length === 0 || (skipDuplicates && validRowsCount === 0)}
             onClick={handleExecuteImport}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/20 flex items-center gap-2 transition-all disabled:opacity-50"
-          >
-            <FileCheck className="w-4 h-4" />
-            Nhập {skipDuplicates ? validRowsCount : previewRows.length} Lead Vào Phễu Bán Hàng
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl shadow-lg shadow-blue-600/20 flex items-center gap-2 transition-all disabled:opacity-50"
+          > <FileCheck className="w-4 h-4" /> Nhập {skipDuplicates ? validRowsCount : previewRows.length} Lead Vào Phễu Bán Hàng </button> </div> </div> </div> );
 }

@@ -11,7 +11,7 @@ export const DEFAULT_QUICK_REPLIES: QuickReplyMacro[] = [
     id: 'macro_2',
     title: 'Gửi Bảng Giá Dịch Vụ TikTok Shop',
     category: 'Báo Giá',
-    content: 'Dạ xin gửi bạn Báo giá Gói TikTok Shop Partner (TSP): Phí khởi tạo 15.000.000đ/tháng (gồm 8 Video ngắn/tháng + 4 Phiên Livestream chuyên nghiệp). Bạn cho bên mình xin SĐT để chuyên viên gọi tư vấn nhé!',
+    content: 'Dạ xin gửi bạn Báo giá Gói TikTok Shop Partner (TSP): Phí khởi tạo 15,000,000đ/tháng (gồm 8 Video ngắn/tháng + 4 Phiên Livestream chuyên nghiệp). Bạn cho bên mình xin SĐT để chuyên viên gọi tư vấn nhé!',
   },
   {
     id: 'macro_3',

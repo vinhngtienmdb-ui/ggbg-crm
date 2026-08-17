@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Settings,
   Building2,
@@ -12,25 +13,77 @@ import {
   Trash2,
   Save,
   CheckCircle2,
-  Sparkles,
-  ShieldCheck,
   Briefcase,
   Layers,
   ChevronRight,
-  TrendingUp,
   Clock,
   MapPin,
   Calendar,
   DollarSign,
   ShieldAlert,
-  Bell,
-  HeartPulse,
-  Gift,
-  Lock,
-  X
+  Percent,
+  Check,
+  X,
+  FileSpreadsheet,
+  FileCheck2,
+  CalendarDays,
+  Sparkles,
+  HelpCircle,
+  TrendingUp,
+  Target,
+  Sliders,
+  ShieldCheck,
+  Globe,
+  Lock
 } from 'lucide-react';
 import OrgChartTree from '@/components/hrm/OrgChartTree';
-import { OrgNode } from '@/types';
+import {
+  OrgNode,
+  SalaryGradeScale,
+  SalaryStepItem,
+  AllowanceCatalogItem,
+  TaxAndInsurancePolicyVersion,
+  HolidayDefinition,
+  WeekendPolicySettings,
+  WorkShift,
+  AttendanceSettings,
+  FormulaWeights,
+  EvaluationCriterion
+} from '@/types';
+import {
+  getSalaryGrades,
+  saveSalaryGrade,
+  deleteSalaryGrade,
+  getAllowanceCatalog,
+  createAllowanceCatalogItem,
+  updateAllowanceCatalogItem,
+  deleteAllowanceCatalogItem,
+  getTaxPolicies,
+  saveTaxPolicy,
+  deleteTaxPolicy,
+  getHolidays,
+  addHoliday,
+  updateHoliday,
+  deleteHoliday,
+  getWeekendPolicy,
+  saveWeekendPolicy,
+  getWorkShifts,
+  createWorkShift,
+  updateWorkShift,
+  deleteWorkShift
+} from '@/lib/hrmStore';
+import {
+  getAttendanceSettings,
+  saveAttendanceSettings,
+  PAYROLL_UPDATED_EVENT
+} from '@/lib/payrollStore';
+import {
+  getFormulaWeights,
+  updateFormulaWeights,
+  DEFAULT_HR_CRITERIA,
+  PERFORMANCE_UPDATED_EVENT
+} from '@/lib/performanceStore';
+import { formatCurrency } from '@/lib/formatters';
 
 // Mock Org Chart Tree Root Node
 const MOCK_ORG_TREE: OrgNode = {
@@ -74,502 +127,604 @@ const MOCK_ORG_TREE: OrgNode = {
                   title: 'Chuyên Viên Tư Vấn Sale 2',
                   role: 'Nhân Viên',
                   department: 'Phòng Kinh Doanh 1',
-                },
-              ],
-            },
-          ],
+                }
+              ]
+            }
+          ]
         },
         {
-          id: 'org_mgr_ops',
-          name: 'Hoàng Kim Ngân',
-          title: 'Trưởng Phòng Vận Hành TMĐT',
+          id: 'org_mgr_cskh',
+          name: 'Lê Thị Mai',
+          title: 'Trưởng Phòng CSKH & Xử Lý Đơn',
           role: 'Trưởng Phòng',
-          department: 'Phòng Vận Hành TMĐT',
-          children: [
-            {
-              id: 'org_ops_1',
-              name: 'Vũ Quốc Anh',
-              title: 'Chuyên Viên Vận Hành Shopee & TikTok',
-              role: 'Nhân Viên',
-              department: 'Phòng Vận Hành TMĐT',
-            },
-          ],
-        },
-      ],
+          department: 'Phòng CSKH & Vận Hành',
+          children: []
+        }
+      ]
     },
     {
       id: 'org_dir_hr',
-      name: 'Nguyễn Thị Bích Ngọc',
-      title: 'Giám Đốc Nhân Sự (CHRO)',
-      role: 'Giám Đốc Khối',
-      department: 'Khối Nhân Sự (HRM)',
-      children: [
-        {
-          id: 'org_hr_lead',
-          name: 'Đỗ Thị Hương',
-          title: 'Trưởng Nhóm C&B & Tuyển Dụng',
-          role: 'Leader',
-          department: 'Khối Nhân Sự (HRM)',
-        },
-      ],
-    },
-  ],
+      name: 'Đặng Kim Anh',
+      title: 'Trưởng Phòng Nhân Sự & Tiền Lương (HRM)',
+      role: 'Trưởng Phòng',
+      department: 'Phòng Nhân Sự (HR)',
+      children: []
+    }
+  ]
 };
 
-export interface JobTitleConfig {
-  id: string;
-  code: string;
-  title_name: string;
-  department: string;
-  salary_grade: string;
-  min_salary: number;
-  max_salary: number;
-  lunch_allowance: number;
-  travel_allowance: number;
-  headcount_count: number;
-  description: string;
-}
-
-const INITIAL_JOB_TITLES: JobTitleConfig[] = [
-  {
-    id: 'jt_1',
-    code: 'CD-CEO',
-    title_name: 'Tổng Giám Đốc (CEO)',
-    department: 'Ban Giám Đốc',
-    salary_grade: 'G6 (Executive)',
-    min_salary: 50000000,
-    max_salary: 100000000,
-    lunch_allowance: 1500000,
-    travel_allowance: 3000000,
-    headcount_count: 1,
-    description: 'Điều hành chiến lược toàn bộ hệ thống GGBG CRM & Agency TMĐT.',
-  },
-  {
-    id: 'jt_2',
-    code: 'CD-DIR-SALES',
-    title_name: 'Giám Đốc Kinh Doanh (Sales Director)',
-    department: 'Khối Kinh Doanh & TMĐT',
-    salary_grade: 'G5 (Director)',
-    min_salary: 35000000,
-    max_salary: 60000000,
-    lunch_allowance: 1200000,
-    travel_allowance: 2000000,
-    headcount_count: 2,
-    description: 'Chịu trách nhiệm chỉ tiêu doanh số tổng & phát triển kênh bán hàng.',
-  },
-  {
-    id: 'jt_3',
-    code: 'CD-MGR-SALES',
-    title_name: 'Trưởng Phòng Kinh Doanh',
-    department: 'Phòng Kinh Doanh 1',
-    salary_grade: 'G4 (Manager)',
-    min_salary: 20000000,
-    max_salary: 35000000,
-    lunch_allowance: 1000000,
-    travel_allowance: 1500000,
-    headcount_count: 3,
-    description: 'Quản lý đội ngũ Trưởng nhóm & Chuyên viên tư vấn giải pháp TMĐT.',
-  },
-  {
-    id: 'jt_4',
-    code: 'CD-LEAD-SALES',
-    title_name: 'Trưởng Nhóm Kinh Doanh (Team Lead)',
-    department: 'Phòng Kinh Doanh 1',
-    salary_grade: 'G3 (Team Lead)',
-    min_salary: 15000000,
-    max_salary: 25000000,
-    lunch_allowance: 800000,
-    travel_allowance: 1000000,
-    headcount_count: 6,
-    description: 'Dẫn dắt 5-8 nhân viên tư vấn chốt đơn dịch vụ gian hàng.',
-  },
-  {
-    id: 'jt_5',
-    code: 'CD-EXEC-SALES',
-    title_name: 'Chuyên Viên Tư Vấn TMĐT',
-    department: 'Phòng Kinh Doanh 1',
-    salary_grade: 'G2 (Senior Executive)',
-    min_salary: 10000000,
-    max_salary: 18000000,
-    lunch_allowance: 730000,
-    travel_allowance: 500000,
-    headcount_count: 24,
-    description: 'Tiếp nhận Lead intake, tư vấn giải pháp gian hàng Shopee/TikTok/Lazada.',
-  },
+// Initial Job Titles
+const INITIAL_JOB_TITLES = [
+  { id: 'jt_1', code: 'EXEC_DIR', name: 'Giám Đốc Điều Hành (CEO)', department: 'Ban Giám Đốc', level: 'Level 6 (C-Level)', min_salary: 40000000, max_salary: 80000000, grade_code: 'G6' },
+  { id: 'jt_2', code: 'SALES_DIR', name: 'Giám Đốc Khối Kinh Doanh', department: 'Khối Kinh Doanh', level: 'Level 5 (Director)', min_salary: 30000000, max_salary: 50000000, grade_code: 'G5' },
+  { id: 'jt_3', code: 'MGR_SALES', name: 'Trưởng Phòng Kinh Doanh', department: 'Phòng Kinh Doanh', level: 'Level 4 (Manager)', min_salary: 18000000, max_salary: 30000000, grade_code: 'G4' },
+  { id: 'jt_4', code: 'LEAD_SALES', name: 'Trưởng Nhóm Sale / Team Leader', department: 'Phòng Kinh Doanh', level: 'Level 3 (Leader)', min_salary: 14000000, max_salary: 22000000, grade_code: 'G3' },
+  { id: 'jt_5', code: 'SPEC_SALES', name: 'Chuyên Viên Tư Vấn TMĐT', department: 'Phòng Kinh Doanh', level: 'Level 2 (Senior / Specialist)', min_salary: 9500000, max_salary: 16000000, grade_code: 'G2' },
+  { id: 'jt_6', code: 'STAFF_CSKH', name: 'Chuyên Viên CSKH & Vận Hành', department: 'Phòng CSKH', level: 'Level 1 (Junior / Staff)', min_salary: 7500000, max_salary: 12000000, grade_code: 'G1' },
 ];
 
-export default function HrmSettingsPage() {
+function HrmSettingsContent() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab');
+
   const [activeTab, setActiveTab] = useState<
-    'ORG_CHART' | 'JOB_TITLES' | 'TIMEKEEPING_CFG' | 'LEAVES_CFG' | 'PAYROLL_CFG' | 'APPROVAL_CFG'
-  >('ORG_CHART');
+    | 'SALARY_GRADES'
+    | 'ALLOWANCES'
+    | 'TAX_POLICIES'
+    | 'ORG_CHART'
+    | 'JOB_TITLES'
+    | 'TIMEKEEPING_SHIFTS'
+    | 'HOLIDAYS_WEEKENDS'
+    | 'PERFORMANCE_FORMULA'
+  >('SALARY_GRADES');
 
-  const [jobTitles, setJobTitles] = useState<JobTitleConfig[]>(INITIAL_JOB_TITLES);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTitle, setEditingTitle] = useState<JobTitleConfig | null>(null);
-  const [viewingTitle, setViewingTitle] = useState<JobTitleConfig | null>(null);
+  // Handle URL Query Params
+  useEffect(() => {
+    if (initialTab === 'TIMEKEEPING_SHIFTS' || initialTab === 'TIMEKEEPING' || initialTab === 'SHIFTS') {
+      setActiveTab('TIMEKEEPING_SHIFTS');
+    } else if (initialTab === 'ALLOWANCES') {
+      setActiveTab('ALLOWANCES');
+    } else if (initialTab === 'TAX_POLICIES') {
+      setActiveTab('TAX_POLICIES');
+    } else if (initialTab === 'HOLIDAYS_WEEKENDS' || initialTab === 'HOLIDAYS') {
+      setActiveTab('HOLIDAYS_WEEKENDS');
+    } else if (initialTab === 'PERFORMANCE_FORMULA' || initialTab === 'FORMULA') {
+      setActiveTab('PERFORMANCE_FORMULA');
+    } else if (initialTab === 'ORG_CHART') {
+      setActiveTab('ORG_CHART');
+    } else if (initialTab === 'JOB_TITLES') {
+      setActiveTab('JOB_TITLES');
+    } else if (initialTab === 'SALARY_GRADES') {
+      setActiveTab('SALARY_GRADES');
+    }
+  }, [initialTab]);
+
+  // Tab 1: Salary Grades State
+  const [salaryGrades, setSalaryGrades] = useState<SalaryGradeScale[]>(() => getSalaryGrades());
+  const [selectedGrade, setSelectedGrade] = useState<SalaryGradeScale>(salaryGrades[0]);
+
+  // Tab 2: Allowances State
+  const [allowanceCatalog, setAllowanceCatalog] = useState<AllowanceCatalogItem[]>(() => getAllowanceCatalog());
+  const [editingAllowance, setEditingAllowance] = useState<AllowanceCatalogItem | null>(null);
+  const [isAllowanceModalOpen, setIsAllowanceModalOpen] = useState(false);
+
+  // Tab 3: Tax Policies State
+  const [taxPolicies, setTaxPolicies] = useState<TaxAndInsurancePolicyVersion[]>(() => getTaxPolicies());
+  const [editingPolicy, setEditingPolicy] = useState<TaxAndInsurancePolicyVersion | null>(null);
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+
+  // Tab 5: Job Titles State
+  const [jobTitles, setJobTitles] = useState(INITIAL_JOB_TITLES);
+
+  // Tab 6: Shifts & Timekeeping Settings State
+  const [workShifts, setWorkShifts] = useState<WorkShift[]>(() => getWorkShifts());
+  const [attSettings, setAttSettings] = useState<AttendanceSettings>(() => getAttendanceSettings());
+  const [editingShift, setEditingShift] = useState<WorkShift | null>(null);
+  const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+
+  // Tab 7: Holidays & Weekend Policies State
+  const [holidays, setHolidays] = useState<HolidayDefinition[]>(() => getHolidays());
+  const [weekendPolicy, setWeekendPolicy] = useState<WeekendPolicySettings>(() => getWeekendPolicy());
+  const [editingHoliday, setEditingHoliday] = useState<HolidayDefinition | null>(null);
+  const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
+
+  // Tab 8: Performance Formula Weights State
+  const [formulaWeights, setFormulaWeights] = useState<FormulaWeights>(() => getFormulaWeights());
+
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-
-  // Comprehensive HR Settings State
-  const [shiftsList, setShiftsList] = useState([
-    { id: 's1', name: 'Ca Hành Chính Standard', start: '08:00', end: '17:30', lunch: '12:00-13:30', hours: 8.0, active: true },
-    { id: 's2', name: 'Ca Sáng (Morning Shift)', start: '06:00', end: '14:00', lunch: 'Nghỉ 30p', hours: 8.0, active: true },
-    { id: 's3', name: 'Ca Chiều / Tối (Evening Shift)', start: '14:00', end: '22:00', lunch: 'Nghỉ 30p', hours: 8.0, active: true },
-    { id: 's4', name: 'Ca Đêm (Overnight +30%)', start: '22:00', end: '06:00', lunch: 'Nghỉ 30p', hours: 8.0, active: true },
-    { id: 's5', name: 'Ca Part-Time Linh Hoạt', start: '08:00', end: '12:00', lunch: 'Không', hours: 4.0, active: true },
-  ]);
-
-  const [locationsList, setLocationsList] = useState([
-    { id: 'loc1', name: 'Trụ Sở Chính Hà Nội', address: 'Tòa nhà Leadvisors, 188 Nguyễn Trãi, Cầu Giấy', lat: 21.028511, long: 105.782345, radius: 200, active: true },
-    { id: 'loc2', name: 'Chi Nhánh TP. Hồ Chí Minh', address: 'Tòa nhà Landmark 81, Bình Thạnh, TP.HCM', lat: 10.795000, long: 106.721800, radius: 250, active: true },
-    { id: 'loc3', name: 'Kho Vận TMĐT Bắc Ninh', address: 'KCN VSIP, Thị xã Từ Sơn, Bắc Ninh', lat: 21.145000, long: 106.078000, radius: 300, active: true },
-  ]);
-
-  const [timekeepingCfg, setTimekeepingCfg] = useState({
-    shift_name: 'Ca Hành Chính Standard',
-    start_time: '08:00',
-    end_time: '17:30',
-    lunch_start: '12:00',
-    lunch_end: '13:30',
-    grace_period_minutes: 15,
-    gps_radius_meters: 200,
-    office_lat: 21.028511,
-    office_long: 105.782345,
-    max_ot_monthly_hours: 40,
-    ot_weekday_mult: 1.5,
-    ot_weekend_mult: 2.0,
-    ot_holiday_mult: 3.0,
-  });
-
-  const [leavesCfg, setLeavesCfg] = useState({
-    accrual_method: 'MONTHLY' as 'MONTHLY' | 'FULL_GRANT',
-    probation_leave_enabled: true,
-    annual_leave_default: 12,
-    manager_leave_default: 15,
-    seniority_bonus_years: 5,
-    seniority_bonus_days: 1,
-    carry_over_max_days: 5,
-    carry_over_deadline: '03-31',
-    encashment_policy: 'PAY_FULL_AVERAGE' as 'PAY_FULL_AVERAGE' | 'FORFEIT' | 'EXPIRE',
-    marriage_self_days: 3,
-    marriage_child_days: 1,
-    bereavement_leave_days: 3,
-    maternity_female_months: 6,
-    maternity_male_days: 5,
-    maternity_bonus_vnd: 1000000,
-    unpaid_leave_max_days: 30,
-    birthday_gift_vnd: 500000,
-    team_building_budget_monthly: 500000,
-    health_check_budget_annual: 2500000,
-    seniority_reward_1y: 1000000,
-    seniority_reward_3y: 3000000,
-    seniority_reward_5y: 10000000,
-  });
-
-  const [holidaysList, setHolidaysList] = useState([
-    { id: 'h1', name: 'Tết Dương Lịch 2026', date: '01/01/2026', days: 1, type: 'Statutory', active: true },
-    { id: 'h2', name: 'Tết Nguyên Đán (Âm Lịch 2026)', date: '16/02/2026 - 20/02/2026', days: 5, type: 'Statutory', active: true },
-    { id: 'h3', name: 'Giỗ Tổ Hùng Vương (10/3 Âm Lịch)', date: '26/04/2026', days: 1, type: 'Statutory', active: true },
-    { id: 'h4', name: 'Ngày Giải Phóng Miền Nam (30/04)', date: '30/04/2026', days: 1, type: 'Statutory', active: true },
-    { id: 'h5', name: 'Quốc Tế Lao Động (01/05)', date: '01/05/2026', days: 1, type: 'Statutory', active: true },
-    { id: 'h6', name: 'Quốc Khánh 02/09', date: '01/09/2026 - 02/09/2026', days: 2, type: 'Statutory', active: true },
-    { id: 'h7', name: 'Sinh Nhật Công Ty GGBG CRM', date: '15/10/2026', days: 1, type: 'Corporate', active: true },
-    { id: 'h8', name: 'Nghỉ Du Lịch Team Building', date: '18/07/2026 - 19/07/2026', days: 2, type: 'Corporate', active: true },
-  ]);
-
-  const [payrollCfg, setPayrollCfg] = useState({
-    bhxh_employee_pct: 8.0,
-    bhyt_employee_pct: 1.5,
-    bhtn_employee_pct: 1.0,
-    bhxh_company_pct: 17.5,
-    bhyt_company_pct: 3.0,
-    bhtn_company_pct: 1.0,
-    union_fee_pct: 1.0,
-    min_region_salary: 4960000,
-    personal_deduction: 11000000,
-    dependent_deduction: 4400000,
-    p3_pool_profit_share_pct: 5.0,
-  });
-
-  const [approvalCfg, setApprovalCfg] = useState({
-    leave_approval_levels: '2_LEVELS', // 1_LEVEL | 2_LEVELS
-    ot_approval_levels: '2_LEVELS',
-    contract_expiry_alert_days: 30,
-    birthday_alert: true,
-    checkin_reminder_time: '07:50',
-  });
-
-  const [newTitle, setNewTitle] = useState({
-    title_name: '',
-    department: 'Phòng Kinh Doanh 1',
-    salary_grade: 'G3 (Team Lead)',
-    min_salary: 15000000,
-    max_salary: 25000000,
-    lunch_allowance: 730000,
-    travel_allowance: 500000,
-    description: '',
-  });
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3500);
+    setTimeout(() => setToastMsg(null), 3000);
   };
 
-  const handleAddJobTitle = (e: React.FormEvent) => {
-    e.preventDefault();
-    const item: JobTitleConfig = {
-      id: `jt_${Date.now()}`,
-      code: `CD-${String(jobTitles.length + 1).padStart(3, '0')}`,
-      title_name: newTitle.title_name,
-      department: newTitle.department,
-      salary_grade: newTitle.salary_grade,
-      min_salary: Number(newTitle.min_salary),
-      max_salary: Number(newTitle.max_salary),
-      lunch_allowance: Number(newTitle.lunch_allowance),
-      travel_allowance: Number(newTitle.travel_allowance),
-      headcount_count: 0,
-      description: newTitle.description,
+  // Reload data
+  const reloadData = () => {
+    setSalaryGrades(getSalaryGrades());
+    setAllowanceCatalog(getAllowanceCatalog());
+    setTaxPolicies(getTaxPolicies());
+    setWorkShifts(getWorkShifts());
+    setAttSettings(getAttendanceSettings());
+    setHolidays(getHolidays());
+    setWeekendPolicy(getWeekendPolicy());
+    setFormulaWeights(getFormulaWeights());
+  };
+
+  useEffect(() => {
+    window.addEventListener(PAYROLL_UPDATED_EVENT, reloadData);
+    window.addEventListener(PERFORMANCE_UPDATED_EVENT, reloadData);
+    return () => {
+      window.removeEventListener(PAYROLL_UPDATED_EVENT, reloadData);
+      window.removeEventListener(PERFORMANCE_UPDATED_EVENT, reloadData);
     };
-    setJobTitles([...jobTitles, item]);
-    setIsModalOpen(false);
-    showToast(`✅ Đã bổ sung Chức danh mới: ${item.title_name}`);
+  }, []);
+
+  // Handlers for Salary Grades
+  const handleUpdateStep = (stepNumber: number, field: keyof SalaryStepItem, value: any) => {
+    if (!selectedGrade) return;
+    const updatedSteps = selectedGrade.steps.map((s) => {
+      if (s.step_number === stepNumber) {
+        return { ...s, [field]: value };
+      }
+      return s;
+    });
+
+    const updatedGrade: SalaryGradeScale = {
+      ...selectedGrade,
+      steps: updatedSteps,
+    };
+
+    saveSalaryGrade(updatedGrade);
+    setSelectedGrade(updatedGrade);
+    setSalaryGrades(getSalaryGrades());
+    showToast(`Đã lưu Bậc ${stepNumber} cho Ngạch ${selectedGrade.code}`);
   };
 
-  const handleDeleteTitle = (id: string) => {
-    setJobTitles(jobTitles.filter((j) => j.id !== id));
-    showToast(`🗑️ Đã xóa chức danh khỏi hệ thống`);
-  };
-
-  const handleFetchCurrentLocation = () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = Math.round(pos.coords.latitude * 1000000) / 1000000;
-          const long = Math.round(pos.coords.longitude * 1000000) / 1000000;
-          setTimekeepingCfg((prev) => ({
-            ...prev,
-            office_lat: lat,
-            office_long: long,
-          }));
-          showToast(`📍 Đã tự động cập nhật tọa độ GPS thực tế: ${lat}, ${long}`);
-        },
-        () => {
-          showToast('⚠️ Không thể lấy tọa độ GPS từ trình duyệt. Vui lòng cho phép quyền truy cập vị trí!');
-        }
-      );
+  // Handlers for Allowances
+  const handleSaveAllowance = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAllowance) return;
+    if (editingAllowance.id) {
+      updateAllowanceCatalogItem(editingAllowance.id, editingAllowance);
+      showToast(`Đã cập nhật phụ cấp: ${editingAllowance.name}`);
     } else {
-      showToast('⚠️ Trình duyệt của bạn không hỗ trợ Geolocation API!');
+      createAllowanceCatalogItem(editingAllowance);
+      showToast(`Đã thêm mới phụ cấp: ${editingAllowance.name}`);
+    }
+    setAllowanceCatalog(getAllowanceCatalog());
+    setIsAllowanceModalOpen(false);
+  };
+
+  const handleDeleteAllowance = (id: string, name: string) => {
+    if (confirm(`Bạn có chắc chắn muốn xóa loại phụ cấp "${name}"?`)) {
+      deleteAllowanceCatalogItem(id);
+      setAllowanceCatalog(getAllowanceCatalog());
+      showToast(`Đã xóa phụ cấp: ${name}`);
     }
   };
 
-  const filteredTitles = jobTitles.filter((j) => {
-    const q = searchTerm.toLowerCase();
-    return !q || j.title_name.toLowerCase().includes(q) || j.code.toLowerCase().includes(q) || j.department.toLowerCase().includes(q);
-  });
+  // Handlers for Tax Policies
+  const handleSavePolicy = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPolicy) return;
+    saveTaxPolicy(editingPolicy);
+    setTaxPolicies(getTaxPolicies());
+    setIsPolicyModalOpen(false);
+    showToast(`Đã lưu phiên bản chính sách: ${editingPolicy.version_name}`);
+  };
+
+  // Handlers for Work Shifts
+  const handleSaveShift = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingShift) return;
+    if (editingShift.id && editingShift.id.startsWith('shift_')) {
+      updateWorkShift(editingShift.id, editingShift);
+      showToast(`Đã cập nhật ca làm việc: ${editingShift.name}`);
+    } else {
+      createWorkShift(editingShift);
+      showToast(`Đã thêm mới ca làm việc: ${editingShift.name}`);
+    }
+    setWorkShifts([...getWorkShifts()]);
+    setIsShiftModalOpen(false);
+  };
+
+  const handleDeleteShift = (id: string, name: string) => {
+    if (confirm(`Bạn có chắc muốn xóa ca làm việc "${name}"?`)) {
+      deleteWorkShift(id);
+      setWorkShifts([...getWorkShifts()]);
+      showToast(`Đã xóa ca: ${name}`);
+    }
+  };
+
+  // Handlers for Timekeeping & Scheduled Lock Settings
+  const handleSaveTimekeepingSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveAttendanceSettings(attSettings);
+    showToast('💾 Đã lưu cấu hình cài đặt chấm công & lịch tự động chốt công!');
+  };
+
+  // Handlers for Holidays & Weekend Policy
+  const handleSaveWeekendPolicy = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveWeekendPolicy(weekendPolicy);
+    showToast('💾 Đã lưu chính sách làm việc ngày nghỉ tuần & GPS trụ sở!');
+  };
+
+  const handleSaveHoliday = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingHoliday) return;
+    if (editingHoliday.id && editingHoliday.id.startsWith('hol_')) {
+      updateHoliday(editingHoliday.id, editingHoliday);
+      showToast(`Đã cập nhật ngày lễ: ${editingHoliday.name}`);
+    } else {
+      addHoliday(editingHoliday);
+      showToast(`Đã thêm ngày nghỉ lễ: ${editingHoliday.name}`);
+    }
+    setHolidays(getHolidays());
+    setIsHolidayModalOpen(false);
+  };
+
+  const handleDeleteHoliday = (id: string, name: string) => {
+    if (confirm(`Bạn có chắc muốn xóa ngày nghỉ lễ "${name}"?`)) {
+      deleteHoliday(id);
+      setHolidays(getHolidays());
+      showToast(`Đã xóa ngày lễ: ${name}`);
+    }
+  };
+
+  // Handlers for Performance Formula Weights
+  const handleSaveFormulaWeights = (e: React.FormEvent) => {
+    e.preventDefault();
+    const total =
+      (formulaWeights.kpi_weight || 0) +
+      (formulaWeights.compliance_weight || 0) +
+      (formulaWeights.teamwork_weight || 0) +
+      (formulaWeights.csat_weight || 0) +
+      (formulaWeights.behavior_weight || 0);
+
+    if (total !== 100) {
+      alert(`Tổng tỷ trọng các tiêu chí phải bằng 100% (Hiện tại: ${total}%). Vui lòng điều chỉnh lại.`);
+      return;
+    }
+
+    updateFormulaWeights(formulaWeights);
+    showToast('💾 Đã lưu cấu hình trọng số công thức hiệu suất 3P & Ma trận thưởng!');
+  };
 
   return (
     <div className="space-y-6">
-      {/* Toast Notification */}
+      {/* Toast Alert */}
       {toastMsg && (
-        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-blue-500/40 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200">
-          <Sparkles className="w-4 h-4 text-blue-400" />
-          {toastMsg}
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
+          <Sparkles className="w-4 h-4 text-emerald-400" />
+          <span className="text-xs font-semibold">{toastMsg}</span>
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <Settings className="w-6 h-6 text-purple-600" />
-            <h1 className="text-xl font-bold text-slate-900">Cấu Hình Nhân Sự & Sơ Đồ Tổ Chức Toàn Diện</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
-              HR Enterprise Governance
-            </span>
+      {/* Top Banner Header */}
+      <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-900">
+            <Settings className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>Trung Tâm Cấu Hình Nhân Sự & Hiệu Suất Tập Trung GGBingo</span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Trung tâm cấu hình Sơ đồ cây tổ chức, Chức danh ngạch lương, Ca làm việc GPS, Phép năm nghỉ lễ, Tỷ lệ bảo hiểm & Quy trình duyệt HR tự động.
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            Cấu Hình Nhân Sự, Ca Chấm Công & Tiền Lương 3P
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-xs max-w-2xl leading-relaxed">
+            Hệ thống quản trị tập trung ngạch bậc lương, phụ cấp định mức, chính sách thuế/BHXH, ca kíp, lịch chốt công và công thức hiệu suất 3P.
           </p>
         </div>
 
-        {activeTab === 'JOB_TITLES' && (
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all active:scale-95"
+            onClick={() => showToast('Dữ liệu đã được đồng bộ tự động với HRM, Chấm Công & Bảng Lương 3P')}
+            className="flex items-center gap-2 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 transition-colors"
           >
-            <Plus className="w-4 h-4" /> Thêm Chức Danh Mới
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Đồng Bộ Hệ Thống</span>
           </button>
-        )}
+        </div>
       </div>
 
-      {/* Navigation Tabs (6 Comprehensive HR Settings Tabs) */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-2 overflow-x-auto text-xs font-extrabold">
+      {/* 8 Comprehensive Tabs Navigation Bar */}
+      <div className="bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-1 overflow-x-auto text-xs font-medium scrollbar-none touch-scroll">
+        <button
+          onClick={() => setActiveTab('SALARY_GRADES')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'SALARY_GRADES'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+          }`}
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5 text-blue-600" />
+          <span>1. Ngạch & Bậc Lương</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('ALLOWANCES')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'ALLOWANCES'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Percent className="w-3.5 h-3.5 text-purple-600" />
+          <span>2. Phụ Cấp & Định Mức</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('TAX_POLICIES')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'TAX_POLICIES'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+          }`}
+        >
+          <CalendarDays className="w-3.5 h-3.5 text-emerald-600" />
+          <span>3. Thuế TNCN & BHXH</span>
+        </button>
         <button
           onClick={() => setActiveTab('ORG_CHART')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'ORG_CHART' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'ORG_CHART'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Building2 className="w-4 h-4 text-blue-400" /> 🏛️ 1. Cơ Cấu Tổ Chức & Phòng Ban
+          <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+          <span>4. Sơ Đồ Tổ Chức</span>
         </button>
-
         <button
           onClick={() => setActiveTab('JOB_TITLES')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'JOB_TITLES' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'JOB_TITLES'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Award className="w-4 h-4 text-purple-400" /> 🏅 2. Chức Danh, Ngạch Lương & Phụ Cấp ({jobTitles.length})
+          <Briefcase className="w-3.5 h-3.5 text-amber-600" />
+          <span>5. Chức Danh & Khung Lương</span>
         </button>
-
         <button
-          onClick={() => setActiveTab('TIMEKEEPING_CFG')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'TIMEKEEPING_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          onClick={() => setActiveTab('TIMEKEEPING_SHIFTS')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'TIMEKEEPING_SHIFTS'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Clock className="w-4 h-4 text-emerald-400" /> ⏰ 3. Ca Làm Việc, Chấm Công & GPS
+          <Clock className="w-3.5 h-3.5 text-blue-600" />
+          <span>6. Ca Làm Việc & Lịch Chốt Công</span>
         </button>
-
         <button
-          onClick={() => setActiveTab('LEAVES_CFG')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'LEAVES_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          onClick={() => setActiveTab('HOLIDAYS_WEEKENDS')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'HOLIDAYS_WEEKENDS'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Calendar className="w-4 h-4 text-amber-400" /> 🌴 4. Phép Năm, Nghỉ Lễ & Phúc Lợi
+          <MapPin className="w-3.5 h-3.5 text-rose-600" />
+          <span>7. Ngày Nghỉ Tuần, Lễ Tết & GPS</span>
         </button>
-
         <button
-          onClick={() => setActiveTab('PAYROLL_CFG')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'PAYROLL_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          onClick={() => setActiveTab('PERFORMANCE_FORMULA')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'PERFORMANCE_FORMULA'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-blue-400" /> 💰 5. Tỷ Lệ Bảo Hiểm, Thuế TNCN & Quỹ P3
-        </button>
-
-        <button
-          onClick={() => setActiveTab('APPROVAL_CFG')}
-          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === 'APPROVAL_CFG' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <ShieldCheck className="w-4 h-4 text-indigo-400" /> 🔐 6. Phân Quyền & Quy Trình Duyệt HR
+          <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
+          <span>8. Trọng Số Hiệu Suất 3P & Tiêu Chí</span>
         </button>
       </div>
 
-      {/* TAB 1: SƠ ĐỒ TỔ CHỨC & PHÒNG BAN */}
-      {activeTab === 'ORG_CHART' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-blue-600" /> Cấu Trúc Cây Tổ Chức Đa Cấp Doanh Nghiệp GGBG
-              </h3>
-              <p className="text-xs text-slate-500">Ban Giám Đốc → Khối Kinh Doanh / Vận Hành / HR → Phòng Ban → Đội Nhóm → Nhân Viên</p>
+      {/* ========================================================================= */}
+      {/* TAB 1: NGẠCH & BẬC LƯƠNG */}
+      {/* ========================================================================= */}
+      {activeTab === 'SALARY_GRADES' && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Left Grade Picker */}
+            <div className="lg:col-span-4 space-y-3">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
+                <span className="font-semibold text-xs text-slate-800 dark:text-slate-200 block">
+                  Danh Sách Ngạch Lương (G1 - G6)
+                </span>
+                <div className="space-y-1.5">
+                  {salaryGrades.map((g) => (
+                    <button
+                      key={g.id}
+                      onClick={() => setSelectedGrade(g)}
+                      className={`w-full text-left p-3 rounded-xl border text-xs transition-all ${
+                        selectedGrade.id === g.id
+                          ? 'bg-blue-50 border-blue-300 dark:bg-blue-950/50 dark:border-blue-800 shadow-sm'
+                          : 'bg-slate-50 border-slate-200/80 dark:bg-slate-800/40 dark:border-slate-800 hover:bg-slate-100'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-blue-700 dark:text-blue-400">{g.code}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">5 Bậc</span>
+                      </div>
+                      <p className="font-semibold text-slate-900 dark:text-slate-100 mt-0.5">{g.name}</p>
+                      <p className="text-[11px] text-slate-500 truncate mt-0.5">{g.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="overflow-x-auto py-4">
-            <OrgChartTree rootData={MOCK_ORG_TREE} />
+            {/* Right Grade Steps Matrix */}
+            <div className="lg:col-span-8 bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                    Chi Tiết Bậc Lương & Mức Đóng BHXH • {selectedGrade.code} - {selectedGrade.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-mono mt-0.5">
+                    Mức lương tối thiểu vùng chuẩn: {formatCurrency(4960000)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium uppercase">
+                      <th className="py-3 px-3">Bậc Lương</th>
+                      <th className="py-3 px-3 text-center">Hệ Số Bậc</th>
+                      <th className="py-3 px-3 text-right">Lương P1 Cứng</th>
+                      <th className="py-3 px-3 text-right">Nền Đóng BHXH</th>
+                      <th className="py-3 px-3 text-center">Thời Gian Nâng Bậc</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                    {selectedGrade.steps.map((step) => (
+                      <tr key={step.step_number} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                        <td className="py-3.5 px-3 font-semibold text-slate-900 dark:text-white">
+                          Bậc {step.step_number}
+                        </td>
+                        <td className="py-3.5 px-3 text-center font-mono text-blue-600 font-bold">
+                          <input
+                            type="number"
+                            step="0.05"
+                            value={step.coefficient}
+                            onChange={(e) => handleUpdateStep(step.step_number, 'coefficient', parseFloat(e.target.value) || 1)}
+                            className="w-16 px-2 py-1 bg-slate-50 dark:bg-slate-800 border rounded text-center font-mono font-bold text-blue-700"
+                          />
+                        </td>
+                        <td className="py-3.5 px-3 text-right font-mono font-bold text-emerald-600">
+                          <input
+                            type="number"
+                            step="100000"
+                            value={step.base_salary}
+                            onChange={(e) => handleUpdateStep(step.step_number, 'base_salary', parseInt(e.target.value) || 0)}
+                            className="w-28 px-2 py-1 bg-slate-50 dark:bg-slate-800 border rounded text-right font-mono font-bold text-emerald-600"
+                          />
+                        </td>
+                        <td className="py-3.5 px-3 text-right font-mono text-purple-600">
+                          <input
+                            type="number"
+                            step="100000"
+                            value={step.insurance_salary}
+                            onChange={(e) => handleUpdateStep(step.step_number, 'insurance_salary', parseInt(e.target.value) || 0)}
+                            className="w-28 px-2 py-1 bg-slate-50 dark:bg-slate-800 border rounded text-right font-mono font-bold text-purple-600"
+                          />
+                        </td>
+                        <td className="py-3.5 px-3 text-center text-slate-500 font-mono text-[11px]">
+                          {step.seniority_months_required || 12} Tháng
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* TAB 2: CHỨC DANH, NGẠCH LƯƠNG & PHỤ CẤP */}
-      {activeTab === 'JOB_TITLES' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm mã, tên chức danh, phòng ban..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl"
-              />
+      {/* ========================================================================= */}
+      {/* TAB 2: DANH MỤC PHỤ CẤP & ĐỊNH MỨC */}
+      {/* ========================================================================= */}
+      {activeTab === 'ALLOWANCES' && (
+        <div className="space-y-4">
+          <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <Percent className="w-4 h-4 text-purple-600" />
+                Danh Mục Phụ Cấp & Định Mức Miễn Thuế TNCN / BHXH Theo Luật
+              </h3>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                Các khoản chi vượt định mức miễn trừ sẽ tự động chịu thuế TNCN hoặc cộng vào nền đóng BHXH
+              </p>
             </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-slate-500 font-bold hidden md:inline">
-                Tổng số <strong className="text-slate-900">{filteredTitles.length} Chức Danh Công Việc</strong>
-              </span>
-
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
-              >
-                <Plus className="w-4 h-4" /> Thêm Chức Danh Mới
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setEditingAllowance({
+                  id: '',
+                  code: '',
+                  name: '',
+                  default_amount: 500000,
+                  is_taxable_pit: false,
+                  tax_exempt_cap: 500000,
+                  is_social_insurance: false,
+                  insurance_exempt_cap: 500000,
+                  calculation_type: 'FIXED_MONTHLY',
+                  is_prorated_by_workdays: false,
+                  description: '',
+                  is_active: true,
+                });
+                setIsAllowanceModalOpen(true);
+              }}
+              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-xs shadow-sm flex items-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" /> + Thêm Loại Phụ Cấp
+            </button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10.5px]">
-                  <th className="p-3">Mã & Tên Chức Danh</th>
-                  <th className="p-3">Phòng Ban Trực Thuộc</th>
-                  <th className="p-3">Ngạch/Bậc Lương</th>
-                  <th className="p-3">Khung Lương Min - Max</th>
-                  <th className="p-3">Định Mức Phụ Cấp</th>
-                  <th className="p-3 text-center">Số Nhân Sự</th>
-                  <th className="p-3 text-center">Thao Tác CRUD</th>
+                <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium uppercase">
+                  <th className="py-3.5 px-4">Mã & Tên Phụ Cấp</th>
+                  <th className="py-3.5 px-4 text-right">Mức Mặc Định</th>
+                  <th className="py-3.5 px-4 text-center">Hình Thức Tính</th>
+                  <th className="py-3.5 px-4 text-center">Thuế TNCN</th>
+                  <th className="py-3.5 px-4 text-center">Bảo Hiểm Xã Hội</th>
+                  <th className="py-3.5 px-4">Căn Cứ / Ghi Chú</th>
+                  <th className="py-3.5 px-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {filteredTitles.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <p className="font-extrabold text-slate-900 text-sm">{t.title_name}</p>
-                      <p className="font-mono text-purple-700 text-[11px]">{t.code}</p>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                {allowanceCatalog.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="py-3.5 px-4">
+                      <span className="font-mono text-[10px] text-purple-600 font-bold block">{item.code}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white block">{item.name}</span>
                     </td>
-
-                    <td className="p-3 font-bold text-slate-800">{t.department}</td>
-
-                    <td className="p-3">
-                      <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-full font-extrabold border border-purple-200 text-[11px]">
-                        {t.salary_grade}
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-emerald-600">
+                      {formatCurrency(item.default_amount)}
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-[10px]">
+                        {item.calculation_type === 'FIXED_MONTHLY' ? 'Cố định tháng' : 'Theo ngày công'}
                       </span>
                     </td>
-
-                    <td className="p-3 font-mono font-extrabold text-emerald-700">
-                      {new Intl.NumberFormat('vi-VN').format(t.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(t.max_salary)} ₫
+                    <td className="py-3.5 px-4 text-center">
+                      {item.is_taxable_pit ? (
+                        <div className="text-[10px]">
+                          <span className="px-2 py-0.5 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded font-semibold">Chịu Thuế</span>
+                          {item.tax_exempt_cap > 0 && (
+                            <span className="block text-slate-400 font-mono mt-0.5">Miễn tối đa: {formatCurrency(item.tax_exempt_cap)}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded font-semibold text-[10px]">Miễn 100%</span>
+                      )}
                     </td>
-
-                    <td className="p-3 font-mono text-[11px]">
-                      <p className="text-slate-700">Ăn trưa: <strong>{new Intl.NumberFormat('vi-VN').format(t.lunch_allowance)} ₫</strong></p>
-                      <p className="text-slate-500">Đi lại: <strong>{new Intl.NumberFormat('vi-VN').format(t.travel_allowance)} ₫</strong></p>
+                    <td className="py-3.5 px-4 text-center">
+                      {item.is_social_insurance ? (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 rounded font-semibold text-[10px]">Đóng BHXH</span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 rounded font-semibold text-[10px]">Không Đóng</span>
+                      )}
                     </td>
-
-                    <td className="p-3 text-center font-bold text-slate-900">
-                      {t.headcount_count} NV
-                    </td>
-
-                    <td className="p-3 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
+                    <td className="py-3.5 px-4 text-slate-500 max-w-xs truncate">{item.description}</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <button
-                          onClick={() => setViewingTitle(t)}
-                          className="p-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"
-                          title="Xem Chi Tiết"
-                        >
-                          👁️
-                        </button>
-
-                        <button
-                          onClick={() => setEditingTitle(t)}
-                          className="p-1.5 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-all"
-                          title="Chỉnh Sửa"
+                          onClick={() => {
+                            setEditingAllowance(item);
+                            setIsAllowanceModalOpen(true);
+                          }}
+                          className="p-1.5 text-slate-600 hover:text-blue-600 rounded"
                         >
                           <Edit className="w-3.5 h-3.5" />
                         </button>
-
                         <button
-                          onClick={() => handleDeleteTitle(t.id)}
-                          className="p-1.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
-                          title="Xóa Chức Danh"
+                          onClick={() => handleDeleteAllowance(item.id, item.name)}
+                          className="p-1.5 text-slate-600 hover:text-rose-600 rounded"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -583,909 +738,856 @@ export default function HrmSettingsPage() {
         </div>
       )}
 
-      {/* TAB 3: CA LÀM VIỆC, CHẤM CÔNG & GPS (MULTI-SHIFT & GEOLOCATION ENHANCED) */}
-      {activeTab === 'TIMEKEEPING_CFG' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <div className="flex items-center justify-between border-b pb-4">
+      {/* ========================================================================= */}
+      {/* TAB 3: CHÍNH SÁCH THUẾ TNCN & BHXH THEO LUẬT */}
+      {/* ========================================================================= */}
+      {activeTab === 'TAX_POLICIES' && (
+        <div className="space-y-4">
+          <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-emerald-600" /> Hệ Thống Cấu Hình Ca Làm Việc Đa Ca, Đi Muộn & Bán Kính Chấm Công GPS
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <CalendarDays className="w-4 h-4 text-emerald-600" />
+                Các Phiên Bản Chính Sách Thuế & BHXH Theo Mốc Thời Gian Áp Dụng
               </h3>
-              <p className="text-xs text-slate-500 font-normal mt-0.5">
-                Cấu hình định mức ca làm việc, thời gian linh hoạt, bán kính Geofencing GPS đa trụ sở & tỷ lệ tính tăng ca OT.
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                Lưu lại lịch sử thay đổi luật lao động & thuế thu nhập cá nhân qua các năm
               </p>
             </div>
-
             <button
-              onClick={() => showToast('💾 Đã lưu thành công cấu hình ca làm việc đa ca & bán kính GPS!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all active:scale-95"
+              onClick={() => {
+                setEditingPolicy({
+                  id: '',
+                  version_name: 'Luật Thuế Mới 2026',
+                  effective_from_date: '2026-07-01',
+                  personal_tax_deduction_self: 11000000,
+                  personal_tax_deduction_dependent: 4400000,
+                  bhxh_employee_rate: 8.0,
+                  bhyt_employee_rate: 1.5,
+                  bhtn_employee_rate: 1.0,
+                  bhxh_employer_rate: 17.5,
+                  bhyt_employer_rate: 3.0,
+                  bhtn_employer_rate: 1.0,
+                  kpcd_employer_rate: 2.0,
+                  max_insurance_base_cap: 36000000,
+                  legal_basis_note: 'Theo Nghị quyết Quốc Hội mới nhất',
+                  is_current: false,
+                });
+                setIsPolicyModalOpen(true);
+              }}
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-xs shadow-sm flex items-center gap-1.5"
             >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công
+              <Plus className="w-4 h-4" /> + Thêm Phiên Bản Luật Mới
             </button>
           </div>
 
-          {/* SECTION 1: DANH SÁCH CÁC CA LÀM VIỆC ĐA DẠNG (MULTI-SHIFT CONFIGURATION) */}
-          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-                <Clock className="w-4 h-4 text-emerald-600" /> 1. Quản Lý Danh Sách Các Ca Làm Việc Doanh Nghiệp (Multi-Shift)
-              </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {taxPolicies.map((p) => (
+              <div
+                key={p.id}
+                className={`p-5 rounded-xl border space-y-3 ${
+                  p.is_current
+                    ? 'bg-blue-50/40 border-blue-300 dark:bg-blue-950/20 dark:border-blue-800'
+                    : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-bold text-sm text-slate-900 dark:text-white block">{p.version_name}</span>
+                    <span className="text-[11px] text-slate-500 font-mono">Hiệu lực từ: <strong>{p.effective_from_date}</strong></span>
+                  </div>
+                  {p.is_current ? (
+                    <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded-full font-bold text-[10px]">
+                      ⭐ Đang Áp Dụng Hiện Hành
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px]">Phiên Bản Cũ</span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg">
+                    <span className="text-slate-500 text-[10px] block">Giảm trừ bản thân</span>
+                    <span className="font-bold text-emerald-600">{formatCurrency(p.personal_tax_deduction_self)}</span>
+                  </div>
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg">
+                    <span className="text-slate-500 text-[10px] block">Giảm trừ người phụ thuộc</span>
+                    <span className="font-bold text-emerald-600">{formatCurrency(p.personal_tax_deduction_dependent)}/người</span>
+                  </div>
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg">
+                    <span className="text-slate-500 text-[10px] block">Tỷ lệ trích đóng NLĐ</span>
+                    <span className="font-bold text-purple-600">BHXH 8% + BHYT 1.5% + BHTN 1% = 10.5%</span>
+                  </div>
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg">
+                    <span className="text-slate-500 text-[10px] block">Trần tiền lương BHXH</span>
+                    <span className="font-bold text-blue-600">{formatCurrency(p.max_insurance_base_cap)}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                  <span className="text-[11px] text-slate-500 truncate max-w-xs">{p.legal_basis_note}</span>
+                  <button
+                    onClick={() => {
+                      setEditingPolicy(p);
+                      setIsPolicyModalOpen(true);
+                    }}
+                    className="px-3 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded font-semibold text-[11px]"
+                  >
+                    Chỉnh Sửa
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 4: SƠ ĐỒ TỔ CHỨC & KHỐI */}
+      {/* ========================================================================= */}
+      {activeTab === 'ORG_CHART' && (
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-indigo-600" />
+              Sơ Đồ Phân Cấp Cơ Cấu Tổ Chức Doanh Nghiệp
+            </h3>
+            <span className="text-xs text-slate-500">Kéo thả & phân tầng khối ban chức năng</span>
+          </div>
+          <OrgChartTree rootData={MOCK_ORG_TREE} />
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 5: CHỨC DANH & KHUNG LƯƠNG */}
+      {/* ========================================================================= */}
+      {activeTab === 'JOB_TITLES' && (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden overflow-x-auto">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <Briefcase className="w-4 h-4 text-amber-600" />
+              Danh Mục Chức Danh & Khung Lương Chuẩn Vị Trí P1
+            </h3>
+          </div>
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium uppercase">
+                <th className="py-3.5 px-4">Mã & Chức Danh</th>
+                <th className="py-3.5 px-4">Bộ Phận / Khối</th>
+                <th className="py-3.5 px-4">Cấp Bậc (Job Level)</th>
+                <th className="py-3.5 px-4 text-center">Ngạch Gán</th>
+                <th className="py-3.5 px-4 text-right">Khung Lương Min - Max P1</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+              {jobTitles.map((jt) => (
+                <tr key={jt.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                  <td className="py-3.5 px-4">
+                    <span className="font-mono text-[10px] text-amber-600 font-bold block">{jt.code}</span>
+                    <span className="font-semibold text-slate-900 dark:text-white block">{jt.name}</span>
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">{jt.department}</td>
+                  <td className="py-3.5 px-4 font-semibold text-blue-600">{jt.level}</td>
+                  <td className="py-3.5 px-4 text-center font-mono font-bold text-purple-600">{jt.grade_code}</td>
+                  <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-600">
+                    {formatCurrency(jt.min_salary)} - {formatCurrency(jt.max_salary)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 6: CA LÀM VIỆC & LỊCH CHỐT CÔNG TỰ ĐỘNG (CONSOLIDATED FROM ATTENDANCE) */}
+      {/* ========================================================================= */}
+      {activeTab === 'TIMEKEEPING_SHIFTS' && (
+        <div className="space-y-6">
+          {/* Section 1: Work Shifts List */}
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-blue-600" />
+                  Danh Sách Ca Làm Việc Toàn Công Ty ({workShifts.length} Ca)
+                </h3>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  Nhân viên được gán ca cố định từ danh sách này; hệ thống tự động khóa ca khi chấm công
+                </p>
+              </div>
               <button
                 onClick={() => {
-                  const newShift = {
-                    id: `s_${Date.now()}`,
-                    name: `Ca Mới ${shiftsList.length + 1}`,
-                    start: '09:00',
-                    end: '18:00',
-                    lunch: '12:00-13:00',
-                    hours: 8.0,
-                    active: true,
-                  };
-                  setShiftsList([...shiftsList, newShift]);
-                  showToast(`⚡ Đã bổ sung ca làm việc mới: ${newShift.name}`);
+                  setEditingShift({
+                    id: '',
+                    shift_code: '',
+                    name: '',
+                    start_time: '08:00',
+                    end_time: '17:30',
+                    break_start: '12:00',
+                    break_end: '13:30',
+                    work_hours: 8.0,
+                    night_shift_bonus_pct: 0,
+                    grace_period_late_mins: 15,
+                    grace_period_early_mins: 0,
+                    is_active: true,
+                    color: 'blue',
+                  });
+                  setIsShiftModalOpen(true);
                 }}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 transition-all"
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-xs shadow-sm flex items-center gap-1.5"
               >
-                <Plus className="w-3.5 h-3.5" /> Thêm Ca Làm Việc
+                <Plus className="w-4 h-4" /> + Thêm Ca Làm Việc
               </button>
             </div>
 
-            <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold">
-                    <th className="p-3">Tên Ca Làm Việc</th>
-                    <th className="p-3">Giờ Bắt Đầu</th>
-                    <th className="p-3">Giờ Kết Thúc</th>
-                    <th className="p-3">Thời Gian Nghỉ Trưa</th>
-                    <th className="p-3 text-center">Số Giờ Công</th>
-                    <th className="p-3 text-center">Trạng Thái</th>
-                    <th className="p-3 text-center">Thao Tác</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
-                  {shiftsList.map((shift) => (
-                    <tr key={shift.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3 font-extrabold text-slate-900 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        {shift.name}
-                      </td>
-                      <td className="p-3 font-mono font-bold text-blue-700">{shift.start}</td>
-                      <td className="p-3 font-mono font-bold text-blue-700">{shift.end}</td>
-                      <td className="p-3 text-slate-600">{shift.lunch}</td>
-                      <td className="p-3 text-center font-mono font-black text-emerald-700">{shift.hours}h</td>
-                      <td className="p-3 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {workShifts.map((s) => (
+                <div key={s.id} className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-slate-900 dark:text-white">{s.name}</span>
+                    <span className="px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 rounded font-mono text-[10px]">
+                      {s.shift_code}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300 font-mono space-y-0.5">
+                    <div>Giờ làm: <strong>{s.start_time} - {s.end_time}</strong> ({s.work_hours}h)</div>
+                    <div>Nghỉ giữa ca: {s.break_start || '12:00'} - {s.break_end || '13:30'}</div>
+                    <div>Phụ cấp ca đêm: <strong>{s.night_shift_bonus_pct || 0}%</strong></div>
+                    <div>Ân hạn đi muộn: <strong>{s.grace_period_late_mins} phút</strong></div>
+                  </div>
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
+                    <button
+                      onClick={() => {
+                        setEditingShift(s);
+                        setIsShiftModalOpen(true);
+                      }}
+                      className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded font-medium text-[11px]"
+                    >
+                      Sửa Ca
+                    </button>
+                    <button
+                      onClick={() => handleDeleteShift(s.id, s.name)}
+                      className="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded font-medium text-[11px]"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 2: Scheduled Auto-Locking & Attendance Settings */}
+          <form onSubmit={handleSaveTimekeepingSettings} className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Lock className="w-5 h-5 text-rose-600" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Cấu Hình Lịch Chốt Bảng Chấm Công Tự Động & Quy Định Công Chuẩn
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Ngày Chốt Công Tự Động Trong Tháng
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={attSettings.auto_lock_day || 5}
+                  onChange={(e) => setAttSettings({ ...attSettings, auto_lock_day: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">VD: Ngày 05 hàng tháng</span>
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Giờ Tự Động Khóa Sổ
+                </label>
+                <input
+                  type="time"
+                  value={attSettings.auto_lock_time || '23:59'}
+                  onChange={(e) => setAttSettings({ ...attSettings, auto_lock_time: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Nhắc Nhở Nhân Viên Trước (Ngày)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={7}
+                  value={attSettings.reminder_days_before || 2}
+                  onChange={(e) => setAttSettings({ ...attSettings, reminder_days_before: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Gửi thông báo hoàn tất giải trình</span>
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Trạng Thái Tự Động Khóa
+                </label>
+                <select
+                  value={attSettings.auto_lock_enabled ? 'TRUE' : 'FALSE'}
+                  onChange={(e) => setAttSettings({ ...attSettings, auto_lock_enabled: e.target.value === 'TRUE' })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold text-emerald-600"
+                >
+                  <option value="TRUE">Bật Tự Động Chốt Theo Lịch</option>
+                  <option value="FALSE">Tắt Tự Động (Chốt Thủ Công)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Số Ngày Công Chuẩn Trong Tháng
+                </label>
+                <input
+                  type="number"
+                  min={20}
+                  max={31}
+                  value={attSettings.standard_workdays}
+                  onChange={(e) => setAttSettings({ ...attSettings, standard_workdays: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Số Phút Cho Phép Đi Muộn Không Phạt (Ân Hạn)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={60}
+                  value={attSettings.late_grace_minutes}
+                  onChange={(e) => setAttSettings({ ...attSettings, late_grace_minutes: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Bán Kính Check-in GPS Định Vị Văn Phòng (Meters)
+                </label>
+                <input
+                  type="number"
+                  value={attSettings.gps_radius_meters}
+                  onChange={(e) => setAttSettings({ ...attSettings, gps_radius_meters: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end pt-3">
+              <button
+                type="submit"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-emerald-600/20 flex items-center gap-1.5"
+              >
+                <Save className="w-4 h-4" /> Lưu Cấu Hình Chấm Công & Ca
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 7: NGÀY NGHỈ TUẦN, LỄ TẾT & GPS TRỤ SỞ */}
+      {/* ========================================================================= */}
+      {activeTab === 'HOLIDAYS_WEEKENDS' && (
+        <div className="space-y-6">
+          {/* Section 1: Weekend & GPS Policy */}
+          <form onSubmit={handleSaveWeekendPolicy} className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-rose-600" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Chính Sách Ngày Nghỉ Tuần, Hệ Số Làm Thêm & Tọa Độ GPS Trụ Sở
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Chính Sách Thứ Bảy</label>
+                <select
+                  value={weekendPolicy.saturday_rule}
+                  onChange={(e) => setWeekendPolicy({ ...weekendPolicy, saturday_rule: e.target.value as any })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                >
+                  <option value="HALF_DAY_MORNING">Làm Buổi Sáng (08:00 - 12:00)</option>
+                  <option value="OFF">Nghỉ Hoàn Toàn (Chế độ 5 ngày/tuần)</option>
+                  <option value="FULL_WORK">Làm Cả Ngày Thứ Bảy</option>
+                  <option value="ALTERNATE">Nghỉ Cách Tuần (1 tuần làm / 1 tuần nghỉ)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Chính Sách Chủ Nhật</label>
+                <select
+                  value={weekendPolicy.sunday_rule}
+                  onChange={(e) => setWeekendPolicy({ ...weekendPolicy, sunday_rule: e.target.value as any })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                >
+                  <option value="OFF">Nghỉ Toàn Bộ (Mặc Định)</option>
+                  <option value="ROTATING">Xoay Ca Theo Phân Công</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Hệ Số Lương Ngày Nghỉ Tuần</label>
+                <input
+                  type="number"
+                  value={weekendPolicy.weekend_pay_rate}
+                  onChange={(e) => setWeekendPolicy({ ...weekendPolicy, weekend_pay_rate: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-bold text-purple-600"
+                />
+                <span className="text-[10px] text-slate-500 mt-0.5 block">Mặc định: 200% (x2.0)</span>
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Hệ Số Lương Ngày Lễ Tết</label>
+                <input
+                  type="number"
+                  value={weekendPolicy.holiday_pay_rate}
+                  onChange={(e) => setWeekendPolicy({ ...weekendPolicy, holiday_pay_rate: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-bold text-rose-600"
+                />
+                <span className="text-[10px] text-slate-500 mt-0.5 block">Chuẩn Luật Lao Động: 300% (x3.0)</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="sm:col-span-2">
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Địa Chỉ Trụ Sở Công Ty (GPS)</label>
+                <input
+                  type="text"
+                  value={weekendPolicy.office_address}
+                  onChange={(e) => setWeekendPolicy({ ...weekendPolicy, office_address: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Bán Kính Check-in Hợp Lệ (Meters)</label>
+                <input
+                  type="number"
+                  value={weekendPolicy.office_radius_meters}
+                  onChange={(e) => setWeekendPolicy({ ...weekendPolicy, office_radius_meters: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end pt-2">
+              <button
+                type="submit"
+                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-sm flex items-center gap-1.5"
+              >
+                <Save className="w-4 h-4" /> Lưu Chính Sách Nghỉ Tuần & GPS
+              </button>
+            </div>
+          </form>
+
+          {/* Section 2: Holidays List */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden overflow-x-auto">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-purple-600" />
+                  Danh Mục Ngày Nghỉ Lễ Toàn Quốc & Doanh Nghiệp (Hưởng 100% Lương)
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingHoliday({
+                    id: '',
+                    name: '',
+                    date: '2026-09-02',
+                    year: 2026,
+                    is_paid: true,
+                    pay_multiplier: 3.0,
+                    description: 'Nghỉ lễ theo Luật Lao Động',
+                  });
+                  setIsHolidayModalOpen(true);
+                }}
+                className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-xs shadow-sm flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" /> + Thêm Ngày Lễ
+              </button>
+            </div>
+
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium uppercase">
+                  <th className="py-3 px-4">Ngày Nghỉ</th>
+                  <th className="py-3 px-4">Dịp Lễ / Sự Kiện</th>
+                  <th className="py-3 px-4 text-center">Năm</th>
+                  <th className="py-3 px-4 text-center">Chế Độ Nghỉ</th>
+                  <th className="py-3 px-4 text-center">Hệ Số Đi Làm Lễ</th>
+                  <th className="py-3 px-4">Mô Tả / Căn Cứ</th>
+                  <th className="py-3 px-4 text-center">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                {holidays.map((h) => (
+                  <tr key={h.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-blue-700 dark:text-blue-400">{h.date}</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">{h.name}</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-slate-500">{h.year}</td>
+                    <td className="py-3.5 px-4 text-center">
+                      {h.is_paid ? (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded font-semibold text-[10px]">
+                          Hưởng 100% Lương
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px]">Không Lương</span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-purple-700 dark:text-purple-300">
+                      x{h.pay_multiplier * 100}% (x{h.pay_multiplier})
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-500 max-w-xs truncate">{h.description}</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => {
-                            setShiftsList(shiftsList.map(s => s.id === shift.id ? { ...s, active: !s.active } : s));
-                            showToast(`⚙️ Đã cập nhật trạng thái ca: ${shift.name}`);
+                            setEditingHoliday(h);
+                            setIsHolidayModalOpen(true);
                           }}
-                          className={`px-2.5 py-0.5 rounded-full font-extrabold text-[10px] ${
-                            shift.active ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'
-                          }`}
+                          className="p-1 text-slate-500 hover:text-blue-600 rounded"
                         >
-                          {shift.active ? '🟢 Đang Áp Dụng' : '⚪ Tạm Dừng'}
+                          <Edit className="w-3.5 h-3.5" />
                         </button>
-                      </td>
-                      <td className="p-3 text-center">
                         <button
-                          onClick={() => {
-                            setShiftsList(shiftsList.filter(s => s.id !== shift.id));
-                            showToast(`🗑️ Đã xóa ca làm việc`);
-                          }}
-                          className="p-1 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all"
-                          title="Xóa Ca"
+                          onClick={() => handleDeleteHoliday(h.id, h.name)}
+                          className="p-1 text-slate-500 hover:text-rose-600 rounded"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 8: TRỌNG SỐ CÔNG THỨC HIỆU SUẤT 3P & MA TRẬN THƯỞNG */}
+      {/* ========================================================================= */}
+      {activeTab === 'PERFORMANCE_FORMULA' && (
+        <form onSubmit={handleSaveFormulaWeights} className="space-y-6">
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Sliders className="w-5 h-5 text-amber-600" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Cấu Hình Trọng Số Công Thức Tính Điểm Hiệu Suất 3P (Tổng = 100%)
+                </h3>
+              </div>
+              <span className="text-xs font-mono font-bold text-emerald-600">
+                Tổng hiện tại: {(formulaWeights.kpi_weight || 0) + (formulaWeights.compliance_weight || 0) + (formulaWeights.teamwork_weight || 0) + (formulaWeights.csat_weight || 0) + (formulaWeights.behavior_weight || 0)}%
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Số Phút Cho Phép Đi Muộn Không Trừ Công (Grace Period)</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl space-y-1">
+                <label className="block font-bold text-slate-800 dark:text-slate-200">1. Chỉ Tiêu KPI Doanh Số (%)</label>
                 <input
                   type="number"
-                  value={timekeepingCfg.grace_period_minutes}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, grace_period_minutes: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-bold"
+                  min={0}
+                  max={100}
+                  value={formulaWeights.kpi_weight}
+                  onChange={(e) => setFormulaWeights({ ...formulaWeights, kpi_weight: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border rounded-lg font-mono font-bold text-blue-600 text-sm"
                 />
-                <p className="text-[10.5px] text-slate-500 font-normal">Đi muộn dưới {timekeepingCfg.grace_period_minutes} phút được tính đầy đủ 1 ngày công.</p>
+                <span className="text-[10px] text-slate-500 block">Đồng bộ từ Module KPIs</span>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Giới Hạn Tăng Ca OT Tối Đa (Giờ / Tháng)</label>
+              <div className="p-3 bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-xl space-y-1">
+                <label className="block font-bold text-slate-800 dark:text-slate-200">2. Tuân Thủ & Chuyên Cần (%)</label>
                 <input
                   type="number"
-                  value={timekeepingCfg.max_ot_monthly_hours}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, max_ot_monthly_hours: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
+                  min={0}
+                  max={100}
+                  value={formulaWeights.compliance_weight}
+                  onChange={(e) => setFormulaWeights({ ...formulaWeights, compliance_weight: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border rounded-lg font-mono font-bold text-purple-600 text-sm"
                 />
-                <p className="text-[10.5px] text-slate-500 font-normal">Theo Luật Lao động Việt Nam (Tối đa 40 giờ OT/tháng).</p>
+                <span className="text-[10px] text-slate-500 block">Tỷ lệ đi làm & đúng giờ</span>
+              </div>
+
+              <div className="p-3 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800 rounded-xl space-y-1">
+                <label className="block font-bold text-slate-800 dark:text-slate-200">3. Phối Hợp Teamwork (%)</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={formulaWeights.teamwork_weight}
+                  onChange={(e) => setFormulaWeights({ ...formulaWeights, teamwork_weight: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border rounded-lg font-mono font-bold text-indigo-600 text-sm"
+                />
+                <span className="text-[10px] text-slate-500 block">Đánh giá chéo / Leader</span>
+              </div>
+
+              <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl space-y-1">
+                <label className="block font-bold text-slate-800 dark:text-slate-200">4. CSAT Khách Hàng (%)</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={formulaWeights.csat_weight}
+                  onChange={(e) => setFormulaWeights({ ...formulaWeights, csat_weight: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border rounded-lg font-mono font-bold text-emerald-600 text-sm"
+                />
+                <span className="text-[10px] text-slate-500 block">Độ hài lòng đối tác</span>
+              </div>
+
+              <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl space-y-1">
+                <label className="block font-bold text-slate-800 dark:text-slate-200">5. Thái Độ & Động Lực (%)</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={formulaWeights.behavior_weight}
+                  onChange={(e) => setFormulaWeights({ ...formulaWeights, behavior_weight: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border rounded-lg font-mono font-bold text-amber-600 text-sm"
+                />
+                <span className="text-[10px] text-slate-500 block">Đóng góp & tự học hỏi</span>
               </div>
             </div>
           </div>
 
-          {/* SECTION 2: QUẢN LÝ ĐỊA ĐIỂM VĂN PHÒNG & BÁN KÍNH GPS CHECK-IN (MULTI-LOCATION GEOFENCING) */}
-          <div className="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-              <div>
-                <h4 className="text-blue-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-blue-600" /> 2. Danh Sách Địa Điểm Văn Phòng & Bán Kính Chấm Công GPS Geofencing
-                </h4>
-                <p className="text-[11px] text-slate-500 font-normal">Cho phép nhân sự check-in đúng tọa độ GPS của trụ sở được phân công.</p>
+          {/* Section 2: Rating Grade Thresholds & P3 Multiplier Matrix */}
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Award className="w-5 h-5 text-purple-600" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Ma Trận Xếp Loại Hiệu Suất & Hệ Số Thưởng Lương P3
+                </h3>
               </div>
-
-              <button
-                onClick={handleFetchCurrentLocation}
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition-all active:scale-95 shrink-0"
-              >
-                <MapPin className="w-4 h-4" /> 📍 Lấy Tọa Độ GPS Hiện Tại (Browser)
-              </button>
             </div>
 
-            <div className="overflow-x-auto border border-blue-200 rounded-xl bg-white">
+            <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-blue-100/60 border-b border-blue-200 text-blue-900 font-extrabold">
-                    <th className="p-3">Tên Trụ Sở / Chi Nhánh</th>
-                    <th className="p-3">Địa Chỉ Chi Tiết</th>
-                    <th className="p-3 font-mono">Tọa Độ GPS (Lat, Long)</th>
-                    <th className="p-3 text-center">Bán Kính Check-in</th>
-                    <th className="p-3 text-center">Trạng Thái</th>
+                  <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium uppercase">
+                    <th className="py-3 px-4">Xếp Loại</th>
+                    <th className="py-3 px-4">Tên Danh Hiệu</th>
+                    <th className="py-3 px-4 text-center">Ngưỡng Điểm Tối Thiểu</th>
+                    <th className="py-3 px-4 text-right">Hệ Số Thưởng Lương P3</th>
+                    <th className="py-3 px-4 text-center">Ghi Chú</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
-                  {locationsList.map((loc) => (
-                    <tr key={loc.id} className="hover:bg-blue-50/40 transition-colors">
-                      <td className="p-3 font-extrabold text-slate-900 flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
-                        {loc.name}
-                      </td>
-                      <td className="p-3 text-slate-600">{loc.address}</td>
-                      <td className="p-3 font-mono text-[11px] font-bold text-slate-800">
-                        {loc.lat}, {loc.long}
-                      </td>
-                      <td className="p-3 text-center font-mono font-black text-blue-700">
-                        {loc.radius}m
-                      </td>
-                      <td className="p-3 text-center">
-                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-extrabold text-[10px]">
-                          🟢 Đang Hoạt Động
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-purple-700 text-sm">Hạng S (A+)</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">Xuất Sắc Vượt Trội</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-purple-600">
+                      ≥ {formulaWeights.grade_s_threshold} Điểm
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-emerald-600 text-sm">
+                      120% Lương P3 (x{formulaWeights.grade_s_p3_multiplier})
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-500">Được đề xuất khen thưởng CEO</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-blue-700 text-sm">Hạng A</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">Hoàn Thành Tốt</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-blue-600">
+                      ≥ {formulaWeights.grade_a_threshold} Điểm
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-emerald-600 text-sm">
+                      100% Lương P3 (x{formulaWeights.grade_a_p3_multiplier})
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-500">Hưởng trọn vẹn lương P3 mục tiêu</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-emerald-700 text-sm">Hạng B</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">Đạt Yêu Cầu / Khá</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-600">
+                      ≥ {formulaWeights.grade_b_threshold} Điểm
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-emerald-600 text-sm">
+                      85% Lương P3 (x{formulaWeights.grade_b_p3_multiplier})
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-500">Đạt chỉ tiêu cơ bản</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-amber-700 text-sm">Hạng C</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">Trung Bình / Cần Cải Thiện</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-amber-600">
+                      ≥ {formulaWeights.grade_c_threshold} Điểm
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-amber-600 text-sm">
+                      50% Lương P3 (x{formulaWeights.grade_c_p3_multiplier})
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-500">Đưa vào danh sách đào tạo lại</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-rose-700 text-sm">Hạng D</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">Không Đạt Yêu Cầu</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-rose-600">
+                      &lt; {formulaWeights.grade_c_threshold} Điểm
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-rose-600 text-sm">
+                      0% Lương P3 (x0.0)
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-500">Không hưởng lương P3 trong tháng</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white rounded-xl border border-blue-100">
-              <div>
-                <label className="block text-slate-700 mb-1 font-bold">Vĩ Độ Văn Phòng Hiện Tại (Latitude)</label>
-                <input
-                  type="number"
-                  step={0.000001}
-                  value={timekeepingCfg.office_lat}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_lat: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-[11px] font-bold text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1 font-bold">Kinh Độ Văn Phòng Hiện Tại (Longitude)</label>
-                <input
-                  type="number"
-                  step={0.000001}
-                  value={timekeepingCfg.office_long}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, office_long: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-[11px] font-bold text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1 font-bold">Bán Kính Geofencing Hợp Lệ (Meters)</label>
-                <input
-                  type="number"
-                  step={50}
-                  value={timekeepingCfg.gps_radius_meters}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, gps_radius_meters: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono font-bold text-blue-700"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION 3: HỆ SỐ TÍNH TĂNG CA OT (OVERTIME MULTIPLIER CONFIG) */}
-          <div className="p-5 bg-purple-50/40 border border-purple-200/80 rounded-2xl space-y-4">
-            <h4 className="text-purple-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-600" /> 3. Quy Tắc Hệ Số Tính Lương Làm Thêm Giờ (Overtime Multipliers)
-            </h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">OT Ngày Thường (Weekday OT Rate)</label>
-                <input
-                  type="number"
-                  step={0.1}
-                  value={timekeepingCfg.ot_weekday_mult}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekday_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho giờ làm ngoài giờ từ Thứ 2 đến Thứ 6 (x1.5).</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">OT Cuối Tuần (Weekend OT Rate)</label>
-                <input
-                  type="number"
-                  step={0.1}
-                  value={timekeepingCfg.ot_weekend_mult}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_weekend_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho ngày nghỉ hằng tuần Thứ 7 & Chủ Nhật (x2.0).</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-purple-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">OT Ngày Lễ Tết (Holiday OT Rate)</label>
-                <input
-                  type="number"
-                  step={0.1}
-                  value={timekeepingCfg.ot_holiday_mult}
-                  onChange={(e) => setTimekeepingCfg({ ...timekeepingCfg, ot_holiday_mult: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho các ngày Lễ Tết quốc gia được hưởng nguyên lương (x3.0).</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: PHÉP NĂM, NGHỈ LỄ & PHÚC LỢI (UPGRADED ENTERPRISE LEAVES ENGINE) */}
-      {activeTab === 'LEAVES_CFG' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-8 text-xs font-bold">
-          <div className="flex items-center justify-between border-b pb-4">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-amber-600" /> Hệ Thống Cấu Hình Phép Năm, Lịch Nghỉ Lễ & Chế Độ Phúc Lợi Chuyên Sâu
-              </h3>
-              <p className="text-xs text-slate-500 font-normal mt-0.5">
-                Chuẩn hóa quy tắc cấp phép năm, dồn phép, chi trả phép tồn, lịch nghỉ lễ Tết quốc gia/công ty & ngân sách phúc lợi hiếu hỷ, thâm niên.
-              </p>
-            </div>
-
-            <button
-              onClick={() => showToast('💾 Đã lưu thành công toàn bộ cấu hình Phép năm, Lịch nghỉ lễ & Phúc lợi!')}
-              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-extrabold shadow-lg shadow-amber-600/30 flex items-center gap-2 transition-all active:scale-95"
-            >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Toàn Bộ
-            </button>
-          </div>
-
-          {/* SECTION 1: CẤU HÌNH QUY TẮC PHÉP NĂM & THÂM NIÊN */}
-          <div className="p-5 bg-amber-50/40 border border-amber-200/80 rounded-2xl space-y-4">
-            <h4 className="text-amber-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-600" /> 1. Quy Tắc Cấp Phép Năm, Tích Lũy & Thanh Toán Phép Tồn (Accrual & Encashment)
-            </h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Phương Thức Cấp Phép Năm</label>
-                <select
-                  value={leavesCfg.accrual_method}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, accrual_method: e.target.value as any })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                >
-                  <option value="MONTHLY">Tích lũy từng tháng (+1 ngày / tháng)</option>
-                  <option value="FULL_GRANT">Cấp trọn gói từ đầu năm (12 ngày / năm)</option>
-                </select>
-                <p className="text-[10.5px] text-slate-500 font-normal">Quy định thời điểm nhân viên được ghi nhận số ngày phép sử dụng.</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Định Mức Phép Năm Nhân Viên (Ngày/Năm)</label>
-                <input
-                  type="number"
-                  value={leavesCfg.annual_leave_default}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, annual_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-amber-700 font-black"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Áp dụng cho Hợp đồng lao động chính thức từ 1 năm trở lên.</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Định Mức Phép Cấp Quản Lý (Ngày/Năm)</label>
-                <input
-                  type="number"
-                  value={leavesCfg.manager_leave_default}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, manager_leave_default: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-black"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Dành cho cấp Trưởng phòng, Giám đốc Khối & C-Level.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Phép Thâm Niên (+Ngày/Số Năm)</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-600">Cộng</span>
-                  <input
-                    type="number"
-                    value={leavesCfg.seniority_bonus_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_bonus_days: Number(e.target.value) })}
-                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center text-amber-700 font-bold"
-                  />
-                  <span className="text-[11px] text-slate-600">ngày mỗi</span>
-                  <input
-                    type="number"
-                    value={leavesCfg.seniority_bonus_years}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_bonus_years: Number(e.target.value) })}
-                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center font-bold"
-                  />
-                  <span className="text-[11px] text-slate-600">năm thâm niên</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Dồn Phép Sang Năm Sau</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-600">Tối đa</span>
-                  <input
-                    type="number"
-                    value={leavesCfg.carry_over_max_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_max_days: Number(e.target.value) })}
-                    className="w-16 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center font-bold"
-                  />
-                  <span className="text-[11px] text-slate-600">ngày, hạn</span>
-                  <input
-                    type="text"
-                    value={leavesCfg.carry_over_deadline}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, carry_over_deadline: e.target.value })}
-                    className="w-20 px-2 py-1 bg-slate-50 border rounded-lg font-mono text-center text-purple-700 font-bold"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-amber-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Quy Định Chi Trả Tiền Phép Tồn</label>
-                <select
-                  value={leavesCfg.encashment_policy}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, encashment_policy: e.target.value as any })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl"
-                >
-                  <option value="PAY_FULL_AVERAGE">Thanh toán 100% lương bình quân khi thôi việc</option>
-                  <option value="EXPIRE">Tự động hủy số phép dư hết hạn ngày 31/03</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION 2: QUẢN LÝ LỊCH NGÀY NGHỈ LỄ TẾT QUỐC GIA & CÔNG TY */}
-          <div className="p-5 bg-purple-50/40 border border-purple-200/80 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-purple-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-                <Gift className="w-4 h-4 text-purple-600" /> 2. Danh Mục Các Ngày Nghỉ Lễ / Tết Hưởng Nguyên Lương ({holidaysList.length} Dịp)
-              </h4>
+            <div className="flex items-center justify-end pt-3">
               <button
-                onClick={() => showToast('➕ Đã thêm dịp Nghỉ Lễ mới vào danh mục')}
-                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[11px] font-extrabold flex items-center gap-1 shadow-sm"
+                type="submit"
+                className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-amber-600/20 flex items-center gap-1.5"
               >
-                <Plus className="w-3.5 h-3.5" /> Thêm Ngày Nghỉ Lễ Mới
+                <Save className="w-4 h-4" /> Lưu Cấu Hình Trọng Số & Ma Trận Thưởng P3
               </button>
             </div>
-
-            <div className="overflow-x-auto bg-white rounded-xl border border-purple-100">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-purple-100 bg-purple-50/50 text-purple-900 font-extrabold text-[10.5px]">
-                    <th className="p-3">Tên Dịp Nghỉ Lễ / Tết</th>
-                    <th className="p-3">Thời Gian / Ngày Nghỉ</th>
-                    <th className="p-3 text-center">Số Ngày Nghỉ Hưởng Lương</th>
-                    <th className="p-3">Phân Loại Nghỉ</th>
-                    <th className="p-3 text-center">Trạng Thái</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-purple-50">
-                  {holidaysList.map((h) => (
-                    <tr key={h.id} className="hover:bg-purple-50/30 transition-colors">
-                      <td className="p-3 font-extrabold text-slate-900">{h.name}</td>
-                      <td className="p-3 font-mono text-purple-700">{h.date}</td>
-                      <td className="p-3 text-center font-mono font-black text-emerald-700">{h.days} ngày</td>
-                      <td className="p-3">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                          h.type === 'Statutory' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-purple-100 text-purple-800 border border-purple-200'
-                        }`}>
-                          {h.type === 'Statutory' ? '🏛️ Luật Lao Động' : '🏢 Ngày Nghỉ Công Ty'}
-                        </span>
-                      </td>
-                      <td className="p-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={h.active}
-                          onChange={() => {
-                            setHolidaysList(
-                              holidaysList.map((item) => (item.id === h.id ? { ...item, active: !item.active } : item))
-                            );
-                          }}
-                          className="w-4 h-4 accent-purple-600 rounded cursor-pointer"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
-
-          {/* SECTION 3: NGHỈ CHẾ ĐỘ ĐẶC BIỆT & THAI SẢN */}
-          <div className="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
-            <h4 className="text-blue-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-              <HeartPulse className="w-4 h-4 text-blue-600" /> 3. Chế Độ Nghỉ Việc Riêng, Tang Chế & Thai Sản (Statutory Leave Policy)
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Kết Hôn Bản Thân</label>
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    value={leavesCfg.marriage_self_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_self_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
-                  />
-                  <span className="text-slate-500 shrink-0">ngày</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Kết Hôn Con Cái</label>
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    value={leavesCfg.marriage_child_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, marriage_child_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
-                  />
-                  <span className="text-slate-500 shrink-0">ngày</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Tang Chế (Tứ Thân)</label>
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    value={leavesCfg.bereavement_leave_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, bereavement_leave_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-red-700 font-bold"
-                  />
-                  <span className="text-slate-500 shrink-0">ngày</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Nghỉ Không Hưởng Lương Max</label>
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    value={leavesCfg.unpaid_leave_max_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, unpaid_leave_max_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-slate-700 font-bold"
-                  />
-                  <span className="text-slate-500 shrink-0">ngày/năm</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thai Sản Nữ Lao Động</label>
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    value={leavesCfg.maternity_female_months}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_female_months: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
-                  />
-                  <span className="text-slate-500 shrink-0">tháng</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thai Sản Nam Lao Động (Vợ Sinh)</label>
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    value={leavesCfg.maternity_male_days}
-                    onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_male_days: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
-                  />
-                  <span className="text-slate-500 shrink-0">ngày</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Trợ Cấp Sinh Con Công Ty Tặng</label>
-                <input
-                  type="number"
-                  step={500000}
-                  value={leavesCfg.maternity_bonus_vnd}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, maternity_bonus_vnd: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION 4: CHẾ ĐỘ PHÚC LỢI, THÂM NIÊN & THĂM HỎI HIẾU HỶ */}
-          <div className="p-5 bg-emerald-50/40 border border-emerald-200/80 rounded-2xl space-y-4">
-            <h4 className="text-emerald-900 uppercase font-black tracking-wider text-[11.5px] flex items-center gap-2">
-              <Gift className="w-4 h-4 text-emerald-600" /> 4. Chế Độ Phúc Lợi, Quà Sinh Nhật, Thâm Niên & Thăm Hỏi Hiếu Hỷ
-            </h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Quà Mừng Sinh Nhật Nhân Sự</label>
-                <input
-                  type="number"
-                  step={100000}
-                  value={leavesCfg.birthday_gift_vnd}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, birthday_gift_vnd: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-emerald-700 font-bold"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Gửi quà tặng kèm thiệp chúc mừng tự động vào ngày sinh nhật.</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Ngân Sách Team Building Hàng Tháng</label>
-                <input
-                  type="number"
-                  step={100000}
-                  value={leavesCfg.team_building_budget_monthly}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, team_building_budget_monthly: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Quỹ ăn uống & gắn kết đội nhóm (VND/nhân sự/tháng).</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-2">
-                <label className="block text-slate-700 font-extrabold">Định Mức Khám Sức Khỏe Định Kỳ</label>
-                <input
-                  type="number"
-                  step={500000}
-                  value={leavesCfg.health_check_budget_annual}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, health_check_budget_annual: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 border rounded-xl font-mono text-purple-700 font-bold"
-                />
-                <p className="text-[10.5px] text-slate-500 font-normal">Gói khám sức khỏe tổng quát hàng năm tại Bệnh viện Quốc tế.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 1 Năm</label>
-                <input
-                  type="number"
-                  step={500000}
-                  value={leavesCfg.seniority_reward_1y}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_1y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-slate-900 font-bold"
-                />
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 3 Năm</label>
-                <input
-                  type="number"
-                  step={1000000}
-                  value={leavesCfg.seniority_reward_3y}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_3y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-blue-700 font-bold"
-                />
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-1">
-                <label className="block text-slate-700 font-extrabold text-[11px]">Thưởng Thâm Niên 5 Năm (VIP)</label>
-                <input
-                  type="number"
-                  step={2000000}
-                  value={leavesCfg.seniority_reward_5y}
-                  onChange={(e) => setLeavesCfg({ ...leavesCfg, seniority_reward_5y: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 bg-slate-50 border rounded-xl font-mono text-amber-700 font-black"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        </form>
       )}
 
-      {/* TAB 5: BẢO HIỂM, THUẾ TNCN & QUỸ LƯƠNG P3 */}
-      {activeTab === 'PAYROLL_CFG' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
-            <DollarSign className="w-4 h-4 text-blue-600" /> Tỷ Lệ Trích Nộp BHXH, Thuế TNCN & Quỹ Thưởng Lương P3
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-blue-700 uppercase font-black tracking-wider text-[11px]">1. Tỷ Lệ Đóng BHXH Nhân Viên & Doanh Nghiệp</h4>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">BHXH Nhân Viên (%)</label>
-                  <input
-                    type="number"
-                    step={0.5}
-                    value={payrollCfg.bhxh_employee_pct}
-                    onChange={(e) => setPayrollCfg({ ...payrollCfg, bhxh_employee_pct: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">BHXH Doanh Nghiệp (%)</label>
-                  <input
-                    type="number"
-                    step={0.5}
-                    value={payrollCfg.bhxh_company_pct}
-                    onChange={(e) => setPayrollCfg({ ...payrollCfg, bhxh_company_pct: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Mức Lương Tối Thiểu Vùng Căn Cứ BHXH (VND)</label>
-                <input
-                  type="number"
-                  step={100000}
-                  value={payrollCfg.min_region_salary}
-                  onChange={(e) => setPayrollCfg({ ...payrollCfg, min_region_salary: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
-                />
-              </div>
-            </div>
-
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-emerald-700 uppercase font-black tracking-wider text-[11px]">2. Giảm Trừ Thuế TNCN & Quỹ Lương P3</h4>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Mức Giảm Trừ Bản Thân (VND/tháng)</label>
-                <input
-                  type="number"
-                  step={500000}
-                  value={payrollCfg.personal_deduction}
-                  onChange={(e) => setPayrollCfg({ ...payrollCfg, personal_deduction: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-emerald-700"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Mức Giảm Trừ Người Phụ Thuộc (VND/người/tháng)</label>
-                <input
-                  type="number"
-                  step={100000}
-                  value={payrollCfg.dependent_deduction}
-                  onChange={(e) => setPayrollCfg({ ...payrollCfg, dependent_deduction: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Tỷ Lệ Trích Lợi Nhuận Gộp Vào Quỹ Lương P3 (%)</label>
-                <input
-                  type="number"
-                  step={0.5}
-                  value={payrollCfg.p3_pool_profit_share_pct}
-                  onChange={(e) => setPayrollCfg({ ...payrollCfg, p3_pool_profit_share_pct: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-amber-700"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end">
-            <button
-              onClick={() => showToast('💾 Đã lưu thành công định mức tỷ lệ đóng BHXH, Thuế TNCN & Quỹ Lương P3!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" /> Lưu Cấu Hình Lương & Thuế
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 6: PHÂN QUYỀN & QUY TRÌNH DUYỆT HR */}
-      {activeTab === 'APPROVAL_CFG' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6 text-xs font-bold">
-          <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2 border-b pb-3">
-            <ShieldCheck className="w-4 h-4 text-indigo-600" /> Phân Quyền Vai Trò & Quy Trình Duyệt Đơn Tự Động
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-indigo-700 uppercase font-black tracking-wider text-[11px]">1. Quy Trình Phê Duyệt Đơn Nghỉ Phép / OT</h4>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Quy Trình Duyệt Đơn Nghỉ Phép</label>
-                <select
-                  value={approvalCfg.leave_approval_levels}
-                  onChange={(e) => setApprovalCfg({ ...approvalCfg, leave_approval_levels: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl"
-                >
-                  <option value="1_LEVEL">1 Cấp Duyệt (Quản lý trực tiếp duyệt)</option>
-                  <option value="2_LEVELS">2 Cấp Duyệt (Quản lý trực tiếp → HR Manager)</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Quy Trình Duyệt Làm Thêm Giờ (OT)</label>
-                <select
-                  value={approvalCfg.ot_approval_levels}
-                  onChange={(e) => setApprovalCfg({ ...approvalCfg, ot_approval_levels: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl"
-                >
-                  <option value="1_LEVEL">1 Cấp Duyệt (Quản lý trực tiếp duyệt)</option>
-                  <option value="2_LEVELS">2 Cấp Duyệt (Quản lý trực tiếp → Giám đốc Khối)</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-              <h4 className="text-purple-700 uppercase font-black tracking-wider text-[11px]">2. Nhắc Nhở Tự Động Hệ Thống</h4>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Cảnh Báo Hợp Đồng Sắp Hết Hạn Trước (Ngày)</label>
-                <input
-                  type="number"
-                  value={approvalCfg.contract_expiry_alert_days}
-                  onChange={(e) => setApprovalCfg({ ...approvalCfg, contract_expiry_alert_days: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-purple-700"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-slate-700">Giờ Nhắc Nhở Chấm Công Hàng Ngày</label>
-                <input
-                  type="time"
-                  value={approvalCfg.checkin_reminder_time}
-                  onChange={(e) => setApprovalCfg({ ...approvalCfg, checkin_reminder_time: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border rounded-xl font-mono text-blue-700"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end">
-            <button
-              onClick={() => showToast('💾 Đã lưu thành công quy trình phê duyệt & hệ thống nhắc nhở tự động!')}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" /> Lưu Quy Trình Phê Duyệt
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL THÊM CHỨC DANH MỚI */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl border shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-purple-600 text-white p-5 flex items-center justify-between">
-              <h3 className="font-extrabold text-base flex items-center gap-2">
-                <Award className="w-5 h-5" /> Thêm Chức Danh Công Việc Mới
+      {/* ========================================================================= */}
+      {/* MODAL: CHỈNH SỬA / THÊM CA LÀM VIỆC */}
+      {/* ========================================================================= */}
+      {isShiftModalOpen && editingShift && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full max-w-lg shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                {editingShift.id ? 'Cập Nhật Ca Làm Việc' : 'Thêm Mới Ca Làm Việc'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
-                <X className="w-5 h-5" />
+              <button onClick={() => setIsShiftModalOpen(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="w-4 h-4" />
               </button>
             </div>
-
-            <form onSubmit={handleAddJobTitle} className="p-6 space-y-4 text-xs font-bold">
-              <div>
-                <label className="block text-slate-700 mb-1">Tên Chức Danh Công Việc *</label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle.title_name}
-                  onChange={(e) => setNewTitle({ ...newTitle, title_name: e.target.value })}
-                  placeholder="Ví dụ: Trưởng Nhóm Marketing"
-                  className="w-full px-3 py-2 border rounded-xl"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1">Khối / Phòng Ban *</label>
-                <select
-                  value={newTitle.department}
-                  onChange={(e) => setNewTitle({ ...newTitle, department: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl"
-                >
-                  <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
-                  <option value="Phòng Kinh Doanh 2">Phòng Kinh Doanh 2</option>
-                  <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
-                  <option value="Phòng CSKH">Phòng CSKH</option>
-                  <option value="Phòng Marketing">Phòng Marketing</option>
-                  <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
-                </select>
-              </div>
-
+            <form onSubmit={handleSaveShift} className="p-5 space-y-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Ngạch / Bậc Lương</label>
+                  <label className="block font-medium mb-1">Mã Ca *</label>
                   <input
                     type="text"
-                    value={newTitle.salary_grade}
-                    onChange={(e) => setNewTitle({ ...newTitle, salary_grade: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-purple-700"
+                    required
+                    value={editingShift.shift_code}
+                    onChange={(e) => setEditingShift({ ...editingShift, shift_code: e.target.value.toUpperCase() })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-bold"
+                    placeholder="VD: SHIFT_OFFICE"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-700 mb-1">Mức Lương Khung Min (VND)</label>
+                  <label className="block font-medium mb-1">Tên Ca *</label>
                   <input
-                    type="number"
-                    step={1000000}
-                    value={newTitle.min_salary}
-                    onChange={(e) => setNewTitle({ ...newTitle, min_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700 font-black"
+                    type="text"
+                    required
+                    value={editingShift.name}
+                    onChange={(e) => setEditingShift({ ...editingShift, name: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold"
+                    placeholder="VD: Ca Hành Chính"
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Phụ Cấp Ăn Trưa (VND)</label>
+                  <label className="block font-medium mb-1">Giờ Vào Ca *</label>
                   <input
-                    type="number"
-                    step={50000}
-                    value={newTitle.lunch_allowance}
-                    onChange={(e) => setNewTitle({ ...newTitle, lunch_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    type="time"
+                    required
+                    value={editingShift.start_time}
+                    onChange={(e) => setEditingShift({ ...editingShift, start_time: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-bold"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-700 mb-1">Phụ Cấp Đi Lại (VND)</label>
+                  <label className="block font-medium mb-1">Giờ Tan Ca *</label>
                   <input
-                    type="number"
-                    step={50000}
-                    value={newTitle.travel_allowance}
-                    onChange={(e) => setNewTitle({ ...newTitle, travel_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
+                    type="time"
+                    required
+                    value={editingShift.end_time}
+                    onChange={(e) => setEditingShift({ ...editingShift, end_time: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-bold"
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1">Mô Tả Nhiệm Vụ Chức Danh (JD)</label>
-                <textarea
-                  rows={3}
-                  value={newTitle.description}
-                  onChange={(e) => setNewTitle({ ...newTitle, description: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-medium mb-1">Nghỉ Giữa Ca (Bắt đầu - Kết thúc)</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="time"
+                      value={editingShift.break_start || '12:00'}
+                      onChange={(e) => setEditingShift({ ...editingShift, break_start: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border rounded px-2 py-1.5 font-mono text-[11px]"
+                    />
+                    <span>-</span>
+                    <input
+                      type="time"
+                      value={editingShift.break_end || '13:30'}
+                      onChange={(e) => setEditingShift({ ...editingShift, break_end: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border rounded px-2 py-1.5 font-mono text-[11px]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Phụ Cấp Ca Đêm (%)</label>
+                  <input
+                    type="number"
+                    value={editingShift.night_shift_bonus_pct}
+                    onChange={(e) => setEditingShift({ ...editingShift, night_shift_bonus_pct: Number(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-bold text-purple-600"
+                  />
+                </div>
               </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-medium mb-1">Số Giờ Công Chuẩn</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={editingShift.work_hours}
+                    onChange={(e) => setEditingShift({ ...editingShift, work_hours: Number(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Số Phút Ân Hạn Đi Muộn</label>
+                  <input
+                    type="number"
+                    value={editingShift.grace_period_late_mins}
+                    onChange={(e) => setEditingShift({ ...editingShift, grace_period_late_mins: Number(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-bold text-emerald-600"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                  onClick={() => setIsShiftModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg shadow-purple-600/30"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl"
                 >
-                  Lưu Chức Danh
+                  Lưu Ca
                 </button>
               </div>
             </form>
@@ -1493,213 +1595,367 @@ export default function HrmSettingsPage() {
         </div>
       )}
 
-      {/* MODAL XEM CHI TIẾT CHỨC DANH (VIEW DETAIL) */}
-      {viewingTitle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-4 text-xs font-medium">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-purple-600" />
-                <h3 className="font-extrabold text-sm text-slate-900">Chi Tiết Chức Danh: {viewingTitle.title_name}</h3>
-              </div>
-              <button onClick={() => setViewingTitle(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
+      {/* ========================================================================= */}
+      {/* MODAL: CHỈNH SỬA / THÊM NGÀY NGHỈ LỄ */}
+      {/* ========================================================================= */}
+      {isHolidayModalOpen && editingHoliday && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full max-w-md shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                {editingHoliday.id ? 'Cập Nhật Ngày Nghỉ Lễ' : 'Thêm Mới Ngày Nghỉ Lễ'}
+              </h3>
+              <button onClick={() => setIsHolidayModalOpen(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="w-4 h-4" />
               </button>
             </div>
-
-            <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <span className="text-slate-500 font-bold block">Mã Chức Danh:</span>
-                  <span className="font-mono font-bold text-purple-700">{viewingTitle.code}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-bold block">Ngạch / Bậc Lương:</span>
-                  <span className="font-bold text-slate-900">{viewingTitle.salary_grade}</span>
-                </div>
-              </div>
-
+            <form onSubmit={handleSaveHoliday} className="p-5 space-y-4 text-xs">
               <div>
-                <span className="text-slate-500 font-bold block">Phòng Ban Trực Thuộc:</span>
-                <span className="font-extrabold text-slate-800 text-sm">{viewingTitle.department}</span>
+                <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">Tên Dịp Lễ *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingHoliday.name}
+                  onChange={(e) => setEditingHoliday({ ...editingHoliday, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold"
+                  placeholder="VD: Quốc Khánh 2/9"
+                />
               </div>
-
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">Ngày Nghỉ *</label>
+                  <input
+                    type="date"
+                    required
+                    value={editingHoliday.date}
+                    onChange={(e) => {
+                      const yr = new Date(e.target.value).getFullYear() || 2026;
+                      setEditingHoliday({ ...editingHoliday, date: e.target.value, year: yr });
+                    }}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-semibold text-blue-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">Hệ Số Làm Việc Lễ</label>
+                  <select
+                    value={editingHoliday.pay_multiplier}
+                    onChange={(e) => setEditingHoliday({ ...editingHoliday, pay_multiplier: parseFloat(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold text-purple-600"
+                  >
+                    <option value={3.0}>x300% (x3.0 - Chuẩn Luật)</option>
+                    <option value={3.5}>x350% (x3.5)</option>
+                    <option value={4.0}>x400% (x4.0 - Đêm Lễ)</option>
+                    <option value={2.0}>x200% (x2.0)</option>
+                  </select>
+                </div>
+              </div>
               <div>
-                <span className="text-slate-500 font-bold block">Dải Lương Cơ Bản (Min - Max):</span>
-                <span className="font-mono font-extrabold text-emerald-700 text-sm">
-                  {new Intl.NumberFormat('vi-VN').format(viewingTitle.min_salary)} ₫ — {new Intl.NumberFormat('vi-VN').format(viewingTitle.max_salary)} ₫
-                </span>
+                <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">Mô Tả & Ghi Chú</label>
+                <textarea
+                  rows={2}
+                  value={editingHoliday.description || ''}
+                  onChange={(e) => setEditingHoliday({ ...editingHoliday, description: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2"
+                />
               </div>
-
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
-                <div>
-                  <span className="text-slate-500 font-bold block">Phụ Cấp Ăn Trưa:</span>
-                  <span className="font-mono font-bold text-blue-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.lunch_allowance)} ₫</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-bold block">Phụ Cấp Đi Lại:</span>
-                  <span className="font-mono font-bold text-amber-700">{new Intl.NumberFormat('vi-VN').format(viewingTitle.travel_allowance)} ₫</span>
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                <label className="flex items-center gap-2 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingHoliday.is_paid}
+                    onChange={(e) => setEditingHoliday({ ...editingHoliday, is_paid: e.target.checked })}
+                    className="rounded text-blue-600 w-4 h-4"
+                  />
+                  <span>Hưởng 100% Lương</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsHolidayModalOpen(false)}
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 rounded-lg"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+                  >
+                    Lưu
+                  </button>
                 </div>
               </div>
-
-              {viewingTitle.description && (
-                <div className="pt-2 border-t border-slate-200">
-                  <span className="text-slate-500 font-bold block mb-1">Mô Tả Công Việc (JD):</span>
-                  <p className="text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 font-normal leading-relaxed">
-                    {viewingTitle.description}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end pt-2">
-              <button
-                onClick={() => setViewingTitle(null)}
-                className="px-5 py-2 bg-slate-900 text-white font-extrabold rounded-xl"
-              >
-                Đóng
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* MODAL CHỈNH SỬA CHỨC DANH (EDIT) */}
-      {editingTitle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-4 text-xs font-bold">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-slate-900">Chỉnh Sửa Chức Danh: {editingTitle.code}</h3>
-              <button onClick={() => setEditingTitle(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
+      {/* ========================================================================= */}
+      {/* MODAL: CHỈNH SỬA / THÊM PHỤ CẤP */}
+      {/* ========================================================================= */}
+      {isAllowanceModalOpen && editingAllowance && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full max-w-xl shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                {editingAllowance.id ? 'Cấu Hình Phụ Cấp & Định Mức Miễn Trừ' : 'Thêm Mới Loại Phụ Cấp'}
+              </h3>
+              <button onClick={() => setIsAllowanceModalOpen(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="w-4 h-4" />
               </button>
             </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setJobTitles(jobTitles.map(j => j.id === editingTitle.id ? editingTitle : j));
-                setEditingTitle(null);
-                showToast(`✅ Đã cập nhật thông tin chức danh: ${editingTitle.title_name}`);
-              }}
-              className="space-y-3"
-            >
-              <div>
-                <label className="block text-slate-700 mb-1">Tên Chức Danh *</label>
-                <input
-                  type="text"
-                  required
-                  value={editingTitle.title_name}
-                  onChange={(e) => setEditingTitle({ ...editingTitle, title_name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl"
-                />
-              </div>
-
+            <form onSubmit={handleSaveAllowance} className="p-5 space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Phòng Ban *</label>
-                  <select
-                    value={editingTitle.department}
-                    onChange={(e) => setEditingTitle({ ...editingTitle, department: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl"
-                  >
-                    <option value="Ban Giám Đốc">Ban Giám Đốc</option>
-                    <option value="Khối Kinh Doanh & TMĐT">Khối Kinh Doanh & TMĐT</option>
-                    <option value="Phòng Kinh Doanh 1">Phòng Kinh Doanh 1</option>
-                    <option value="Phòng Vận Hành TMĐT">Phòng Vận Hành TMĐT</option>
-                    <option value="Khối Nhân Sự (HRM)">Khối Nhân Sự (HRM)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Ngạch Lương *</label>
+                  <label className="block font-medium mb-1">Mã Phụ Cấp *</label>
                   <input
                     type="text"
                     required
-                    value={editingTitle.salary_grade}
-                    onChange={(e) => setEditingTitle({ ...editingTitle, salary_grade: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl"
+                    value={editingAllowance.code}
+                    onChange={(e) => setEditingAllowance({ ...editingAllowance, code: e.target.value.toUpperCase() })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-medium"
+                    placeholder="VD: AL_LUNCH"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Tên Phụ Cấp *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingAllowance.name}
+                    onChange={(e) => setEditingAllowance({ ...editingAllowance, name: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-medium"
+                    placeholder="VD: Phụ Cấp Ăn Trưa"
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 mb-1">Lương Tối Thiểu (VND)</label>
+                  <label className="block font-medium mb-1">Mức Phụ Cấp Mặc Định (VNĐ)</label>
                   <input
                     type="number"
-                    step={1000000}
-                    value={editingTitle.min_salary}
-                    onChange={(e) => setEditingTitle({ ...editingTitle, min_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
+                    step="50000"
+                    required
+                    value={editingAllowance.default_amount}
+                    onChange={(e) => setEditingAllowance({ ...editingAllowance, default_amount: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold text-emerald-600"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-700 mb-1">Lương Tối Đa (VND)</label>
-                  <input
-                    type="number"
-                    step={1000000}
-                    value={editingTitle.max_salary}
-                    onChange={(e) => setEditingTitle({ ...editingTitle, max_salary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-emerald-700"
-                  />
+                  <label className="block font-medium mb-1">Hình Thức Tính</label>
+                  <select
+                    value={editingAllowance.calculation_type}
+                    onChange={(e) => setEditingAllowance({ ...editingAllowance, calculation_type: e.target.value as any })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-medium"
+                  >
+                    <option value="FIXED_MONTHLY">Cố định nguyên tháng</option>
+                    <option value="PRORATED_BY_WORKDAYS">Khấu trừ theo ngày công thực tế</option>
+                  </select>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Phụ Cấp Ăn Trưa (VND)</label>
+              <div className="p-3.5 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 rounded-xl space-y-2">
+                <label className="flex items-center gap-2 font-medium cursor-pointer">
                   <input
-                    type="number"
-                    step={50000}
-                    value={editingTitle.lunch_allowance}
-                    onChange={(e) => setEditingTitle({ ...editingTitle, lunch_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700"
+                    type="checkbox"
+                    checked={editingAllowance.is_taxable_pit}
+                    onChange={(e) => setEditingAllowance({ ...editingAllowance, is_taxable_pit: e.target.checked })}
+                    className="rounded text-blue-600 w-4 h-4"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 mb-1">Phụ Cấp Đi Lại (VND)</label>
-                  <input
-                    type="number"
-                    step={50000}
-                    value={editingTitle.travel_allowance}
-                    onChange={(e) => setEditingTitle({ ...editingTitle, travel_allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-xl font-mono text-amber-700"
-                  />
-                </div>
+                  <span>Thuộc diện tính Thuế Thu Nhập Cá Nhân (TNCN)</span>
+                </label>
+                {editingAllowance.is_taxable_pit && (
+                  <div>
+                    <label className="block text-[11px] mb-1">Định mức tối đa Miễn Thuế (VNĐ/tháng)</label>
+                    <input
+                      type="number"
+                      step="50000"
+                      value={editingAllowance.tax_exempt_cap}
+                      onChange={(e) => setEditingAllowance({ ...editingAllowance, tax_exempt_cap: parseInt(e.target.value) || 0 })}
+                      className="w-full bg-white dark:bg-slate-900 border rounded px-3 py-1.5 font-medium"
+                    />
+                  </div>
+                )}
               </div>
-
+              <div className="p-3.5 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900/40 rounded-xl space-y-2">
+                <label className="flex items-center gap-2 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingAllowance.is_social_insurance}
+                    onChange={(e) => setEditingAllowance({ ...editingAllowance, is_social_insurance: e.target.checked })}
+                    className="rounded text-indigo-600 w-4 h-4"
+                  />
+                  <span>Thuộc diện cộng vào nền đóng BHXH</span>
+                </label>
+              </div>
               <div>
-                <label className="block text-slate-700 mb-1">Mô Tả Nhiệm Vụ (JD)</label>
+                <label className="block font-medium mb-1">Ghi Chú Căn Cứ</label>
                 <textarea
                   rows={2}
-                  value={editingTitle.description}
-                  onChange={(e) => setEditingTitle({ ...editingTitle, description: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl"
+                  value={editingAllowance.description}
+                  onChange={(e) => setEditingAllowance({ ...editingAllowance, description: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2"
                 />
               </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setEditingTitle(null)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                  onClick={() => setIsAllowanceModalOpen(false)}
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 rounded-lg"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl shadow-lg shadow-amber-600/30"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                 >
-                  Cập Nhật Chức Danh
+                  Lưu
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: CHỈNH SỬA / THÊM CHÍNH SÁCH THUẾ */}
+      {/* ========================================================================= */}
+      {isPolicyModalOpen && editingPolicy && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full max-w-xl shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                Cập Nhật Chính Sách Thuế & BHXH Theo Luật
+              </h3>
+              <button onClick={() => setIsPolicyModalOpen(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleSavePolicy} className="p-5 space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-medium mb-1">Tên Phiên Bản *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingPolicy.version_name}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, version_name: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Mốc Bắt Đầu Áp Dụng *</label>
+                  <input
+                    type="date"
+                    required
+                    value={editingPolicy.effective_from_date}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, effective_from_date: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold text-blue-600 font-mono"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-medium mb-1">Giảm Trừ Bản Thân (VNĐ)</label>
+                  <input
+                    type="number"
+                    step="500000"
+                    required
+                    value={editingPolicy.personal_tax_deduction_self}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, personal_tax_deduction_self: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold text-emerald-600 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Giảm Trừ Người Phụ Thuộc (VNĐ)</label>
+                  <input
+                    type="number"
+                    step="100000"
+                    required
+                    value={editingPolicy.personal_tax_deduction_dependent}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, personal_tax_deduction_dependent: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold text-emerald-600 font-mono"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-medium mb-1">% BHXH (NLĐ)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editingPolicy.bhxh_employee_rate}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, bhxh_employee_rate: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">% BHYT (NLĐ)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editingPolicy.bhyt_employee_rate}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, bhyt_employee_rate: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">% BHTN (NLĐ)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editingPolicy.bhtn_employee_rate}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, bhtn_employee_rate: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Mức Trần Lương Đóng BHXH</label>
+                <input
+                  type="number"
+                  step="500000"
+                  value={editingPolicy.max_insurance_base_cap}
+                  onChange={(e) => setEditingPolicy({ ...editingPolicy, max_insurance_base_cap: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold font-mono"
+                />
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                <label className="flex items-center gap-2 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingPolicy.is_current}
+                    onChange={(e) => setEditingPolicy({ ...editingPolicy, is_current: e.target.checked })}
+                    className="rounded text-blue-600 w-4 h-4"
+                  />
+                  <span>Đặt làm chính sách mặc định hiện hành</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsPolicyModalOpen(false)}
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 rounded-lg"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+                  >
+                    Lưu
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+export default function HrmSettingsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Đang tải cấu hình nhân sự...</div>}>
+      <HrmSettingsContent />
+    </Suspense>
   );
 }

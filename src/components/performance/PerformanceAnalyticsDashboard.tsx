@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { Award, Sparkles, DollarSign, TrendingUp, BarChart3, PieChart as PieIcon, ShieldCheck } from 'lucide-react';
 import { PerformanceScorecard } from '@/types';
+import { formatCurrency } from '@/lib/formatters';
 
 interface PerformanceAnalyticsDashboardProps {
   scorecards: PerformanceScorecard[];
@@ -77,20 +78,20 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
   const totalP3Pool = Object.values(gradeP3Salary).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-6 border border-slate-800">
+    <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
       {/* Title Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] font-bold mb-1">
-            <Award className="w-3.5 h-3.5 text-purple-400" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-900 text-[11px] font-semibold mb-1">
+            <Award className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
             <span>Phân Tích Báo Cáo Hiệu Suất</span>
           </div>
-          <h2 className="text-lg font-black text-white">Dashboard Phân Tích Hiệu Suất Nhân Sự & Quỹ Lương P3</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Dashboard Phân Tích Hiệu Suất Nhân Sự & Quỹ Lương P3</h2>
         </div>
-        <div className="text-right">
-          <span className="text-xs text-slate-400 font-medium block">Tổng Quỹ Lương P3 Đã Phân Bổ:</span>
-          <span className="font-mono font-black text-purple-400 text-lg">
-            {totalP3Pool.toLocaleString('vi-VN')} ₫
+        <div className="text-left sm:text-right">
+          <span className="text-xs text-slate-500 font-medium block">Tổng Quỹ Lương P3 Đã Phân Bổ:</span>
+          <span className="font-mono font-semibold text-purple-600 dark:text-purple-400 text-lg">
+            {formatCurrency(totalP3Pool)}
           </span>
         </div>
       </div>
@@ -98,19 +99,26 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Grade Bell Curve Bar Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-purple-400" /> Phân Phối Chuẩn Xếp Loại Hạng (Bell Curve)
+        <div className="bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            Phân Phối Chuẩn Xếp Loại Hạng (Bell Curve)
           </h3>
-
           <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={gradeChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="grade" stroke="#9CA3AF" tick={{ fontSize: 10 }} />
-                <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="grade" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis stroke="#64748b" tick={{ fontSize: 11, fill: '#64748b' }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
                 <Bar dataKey="count" fill="#8B5CF6" radius={[6, 6, 0, 0]} name="Số Nhân Sự">
                   {gradeChartData.map((entry, index) => (
@@ -123,19 +131,26 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
         </div>
 
         {/* Chart 2: Dept Average Final Score Bar Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-400" /> Điểm Hiệu Suất Trung Bình (0-100) Theo Phòng Ban
+        <div className="bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            Điểm Hiệu Suất TB (0-100) Theo Phòng Ban
           </h3>
-
           <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={deptAvgChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 10 }} />
-                <YAxis domain={[0, 100]} stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis domain={[0, 100]} stroke="#64748b" tick={{ fontSize: 11, fill: '#64748b' }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
                 <Bar dataKey="ĐiểmTB" fill="#3B82F6" radius={[6, 6, 0, 0]} name="Điểm TB" />
               </BarChart>
@@ -144,11 +159,11 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
         </div>
 
         {/* Chart 3: P3 Salary Distribution Pie Chart */}
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <h3 className="font-extrabold text-xs text-slate-200 flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-emerald-400" /> Cơ Cấu Phân Bổ Lương P3 (Triệu VNĐ)
+        <div className="bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            Cơ Cấu Phân Bổ Lương P3 (Triệu VNĐ)
           </h3>
-
           <div className="h-44 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -166,20 +181,26 @@ export default function PerformanceAnalyticsDashboard({ scorecards }: Performanc
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', borderRadius: '12px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-
-          <div className="space-y-1 pt-1 border-t border-slate-700/60 text-[11px]">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-[11px]">
             {p3PieData.map((st) => (
               <div key={st.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: st.color }} />
+                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   {st.name}
                 </span>
-                <span className="font-mono font-bold text-emerald-400">{st.value} Tr VNĐ</span>
+                <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">{st.value} Tr VNĐ</span>
               </div>
             ))}
           </div>
