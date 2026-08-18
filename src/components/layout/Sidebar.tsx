@@ -253,9 +253,8 @@ function SidebarNavigation({
                       >
                         <Link
                           href={item.href}
-                          prefetch={true}
+                          prefetch={false}
                           title={hasSubItems ? `${item.name} - Báo Cáo Tổng Quan` : item.name}
-                          onMouseEnter={() => router.prefetch(item.href)}
                           onClick={() => {
                             if (hasSubItems) {
                               setExpandedKeys((prev) => ({ ...prev, [item.href]: true }));
@@ -321,8 +320,7 @@ function SidebarNavigation({
                               <Link
                                 key={sub.href}
                                 href={sub.href}
-                                prefetch={true}
-                                onMouseEnter={() => router.prefetch(sub.href)}
+                                prefetch={false}
                                 onClick={() => {
                                   if (onClose) onClose();
                                 }}

@@ -83,6 +83,7 @@ import {
   getTaxPolicies,
   calculateSalaryFromGradeStep
 } from '@/lib/hrmStore';
+import { ALL_BANKS, getBranchesForBank } from '@/lib/bankService';
 
 const formatVND = (n?: number) => {
   if (n === undefined || n === null || isNaN(n)) return '—';
@@ -1269,32 +1270,62 @@ export default function EmployeeModal({
                     <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Tên Ngân Hàng *</label>
                     <select
                       disabled={isViewOnly}
-                      value={formData.bank_name || 'Techcombank'}
-                      onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold"
+                      value={formData.bank_name || 'MB'}
+                      onChange={(e) => setFormData({ ...formData, bank_name: e.target.value, bank_branch: '' })}
+                      className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold bg-white dark:bg-slate-800"
                     >
-                      <option value="Techcombank">Techcombank (TCB)</option>
-                      <option value="MBBank">MBBank Quân Đội (MBB)</option>
-                      <option value="Vietcombank">Vietcombank (VCB)</option>
-                      <option value="VietinBank">VietinBank (CTG)</option>
-                      <option value="BIDV">BIDV (BID)</option>
-                      <option value="VPBank">VPBank (VPB)</option>
-                      <option value="ACB">ACB - Á Châu (ACB)</option>
-                      <option value="TPBank">TPBank (TPB)</option>
-                      <option value="Sacombank">Sacombank (STB)</option>
-                      <option value="VIB">VIB - Quốc Tế (VIB)</option>
+                      <optgroup label="⭐ Các Ngân Hàng Phổ Biến Nhất">
+                        <option value="MB">MB - Ngân Hàng TMCP Quân Đội (MBBank)</option>
+                        <option value="Vietcombank">Vietcombank - NH TMCP Ngoại Thương VN</option>
+                        <option value="BIDV">BIDV - NH TMCP Đầu Tư và Phát Triển VN</option>
+                        <option value="Vietinbank">Vietinbank - NH TMCP Công Thương VN</option>
+                        <option value="Techcombank">Techcombank - NH TMCP Kỹ Thương VN</option>
+                        <option value="VPBank">VPBank - NH TMCP Việt Nam Thịnh Vượng</option>
+                        <option value="ACB">ACB - NH TMCP Á Châu</option>
+                        <option value="TPBank">TPBank - NH TMCP Tiên Phong</option>
+                        <option value="Sacombank">Sacombank - NH TMCP Sài Gòn Thương Tín</option>
+                        <option value="Agribank">Agribank - NH Nông Nghiệp & PT Nông Thôn VN</option>
+                        <option value="HDBank">HDBank - NH TMCP Phát Triển TP.HCM</option>
+                        <option value="VIB">VIB - NH TMCP Quốc Tế Việt Nam</option>
+                        <option value="SHB">SHB - NH TMCP Sài Gòn - Hà Nội</option>
+                        <option value="MSB">MSB - NH TMCP Hàng Hải Việt Nam</option>
+                        <option value="OCB">OCB - NH TMCP Phương Đông</option>
+                        <option value="SeABank">SeABank - NH TMCP Đông Nam Á</option>
+                      </optgroup>
+                      <optgroup label={`📋 Toàn Bộ ${ALL_BANKS.length} Ngân Hàng Hệ Thống`}>
+                        {ALL_BANKS.map((b) => (
+                          <option key={b.code} value={b.shortName || b.code}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select>
                   </div>
                   <div>
-                    <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Chi Nhánh Mở Thẻ</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-medium text-slate-700 dark:text-slate-300">Chi Nhánh Mở Thẻ</label>
+                      {getBranchesForBank(formData.bank_name).length > 0 && (
+                        <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                          {getBranchesForBank(formData.bank_name).length} chi nhánh gợi ý
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
+                      list="bank-branch-options"
                       disabled={isViewOnly}
-                      placeholder="Chi nhánh Cầu Giấy, Hà Nội"
+                      placeholder="Chọn chi nhánh từ danh sách hoặc tự nhập..."
                       value={formData.bank_branch || ''}
                       onChange={(e) => setFormData({ ...formData, bank_branch: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg"
+                      className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800"
                     />
+                    <datalist id="bank-branch-options">
+                      {getBranchesForBank(formData.bank_name).map((br, idx) => (
+                        <option key={idx} value={br.branchName}>
+                          {br.rawBranch}
+                        </option>
+                      ))}
+                    </datalist>
                   </div>
                 </div>
               </div>
