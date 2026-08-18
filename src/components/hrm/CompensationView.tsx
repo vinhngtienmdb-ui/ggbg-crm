@@ -39,10 +39,21 @@ import {
 import { formatCurrency } from '@/lib/formatters';
 
 export default function CompensationView({ targetEmployee }: { targetEmployee?: EmployeeProfile | null }) {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setHistory(getCompensationHistory(targetEmployee?.id)); } catch(e){}
+      try { set_employees(getEmployees()); } catch(e){}
+      try { set_allowanceCatalog(getAllowanceCatalog()); } catch(e){}
+      try { set_salaryGrades(getSalaryGrades()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [history, setHistory] = useState<CompensationHistoryRecord[]>(() => getCompensationHistory(targetEmployee?.id));
-  const [employees] = useState<EmployeeProfile[]>(() => getEmployees());
-  const [allowanceCatalog] = useState<AllowanceCatalogItem[]>(() => getAllowanceCatalog());
-  const [salaryGrades] = useState(() => getSalaryGrades());
+  const [employees, set_employees] = useState<EmployeeProfile[]>(() => getEmployees());
+  const [allowanceCatalog, set_allowanceCatalog] = useState<AllowanceCatalogItem[]>(() => getAllowanceCatalog());
+  const [salaryGrades, set_salaryGrades] = useState(() => getSalaryGrades());
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('ALL');
@@ -79,6 +90,8 @@ export default function CompensationView({ targetEmployee }: { targetEmployee?: 
   const [decisionNumber, setDecisionNumber] = useState(`QĐ-NL/2026/${String(Math.floor(Math.random() * 90 + 10))}`);
   const [approverName, setApproverName] = useState('Phạm Minh Đức (Giám Đốc)');
   const [reason, setReason] = useState('');
+
+  
 
   const showToast = (msg: string) => {
     setToastMsg(msg);

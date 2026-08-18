@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   EmployeeProfile,
   OrgNode,
@@ -450,6 +451,7 @@ export function createEmployee(newEmp: Omit<EmployeeProfile, 'id' | 'created_at'
   };
 
   employees = [created, ...employees];
+  notifyHRM();
   return created;
 }
 
@@ -471,6 +473,7 @@ export function approveByDirectManager(empId: string, actorName: string, note?: 
   emp.approval_status = 'PENDING_SALES_DIRECTOR'; // Chuyển sang bước 2: Chờ Giám đốc Kinh doanh duyệt
   emp.approval_history = [...(emp.approval_history || []), newStep];
 
+  notifyHRM();
   return emp;
 }
 
@@ -492,6 +495,7 @@ export function approveBySalesDirector(empId: string, actorName: string, note?: 
   emp.approval_status = 'APPROVED_FOR_ONBOARDING'; // Hoàn tất duyệt -> Chuyển HR Onboard
   emp.approval_history = [...(emp.approval_history || []), newStep];
 
+  notifyHRM();
   return emp;
 }
 
@@ -513,6 +517,7 @@ export function rejectEmployeeApproval(empId: string, actorName: string, reason:
   emp.rejection_reason = reason;
   emp.approval_history = [...(emp.approval_history || []), newStep];
 
+  notifyHRM();
   return emp;
 }
 
@@ -559,6 +564,7 @@ export function changeEmployeeStatus(
   emp.status = newStatus;
   emp.approval_history = [...(emp.approval_history || []), auditStep];
 
+  notifyHRM();
   return emp;
 }
 
@@ -597,12 +603,14 @@ export function createPositionCategory(newPos: Omit<PositionCategoryDefinition, 
   };
   positionCategories = [created, ...positionCategories];
   syncJobTitlesToSystem();
+  notifyHRM();
   return created;
 }
 
 export function deletePositionCategory(id: string): boolean {
   positionCategories = positionCategories.filter((p) => p.id !== id);
   syncJobTitlesToSystem();
+  notifyHRM();
   return true;
 }
 
@@ -640,12 +648,14 @@ export function createGradeLevel(newGrade: Omit<GradeLevelDefinition, 'id' | 'cr
   };
   gradeLevels = [...gradeLevels, created];
   syncJobTitlesToSystem();
+  notifyHRM();
   return created;
 }
 
 export function deleteGradeLevel(id: string): boolean {
   gradeLevels = gradeLevels.filter((g) => g.id !== id);
   syncJobTitlesToSystem();
+  notifyHRM();
   return true;
 }
 
@@ -687,6 +697,7 @@ export function createJobTitle(newTitle: Omit<JobTitleDefinition, 'id' | 'create
   };
   jobTitles = [created, ...jobTitles];
   syncJobTitlesToSystem();
+  notifyHRM();
   return created;
 }
 
@@ -703,6 +714,7 @@ export function updateJobTitle(id: string, fields: Partial<JobTitleDefinition>):
 export function deleteJobTitle(id: string): boolean {
   jobTitles = jobTitles.filter((jt) => jt.id !== id);
   syncJobTitlesToSystem();
+  notifyHRM();
   return true;
 }
 
@@ -810,11 +822,13 @@ export function saveSalaryGrade(grade: SalaryGradeScale): SalaryGradeScale {
   } else {
     salaryGrades = [grade, ...salaryGrades];
   }
+  notifyHRM();
   return grade;
 }
 
 export function deleteSalaryGrade(id: string): boolean {
   salaryGrades = salaryGrades.filter((g) => g.id !== id);
+  notifyHRM();
   return true;
 }
 
@@ -957,6 +971,7 @@ export function saveHrmCustomField(field: HrmCustomFieldDefinition): HrmCustomFi
     localStorage.setItem('ggbg_hrm_custom_fields', JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent('ggbg_hrm_custom_fields_updated', { detail: updated }));
   }
+  notifyHRM();
   return field;
 }
 
@@ -968,6 +983,7 @@ export function deleteHrmCustomField(id: string): boolean {
     localStorage.setItem('ggbg_hrm_custom_fields', JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent('ggbg_hrm_custom_fields_updated', { detail: updated }));
   }
+  notifyHRM();
   return true;
 }
 
@@ -1085,6 +1101,7 @@ export function createAllowanceCatalogItem(item: Omit<AllowanceCatalogItem, 'id'
     id: `al_${Date.now()}`,
   };
   allowanceCatalog = [created, ...allowanceCatalog];
+  notifyHRM();
   return created;
 }
 
@@ -1099,6 +1116,7 @@ export function updateAllowanceCatalogItem(id: string, fields: Partial<Allowance
 
 export function deleteAllowanceCatalogItem(id: string): boolean {
   allowanceCatalog = allowanceCatalog.filter((al) => al.id !== id);
+  notifyHRM();
   return true;
 }
 
@@ -1156,11 +1174,13 @@ export function saveTaxPolicy(policy: TaxAndInsurancePolicyVersion): TaxAndInsur
   } else {
     taxPolicies = [policy, ...taxPolicies];
   }
+  notifyHRM();
   return policy;
 }
 
 export function deleteTaxPolicy(id: string): boolean {
   taxPolicies = taxPolicies.filter((p) => p.id !== id);
+  notifyHRM();
   return true;
 }
 
@@ -1189,6 +1209,7 @@ export function getWorkShifts(): WorkShift[] {
 export function createWorkShift(shift: Omit<WorkShift, 'id'>): WorkShift {
   const created: WorkShift = { ...shift, id: `shift_${Date.now()}` };
   workShifts = [...workShifts, created];
+  notifyHRM();
   return created;
 }
 
@@ -1203,6 +1224,7 @@ export function updateWorkShift(id: string, fields: Partial<WorkShift>): WorkShi
 
 export function deleteWorkShift(id: string): boolean {
   workShifts = workShifts.filter((s) => s.id !== id);
+  notifyHRM();
   return true;
 }
 
@@ -1238,6 +1260,7 @@ export function saveShiftAssignment(assignment: Omit<ShiftAssignment, 'id'>): Sh
 
 export function deleteShiftAssignment(employee_id: string, date: string): boolean {
   shiftAssignments = shiftAssignments.filter((sa) => !(sa.employee_id === employee_id && sa.date === date));
+  notifyHRM();
   return true;
 }
 
@@ -1364,6 +1387,7 @@ export function addCompensationRecord(record: Omit<CompensationHistoryRecord, 'i
     applyCompensationToEmployee(created);
   }
 
+  notifyHRM();
   return created;
 }
 
@@ -1518,6 +1542,7 @@ export function createCandidate(cand: Omit<Candidate, 'id' | 'candidate_code' | 
     applied_date: new Date().toISOString().split('T')[0],
   };
   candidates = [created, ...candidates];
+  notifyHRM();
   return created;
 }
 
@@ -1532,6 +1557,7 @@ export function updateCandidate(id: string, fields: Partial<Candidate>): Candida
 
 export function deleteCandidate(id: string): boolean {
   candidates = candidates.filter((c) => c.id !== id);
+  notifyHRM();
   return true;
 }
 
@@ -1586,6 +1612,7 @@ export function convertCandidateToEmployee(
 
   employees = [createdEmp, ...employees];
   updateCandidate(candidateId, { stage: 'HIRED_ONBOARDING', notes: 'Đã hoàn tất chuyển sang nhân sự chính thức trong HRM' });
+  notifyHRM();
   return createdEmp;
 }
 
@@ -1767,6 +1794,7 @@ export function sendRecruitmentEmail(
   };
 
   emailLogs = [newLog, ...emailLogs];
+  notifyHRM();
   return newLog;
 }
 
@@ -1916,6 +1944,7 @@ export function createGeneratedDocument(doc: Omit<GeneratedDocument, 'id' | 'cre
     created_at: new Date().toISOString().split('T')[0],
   };
   generatedDocuments = [created, ...generatedDocuments];
+  notifyHRM();
   return created;
 }
 
@@ -1949,6 +1978,7 @@ export function sendDocumentEmail(docId: string, recipientEmail: string): Genera
 
 export function deleteGeneratedDocument(docId: string): boolean {
   generatedDocuments = generatedDocuments.filter((d) => d.id !== docId);
+  notifyHRM();
   return true;
 }
 
@@ -2120,6 +2150,7 @@ export function getSocialInsuranceConfig(): SocialInsuranceConfig {
 
 export function saveSocialInsuranceConfig(newConfig: Partial<SocialInsuranceConfig>): SocialInsuranceConfig {
   socialInsuranceConfig = { ...socialInsuranceConfig, ...newConfig };
+  notifyHRM();
   return socialInsuranceConfig;
 }
 
@@ -2133,6 +2164,7 @@ export function addBhxhChangeLog(record: Omit<BhxhChangeLogRecord, 'id'>): BhxhC
     id: `bcl_${Date.now()}`,
   };
   bhxhChangeLogs = [created, ...bhxhChangeLogs];
+  notifyHRM();
   return created;
 }
 
@@ -2181,6 +2213,7 @@ export function addHoliday(holiday: Omit<HolidayDefinition, 'id'>): HolidayDefin
     id: `hol_${Date.now()}`,
   };
   holidaysList = [created, ...holidaysList];
+  notifyHRM();
   return created;
 }
 
@@ -2195,6 +2228,7 @@ export function updateHoliday(id: string, fields: Partial<HolidayDefinition>): H
 
 export function deleteHoliday(id: string): boolean {
   holidaysList = holidaysList.filter((h) => h.id !== id);
+  notifyHRM();
   return true;
 }
 
@@ -2204,6 +2238,39 @@ export function getWeekendPolicy(): WeekendPolicySettings {
 
 export function saveWeekendPolicy(newPolicy: Partial<WeekendPolicySettings>): WeekendPolicySettings {
   weekendPolicy = { ...weekendPolicy, ...newPolicy };
+  notifyHRM();
   return weekendPolicy;
 }
 
+
+
+// ==================== 14. EVENT EMITTER & LOCAL STORAGE ====================
+export const HRMEventEmitter = typeof window !== 'undefined' ? new EventTarget() : null;
+export function useHRMStore<T>(selector: () => T): T {
+  const [state, setState] = React.useState(selector);
+  React.useEffect(() => {
+    if (!HRMEventEmitter) return;
+    const handleUpdate = () => setState(selector());
+    HRMEventEmitter.addEventListener('hrm-update', handleUpdate);
+    return () => HRMEventEmitter.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+  return state;
+}
+export function notifyHRM() {
+  if (typeof window !== 'undefined') {
+    try { localStorage.setItem('ggbg_hrm_data', JSON.stringify({ employees, candidates, generatedDocuments, compensationHistory, shiftAssignments, workShifts, socialInsuranceProfiles, bhxhChangeLogs })); } catch (e) {}
+    if (HRMEventEmitter) window.dispatchEvent(new Event('hrm-update'));
+  }
+}
+if (typeof window !== 'undefined') {
+  try { const saved = localStorage.getItem('ggbg_hrm_data'); if (saved) { const parsed = JSON.parse(saved);
+    if (parsed.employees) employees = parsed.employees;
+    if (parsed.candidates) candidates = parsed.candidates;
+    if (parsed.generatedDocuments) generatedDocuments = parsed.generatedDocuments;
+    if (parsed.compensationHistory) compensationHistory = parsed.compensationHistory;
+    if (parsed.shiftAssignments) shiftAssignments = parsed.shiftAssignments;
+    if (parsed.workShifts) workShifts = parsed.workShifts;
+    if (parsed.socialInsuranceProfiles) socialInsuranceProfiles = parsed.socialInsuranceProfiles;
+    if (parsed.bhxhChangeLogs) bhxhChangeLogs = parsed.bhxhChangeLogs;
+  } } catch (e) {}
+}

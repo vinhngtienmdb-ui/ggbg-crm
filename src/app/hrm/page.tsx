@@ -182,6 +182,12 @@ function HRMContent() {
     setEmployees([...getEmployees()]);
   };
 
+  useEffect(() => {
+    const handleUpdate = () => reloadEmployees();
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const filteredEmployees = employees.filter((emp) => {
     const matchSearch =
       emp.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -207,6 +213,11 @@ function HRMContent() {
     setSelectedEmployee(emp);
     setEmployeeModalMode('edit');
     setIsEmployeeModalOpen(true);
+  };
+
+  const handleOpenViewModalByName = (name: string) => {
+    const emp = employees.find(e => e.full_name === name || e.job_title === name);
+    if (emp) handleOpenViewModal(emp);
   };
 
   const handleOpenViewModal = (emp: EmployeeProfile) => {
@@ -845,7 +856,7 @@ function HRMContent() {
               <Building2 className="w-5 h-5 text-blue-600" />
               Sơ Đồ Cây Phân Cấp Tổ Chức (Org Chart)
             </h3>
-            <OrgChartTree rootData={getOrgChartTree()} />
+            <OrgChartTree rootData={getOrgChartTree()} onSelectMember={handleOpenViewModalByName} />
           </div>
         )}
 

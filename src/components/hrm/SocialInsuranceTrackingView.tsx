@@ -44,10 +44,21 @@ const STATUS_BADGES: Record<BhxhParticipationStatus, { label: string; class: str
 };
 
 export default function SocialInsuranceTrackingView() {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setProfiles(getSocialInsuranceProfiles()); } catch(e){}
+      try { setChangeLogs(getBhxhChangeLogs()); } catch(e){}
+      try { set_config(getSocialInsuranceConfig()); } catch(e){}
+      try { set_employees(getEmployees()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [profiles, setProfiles] = useState<SocialInsuranceProfile[]>(() => getSocialInsuranceProfiles());
   const [changeLogs, setChangeLogs] = useState<BhxhChangeLogRecord[]>(() => getBhxhChangeLogs());
-  const [config] = useState(() => getSocialInsuranceConfig());
-  const [employees] = useState<EmployeeProfile[]>(() => getEmployees());
+  const [config, set_config] = useState(() => getSocialInsuranceConfig());
+  const [employees, set_employees] = useState<EmployeeProfile[]>(() => getEmployees());
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -60,6 +71,8 @@ export default function SocialInsuranceTrackingView() {
 
   // New Log Form
   const [newLogData, setNewLogData] = useState({
+
+  
     employee_id: employees[0]?.id || '',
     change_type: 'TĂNG_MỚI' as const,
     new_salary: 12000000,

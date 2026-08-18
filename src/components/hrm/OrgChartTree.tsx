@@ -57,11 +57,11 @@ function OrgTreeNode({
               level <= 1 ? 'bg-white/20 text-white border-white/30' : 'bg-blue-50 text-blue-700 border-blue-200'
             }`}> {node.name.charAt(0)} </div> <div className="overflow-hidden"> <h4 className="font-semibold text-sm truncate">{node.name}</h4> <p className="text-xs opacity-80 truncate">{node.title || node.role}</p> {node.email && <p className="text-[10px] opacity-70 truncate mt-0.5">{node.email}</p>} </div> </div> {hasChildren && ( <div className="mt-3 pt-2 border-t border-current/10 flex items-center justify-between gap-1 text-[11px] font-medium opacity-80"> <span className="flex items-center gap-1"> {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                 {isExpanded ? 'Thu gọn' : `Mở rộng (${node.children?.length})`} </span> {/* Node Action Buttons */} <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}> <button
-                  onClick={() => alert(`👁 Chi tiết phòng ban / chức danh: ${node.name} - ${node.department}`)}
+                  onClick={() => { if (onSelectMember) onSelectMember(node.name); }}
                   className="p-1 hover:bg-black/10 rounded"
                   title="Xem Chi Tiết"
                 > 👁 </button> <button
-                  onClick={() => alert(`✏ Chỉnh sửa phòng ban: ${node.department}`)}
+                  onClick={() => { if (onSelectMember) onSelectMember(node.name); }}
                   className="p-1 hover:bg-black/10 rounded"
                   title="Chỉnh Sửa"
                 > ✏ </button> </div> </div> )} </div> </div> {/* Connectors & Children */}

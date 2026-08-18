@@ -38,9 +38,19 @@ interface DocumentGeneratorModalProps {
 }
 
 export default function DocumentGeneratorModal({ isOpen, onClose }: DocumentGeneratorModalProps) {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setDocuments(getGeneratedDocuments()); } catch(e){}
+      try { set_templates(getDocumentTemplates()); } catch(e){}
+      try { set_employees(getEmployees()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [documents, setDocuments] = useState<GeneratedDocument[]>(() => getGeneratedDocuments());
-  const [templates] = useState<DocumentTemplate[]>(() => getDocumentTemplates());
-  const [employees] = useState<EmployeeProfile[]>(() => getEmployees());
+  const [templates, set_templates] = useState<DocumentTemplate[]>(() => getDocumentTemplates());
+  const [employees, set_employees] = useState<EmployeeProfile[]>(() => getEmployees());
 
   const [selectedDoc, setSelectedDoc] = useState<GeneratedDocument | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -52,6 +62,8 @@ export default function DocumentGeneratorModal({ isOpen, onClose }: DocumentGene
   const [customReason, setCustomReason] = useState('');
   const [newSalary, setNewSalary] = useState<number>(25000000);
   const [effectiveDate, setEffectiveDate] = useState(new Date().toISOString().split('T')[0]);
+
+  
 
   if (!isOpen) return null;
 

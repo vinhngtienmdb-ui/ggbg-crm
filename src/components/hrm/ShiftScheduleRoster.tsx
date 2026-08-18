@@ -73,9 +73,19 @@ const DEFAULT_NEW_SHIFT = {
 };
 
 export default function ShiftScheduleRoster() {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setShifts(getWorkShifts()); } catch(e){}
+      try { setAssignments(getShiftAssignments()); } catch(e){}
+      try { set_employees(getEmployees()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [shifts, setShifts] = useState<WorkShift[]>(() => getWorkShifts());
   const [assignments, setAssignments] = useState<ShiftAssignment[]>(() => getShiftAssignments());
-  const [employees] = useState<EmployeeProfile[]>(() => getEmployees());
+  const [employees, set_employees] = useState<EmployeeProfile[]>(() => getEmployees());
 
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [shiftFilter, setShiftFilter] = useState<string>('ALL');
@@ -89,6 +99,8 @@ export default function ShiftScheduleRoster() {
   // View assigned employees modal
   const [viewingEmployeesForShift, setViewingEmployeesForShift] = useState<WorkShift | null>(null);
   const [searchEmpInShiftModal, setSearchEmpInShiftModal] = useState('');
+
+  
   
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 

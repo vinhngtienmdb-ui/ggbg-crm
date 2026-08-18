@@ -41,10 +41,21 @@ interface CompensationHistoryModalProps {
 }
 
 export default function CompensationHistoryModal({ isOpen, onClose, employee }: CompensationHistoryModalProps) {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setHistory(getCompensationHistory(employee?.id)); } catch(e){}
+      try { set_employees(getEmployees()); } catch(e){}
+      try { set_allowanceCatalog(getAllowanceCatalog()); } catch(e){}
+      try { set_salaryGrades(getSalaryGrades()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [history, setHistory] = useState<CompensationHistoryRecord[]>(() => getCompensationHistory(employee?.id));
-  const [employees] = useState<EmployeeProfile[]>(() => getEmployees());
-  const [allowanceCatalog] = useState<AllowanceCatalogItem[]>(() => getAllowanceCatalog());
-  const [salaryGrades] = useState(() => getSalaryGrades());
+  const [employees, set_employees] = useState<EmployeeProfile[]>(() => getEmployees());
+  const [allowanceCatalog, set_allowanceCatalog] = useState<AllowanceCatalogItem[]>(() => getAllowanceCatalog());
+  const [salaryGrades, set_salaryGrades] = useState(() => getSalaryGrades());
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -77,6 +88,8 @@ export default function CompensationHistoryModal({ isOpen, onClose, employee }: 
   const [decisionNumber, setDecisionNumber] = useState(`QĐ-NL/2026/${String(Math.floor(Math.random() * 90 + 10))}`);
   const [approverName, setApproverName] = useState('Phạm Minh Đức (Giám Đốc)');
   const [reason, setReason] = useState('');
+
+  
 
   if (!isOpen) return null;
 

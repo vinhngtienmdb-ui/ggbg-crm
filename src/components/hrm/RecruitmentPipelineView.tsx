@@ -53,6 +53,14 @@ const STAGES = [
 ];
 
 export default function RecruitmentPipelineView({ onCandidateConverted }: RecruitmentPipelineViewProps) {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setCandidates(getCandidates()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [candidates, setCandidates] = useState<Candidate[]>(() => getCandidates());
   const [searchTerm, setSearchTerm] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
@@ -72,6 +80,8 @@ export default function RecruitmentPipelineView({ onCandidateConverted }: Recrui
 
   // Form State for new candidate
   const [formData, setFormData] = useState({
+
+  
     full_name: '',
     email: '',
     phone: '',

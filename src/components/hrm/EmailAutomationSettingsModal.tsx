@@ -29,6 +29,15 @@ interface EmailAutomationSettingsModalProps {
 }
 
 export default function EmailAutomationSettingsModal({ isOpen, onClose }: EmailAutomationSettingsModalProps) {
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try { setTemplates(getRecruitmentEmailTemplates()); } catch(e){}
+      try { setLogs(getEmailLogs()); } catch(e){}
+    };
+    window.addEventListener('hrm-update', handleUpdate);
+    return () => window.removeEventListener('hrm-update', handleUpdate);
+  }, []);
+
   const [templates, setTemplates] = useState<RecruitmentEmailTemplate[]>(() => getRecruitmentEmailTemplates());
   const [logs, setLogs] = useState<EmailLogEntry[]>(() => getEmailLogs());
   const [activeTab, setActiveTab] = useState<'TEMPLATES' | 'LOGS'>('TEMPLATES');
