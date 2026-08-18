@@ -50,6 +50,7 @@ export default function KpiModal({
   mode = 'create',
 }: KpiModalProps) {
   const [employees] = useState(() => getEmployees());
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<Partial<KPIAssignment>>({
     kpi_name: '',
@@ -126,7 +127,7 @@ export default function KpiModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.kpi_name?.trim()) {
-      alert('Vui lòng nhập tên chỉ tiêu KPI!');
+      setErrorMsg('Vui lòng nhập tên chỉ tiêu KPI!');
       return;
     }
     onSave({
@@ -138,10 +139,48 @@ export default function KpiModal({
     onClose();
   };
 
-  return ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200"> {/* Modal Header */} <div className="bg-slate-900 text-white p-5 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-medium text-white shadow-md"> <Target className="w-5 h-5" /> </div> <div> <h2 className="text-base font-semibold text-white"> {mode === 'create' ? 'Tạo & Phân Bổ Chỉ Tiêu KPI Mới' : 'Cập Nhật Tiến Độ & Chỉnh Sửa KPI'} </h2> <p className="text-xs text-slate-300"> Phân bổ chỉ tiêu chi tiết theo Công Ty / Bộ Phận / Đội Nhóm / Cá Nhân </p> </div> </div> <button
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+        {/* Modal Header */}
+        <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-medium text-white shadow-md">
+              <Target className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-white">
+                {mode === 'create' ? 'Tạo & Phân Bổ Chỉ Tiêu KPI Mới' : 'Cập Nhật Tiến Độ & Chỉnh Sửa KPI'}
+              </h2>
+              <p className="text-xs text-slate-300">
+                Phân bổ chỉ tiêu chi tiết theo Công Ty / Bộ Phận / Đội Nhóm / Cá Nhân
+              </p>
+            </div>
+          </div>
+          <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          > <X className="w-5 h-5" /> </button> </div> {/* Modal Form */} <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto"> {/* Target Name */} <div> <label className="block text-xs font-medium text-slate-700 uppercase tracking-wider mb-1.5"> Tên Chỉ Tiêu KPI <span className="text-red-500">*</span> </label> <input
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Error Banner */}
+        {errorMsg && (
+          <div className="p-3.5 bg-rose-50 border-b border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* Modal Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+          {/* Target Name */}
+          <div>
+            <label className="block text-xs font-medium text-slate-700 uppercase tracking-wider mb-1.5">
+              Tên Chỉ Tiêu KPI <span className="text-red-500">*</span>
+            </label>
+            <input
               type="text"
               required
               value={formData.kpi_name || ''}

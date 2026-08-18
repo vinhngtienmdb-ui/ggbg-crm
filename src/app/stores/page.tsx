@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShoppingBag,
   CheckCircle2,
@@ -14,15 +14,21 @@ import {
   RefreshCw,
   X
 } from 'lucide-react';
-import { INITIAL_STORES } from '@/lib/storeStore';
+import { getStores, STORES_UPDATED_EVENT } from '@/lib/storeStore';
 import { EcomStore } from '@/types/store';
 import { formatCurrency } from '@/lib/formatters';
 
 export default function StoresPage() {
-  const [stores, setStores] = useState<EcomStore[]>(INITIAL_STORES);
+  const [stores, setStores] = useState<EcomStore[]>(() => getStores());
   const [selectedPlatform, setSelectedPlatform] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    const handleUpdate = () => setStores([...getStores()]);
+    window.addEventListener(STORES_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(STORES_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   const filteredStores = stores.filter((s) => {
     if (selectedPlatform !== 'ALL' && s.platform !== selectedPlatform) return false;

@@ -250,7 +250,7 @@ export default function AttendanceCheckinModal({
     if (!selectedEmp) return;
 
     if (lockStatus.is_locked) {
-      alert('Kỳ chấm công này đã được chốt và khóa sổ. Không thể thực hiện chấm công bổ sung.');
+      setCameraError('Kỳ chấm công này đã được chốt và khóa sổ. Không thể thực hiện chấm công bổ sung.');
       return;
     }
 

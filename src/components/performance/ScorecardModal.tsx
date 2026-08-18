@@ -67,6 +67,7 @@ export default function ScorecardModal({
   });
 
   const [workItems, setWorkItems] = useState<SelfWorkItem[]>([]);
+  const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -137,13 +138,14 @@ export default function ScorecardModal({
       kpi_score: syncedScore,
       auto_synced_kpis: true,
     }));
-    alert(`Đã tự động đồng bộ kết quả KPI! Điểm KPI quy đổi: ${syncedScore} / 10`);
+    setFeedbackMsg({ text: `Đã tự động đồng bộ kết quả KPI! Điểm KPI quy đổi: ${syncedScore} / 10`, type: 'success' });
+    setTimeout(() => setFeedbackMsg(null), 4000);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.employee_name?.trim()) {
-      alert('Vui lòng nhập tên nhân sự đánh giá!');
+      setFeedbackMsg({ text: 'Vui lòng nhập tên nhân sự đánh giá!', type: 'error' });
       return;
     }
 
@@ -168,7 +170,20 @@ export default function ScorecardModal({
   return ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200"> {/* Header */} <div className="bg-slate-900 text-white p-5 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-medium text-white shadow-md"> <Award className="w-5 h-5" /> </div> <div> <h2 className="text-base font-semibold text-white"> {mode === 'create' ? 'Tạo Bảng Điểm Hiệu Suất Tháng Mới' : 'Đánh Giá Hiệu Suất & Tự Tính Lương P3'} </h2> <p className="text-xs text-slate-300"> Đồng bộ kết quả KPI, tự đánh giá công việc & quy trình phê duyệt đa cấp </p> </div> </div> <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          > <X className="w-5 h-5" /> </button> </div> {/* Content Form */} <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto"> {/* Employee Basic Info Grid */} <div className="grid grid-cols-1 sm:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 uppercase tracking-wider mb-1"> Tên Nhân Sự <span className="text-red-500">*</span> </label> <input
+          > <X className="w-5 h-5" /> </button> </div>
+          
+          {/* Feedback Alert Banner */}
+          {feedbackMsg && (
+            <div className={`p-3.5 border-b text-xs font-semibold flex items-center gap-2 ${
+              feedbackMsg.type === 'success'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                : 'bg-rose-50 border-rose-200 text-rose-800'
+            }`}>
+              <span>{feedbackMsg.type === 'success' ? '✓' : '⚠️'} {feedbackMsg.text}</span>
+            </div>
+          )}
+
+          {/* Content Form */} <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto"> {/* Employee Basic Info Grid */} <div className="grid grid-cols-1 sm:grid-cols-3 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 uppercase tracking-wider mb-1"> Tên Nhân Sự <span className="text-red-500">*</span> </label> <input
                 type="text"
                 required
                 value={formData.employee_name || ''}

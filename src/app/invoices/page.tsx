@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FileSpreadsheet,
   Plus,
@@ -18,13 +18,19 @@ import {
   X
 } from 'lucide-react';
 import { InvoiceVAT } from '@/types';
-import { getInvoices, addInvoice } from '@/lib/invoiceStore';
+import { getInvoices, addInvoice, INVOICES_UPDATED_EVENT } from '@/lib/invoiceStore';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<InvoiceVAT[]>(() => getInvoices());
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleUpdate = () => setInvoices([...getInvoices()]);
+    window.addEventListener(INVOICES_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(INVOICES_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);

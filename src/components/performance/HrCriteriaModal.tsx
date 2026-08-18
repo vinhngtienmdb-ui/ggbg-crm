@@ -46,7 +46,7 @@ export default function HrCriteriaModal({ isOpen, onClose, onSaveSuccess }: HrCr
 
   const handleDeleteCriterion = (id: string) => {
     if (criteria.length <= 1) {
-      alert('Phải giữ ít nhất 1 tiêu chí đánh giá trong hệ thống!');
+      setErrorMsg('Phải giữ ít nhất 1 tiêu chí đánh giá trong hệ thống!');
       return;
     }
     setCriteria(criteria.filter((c) => c.id !== id));

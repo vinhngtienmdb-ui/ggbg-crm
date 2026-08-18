@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShoppingCart,
   Plus,
@@ -28,7 +28,8 @@ import {
   addSupplier,
   getPurchaseOrders,
   addPurchaseOrder,
-  approvePurchaseOrder
+  approvePurchaseOrder,
+  PURCHASING_UPDATED_EVENT
 } from '@/lib/purchasingStore';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 
@@ -38,6 +39,15 @@ export default function PurchasingPage() {
   const [activeTab, setActiveTab] = useState<'ORDERS' | 'SUPPLIERS'>('ORDERS');
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setSuppliers([...getSuppliers()]);
+      setOrders([...getPurchaseOrders()]);
+    };
+    window.addEventListener(PURCHASING_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(PURCHASING_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   // Modals
   const [isPoModalOpen, setIsPoModalOpen] = useState(false);

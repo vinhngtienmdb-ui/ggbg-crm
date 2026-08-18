@@ -417,7 +417,7 @@ export default function AttendancePage() {
   const handleAdminUnlockSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminUnlockReason.trim()) {
-      alert('Vui lòng nhập lý do mở khóa bảng công!');
+      showToast('⚠️ Vui lòng nhập lý do mở khóa bảng công!');
       return;
     }
     unlockTimesheetPeriod(selectedPeriod, adminRoleName, adminUnlockReason);

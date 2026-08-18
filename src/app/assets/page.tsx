@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Truck,
   Plus,
@@ -25,7 +25,8 @@ import {
   getFixedAssets,
   addFixedAsset,
   updateFixedAsset,
-  deleteFixedAsset
+  deleteFixedAsset,
+  ERP_UPDATED_EVENT
 } from '@/lib/erpStore';
 import { formatCurrency } from '@/lib/formatters';
 
@@ -34,6 +35,12 @@ export default function FixedAssetsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleUpdate = () => setAssets([...getFixedAssets()]);
+    window.addEventListener(ERP_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(ERP_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   // Modals
   const [isCreateOpen, setIsCreateOpen] = useState(false);

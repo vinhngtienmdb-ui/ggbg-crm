@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   Search,
@@ -14,13 +14,19 @@ import {
   Monitor,
   Key
 } from 'lucide-react';
-import { INITIAL_AUDIT_LOGS } from '@/lib/auditStore';
+import { getAuditLogs, AUDIT_UPDATED_EVENT } from '@/lib/auditStore';
 import { AuditLogEntry } from '@/types/audit';
 
 export default function AuditTrailPage() {
-  const [logs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOGS);
+  const [logs, setLogs] = useState<AuditLogEntry[]>(() => getAuditLogs());
   const [selectedSeverity, setSelectedSeverity] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const handleUpdate = () => setLogs([...getAuditLogs()]);
+    window.addEventListener(AUDIT_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(AUDIT_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   const filteredLogs = logs.filter((log) => {
     if (selectedSeverity !== 'ALL' && log.severity !== selectedSeverity) return false;

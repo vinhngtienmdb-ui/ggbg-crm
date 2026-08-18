@@ -45,7 +45,14 @@ import {
   Legend
 } from 'recharts';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
-import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
+import {
+  INITIAL_PL_DATA,
+  INITIAL_DEBT_INVOICES,
+  getFinancialSummary,
+  getPLStatements,
+  getDebtInvoices,
+  FINANCE_UPDATED_EVENT
+} from '@/lib/financeStore';
 import { ContractProfitLoss, DebtInvoice, CashFlowTransaction, DepartmentBudget, CreditLimitApprovalRequest } from '@/types/finance';
 import { getStoredCreditRequests, saveStoredCreditRequests, getStoredCustomers, saveStoredCustomers } from '@/lib/customerStore';
 import { useSearchParams } from 'next/navigation';
@@ -147,8 +154,8 @@ function FinanceContent() {
   const activeRole = simulatedRole || user?.role || 'SALE_EXEC';
   const searchParams = useSearchParams();
 
-  const [plStatements] = useState<ContractProfitLoss[]>(INITIAL_PL_DATA);
-  const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
+  const [plStatements, setPlStatements] = useState<ContractProfitLoss[]>(() => getPLStatements());
+  const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(() => getDebtInvoices());
   const [transactions, setTransactions] = useState<CashFlowTransaction[]>(INITIAL_TRANSACTIONS);
   const [budgets] = useState<DepartmentBudget[]>(INITIAL_BUDGETS);
   const [creditRequests, setCreditRequests] = useState<CreditLimitApprovalRequest[]>([]);
@@ -160,6 +167,15 @@ function FinanceContent() {
   });
 
   const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST' | 'VAS_BALANCE_SHEET' | 'FINANCE_CONFIG'>('EXECUTIVE');
+
+  useEffect(() => {
+    const handleFinanceUpdate = () => {
+      setPlStatements([...getPLStatements()]);
+      setDebtInvoices([...getDebtInvoices()]);
+    };
+    window.addEventListener(FINANCE_UPDATED_EVENT, handleFinanceUpdate);
+    return () => window.removeEventListener(FINANCE_UPDATED_EVENT, handleFinanceUpdate);
+  }, []);
 
   useEffect(() => {
     setCreditRequests(getStoredCreditRequests());

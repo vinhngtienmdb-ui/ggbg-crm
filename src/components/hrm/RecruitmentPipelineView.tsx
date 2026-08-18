@@ -141,7 +141,7 @@ export default function RecruitmentPipelineView({ onCandidateConverted }: Recrui
   const handleCreateCandidate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.full_name || !formData.email) {
-      alert('Vui lòng nhập họ tên và email ứng viên');
+      showToast('⚠️ Vui lòng nhập họ tên và email ứng viên');
       return;
     }
 

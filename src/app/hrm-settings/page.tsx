@@ -413,7 +413,7 @@ function HrmSettingsContent() {
       (formulaWeights.behavior_weight || 0);
 
     if (total !== 100) {
-      alert(`Tổng tỷ trọng các tiêu chí phải bằng 100% (Hiện tại: ${total}%). Vui lòng điều chỉnh lại.`);
+      showToast(`⚠️ Tổng tỷ trọng các tiêu chí phải bằng 100% (Hiện tại: ${total}%). Vui lòng điều chỉnh lại.`);
       return;
     }
 

@@ -18,6 +18,7 @@ export default function FormulaConfigModal({
   onSave,
 }: FormulaConfigModalProps) {
   const [formData, setFormData] = useState<FormulaWeights>({ ...weights });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -26,7 +27,7 @@ export default function FormulaConfigModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (totalWeight !== 100) {
-      alert('Tổng trọng số ba thành phần (KPI + Kỷ luật + Thái độ) phải bằng 100%!');
+      setErrorMsg('Tổng trọng số ba thành phần (KPI + Kỷ luật + Thái độ) phải bằng 100%!');
       return;
     }
     onSave(formData);
@@ -36,7 +37,7 @@ export default function FormulaConfigModal({
   return ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"> <div className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200"> {/* Modal Header */} <div className="bg-white border-b border-slate-200 text-slate-900 p-5 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center font-medium text-white shadow-md"> <Sliders className="w-5 h-5" /> </div> <div> <h2 className="text-base font-semibold text-slate-900">Cấu Hình Trọng Số & Ngưỡng Xếp Loại Performance</h2> <p className="text-xs text-slate-500"> Formula Engine: Tổng Điểm = (KPI × W1) + (Kỷ Luật × W2) + (Thái Độ × W3) + Thưởng - Phạt </p> </div> </div> <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          > <X className="w-5 h-5" /> </button> </div> {/* Modal Form */} <form onSubmit={handleSubmit} className="p-6 space-y-5"> {/* Component Weights */} <div> <div className="flex items-center justify-between mb-2"> <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900"> 1. Trọng Số Các Thành Phần (%) </h3> <span className={`text-xs font-mono font-medium px-2.5 py-0.5 rounded-full ${
+          > <X className="w-5 h-5" /> </button> </div> {errorMsg && ( <div className="p-3 bg-rose-50 border-b border-rose-200 text-rose-800 text-xs font-semibold text-center"> ⚠️ {errorMsg} </div> )} {/* Modal Form */} <form onSubmit={handleSubmit} className="p-6 space-y-5"> {/* Component Weights */} <div> <div className="flex items-center justify-between mb-2"> <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900"> 1. Trọng Số Các Thành Phần (%) </h3> <span className={`text-xs font-mono font-medium px-2.5 py-0.5 rounded-full ${
                 totalWeight === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
               }`}> Tổng: {totalWeight}% {totalWeight !== 100 && '(Phải = 100%)'} </span> </div> <div className="grid grid-cols-3 gap-3"> <div className="bg-slate-50 p-3 rounded-xl border border-slate-200"> <label className="block text-[11px] font-semibold text-slate-700 mb-1">Điểm KPI (%)</label> <input
                   type="number"

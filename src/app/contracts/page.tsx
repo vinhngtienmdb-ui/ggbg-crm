@@ -11,7 +11,8 @@ import {
   Building2,
   ShieldCheck,
   Calendar,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -28,13 +29,19 @@ interface ContractItem {
   status: 'ACTIVE' | 'PENDING_RENEWAL';
 }
 
-const CONTRACTS_LIST: ContractItem[] = [];
+const INITIAL_CONTRACTS: ContractItem[] = [];
 
 export default function ContractsPage() {
-  const [contracts] = useState<ContractItem[]>(CONTRACTS_LIST);
+  const [contracts, setContracts] = useState<ContractItem[]>(INITIAL_CONTRACTS);
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedContract, setSelectedContract] = useState<ContractItem | null>(null);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
 
   const filteredContracts = contracts.filter((c) => {
     if (searchTerm.trim()) {
@@ -53,7 +60,22 @@ export default function ContractsPage() {
     setIsPdfModalOpen(true);
   };
 
-  return ( <div className="space-y-5"> {/* Header - Clean White with Colorful Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400"> <FileText className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Quản Lý Hợp Đồng </h1> <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-[11px] font-medium border border-blue-200 dark:border-blue-800"> {contracts.length} Hợp đồng </span> </div> <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5"> Quản lý hợp đồng dịch vụ vận hành TMĐT, con dấu điện tử & mã QR xác thực </p> </div> </div> </div> {/* Filter Bar */} <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"> <div className="relative w-full sm:w-80"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
+  return (
+    <div className="space-y-5">
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="p-4 rounded-xl bg-emerald-600 text-white font-medium text-xs shadow-sm flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+            <span>{toastMsg}</span>
+          </div>
+          <button onClick={() => setToastMsg(null)} className="p-1 hover:bg-emerald-700 rounded-lg">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Header - Clean White with Colorful Highlights */} <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400"> <FileText className="w-5 h-5" /> </div> <div> <div className="flex items-center gap-2"> <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"> Quản Lý Hợp Đồng </h1> <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-[11px] font-medium border border-blue-200 dark:border-blue-800"> {contracts.length} Hợp đồng </span> </div> <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5"> Quản lý hợp đồng dịch vụ vận hành TMĐT, con dấu điện tử & mã QR xác thực </p> </div> </div> </div> {/* Filter Bar */} <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"> <div className="relative w-full sm:w-80"> <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /> <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -63,7 +85,8 @@ export default function ContractsPage() {
                           onClick={() => {
                             cnt.status = 'ACTIVE';
                             cnt.expiry_date = '2027-09-01';
-                            alert(`📜 Đã sinh Phụ lục Gia hạn Hợp đồng thêm 12 tháng thành công cho ${cnt.company_name}!`);
+                            setContracts([...contracts]);
+                            showToast(`📜 Đã sinh Phụ lục Gia hạn Hợp đồng thêm 12 tháng thành công cho ${cnt.company_name}!`);
                           }}
                           className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded text-[11px] inline-flex items-center gap-1 shadow-xs transition-colors"
                         > <Sparkles className="w-3.5 h-3.5" /> Phụ Lục Gia Hạn 1-Click </button> )} <button
