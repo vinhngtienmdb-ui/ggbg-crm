@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
-      <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans">
+    <html lang="vi" suppressHydrationWarning>
+      <body className="bg-slate-50 text-slate-900 overflow-hidden font-sans" suppressHydrationWarning>
         <AppShell>{children}</AppShell>
       </body>
     </html>
