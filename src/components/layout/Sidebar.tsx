@@ -257,17 +257,19 @@ function SidebarNavigation({
                             : 'text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400'
                         }`}
                       >
-                        <Link
+                        <a
+                          key={item.href}
                           href={item.href}
-                          prefetch={false}
-                          title={hasSubItems ? `${item.name} - Báo Cáo Tổng Quan` : item.name}
-                          onClick={() => {
+                          onClick={(e) => {
                             if (hasSubItems) {
                               setExpandedKeys((prev) => ({ ...prev, [item.href]: true }));
+                              e.preventDefault();
+                            } else {
+                              if (onClose) onClose();
                             }
-                            if (onClose) onClose();
                           }}
                           className="flex items-center gap-2.5 min-w-0 flex-1 py-0.5"
+                          title={hasSubItems ? `${item.name} - Báo Cáo Tổng Quan` : item.name}
                         >
                           <Icon
                             className={`w-4 h-4 shrink-0 transition-colors ${
@@ -279,7 +281,7 @@ function SidebarNavigation({
                             }`}
                           />
                           <span className="truncate">{item.name}</span>
-                        </Link>
+                        </a>
 
                         {/* SUB-ITEMS TOGGLE CHEVRON & BADGE */}
                         {hasSubItems ? (
@@ -323,10 +325,9 @@ function SidebarNavigation({
                               pathname === item.href && activeTabParam === sub.tabKey;
 
                             return (
-                              <Link
+                              <a
                                 key={sub.href}
                                 href={sub.href}
-                                prefetch={false}
                                 onClick={() => {
                                   if (onClose) onClose();
                                 }}
@@ -346,7 +347,7 @@ function SidebarNavigation({
                                   />
                                   <span className="truncate">{sub.name}</span>
                                 </div>
-                              </Link>
+                              </a>
                             );
                           })}
                         </div>

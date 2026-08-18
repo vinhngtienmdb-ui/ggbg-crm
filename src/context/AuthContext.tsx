@@ -48,7 +48,7 @@ const DEFAULT_ADMIN_USER: UserSession = {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserSession | null>(DEFAULT_ADMIN_USER);
+  const [user, setUser] = useState<UserSession | null>(null);
   const [simulatedRole, setSimulatedRole] = useState<UserRole>('SUPER_ADMIN');
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);

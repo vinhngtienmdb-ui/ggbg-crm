@@ -34,15 +34,22 @@ export default function MobileBottomNav({ onToggleMobileSidebar }: MobileBottomN
   return ( <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1 flex items-center justify-around shadow-lg"> {visibleNavItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;
-        return ( <Link
+        return (
+          <a
             key={item.href}
             href={item.href}
-            prefetch={true}
             className={`flex flex-col items-center justify-center py-1 px-2 min-w-[56px] rounded-xl text-[10px] font-medium transition-all active:scale-95 ${
               isActive ? 'text-blue-600 font-semibold' : 'text-slate-400 hover:text-blue-600'
             }`}
-          > <div className={`p-1 rounded-lg ${isActive ? 'bg-blue-50 text-blue-600' : ''}`}> <Icon className="w-5 h-5" /> </div> <span className="mt-0.5">{item.name}</span> </Link> );
-      })}
+          >
+            <div className={`p-1.5 rounded-lg mb-0.5 transition-colors ${
+              isActive ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-transparent'
+            }`}>
+              <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500'}`} />
+            </div>
+            <span className="truncate w-full text-center">{item.name}</span>
+          </a>
+        );})}
 
       {/* Menu Drawer Toggle Button */} <button
         onClick={onToggleMobileSidebar}
