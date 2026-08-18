@@ -35,18 +35,15 @@ export default function QuickCreateCustomerModal({
       customer_code: newCode,
       name: name.trim(),
       entity_type: entityType,
-      company_name: companyName.trim() || (entityType === 'ENTERPRISE' ? 'Doanh Nghiệp Mới' : 'Hộ Kinh Doanh Mới'),
+      company_name: companyName.trim() || (entityType === 'ENTERPRISE' ? 'Doanh Nghiệp Mới' : entityType === 'HOUSEHOLD_BUSINESS' ? 'Hộ Kinh Doanh Mới' : 'Cá Nhân'),
       phone: phone.trim() || '0988****999',
       email: email.trim() || `${newCode.toLowerCase()}@ggbingo.vn`,
-      customer_type: 'B2B_Agency_Service',
       tier: tier,
-      lifecycle_stage: 'VIP',
-      health_score: 85,
-      ltv_total_spent: 150000000,
-      ecom_platforms: ['Shopee', 'TikTokShop', 'GGBingoVN'],
-      avg_monthly_gmv: 250000000,
+      lifecycle_stage: 'Prospect',
+      health_score: 100,
+      ltv_total_spent: 0,
       owner_name: chat.assigned_rep_name,
-      kyc_status: 'VERIFIED',
+      kyc_status: 'PENDING',
       tags: ['Tạo từ Live Chat', chat.channel_name],
       created_at: new Date().toISOString().substring(0, 10),
     };
@@ -59,7 +56,11 @@ export default function QuickCreateCustomerModal({
                 value={entityType}
                 onChange={(e) => setEntityType(e.target.value as any)}
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
-              > <option value="ENTERPRISE">🏢 Doanh Nghiệp (B2B)</option> <option value="INDIVIDUAL">👤 Cá Nhân / HKD (B2C)</option> </select> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Phân Hạng Dự Kiến</label> <select
+              >
+                <option value="ENTERPRISE">🏢 Doanh Nghiệp</option>
+                <option value="HOUSEHOLD_BUSINESS">🏪 Hộ Kinh Doanh</option>
+                <option value="INDIVIDUAL">👤 Cá Nhân</option>
+              </select> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Phân Hạng Dự Kiến</label> <select
                 value={tier}
                 onChange={(e) => setTier(e.target.value as any)}
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"

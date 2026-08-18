@@ -46,9 +46,12 @@ import {
 } from 'recharts';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { INITIAL_PL_DATA, INITIAL_DEBT_INVOICES, getFinancialSummary } from '@/lib/financeStore';
-import { ContractProfitLoss, DebtInvoice, CashFlowTransaction, DepartmentBudget } from '@/types/finance';
+import { ContractProfitLoss, DebtInvoice, CashFlowTransaction, DepartmentBudget, CreditLimitApprovalRequest } from '@/types/finance';
+import { getStoredCreditRequests, saveStoredCreditRequests, getStoredCustomers, saveStoredCustomers } from '@/lib/customerStore';
 import { useSearchParams } from 'next/navigation';
 import { ModuleBanner } from '@/components/ui';
+import { useAuth } from '@/context/AuthContext';
+import { canAccessSettings } from '@/lib/permissions';
 
 // Mock 12-Month Financial Performance Trend Data
 const FINANCIAL_TREND_DATA = [
@@ -75,14 +78,69 @@ const COST_BREAKDOWN_DATA = [
   { name: 'Chi Phí Quản Lý Khác', value: 5, color: '#64748B' },
 ];
 
-// Cash Flow Ledger
-const INITIAL_TRANSACTIONS: CashFlowTransaction[] = [];
+const INITIAL_TRANSACTIONS: CashFlowTransaction[] = [
+  {
+    id: 'tx_1',
+    code: 'PT-2026-0701',
+    date: '2026-07-28',
+    type: 'INCOME',
+    category: 'Hợp Đồng Dịch Vụ',
+    amount: 38250000,
+    account: 'Techcombank',
+    description: 'Thu tiền dịch vụ hợp đồng Agency Hồng Lực',
+    approval_status: 'APPROVED',
+  },
+  {
+    id: 'tx_2',
+    code: 'PC-2026-0702',
+    date: '2026-07-25',
+    type: 'EXPENSE',
+    category: 'Chi Lương Nhân Sự',
+    amount: 145000000,
+    account: 'Techcombank',
+    description: 'Thanh toán lương 3P tháng 7 cho nhân sự',
+    approval_status: 'APPROVED',
+  },
+];
 
-// Department Budgets
-const INITIAL_BUDGETS: DepartmentBudget[] = [];
-
-import { useAuth } from '@/context/AuthContext';
-import { canAccessSettings } from '@/lib/permissions';
+const INITIAL_BUDGETS: DepartmentBudget[] = [
+  {
+    id: 'b_1',
+    department_name: 'Khối Kinh Doanh (Sales & BD)',
+    allocated_budget: 150000000,
+    spent_amount: 112000000,
+    remaining_amount: 38000000,
+    utilization_pct: 74.6,
+    status: 'SAFE',
+  },
+  {
+    id: 'b_2',
+    department_name: 'Khối Marketing & Media KOC',
+    allocated_budget: 200000000,
+    spent_amount: 185000000,
+    remaining_amount: 15000000,
+    utilization_pct: 92.5,
+    status: 'WARNING',
+  },
+  {
+    id: 'b_3',
+    department_name: 'Khối Vận Hành & CSKH',
+    allocated_budget: 80000000,
+    spent_amount: 54000000,
+    remaining_amount: 26000000,
+    utilization_pct: 67.5,
+    status: 'SAFE',
+  },
+  {
+    id: 'b_4',
+    department_name: 'Khối Hành Chính Nhân Sự C&B',
+    allocated_budget: 60000000,
+    spent_amount: 45000000,
+    remaining_amount: 15000000,
+    utilization_pct: 75.0,
+    status: 'SAFE',
+  },
+];
 
 function FinanceContent() {
   const { user, simulatedRole } = useAuth();
@@ -93,8 +151,24 @@ function FinanceContent() {
   const [debtInvoices, setDebtInvoices] = useState<DebtInvoice[]>(INITIAL_DEBT_INVOICES);
   const [transactions, setTransactions] = useState<CashFlowTransaction[]>(INITIAL_TRANSACTIONS);
   const [budgets] = useState<DepartmentBudget[]>(INITIAL_BUDGETS);
+  const [creditRequests, setCreditRequests] = useState<CreditLimitApprovalRequest[]>([]);
+  const [isCreditModalOpen, setIsCreditModalOpen] = useState(false);
+  const [newCreditReq, setNewCreditReq] = useState({
+    customer_id: '',
+    requested_limit: 50000000,
+    reason: '',
+  });
 
   const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'P_L' | 'DEBT' | 'CASH_FLOW' | 'BUDGET_FORECAST' | 'VAS_BALANCE_SHEET' | 'FINANCE_CONFIG'>('EXECUTIVE');
+
+  useEffect(() => {
+    setCreditRequests(getStoredCreditRequests());
+    const handleCreditUpdate = () => {
+      setCreditRequests(getStoredCreditRequests());
+    };
+    window.addEventListener('ggbg_credit_requests_updated', handleCreditUpdate);
+    return () => window.removeEventListener('ggbg_credit_requests_updated', handleCreditUpdate);
+  }, []);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -164,6 +238,130 @@ function FinanceContent() {
     }
   };
 
+  const handleApproveCreditStep = (
+    reqId: string,
+    step: 1 | 2 | 3,
+    action: 'APPROVE' | 'REJECT',
+    note?: string
+  ) => {
+    const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+    const updatedReqs = creditRequests.map((r) => {
+      if (r.id === reqId) {
+        if (action === 'REJECT') {
+          return {
+            ...r,
+            status: 'REJECTED' as const,
+            rejection_reason: note || 'Từ chối cấp hạn mức tín dụng',
+            updated_at: now,
+          };
+        }
+
+        if (step === 1) {
+          return {
+            ...r,
+            status: 'PENDING_CHIEF_ACCOUNTANT' as const,
+            sales_director_approval: {
+              approver_name: user?.name || 'Giám Đốc Kinh Doanh',
+              approved_at: now,
+              status: 'APPROVED' as const,
+              note: note || 'Đã thẩm định nhu cầu khách hàng',
+            },
+            updated_at: now,
+          };
+        } else if (step === 2) {
+          return {
+            ...r,
+            status: 'PENDING_CEO' as const,
+            chief_accountant_approval: {
+              approver_name: user?.name || 'Kế Toán Trưởng',
+              approved_at: now,
+              status: 'APPROVED' as const,
+              note: note || 'Thẩm tra lịch sử thanh toán đạt yêu cầu',
+            },
+            updated_at: now,
+          };
+        } else if (step === 3) {
+          // CEO APPROVES => Update customer store
+          const custs = getStoredCustomers();
+          const updatedCusts = custs.map((c) => {
+            if (c.id === r.customer_id) {
+              return {
+                ...c,
+                credit_limit_info: {
+                  approved_limit: r.requested_limit,
+                  status: 'APPROVED' as const,
+                  requested_limit: r.requested_limit,
+                  reason: r.reason,
+                  sales_director_approval: r.sales_director_approval,
+                  chief_accountant_approval: r.chief_accountant_approval,
+                  ceo_approval: {
+                    approver_name: user?.name || 'Nguyễn Quốc Tuấn (CEO)',
+                    approved_at: now,
+                    status: 'APPROVED' as const,
+                    note: note || 'Phê chuẩn hạn mức tín dụng',
+                  },
+                },
+              };
+            }
+            return c;
+          });
+          saveStoredCustomers(updatedCusts);
+
+          return {
+            ...r,
+            status: 'APPROVED' as const,
+            current_limit: r.requested_limit,
+            ceo_approval: {
+              approver_name: user?.name || 'Nguyễn Quốc Tuấn (CEO)',
+              approved_at: now,
+              status: 'APPROVED' as const,
+              note: note || 'Phê chuẩn hạn mức tín dụng',
+            },
+            updated_at: now,
+          };
+        }
+      }
+      return r;
+    });
+
+    setCreditRequests(updatedReqs);
+    saveStoredCreditRequests(updatedReqs);
+    showToast(action === 'APPROVE' ? `✓ Đã phê duyệt cấp ${step} thành công!` : '❌ Đã từ chối yêu cầu cấp hạn mức!');
+  };
+
+  const handleCreateCreditRequestSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const custs = getStoredCustomers();
+    const cust = custs.find((c) => c.id === newCreditReq.customer_id);
+    if (!cust) {
+      showToast('⚠️ Vui lòng chọn khách hàng!');
+      return;
+    }
+
+    const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+    const newReq: CreditLimitApprovalRequest = {
+      id: `req_cred_${Date.now()}`,
+      request_code: `CR-2026-${String(creditRequests.length + 1).padStart(4, '0')}`,
+      customer_id: cust.id,
+      customer_code: cust.customer_code,
+      customer_name: cust.name,
+      company_name: cust.company_name || cust.household_name,
+      entity_type: cust.entity_type,
+      current_limit: cust.credit_limit_info?.approved_limit || 0,
+      requested_limit: Number(newCreditReq.requested_limit) || 0,
+      reason: newCreditReq.reason.trim() || 'Cấp hạn mức công nợ theo hợp đồng dịch vụ',
+      status: 'PENDING_SALES_DIR',
+      created_at: now,
+      updated_at: now,
+    };
+
+    const updatedReqs = [newReq, ...creditRequests];
+    setCreditRequests(updatedReqs);
+    saveStoredCreditRequests(updatedReqs);
+    setIsCreditModalOpen(false);
+    showToast(`🎉 Đã tạo yêu cầu phê duyệt hạn mức [${newReq.request_code}] thành công!`);
+  };
+
   const handleAddTransaction = (e: React.FormEvent) => {
     e.preventDefault();
     const item: CashFlowTransaction = {
@@ -179,7 +377,7 @@ function FinanceContent() {
     };
     setTransactions([item, ...transactions]);
     setIsTxModalOpen(false);
-    showToast(` Đã lập thành công Phiếu ${newTx.type === 'INCOME' ? 'Thu' : 'Chi'} ${item.code}`);
+    showToast(`✓ Đã lập thành công Phiếu ${newTx.type === 'INCOME' ? 'Thu' : 'Chi'} ${item.code}`);
   };
 
   return ( <div className="space-y-6"> {/* Toast Notification */}
@@ -367,26 +565,281 @@ function FinanceContent() {
                           : 'bg-red-100 text-red-800 border border-red-300'
                       }`}> {pl.profit_margin_percent}% </span> </td> </tr> ))} </tbody> </table> </div> </div> )}
 
-      {/* TAB 3: ACCOUNTS RECEIVABLE & DEBT COLLECTION */}
-      {activeTab === 'DEBT' && ( <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-6 text-xs font-medium"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <AlertTriangle className="w-4 h-4 text-amber-600" /> Sổ Quản Lý Công Nợ Hóa Đơn & Đòi Nợ Tự Động Multi-Channel </h3> <p className="text-xs text-slate-500 mt-0.5">Tự động gửi thông báo nhắc nợ kỳ thu phí dịch vụ qua Zalo ZNS, Email tự động & SMS Brandname.</p> </div> <div className="overflow-x-auto"> <table className="w-full text-left border-collapse"> <thead> <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]"> <th className="p-3">Mã Hóa Đơn & Khách Hàng</th> <th className="p-3">Kỳ Thu Phí & Hợp Đồng</th> <th className="p-3">Số Tiền Phải Thu</th> <th className="p-3">Hạn Thanh Toán</th> <th className="p-3 text-center">Trạng Thái Thắng Nợ</th> <th className="p-3 text-center">Gửi Đòi Nợ Tự Động</th> </tr> </thead> <tbody className="divide-y divide-slate-100"> {debtInvoices.map((inv) => ( <tr key={inv.id} className="hover:bg-slate-50 transition-colors"> <td className="p-3"> <p className="font-semibold text-slate-900">{inv.customer_name}</p> <p className="font-mono text-blue-700 text-[11px]">{inv.invoice_code}</p> </td> <td className="p-3"> <p className="font-medium text-slate-800">{inv.billing_period}</p> <p className="font-mono text-slate-500 text-[11px]">{inv.contract_code}</p> </td> <td className="p-3 font-mono font-semibold text-slate-900 text-sm"> {formatCurrency(inv.amount_due)} </td> <td className="p-3 font-mono text-slate-700">{inv.due_date}</td> <td className="p-3 text-center"> <span className={`px-2.5 py-1 rounded-full font-medium text-[10.5px] ${
-                        inv.payment_status === 'PAID'
-                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                          : inv.payment_status === 'UNPAID'
-                          ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                          : 'bg-red-100 text-red-800 border border-red-300 animate-pulse'
-                      }`}> {inv.payment_status === 'PAID' ? ' Đã Thanh Toán' : inv.payment_status === 'UNPAID' ? '⏳ Chờ Thanh Toán' : ' Nợ Quá Hạn'} </span> </td> <td className="p-3 text-center"> {inv.payment_status !== 'PAID' ? ( <div className="flex items-center justify-center gap-1.5"> <button
-                            onClick={() => handleSendReminder(inv, 'Zalo ZNS')}
-                            className="px-2.5 py-1 bg-blue-50 text-blue-700 font-semibold rounded-lg hover:bg-blue-100 transition-all border border-blue-200"
-                            title="Gửi Zalo ZNS"
-                          > Zalo </button> <button
-                            onClick={() => handleSendReminder(inv, 'Email')}
-                            className="px-2.5 py-1 bg-purple-50 text-purple-700 font-semibold rounded-lg hover:bg-purple-100 transition-all border border-purple-200"
-                            title="Gửi Email"
-                          > 📧 Email </button> <button
-                            onClick={() => handleSendReminder(inv, 'SMS')}
-                            className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-semibold rounded-lg hover:bg-emerald-100 transition-all border border-emerald-200"
-                            title="Gửi SMS Brandname"
-                          > SMS </button> </div> ) : ( <span className="text-slate-400 font-medium text-[11px]">Không cần nhắc</span> )} </td> </tr> ))} </tbody> </table> </div> </div> )}
+      {/* TAB 3: ACCOUNTS RECEIVABLE & CREDIT LIMIT 3-STEP APPROVAL */}
+      {activeTab === 'DEBT' && (
+        <div className="space-y-6 text-xs font-medium">
+          {/* SECTION 1: 3-STEP CREDIT LIMIT APPROVAL WORKFLOW */}
+          <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-blue-600" />
+                  <span>Quy Trình Thẩm Định & Phê Duyệt Hạn Mức Tín Dụng Khách Hàng (3 Cấp Duyệt)</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Quy trình xét duyệt chuẩn: <strong>1. Giám Đốc Kinh Doanh</strong> → <strong>2. Kế Toán Trưởng</strong> → <strong>3. CEO Phê Chuẩn</strong> (Đồng bộ hạn mức sang hồ sơ Khách hàng)
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCreditModalOpen(true)}
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-xs flex items-center gap-1.5 transition-all shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Đề Xuất Cấp Hạn Mức</span>
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]">
+                    <th className="p-3">Mã Phiếu & Khách Hàng</th>
+                    <th className="p-3">Thể Nhân</th>
+                    <th className="p-3 font-mono">Hạn Mức Đề Xuất</th>
+                    <th className="p-3">Lý Do Đề Xuất</th>
+                    <th className="p-3 text-center">Tiến Trình Duyệt 3 Cấp</th>
+                    <th className="p-3 text-right">Thao Tác Duyệt</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {creditRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-6 text-center text-slate-400">
+                        Chưa có yêu cầu cấp hạn mức tín dụng nào
+                      </td>
+                    </tr>
+                  ) : (
+                    creditRequests.map((req) => (
+                      <tr key={req.id} className="hover:bg-slate-50 transition-colors">
+                        {/* Customer Info */}
+                        <td className="p-3">
+                          <p className="font-semibold text-slate-900">{req.company_name || req.customer_name}</p>
+                          <p className="font-mono text-blue-700 text-[11px]">
+                            {req.request_code} · {req.customer_code} ({req.customer_name})
+                          </p>
+                        </td>
+
+                        {/* Entity Type */}
+                        <td className="p-3">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">
+                            {req.entity_type === 'ENTERPRISE'
+                              ? 'Doanh Nghiệp'
+                              : req.entity_type === 'HOUSEHOLD_BUSINESS'
+                              ? 'Hộ Kinh Doanh'
+                              : 'Cá Nhân'}
+                          </span>
+                        </td>
+
+                        {/* Limit Amount */}
+                        <td className="p-3 font-mono">
+                          <div className="font-semibold text-slate-900 text-sm">
+                            {formatCurrency(req.requested_limit)}
+                          </div>
+                          {req.current_limit > 0 && (
+                            <div className="text-[10.5px] text-slate-400">
+                              Hiện tại: {formatCurrency(req.current_limit)}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Reason */}
+                        <td className="p-3 text-slate-600 max-w-[200px] truncate">
+                          {req.reason}
+                        </td>
+
+                        {/* 3 Steps Pipeline Visual */}
+                        <td className="p-3">
+                          <div className="flex items-center justify-center gap-1 text-[10px]">
+                            {/* Step 1: Sales Dir */}
+                            <span
+                              className={`px-2 py-0.5 rounded font-semibold border ${
+                                req.sales_director_approval?.status === 'APPROVED'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                  : req.status === 'PENDING_SALES_DIR'
+                                  ? 'bg-amber-50 text-amber-800 border-amber-300 animate-pulse'
+                                  : 'bg-slate-50 text-slate-400 border-slate-200'
+                              }`}
+                              title={req.sales_director_approval?.approver_name || '1. GĐ Kinh Doanh'}
+                            >
+                              1. GĐ Kinh Doanh
+                            </span>
+                            <span>→</span>
+                            {/* Step 2: Chief Accountant */}
+                            <span
+                              className={`px-2 py-0.5 rounded font-semibold border ${
+                                req.chief_accountant_approval?.status === 'APPROVED'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                  : req.status === 'PENDING_CHIEF_ACCOUNTANT'
+                                  ? 'bg-amber-50 text-amber-800 border-amber-300 animate-pulse'
+                                  : 'bg-slate-50 text-slate-400 border-slate-200'
+                              }`}
+                              title={req.chief_accountant_approval?.approver_name || '2. Kế Toán Trưởng'}
+                            >
+                              2. Kế Toán Trưởng
+                            </span>
+                            <span>→</span>
+                            {/* Step 3: CEO */}
+                            <span
+                              className={`px-2 py-0.5 rounded font-semibold border ${
+                                req.ceo_approval?.status === 'APPROVED'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                  : req.status === 'PENDING_CEO'
+                                  ? 'bg-amber-50 text-amber-800 border-amber-300 animate-pulse'
+                                  : 'bg-slate-50 text-slate-400 border-slate-200'
+                              }`}
+                              title={req.ceo_approval?.approver_name || '3. CEO Phê Chuẩn'}
+                            >
+                              3. CEO
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="p-3 text-right">
+                          {req.status === 'APPROVED' ? (
+                            <span className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              ✓ Đã Duyệt Hạn Mức
+                            </span>
+                          ) : req.status === 'REJECTED' ? (
+                            <span className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-red-100 text-red-800 border border-red-300">
+                              ✕ Từ Chối
+                            </span>
+                          ) : (
+                            <div className="flex items-center justify-end gap-1.5">
+                              {req.status === 'PENDING_SALES_DIR' && (
+                                <button
+                                  onClick={() => handleApproveCreditStep(req.id, 1, 'APPROVE')}
+                                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold text-[11px] shadow-xs"
+                                >
+                                  GĐ KD Duyệt
+                                </button>
+                              )}
+                              {req.status === 'PENDING_CHIEF_ACCOUNTANT' && (
+                                <button
+                                  onClick={() => handleApproveCreditStep(req.id, 2, 'APPROVE')}
+                                  className="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded font-semibold text-[11px] shadow-xs"
+                                >
+                                  KTT Thẩm Tra
+                                </button>
+                              )}
+                              {req.status === 'PENDING_CEO' && (
+                                <button
+                                  onClick={() => handleApproveCreditStep(req.id, 3, 'APPROVE')}
+                                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-semibold text-[11px] shadow-xs"
+                                >
+                                  CEO Phê Chuẩn
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleApproveCreditStep(req.id, 1, 'REJECT')}
+                                className="px-2 py-1 bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 rounded text-[11px]"
+                              >
+                                Từ chối
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* SECTION 2: ACCOUNTS RECEIVABLE & DEBT INVOICES */}
+          <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4">
+            <div>
+              <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <span>Sổ Quản Lý Công Nợ Hóa Đơn & Đòi Nợ Tự Động Multi-Channel</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Tự động gửi thông báo nhắc nợ kỳ thu phí dịch vụ qua Zalo ZNS, Email tự động & SMS Brandname.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10.5px]">
+                    <th className="p-3">Mã Hóa Đơn & Khách Hàng</th>
+                    <th className="p-3">Kỳ Thu Phí & Hợp Đồng</th>
+                    <th className="p-3">Số Tiền Phải Thu</th>
+                    <th className="p-3">Hạn Thanh Toán</th>
+                    <th className="p-3 text-center">Trạng Thái Thắng Nợ</th>
+                    <th className="p-3 text-center">Gửi Đòi Nợ Tự Động</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {debtInvoices.map((inv) => (
+                    <tr key={inv.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="p-3">
+                        <p className="font-semibold text-slate-900">{inv.customer_name}</p>
+                        <p className="font-mono text-blue-700 text-[11px]">{inv.invoice_code}</p>
+                      </td>
+                      <td className="p-3">
+                        <p className="font-medium text-slate-800">{inv.billing_period}</p>
+                        <p className="font-mono text-slate-500 text-[11px]">{inv.contract_code}</p>
+                      </td>
+                      <td className="p-3 font-mono font-semibold text-slate-900 text-sm">
+                        {formatCurrency(inv.amount_due)}
+                      </td>
+                      <td className="p-3 font-mono text-slate-700">{inv.due_date}</td>
+                      <td className="p-3 text-center">
+                        <span
+                          className={`px-2.5 py-1 rounded-full font-medium text-[10.5px] ${
+                            inv.payment_status === 'PAID'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              : inv.payment_status === 'UNPAID'
+                              ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                              : 'bg-red-100 text-red-800 border border-red-300 animate-pulse'
+                          }`}
+                        >
+                          {inv.payment_status === 'PAID'
+                            ? '✓ Đã Thanh Toán'
+                            : inv.payment_status === 'UNPAID'
+                            ? '⏳ Chờ Thanh Toán'
+                            : '⚡ Nợ Quá Hạn'}
+                        </span>
+                      </td>
+                      <td className="p-3 text-center">
+                        {inv.payment_status !== 'PAID' ? (
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => handleSendReminder(inv, 'Zalo ZNS')}
+                              className="px-2.5 py-1 bg-blue-50 text-blue-700 font-semibold rounded-lg hover:bg-blue-100 transition-all border border-blue-200"
+                              title="Gửi Zalo ZNS"
+                            >
+                              Zalo
+                            </button>
+                            <button
+                              onClick={() => handleSendReminder(inv, 'Email')}
+                              className="px-2.5 py-1 bg-purple-50 text-purple-700 font-semibold rounded-lg hover:bg-purple-100 transition-all border border-purple-200"
+                              title="Gửi Email"
+                            >
+                              📧 Email
+                            </button>
+                            <button
+                              onClick={() => handleSendReminder(inv, 'SMS')}
+                              className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-semibold rounded-lg hover:bg-emerald-100 transition-all border border-emerald-200"
+                              title="Gửi SMS Brandname"
+                            >
+                              SMS
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 font-medium text-[11px]">Không cần nhắc</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TAB 4: CASH FLOW & TRANSACTION LEDGER */}
       {activeTab === 'CASH_FLOW' && ( <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 text-xs font-medium"> <div className="flex flex-col sm:flex-row items-center justify-between gap-4"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <Wallet className="w-4 h-4 text-purple-600" /> Sổ Nhật Ký Giao Dịch Thu / Chi Dòng Tiền Real-Time </h3> <p className="text-xs text-slate-500 mt-0.5">Theo dõi lịch sử biến động dòng tiền thực tế qua các tài khoản ngân hàng và quỹ tiền mặt.</p> </div> <button
@@ -530,6 +983,101 @@ function FinanceContent() {
                   className="px-5 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30"
                 >
                   Lưu Phiếu Giao Dịch
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ĐỀ XUẤT CẤP HẠN MỨC TÍN DỤNG MỚI */}
+      {isCreditModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-4 bg-slate-50 border-b flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <h3 className="font-semibold text-slate-900 text-sm">Đề Xuất Cấp Hạn Mức Tín Dụng</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreditModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCreditRequestSubmit} className="p-5 space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-700 font-medium mb-1">
+                  Chọn Khách Hàng / Đơn Vị <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={newCreditReq.customer_id}
+                  onChange={(e) => setNewCreditReq({ ...newCreditReq, customer_id: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-medium text-slate-800"
+                >
+                  <option value="">-- Chọn khách hàng --</option>
+                  {getStoredCustomers().map((c) => (
+                    <option key={c.id} value={c.id}>
+                      [{c.customer_code}] {c.company_name || c.household_name || c.name} ({c.entity_type === 'ENTERPRISE' ? 'Doanh Nghiệp' : c.entity_type === 'HOUSEHOLD_BUSINESS' ? 'Hộ Kinh Doanh' : 'Cá Nhân'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium mb-1">
+                  Hạn Mức Đề Xuất (VND) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  step={5000000}
+                  required
+                  value={newCreditReq.requested_limit}
+                  onChange={(e) => setNewCreditReq({ ...newCreditReq, requested_limit: Number(e.target.value) })}
+                  className="w-full px-3 py-2 border rounded-xl font-mono text-blue-700 font-semibold text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium mb-1">
+                  Lý Do Đề Xuất & Căn Cứ Đánh Giá <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={newCreditReq.reason}
+                  onChange={(e) => setNewCreditReq({ ...newCreditReq, reason: e.target.value })}
+                  placeholder="VD: Khách hàng ký hợp đồng dịch vụ vận hành 12 tháng, lịch sử thanh toán tốt..."
+                  className="w-full px-3 py-2 border rounded-xl"
+                />
+              </div>
+
+              <div className="p-3 bg-blue-50 rounded-xl text-[11px] text-blue-700 space-y-1">
+                <p className="font-semibold">Quy trình duyệt tự động:</p>
+                <p>1. Giám Đốc Kinh Doanh thẩm định nhu cầu</p>
+                <p>2. Kế Toán Trưởng thẩm tra năng lực tài chính</p>
+                <p>3. CEO phê chuẩn & ban hành hạn mức công nợ</p>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setIsCreditModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30"
+                >
+                  Gửi Yêu Cầu Phê Duyệt
                 </button>
               </div>
             </form>

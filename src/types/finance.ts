@@ -59,3 +59,24 @@ export interface FinancialSummary {
   contracts_count: number;
   net_cash_flow?: number;
 }
+
+export interface CreditLimitApprovalRequest {
+  id: string;
+  request_code: string;
+  customer_id: string;
+  customer_code: string;
+  customer_name: string;
+  company_name?: string;
+  entity_type: 'ENTERPRISE' | 'HOUSEHOLD_BUSINESS' | 'INDIVIDUAL';
+  current_limit: number;
+  requested_limit: number;
+  reason: string;
+  status: 'PENDING_SALES_DIR' | 'PENDING_CHIEF_ACCOUNTANT' | 'PENDING_CEO' | 'APPROVED' | 'REJECTED';
+  rejection_reason?: string;
+  sales_director_approval?: { approver_name: string; approved_at: string; status: 'APPROVED' | 'REJECTED'; note?: string };
+  chief_accountant_approval?: { approver_name: string; approved_at: string; status: 'APPROVED' | 'REJECTED'; note?: string };
+  ceo_approval?: { approver_name: string; approved_at: string; status: 'APPROVED' | 'REJECTED'; note?: string };
+  created_at: string;
+  updated_at: string;
+}
+

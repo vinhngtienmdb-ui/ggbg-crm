@@ -21,7 +21,7 @@ interface ChannelAnalyticsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   leads: Lead[];
-  onTriggerTestWebhook: () => void;
+  onTriggerTestWebhook?: () => void;
 }
 
 export default function ChannelAnalyticsDrawer({

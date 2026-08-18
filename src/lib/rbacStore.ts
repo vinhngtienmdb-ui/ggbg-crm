@@ -7,7 +7,7 @@ export const CORE_12_PERMISSIONS: { key: GranularPermission; name: string; categ
   { key: 'leads:delete', name: 'Xóa Lead', category: 'Phân Hệ Lead', description: 'Xóa bớt Lead khỏi danh sách quản lý' },
   { key: 'leads:assign', name: 'Phân Bổ Lead (Assign)', category: 'Phân Hệ Lead', description: 'Gán Lead cho nhân sự Sales Exec trong đội' },
 
-  { key: 'customers:read', name: 'Xem Khách Hàng 360°', category: 'Phân Hệ Khách Hàng', description: 'Xem hồ sơ 360° Doanh nghiệp & Cá nhân' },
+  { key: 'customers:read', name: 'Xem Hồ Sơ Khách Hàng', category: 'Phân Hệ Khách Hàng', description: 'Xem thông tin Doanh nghiệp, Hộ kinh doanh & Cá nhân' },
   { key: 'customers:edit', name: 'Sửa Hồ Sơ Khách Hàng', category: 'Phân Hệ Khách Hàng', description: 'Chỉnh sửa thông tin định danh MST, CCCD, KYC' },
   { key: 'customers:export', name: 'Xuất Dữ Liệu Excel', category: 'Phân Hệ Khách Hàng', description: 'Xuất danh sách khách hàng ra tệp Excel' },
 

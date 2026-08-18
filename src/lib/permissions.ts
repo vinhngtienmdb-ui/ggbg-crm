@@ -290,7 +290,7 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         ],
       },
       {
-        name: 'Đánh Giá 360°',
+        name: 'Đánh Giá Đa Chiều',
         href: '/reviews',
         iconName: 'UserCog',
         moduleKey: 'reviews',
@@ -409,3 +409,11 @@ export function getFilteredMenuClusters(role: UserRole, toggles: ModuleToggles):
     };
   }).filter((group) => group.items.length > 0);
 }
+
+export function canViewPII(role?: UserRole, isSuperAdmin?: boolean): boolean {
+  if (isSuperAdmin || role === 'SUPER_ADMIN' || role === 'DIRECTOR' || role === 'HR_MANAGER' || role === 'AUDITOR') {
+    return true;
+  }
+  return false;
+}
+

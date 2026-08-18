@@ -4,9 +4,45 @@ import {
   WebhookConfig,
   SecuritySystemConfig,
   ConfigAuditLog,
-  BrandingConfig
+  BrandingConfig,
+  CustomerTierRuleConfig
 } from '@/types';
 import { DEFAULT_BRANDING } from '@/context/BrandingContext';
+
+export const DEFAULT_CUSTOMER_TIER_RULES: CustomerTierRuleConfig[] = [
+  {
+    tier: 'Standard',
+    tier_name: 'Tiêu Chuẩn (Standard)',
+    min_ltv: 0,
+    min_active_contracts: 0,
+    color_badge: 'bg-slate-100 text-slate-700 border-slate-200',
+    description: 'Hạng khách hàng mới tiếp nhận hoặc LTV < 20 triệu VNĐ.',
+  },
+  {
+    tier: 'Silver',
+    tier_name: 'Bạc (Silver)',
+    min_ltv: 20000000,
+    min_active_contracts: 1,
+    color_badge: 'bg-blue-50 text-blue-700 border-blue-200',
+    description: 'Khách hàng có tổng chi tiêu LTV từ 20 triệu VNĐ trở lên.',
+  },
+  {
+    tier: 'Gold',
+    tier_name: 'Vàng (Gold)',
+    min_ltv: 50000000,
+    min_active_contracts: 2,
+    color_badge: 'bg-amber-50 text-amber-800 border-amber-200',
+    description: 'Khách hàng thân thiết có LTV từ 50 triệu VNĐ trở lên.',
+  },
+  {
+    tier: 'VIP',
+    tier_name: 'VIP / Kim Cương (VIP)',
+    min_ltv: 100000000,
+    min_active_contracts: 3,
+    color_badge: 'bg-purple-50 text-purple-800 border-purple-200',
+    description: 'Đối tác chiến lược trọng điểm có LTV từ 100 triệu VNĐ trở lên.',
+  },
+];
 
 export interface SystemConfig {
   r2: {
@@ -38,6 +74,7 @@ export interface SystemConfig {
   webhook: WebhookConfig;
   security: SecuritySystemConfig;
   branding: BrandingConfig;
+  customer_tier_rules: CustomerTierRuleConfig[];
   audit_logs: ConfigAuditLog[];
 }
 
@@ -97,6 +134,7 @@ const DEFAULT_CONFIG: SystemConfig = {
     notify_on_kpi_deadline: true,
     notify_on_employee_onboard: true,
   },
+  customer_tier_rules: DEFAULT_CUSTOMER_TIER_RULES,
   security: {
     max_file_size_mb: 50,
     session_timeout_mins: 120,
@@ -178,4 +216,22 @@ export function saveSystemConfig(newConfig: SystemConfig, actorName: string = 'S
   }
   return currentConfig;
 }
+
+export function getCustomerTierRules(): CustomerTierRuleConfig[] {
+  const config = getSystemConfig();
+  return config.customer_tier_rules && config.customer_tier_rules.length > 0
+    ? config.customer_tier_rules
+    : DEFAULT_CUSTOMER_TIER_RULES;
+}
+
+export function saveCustomerTierRules(rules: CustomerTierRuleConfig[], actorName: string = 'Super Admin'): CustomerTierRuleConfig[] {
+  const config = getSystemConfig();
+  const updated = {
+    ...config,
+    customer_tier_rules: rules,
+  };
+  saveSystemConfig(updated, actorName, 'Cập nhật bảng quy tắc phân hạng khách hàng');
+  return rules;
+}
+
 

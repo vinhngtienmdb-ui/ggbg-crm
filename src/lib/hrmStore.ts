@@ -21,10 +21,99 @@ import {
   BhxhParticipationStatus,
   EmailTemplateType,
   HolidayDefinition,
-  WeekendPolicySettings
+  WeekendPolicySettings,
+  HrmCustomFieldDefinition,
+  JobTitleDefinition
 } from '@/types';
 
 export const INITIAL_EMPLOYEES: EmployeeProfile[] = [
+  {
+    id: 'e_ceo',
+    gender: 'Nam', date_of_birth: '1985-08-10', nationality: 'Việt Nam',
+    education_level: 'Thạc sĩ', skill_level: 'Bậc 5/5',
+    bhxh_status: 'Đang tham gia', base_salary: 85000000, probation_salary: 85000000, insurance_salary: 35000000,
+    salary_grade: 'G6', salary_grade_id: 'sg_g6', salary_step_number: 6, dependent_count: 2,
+    employee_code: 'NV-00001',
+    full_name: 'Nguyễn Hoàng Long',
+    email: 'long.nh@ggbingo.vn',
+    phone: '0903 888 999',
+    department: 'Ban Giám Đốc',
+    team: 'Hội Đồng Quản Trị',
+    position: 'Ban Giám Đốc',
+    job_title: 'Tổng Giám Đốc Điều Hành (CEO)',
+    joined_date: '2020-01-01',
+    status: 'Active',
+    contract_number: 'HĐLĐ-2020/001',
+    contract_type: 'Chính thức',
+    contract_file_r2: 'storage.ggbingo.vn/contracts/HDLD_NV00001.pdf',
+    created_at: '2020-01-01',
+  },
+  {
+    id: 'e_dir_sales',
+    gender: 'Nam', date_of_birth: '1988-11-22', nationality: 'Việt Nam',
+    education_level: 'Thạc sĩ', skill_level: 'Bậc 5/5',
+    bhxh_status: 'Đang tham gia', base_salary: 55000000, probation_salary: 55000000, insurance_salary: 28000000,
+    salary_grade: 'G6', salary_grade_id: 'sg_g6', salary_step_number: 3, dependent_count: 1,
+    employee_code: 'NV-00002',
+    full_name: 'Phạm Minh Đức',
+    email: 'duc.pm@ggbingo.vn',
+    phone: '0912 999 888',
+    department: 'Ban Giám Đốc',
+    team: 'Khối Kinh Doanh',
+    position: 'Giám Đốc Khối',
+    job_title: 'Giám Đốc Khối Kinh Doanh & Tiếp Thị (CSO)',
+    joined_date: '2021-03-15',
+    status: 'Active',
+    contract_number: 'HĐLĐ-2021/010',
+    contract_type: 'Chính thức',
+    contract_file_r2: 'storage.ggbingo.vn/contracts/HDLD_NV00002.pdf',
+    direct_manager_name: 'Nguyễn Hoàng Long (Tổng Giám Đốc Điều Hành)',
+    created_at: '2021-03-15',
+  },
+  {
+    id: 'e_head_sales1',
+    gender: 'Nam', date_of_birth: '1990-05-18', nationality: 'Việt Nam',
+    education_level: 'Đại học', skill_level: 'Bậc 4/5',
+    bhxh_status: 'Đang tham gia', base_salary: 38000000, probation_salary: 38000000, insurance_salary: 20000000,
+    salary_grade: 'G5', salary_grade_id: 'sg_g5', salary_step_number: 4, dependent_count: 1,
+    employee_code: 'NV-00005',
+    full_name: 'Đỗ Quốc Bảo',
+    email: 'bao.dq@ggbingo.vn',
+    phone: '0934 567 890',
+    department: 'Phòng Kinh Doanh 1',
+    team: 'Ban Quản Lý Sale 1',
+    position: 'Trưởng Phòng',
+    job_title: 'Trưởng Phòng Kinh Doanh 1',
+    joined_date: '2022-02-01',
+    status: 'Active',
+    contract_number: 'HĐLĐ-2022/025',
+    contract_type: 'Chính thức',
+    contract_file_r2: 'storage.ggbingo.vn/contracts/HDLD_NV00005.pdf',
+    direct_manager_name: 'Phạm Minh Đức (Giám Đốc Khối Kinh Doanh)',
+    created_at: '2022-02-01',
+  },
+  {
+    id: 'e_head_ops',
+    gender: 'Nam', date_of_birth: '1989-07-12', nationality: 'Việt Nam',
+    education_level: 'Đại học', skill_level: 'Bậc 4/5',
+    bhxh_status: 'Đang tham gia', base_salary: 36000000, probation_salary: 36000000, insurance_salary: 20000000,
+    salary_grade: 'G5', salary_grade_id: 'sg_g5', salary_step_number: 3, dependent_count: 1,
+    employee_code: 'NV-00006',
+    full_name: 'Vũ Nam Khánh',
+    email: 'khanh.vn@ggbingo.vn',
+    phone: '0978 112 233',
+    department: 'Phòng Vận Hành TMĐT',
+    team: 'Ban Quản Lý Vận Hành',
+    position: 'Trưởng Phòng',
+    job_title: 'Trưởng Phòng Vận Hành TMĐT',
+    joined_date: '2022-04-15',
+    status: 'Active',
+    contract_number: 'HĐLĐ-2022/045',
+    contract_type: 'Chính thức',
+    contract_file_r2: 'storage.ggbingo.vn/contracts/HDLD_NV00006.pdf',
+    direct_manager_name: 'Nguyễn Hoàng Long (Tổng Giám Đốc Điều Hành)',
+    created_at: '2022-04-15',
+  },
   {
     id: 'e1',
     gender: 'Nam', date_of_birth: '1992-04-12', nationality: 'Việt Nam',
@@ -561,18 +650,6 @@ export function deleteGradeLevel(id: string): boolean {
 }
 
 // ==================== 3. CHỨC DANH CHUYÊN MÔN (JOB TITLES) ====================
-export interface JobTitleDefinition {
-  id: string;
-  code: string;
-  name: string;
-  position_name: string;
-  grade_code: string;
-  department: string;
-  rank_level: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 export const INITIAL_JOB_TITLES: JobTitleDefinition[] = [
   { id: 'jt_1', code: 'DIR_SALES', name: 'Giám Đốc Kinh Doanh', position_name: 'Giám Đốc', grade_code: 'G1', department: 'Phòng Kinh Doanh 1', rank_level: 1, description: 'Chịu trách nhiệm chiến lược doanh số toàn công ty', is_active: true, created_at: '2025-01-01' },
@@ -580,7 +657,7 @@ export const INITIAL_JOB_TITLES: JobTitleDefinition[] = [
   { id: 'jt_3', code: 'MGR_SALES', name: 'Trưởng Phòng Kinh Doanh', position_name: 'Trưởng Phòng', grade_code: 'G2', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý phòng kinh doanh & điều phối KPI đội nhóm', is_active: true, created_at: '2025-01-01' },
   { id: 'jt_4', code: 'LEAD_SALES', name: 'Trưởng Nhóm Sale', position_name: 'Trưởng Nhóm', grade_code: 'G3', department: 'Phòng Kinh Doanh 1', rank_level: 2, description: 'Quản lý đội sale & giao chỉ tiêu GMV hàng tháng', is_active: true, created_at: '2025-01-01' },
   { id: 'jt_5', code: 'EXEC_SALES', name: 'Chuyên Viên Sale', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G4', department: 'Phòng Kinh Doanh 1', rank_level: 3, description: 'Chăm sóc Lead & tư vấn chốt hợp đồng', is_active: true, created_at: '2025-01-01' },
-  { id: 'jt_6', code: 'MGR_HR', name: 'Quản Lý HR', position_name: 'Trưởng Phòng', grade_code: 'G2', department: 'Phòng Nhân Sự (HR)', rank_level: 2, description: 'Quản lý hồ sơ nhân sự, tuyển dụng & đánh giá 360°', is_active: true, created_at: '2025-01-01' },
+  { id: 'jt_6', code: 'MGR_HR', name: 'Quản Lý HR', position_name: 'Trưởng Phòng', grade_code: 'G2', department: 'Phòng Nhân Sự (HR)', rank_level: 2, description: 'Quản lý hồ sơ nhân sự, tuyển dụng & đánh giá đa chiều', is_active: true, created_at: '2025-01-01' },
   { id: 'jt_7', code: 'SPEC_CSKH', name: 'Specialist CSKH', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G5', department: 'Phòng CSKH', rank_level: 3, description: 'Tiếp nhận live chat đa kênh & hỗ trợ khách hàng', is_active: true, created_at: '2025-01-01' },
   { id: 'jt_8', code: 'SPEC_OPS', name: 'Chuyên Viên Tối Ưu Gian Hàng', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G4', department: 'Phòng Vận Hành TMĐT', rank_level: 3, description: 'Quản lý gian hàng Shopee, TikTok Shop, Lazada', is_active: true, created_at: '2025-01-01' },
   { id: 'jt_9', code: 'AUDITOR_SYS', name: 'Chuyên Viên Kiểm Toán', position_name: 'Chuyên Viên / Nhân Viên', grade_code: 'G4', department: 'Phòng Kiểm Toán & An Ninh', rank_level: 3, description: 'Kiểm tra nhật ký hệ thống & bảo mật dữ liệu', is_active: true, created_at: '2025-01-01' },
@@ -745,6 +822,153 @@ export function getSalaryStep(gradeIdOrCode: string, stepNumber: number): Salary
   const grade = salaryGrades.find((g) => g.id === gradeIdOrCode || g.code === gradeIdOrCode);
   if (!grade) return undefined;
   return grade.steps.find((s) => s.step_number === stepNumber);
+}
+
+// ==================== MA TRẬN ĐỒNG BỘ: PHÒNG BAN ➔ CHỨC DANH ➔ NGẠCH BẬC LƯƠNG ====================
+export const INITIAL_DEPARTMENTS: string[] = [
+  'Phòng Kinh Doanh 1',
+  'Phòng Kinh Doanh 2',
+  'Phòng CSKH',
+  'Phòng Marketing',
+  'Phòng Vận Hành TMĐT',
+  'Phòng Kỹ Thuật & Công Nghệ',
+  'Phòng Tài Chính - Kế Toán',
+  'Khối Nhân Sự (HRM)',
+  'Phòng Kiểm Toán & An Ninh',
+  'Ban Giám Đốc GGBG CRM'
+];
+
+export function getDepartmentsList(): string[] {
+  const set = new Set<string>(INITIAL_DEPARTMENTS);
+  jobTitles.forEach((jt) => {
+    if (jt.department) set.add(jt.department);
+  });
+  employees.forEach((emp) => {
+    if (emp.department) set.add(emp.department);
+  });
+  return Array.from(set);
+}
+
+export function getJobTitlesByDepartment(departmentName?: string): JobTitleDefinition[] {
+  if (!departmentName || departmentName === 'ALL') return jobTitles;
+  const filtered = jobTitles.filter((jt) => jt.department === departmentName);
+  return filtered.length > 0 ? filtered : jobTitles;
+}
+
+export function getSalaryGradeByJobTitle(jobTitleIdOrName: string): SalaryGradeScale | undefined {
+  const targetJt = jobTitles.find(
+    (jt) => jt.id === jobTitleIdOrName || jt.name === jobTitleIdOrName || jt.code === jobTitleIdOrName
+  );
+  if (!targetJt) return undefined;
+  return salaryGrades.find((g) => g.code === targetJt.grade_code);
+}
+
+export function calculateSalaryFromGradeStep(gradeIdOrCode: string, stepNumber: number = 1) {
+  const grade = salaryGrades.find((g) => g.id === gradeIdOrCode || g.code === gradeIdOrCode) || salaryGrades[0];
+  const step = grade.steps.find((s) => s.step_number === stepNumber) || grade.steps[0];
+  const baseSalary = step ? step.base_salary : 18000000;
+  const insuranceSalary = step ? step.insurance_salary : 11000000;
+  const probationSalary = Math.round(baseSalary * 0.85);
+  const coefficient = step ? step.coefficient : 1.0;
+  const stepName = step ? step.step_name : `Bậc ${stepNumber}`;
+
+  return {
+    gradeId: grade.id,
+    gradeCode: grade.code,
+    gradeName: grade.name,
+    stepNumber: step ? step.step_number : stepNumber,
+    stepName,
+    coefficient,
+    baseSalary,
+    insuranceSalary,
+    probationSalary,
+  };
+}
+
+// ==================== HỆ THỐNG TRƯỜNG TÙY BIẾN (CUSTOM FIELDS ENGINE) ====================
+export const INITIAL_CUSTOM_FIELDS: HrmCustomFieldDefinition[] = [
+  {
+    id: 'cf_1',
+    field_key: 'nickname_work',
+    label: 'Biệt Danh / Nickname Làm Việc',
+    target_tab: 'WORK_INFO',
+    data_type: 'TEXT',
+    placeholder: 'VD: Alex Hoàng, Sarah Mai...',
+    is_required: false,
+    is_active: true,
+  },
+  {
+    id: 'cf_2',
+    field_key: 'work_laptop_serial',
+    label: 'Mã Số Máy Tính Cấp Phát (Asset Tag)',
+    target_tab: 'WORK_INFO',
+    data_type: 'TEXT',
+    placeholder: 'VD: LAP-2026-0948',
+    is_required: false,
+    is_active: true,
+  },
+  {
+    id: 'cf_3',
+    field_key: 'language_cert',
+    label: 'Chứng Chỉ Ngoại Ngữ Cao Nhất',
+    target_tab: 'OTHER_INFO',
+    data_type: 'SELECT',
+    options: ['TOEIC 850+', 'IELTS 7.0+', 'HSK 5 (Tiếng Trung)', 'JLPT N2 (Tiếng Nhật)', 'Không có'],
+    is_required: false,
+    is_active: true,
+  },
+  {
+    id: 'cf_4',
+    field_key: 'emergency_hospital',
+    label: 'Bệnh Viện Chỉ Định Cấp Cứu Khi Khẩn Cấp',
+    target_tab: 'PERSONAL_HISTORY',
+    data_type: 'TEXT',
+    placeholder: 'VD: BV Đại Học Y Hà Nội, BV Chợ Rẫy...',
+    is_required: false,
+    is_active: true,
+  },
+];
+
+let customFieldsList = [...INITIAL_CUSTOM_FIELDS];
+
+export function getHrmCustomFields(): HrmCustomFieldDefinition[] {
+  if (typeof window === 'undefined') return customFieldsList;
+  try {
+    const raw = localStorage.getItem('ggbg_hrm_custom_fields');
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem('ggbg_hrm_custom_fields', JSON.stringify(customFieldsList));
+    return customFieldsList;
+  } catch {
+    return customFieldsList;
+  }
+}
+
+export function saveHrmCustomField(field: HrmCustomFieldDefinition): HrmCustomFieldDefinition {
+  const current = getHrmCustomFields();
+  const idx = current.findIndex((f) => f.id === field.id || f.field_key === field.field_key);
+  let updated: HrmCustomFieldDefinition[];
+  if (idx !== -1) {
+    updated = current.map((f, i) => (i === idx ? field : f));
+  } else {
+    updated = [field, ...current];
+  }
+  customFieldsList = updated;
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('ggbg_hrm_custom_fields', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('ggbg_hrm_custom_fields_updated', { detail: updated }));
+  }
+  return field;
+}
+
+export function deleteHrmCustomField(id: string): boolean {
+  const current = getHrmCustomFields();
+  const updated = current.filter((f) => f.id !== id);
+  customFieldsList = updated;
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('ggbg_hrm_custom_fields', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('ggbg_hrm_custom_fields_updated', { detail: updated }));
+  }
+  return true;
 }
 
 // ==================== 4. DANH MỤC PHỤ CẤP CÔNG TY & ĐỊNH MỨC MIỄN TRỪ (ALLOWANCE CATALOG) ====================

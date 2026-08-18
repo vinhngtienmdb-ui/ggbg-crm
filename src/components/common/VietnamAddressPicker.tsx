@@ -188,5 +188,5 @@ export default function VietnamAddressPicker({
           placeholder="VD: Số 188 Nguyễn Trãi, Tòa A..."
           className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 disabled:bg-slate-100"
         /> </div> {/* Full Formatted Address Preview */}
-      {currentFullAddress && ( <div className="p-2.5 bg-white border border-red-200/80 rounded-xl flex items-center gap-2"> <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" /> <div className="overflow-hidden"> <span className="text-[11px] font-medium text-slate-500 block">Địa chỉ chuẩn hoá (API tinhthanhpho.com):</span> <span className="font-medium text-slate-900 truncate block">{currentFullAddress}</span> </div> </div> )} </div> );
+      {currentFullAddress && ( <div className="p-2.5 bg-white border border-red-200/80 rounded-xl flex items-center gap-2"> <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" /> <div className="overflow-hidden"> <span className="text-[11px] font-medium text-slate-500 block">Địa chỉ chuẩn hoá:</span> <span className="font-medium text-slate-900 truncate block">{currentFullAddress}</span> </div> </div> )} </div> );
 }

@@ -14,8 +14,9 @@ import {
   ArrowRight,
   Filter
 } from 'lucide-react';
-import { Lead, BulkImportRow, CustomerEntityType, LeadSource } from '@/types';
+import { Lead, BulkImportRow, CustomerEntityType, LeadSource, Customer } from '@/types';
 import { formatCurrency } from '@/lib/formatters';
+import { getStoredCustomers, saveStoredCustomers } from '@/lib/customerStore';
 
 interface BulkLeadImportModalProps {
   isOpen: boolean;
@@ -146,14 +147,57 @@ export default function BulkLeadImportModal({
       'Phạm Minh Đức',
     ];
 
+    const currentCusts = getStoredCustomers();
+    const newCustomersToSave: Customer[] = [];
+
     const newLeads: Lead[] = rowsToImport.map((row, idx) => {
       const assignedSale = salesList[idx % salesList.length];
       const leadScore = Math.floor(75 + Math.random() * 20);
       const newCode = `LD-IMP-${1050 + idx}`;
+      const custId = `cust_imp_${Date.now()}_${idx}`;
+      const nextCustCode = `KH-${1000 + currentCusts.length + idx + 1}`;
+
+      const newCust: Customer = {
+        id: custId,
+        customer_code: nextCustCode,
+        name: row.full_name,
+        entity_type: 'ENTERPRISE',
+        company_name: row.company_name || 'Doanh Nghiệp Import',
+        phone: row.phone,
+        email: row.email || `${newCode.toLowerCase()}@import.vn`,
+        contacts: [
+          {
+            id: `c_imp_${Date.now()}_${idx}`,
+            name: row.full_name,
+            role_title: 'Đại Diện Doanh Nghiệp',
+            phone: row.phone,
+            email: row.email || '',
+            is_primary: true,
+          },
+        ],
+        tier: 'Standard',
+        tier_auto_updated_at: new Date().toISOString().substring(0, 10),
+        lifecycle_stage: 'Prospect',
+        lifecycle_auto_updated_at: new Date().toISOString().substring(0, 10),
+        lifecycle_reason: `Import tự động từ file Lead [${newCode}]`,
+        health_score: 100,
+        ltv_total_spent: 0,
+        owner_name: assignedSale,
+        credit_limit_info: {
+          approved_limit: 0,
+          status: 'NOT_SET',
+          reason: 'Lead import mới, chưa phát sinh công nợ',
+        },
+        kyc_status: 'PENDING',
+        tags: ['Import File', 'Phễu Lead'],
+        created_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      };
+      newCustomersToSave.push(newCust);
 
       return {
         id: `lead_imp_${Date.now()}_${idx}`,
         lead_code: newCode,
+        customer_id: custId,
         full_name: row.full_name,
         entity_type: 'ENTERPRISE',
         phone: row.phone,
@@ -170,6 +214,10 @@ export default function BulkLeadImportModal({
         created_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
       };
     });
+
+    if (newCustomersToSave.length > 0) {
+      saveStoredCustomers([...newCustomersToSave, ...currentCusts]);
+    }
 
     onImportSuccess(newLeads);
     onClose();

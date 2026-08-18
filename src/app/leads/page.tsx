@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   UserCheck,
   Plus,
@@ -28,6 +29,7 @@ import {
   Flame,
   Check,
   User,
+  Store,
   BadgeCheck,
   LayoutGrid,
   List,
@@ -38,19 +40,24 @@ import {
   FilterX,
   FileSpreadsheet,
   BarChart3,
-  Zap
+  Zap,
+  ArrowUpRight,
+  ExternalLink,
+  Users,
+  Layers
 } from 'lucide-react';
 import { Lead, VoIPCallLog, LeadSource, Customer, CustomerEntityType } from '@/types';
 import VietnamAddressPicker, { VietnamAddressValue } from '@/components/common/VietnamAddressPicker';
 import { INITIAL_PRODUCTS } from '@/lib/productStore';
 import { formatFullAddressPost2025 } from '@/lib/locationService';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatNumber } from '@/lib/formatters';
 import dynamic from 'next/dynamic';
+import { getStoredCustomers, saveStoredCustomers } from '@/lib/customerStore';
+import LeadFullPageDetail from '@/components/leads/LeadFullPageDetail';
 
 const BulkLeadImportModal = dynamic(() => import('@/components/leads/BulkLeadImportModal'), { ssr: false });
 const ChannelAnalyticsDrawer = dynamic(() => import('@/components/leads/ChannelAnalyticsDrawer'), { ssr: false });
 import LeadAnalyticsDashboard from '@/components/leads/LeadAnalyticsDashboard';
-import { ModuleBanner, ViewModeSwitcher } from '@/components/ui';
 
 interface StageDefinition {
   id: string;
@@ -79,32 +86,94 @@ export interface LeadStageLog {
   note?: string;
 }
 
-const INITIAL_CUSTOMERS_LIST: Customer[] = [];
-const initialLeads: Lead[] = [];
-const INITIAL_LOGS: LeadStageLog[] = [];
-
-const SALES_REPS = [
-  'Trần Văn Hoàng',
-  'Nguyễn Quốc Tuấn',
-  'Lê Thị Mai',
-  'Phạm Minh Đức',
+const INITIAL_SAMPLE_LEADS: Lead[] = [
+  {
+    id: 'lead_01',
+    lead_code: 'LD-1001',
+    customer_id: 'cust_01',
+    full_name: 'Nguyễn Văn Hùng',
+    entity_type: 'ENTERPRISE',
+    company_name: 'Công Ty Cổ Phần Công Nghệ & Thương Mại Alpha',
+    tax_code: '0108992384',
+    phone: '0912345678',
+    email: 'contact@alphatech.vn',
+    interested_product_id: 'p1',
+    interested_product_name: 'Gói Vận Hành Gian Hàng TMĐT Toàn Diện',
+    address: 'Tầng 12, Keangnam Landmark 72, Nam Từ Liêm, Hà Nội',
+    source_name: 'Facebook Ads',
+    pipeline_id: 'AGENCY',
+    stage_id: 'stage_6',
+    stage_name: '6. Chốt Thành Công',
+    assigned_sale_name: 'Trần Văn Hoàng (Đội 1)',
+    estimated_budget: 145000000,
+    lead_score: 95,
+    status: 'Converted',
+    kyc_status: 'VERIFIED',
+    created_at: '2026-08-01 10:00',
+  },
+  {
+    id: 'lead_02',
+    lead_code: 'LD-1002',
+    customer_id: 'cust_02',
+    full_name: 'Vũ Đình Trọng',
+    entity_type: 'HOUSEHOLD_BUSINESS',
+    company_name: 'Hộ Kinh Doanh Thời Trang May Mặc Trọng Phát',
+    tax_code: '8392019283',
+    phone: '0903456789',
+    email: 'trongphat.fashion@gmail.com',
+    interested_product_id: 'p2',
+    interested_product_name: 'Gói Livestream TikTok Shop & KOC Booking',
+    address: 'Số 45 Phố Huế, Phường Hàng Bài, Hoàn Kiếm, Hà Nội',
+    source_name: 'Google Ads',
+    pipeline_id: 'AGENCY',
+    stage_id: 'stage_3',
+    stage_name: '3. Tư Vấn Giải Pháp',
+    assigned_sale_name: 'Nguyễn Quốc Tuấn (Đội 2)',
+    estimated_budget: 65000000,
+    lead_score: 82,
+    status: 'Contacted',
+    kyc_status: 'PENDING',
+    created_at: '2026-08-10 14:30',
+  },
+  {
+    id: 'lead_03',
+    lead_code: 'LD-1003',
+    customer_id: 'cust_03',
+    full_name: 'Phạm Thu Thảo',
+    entity_type: 'INDIVIDUAL',
+    phone: '0978901234',
+    email: 'thuthao.pham@gmail.com',
+    interested_product_id: 'p3',
+    interested_product_name: 'Gói Chạy Quảng Cáo Shopee & Lazada Ads Tối Ưu ROI',
+    address: 'Chung cư Vinhomes Central Park, Bình Thạnh, TP.HCM',
+    source_name: 'Referral / Giới Thiệu',
+    pipeline_id: 'AGENCY',
+    stage_id: 'stage_1',
+    stage_name: '1. Tiếp Nhận Mới',
+    assigned_sale_name: 'Lê Thị Mai (Đội 3)',
+    estimated_budget: 35000000,
+    lead_score: 88,
+    status: 'New',
+    kyc_status: 'PENDING',
+    created_at: '2026-08-15 09:15',
+  }
 ];
 
 export default function LeadsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [stageLogs, setStageLogs] = useState<LeadStageLog[]>(INITIAL_LOGS);
-  const [existingCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS_LIST);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [stageLogs, setStageLogs] = useState<LeadStageLog[]>([]);
+  const [existingCustomers, setExistingCustomers] = useState<Customer[]>([]);
 
-  // VIEW MODE TOGGLE: CHUYỂN ĐỔI TỨC THỜI GIỮA KANBAN VÀ BẢNG TRÊN CÙNG 1 KHUNG NHÌN
-  const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
+  // VIEW MODE TOGGLE
+  const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST' | 'DETAIL'>('KANBAN');
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
   const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
   const [isChannelDrawerOpen, setIsChannelDrawerOpen] = useState(false);
 
-  // FILTER LOG BY SPECIFIC LEAD (GHI LOG VÀ LỌC LOG THEO TỪNG LEAD KHÁCH HÀNG)
   const [selectedLeadLogFilter, setSelectedLeadLogFilter] = useState<string>('ALL');
-
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState<string>('ALL');
   const [selectedRepFilter, setSelectedRepFilter] = useState<string>('ALL');
@@ -131,7 +200,7 @@ export default function LeadsPage() {
   const [assignedSaleName, setAssignedSaleName] = useState('Trần Văn Hoàng (Đội 1)');
   const [formError, setFormError] = useState('');
 
-  // Vietnam Administrative Units Address State (Post-01/07/2025 Structure)
+  // Vietnam Administrative Units Address State
   const [addressData, setAddressData] = useState<VietnamAddressValue>({
     provinceCode: '01',
     provinceName: 'Thành phố Hà Nội',
@@ -140,6 +209,37 @@ export default function LeadsPage() {
     detailAddress: 'Số 188 Nguyễn Trãi',
     fullAddress: 'Số 188 Nguyễn Trãi, Phường Thượng Đình, Thành phố Hà Nội',
   });
+
+  // Load Customers & Leads on mount and listen to changes
+  useEffect(() => {
+    // 1. Load customers from customerStore
+    const custs = getStoredCustomers();
+    setExistingCustomers(custs);
+
+    // 2. Load leads from localStorage or default
+    const savedLeads = localStorage.getItem('ggbg_crm_leads');
+    if (savedLeads) {
+      try {
+        setLeads(JSON.parse(savedLeads));
+      } catch {
+        setLeads(INITIAL_SAMPLE_LEADS);
+      }
+    } else {
+      setLeads(INITIAL_SAMPLE_LEADS);
+      localStorage.setItem('ggbg_crm_leads', JSON.stringify(INITIAL_SAMPLE_LEADS));
+    }
+
+    const handleCustomerUpdate = () => {
+      setExistingCustomers(getStoredCustomers());
+    };
+    window.addEventListener('ggbg_customers_updated', handleCustomerUpdate);
+    return () => window.removeEventListener('ggbg_customers_updated', handleCustomerUpdate);
+  }, []);
+
+  const saveLeadsToStorage = (updatedLeads: Lead[]) => {
+    setLeads(updatedLeads);
+    localStorage.setItem('ggbg_crm_leads', JSON.stringify(updatedLeads));
+  };
 
   // AUTO CREATE LEAD FROM CUSTOMER DIRECTORY LISTENER
   useEffect(() => {
@@ -156,12 +256,12 @@ export default function LeadsPage() {
           setFullName(pending.name || '');
           setPhone(pending.phone || '');
           setEmail(pending.email || '');
-          setCompanyName(pending.company_name || '');
-          setTaxCode(pending.tax_code || '');
+          setCompanyName(pending.company_name || pending.household_name || '');
+          setTaxCode(pending.tax_code || pending.household_reg_num || '');
           setIdCardNumber(pending.id_card_number || '');
           setIsAddModalOpen(true);
 
-          setSuccessToast(` Đã tự động lấy thông tin từ Khách Hàng [${pending.customer_code}] ${pending.name}!`);
+          setSuccessToast(`✓ Đã tự động nạp thông tin từ Khách Hàng [${pending.customer_code}] ${pending.name}!`);
           setTimeout(() => setSuccessToast(''), 5000);
         } catch {
           // ignore
@@ -201,8 +301,8 @@ export default function LeadsPage() {
     setFullName(cust.name);
     setPhone(cust.phone);
     setEmail(cust.email || '');
-    setCompanyName(cust.company_name || '');
-    setTaxCode(cust.tax_code || '');
+    setCompanyName(cust.company_name || cust.household_name || '');
+    setTaxCode(cust.tax_code || cust.household_reg_num || '');
     setIdCardNumber(cust.id_card_number || '');
     setFormError('');
   };
@@ -213,7 +313,7 @@ export default function LeadsPage() {
     setIsLogDrawerOpen(true);
   };
 
-  // MOVE STAGE WITH CLEAR AUDIT LOGGING BY LEAD
+  // MOVE STAGE WITH CLEAR AUDIT LOGGING AND CUSTOMER STORE SYNC
   const moveLeadToStage = (leadId: string, targetStageId: string, customNote?: string) => {
     const targetStage = SEVEN_STAGES.find((s) => s.id === targetStageId);
     if (!targetStage) return;
@@ -224,18 +324,19 @@ export default function LeadsPage() {
     const fromStageName = currentLead.stage_name;
     const toStageName = targetStage.name;
 
-    setLeads((prev) => prev.map((l) => {
-        if (l.id === leadId) {
-          return {
-            ...l,
-            stage_id: targetStage.id,
-            stage_name: targetStage.name,
-            status: targetStageId === 'stage_6' ? 'Converted' : targetStageId === 'stage_7' ? 'Lost' : 'Contacted',
-          };
-        }
-        return l;
-      })
-    );
+    const updatedLeads = leads.map((l) => {
+      if (l.id === leadId) {
+        return {
+          ...l,
+          stage_id: targetStage.id,
+          stage_name: targetStage.name,
+          status: targetStageId === 'stage_6' ? ('Converted' as const) : targetStageId === 'stage_7' ? ('Lost' as const) : ('Contacted' as const),
+        };
+      }
+      return l;
+    });
+
+    saveLeadsToStorage(updatedLeads);
 
     // GHI LOG RIÊNG BIỆT THEO TỪNG LEAD CODE VÀ TÊN LEAD
     const newLog: LeadStageLog = {
@@ -248,79 +349,94 @@ export default function LeadsPage() {
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
       note: customNote || `Chuyển bước phễu xử lý sang ${toStageName}`,
     };
-
     setStageLogs((prev) => [newLog, ...prev]);
-    setSuccessToast(`Đã chuyển Lead [${currentLead.lead_code}] ${currentLead.full_name} sang [${toStageName}] và ghi nhận nhật ký!`);
+
+    // SYNC WITH CUSTOMER STORE IF CONVERTED (STAGE 6)
+    if (targetStageId === 'stage_6') {
+      const allCusts = getStoredCustomers();
+      let customerMatched = false;
+
+      const updatedCusts = allCusts.map((c) => {
+        if (c.id === currentLead.customer_id || c.phone.replace(/\D/g, '') === currentLead.phone.replace(/\D/g, '')) {
+          customerMatched = true;
+          return {
+            ...c,
+            lifecycle_stage: 'Active' as const,
+            lifecycle_auto_updated_at: new Date().toISOString().substring(0, 10),
+            lifecycle_reason: `Chốt hợp đồng thành công từ Lead [${currentLead.lead_code}]`,
+            ltv_total_spent: Math.max(c.ltv_total_spent || 0, currentLead.estimated_budget || 0),
+          };
+        }
+        return c;
+      });
+
+      if (customerMatched) {
+        saveStoredCustomers(updatedCusts);
+        setExistingCustomers(updatedCusts);
+      }
+    }
+
+    setSuccessToast(`Đã chuyển Lead [${currentLead.lead_code}] ${currentLead.full_name} sang [${toStageName}] và đồng bộ hồ sơ Khách Hàng!`);
     setTimeout(() => setSuccessToast(''), 4000);
   };
 
   const handleConvertLeadToVipCustomer = (lead: Lead) => {
     moveLeadToStage(lead.id, 'stage_6', 'Chuyển 1-Click thành Khách Hàng VIP');
+
+    // Nâng cấp trực tiếp thành VIP trong CustomerStore
+    const allCusts = getStoredCustomers();
+    const updatedCusts = allCusts.map((c) => {
+      if (c.id === lead.customer_id || c.phone.replace(/\D/g, '') === lead.phone.replace(/\D/g, '')) {
+        return {
+          ...c,
+          tier: 'VIP' as const,
+          tier_auto_updated_at: new Date().toISOString().substring(0, 10),
+          lifecycle_stage: 'VIP' as const,
+          lifecycle_auto_updated_at: new Date().toISOString().substring(0, 10),
+          lifecycle_reason: `Nâng hạng VIP trực tiếp từ Lead [${lead.lead_code}]`,
+          ltv_total_spent: Math.max(c.ltv_total_spent || 0, lead.estimated_budget || 100000000),
+        };
+      }
+      return c;
+    });
+    saveStoredCustomers(updatedCusts);
+    setExistingCustomers(updatedCusts);
   };
 
+  // SUBMIT CREATE LEAD & AUTO-LINK WITH CUSTOMER MODULE
   const handleAddLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
 
     if (!fullName.trim()) {
-      setFormError(' Bắt buộc nhập đầy đủ Họ và Tên Khách Hàng!');
+      setFormError('⚠️ Bắt buộc nhập đầy đủ Họ và Tên Khách Hàng!');
       return;
     }
 
     const cleanPhone = phone.replace(/\D/g, '');
     if (!phone.trim() || cleanPhone.length < 9) {
-      setFormError(' Bắt buộc nhập Số Điện Thoại hợp lệ (tối thiểu 9-10 chữ số)!');
+      setFormError('⚠️ Bắt buộc nhập Số Điện Thoại hợp lệ (tối thiểu 9-10 chữ số)!');
       return;
     }
 
     if (!email.trim() || !email.includes('@')) {
-      setFormError(' Bắt buộc nhập Email hợp lệ (ví dụ: khachhang@company.com)!');
-      return;
-    }
-
-    if (!companyName.trim()) {
-      setFormError(' Bắt buộc nhập Tên Doanh Nghiệp / Công Ty / Hộ Kinh Doanh!');
+      setFormError('⚠️ Bắt buộc nhập Email hợp lệ (ví dụ: khachhang@company.com)!');
       return;
     }
 
     if (entityType === 'ENTERPRISE' && !taxCode.trim()) {
-      setFormError(' Bắt buộc nhập Mã Số Thuế (MST) cho khách hàng Doanh Nghiệp!');
+      setFormError('⚠️ Bắt buộc nhập Mã Số Thuế (MST) cho khách hàng Doanh Nghiệp!');
       return;
     }
 
     if (entityType === 'INDIVIDUAL' && !idCardNumber.trim()) {
-      setFormError(' Bắt buộc nhập Số CCCD cho khách hàng Cá Nhân!');
+      setFormError('⚠️ Bắt buộc nhập Số CCCD cho khách hàng Cá Nhân!');
       return;
     }
 
     if (!selectedProductId) {
-      setFormError(' Bắt buộc chọn Sản Phẩm / Gói Dịch Vụ Khách Hàng Quan Tâm!');
+      setFormError('⚠️ Bắt buộc chọn Sản Phẩm / Gói Dịch Vụ Khách Hàng Quan Tâm!');
       return;
-    }
-
-    if (!addressData.provinceCode || !addressData.provinceName) {
-      setFormError(' Bắt buộc chọn Tỉnh / Thành Phố thuộc Cấu Hình Địa Chỉ Hành Chính 2 Cấp!');
-      return;
-    }
-
-    if (!addressData.wardCode || !addressData.wardName) {
-      setFormError(' Bắt buộc chọn Phường / Xã / Quận / Huyện thuộc Cấu Hình Địa Chỉ Hành Chính 2 Cấp!');
-      return;
-    }
-
-    if (!addressData.detailAddress || !addressData.detailAddress.trim()) {
-      setFormError(' Bắt buộc nhập Số Nhà / Tên Đường Địa Chỉ Chi Tiết!');
-      return;
-    }
-
-    if (addMode === 'CREATE_NEW') {
-      const phoneExistsInLeads = leads.some((l) => l.phone.replace(/\D/g, '') === cleanPhone);
-      const phoneExistsInCustomers = existingCustomers.some((c) => c.phone.replace(/\D/g, '') === cleanPhone);
-
-      if (phoneExistsInLeads || phoneExistsInCustomers) {
-        setFormError(` Số điện thoại [${phone}] đã tồn tại trong hệ thống Khách Hàng / Lead! Vui lòng chọn "Chọn Khách Hàng Hiện Hữu".`);
-        return;
-      }
     }
 
     const selectedProd = INITIAL_PRODUCTS.find((p) => p.id === selectedProductId);
@@ -330,10 +446,65 @@ export default function LeadsPage() {
     const newCode = `LD-${1031 + leads.length}`;
     const calculatedScore = Math.floor(75 + Math.random() * 20);
 
+    let linkedCustomerId = selectedCustomerId;
+
+    // TỰ ĐỘNG TẠO HỒ SƠ KHÁCH HÀNG MỚI NẾU CHƯA CÓ TRONG HỆ THỐNG
+    if (addMode === 'CREATE_NEW' || !linkedCustomerId) {
+      const currentCusts = getStoredCustomers();
+      const nextCustCode = `KH-${1000 + currentCusts.length + 1}`;
+      const newCustId = `cust_${Date.now()}`;
+
+      const newCustomer: Customer = {
+        id: newCustId,
+        customer_code: nextCustCode,
+        name: fullName.trim(),
+        entity_type: entityType,
+        company_name: entityType === 'ENTERPRISE' ? companyName.trim() : undefined,
+        household_name: entityType === 'HOUSEHOLD_BUSINESS' ? companyName.trim() : undefined,
+        tax_code: entityType === 'ENTERPRISE' ? taxCode.trim() : undefined,
+        household_reg_num: entityType === 'HOUSEHOLD_BUSINESS' ? taxCode.trim() : undefined,
+        id_card_number: entityType === 'INDIVIDUAL' ? idCardNumber.trim() : undefined,
+        phone: phone.trim(),
+        email: email.trim(),
+        address: formattedAddress,
+        contacts: [
+          {
+            id: `c_${Date.now()}`,
+            name: fullName.trim(),
+            role_title: entityType === 'ENTERPRISE' ? 'Đại Diện Doanh Nghiệp' : entityType === 'HOUSEHOLD_BUSINESS' ? 'Chủ Hộ Kinh Doanh' : 'Chủ Thể Cá Nhân',
+            phone: phone.trim(),
+            email: email.trim(),
+            is_primary: true,
+          },
+        ],
+        tier: 'Standard',
+        tier_auto_updated_at: new Date().toISOString().substring(0, 10),
+        lifecycle_stage: 'Prospect',
+        lifecycle_auto_updated_at: new Date().toISOString().substring(0, 10),
+        lifecycle_reason: `Khởi tạo tự động từ Lead [${newCode}] tiếp nhận qua kênh ${sourceName}`,
+        health_score: 100,
+        ltv_total_spent: 0,
+        owner_name: assignedSaleName,
+        credit_limit_info: {
+          approved_limit: 0,
+          status: 'NOT_SET',
+          reason: 'Lead mới tiếp nhận phễu bán hàng, chưa phát sinh công nợ',
+        },
+        kyc_status: 'PENDING',
+        tags: ['Tạo từ Phễu Lead', sourceName],
+        created_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      };
+
+      const updatedCusts = [newCustomer, ...currentCusts];
+      saveStoredCustomers(updatedCusts);
+      setExistingCustomers(updatedCusts);
+      linkedCustomerId = newCustId;
+    }
+
     const newLead: Lead = {
       id: `lead_${Date.now()}`,
       lead_code: newCode,
-      customer_id: selectedCustomerId || undefined,
+      customer_id: linkedCustomerId,
       full_name: fullName.trim(),
       entity_type: entityType,
       phone: phone.trim(),
@@ -356,7 +527,7 @@ export default function LeadsPage() {
       created_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
     };
 
-    setLeads([newLead, ...leads]);
+    saveLeadsToStorage([newLead, ...leads]);
 
     const createLog: LeadStageLog = {
       id: `log_${Date.now()}`,
@@ -371,7 +542,7 @@ export default function LeadsPage() {
     setStageLogs((prev) => [createLog, ...prev]);
 
     setIsAddModalOpen(false);
-    setSuccessToast(`🎉 Đã tạo thành công Lead ${fullName} (${newCode}) kèm Sản Phẩm & Địa Chỉ Hành Chính!`);
+    setSuccessToast(`🎉 Đã tạo Lead [${newCode}] và đồng bộ hồ sơ Khách Hàng [${fullName}] thành công!`);
 
     setFullName('');
     setPhone('');
@@ -387,312 +558,416 @@ export default function LeadsPage() {
 
   // HANDLE BULK IMPORT SUCCESS
   const handleBulkImportSuccess = (newImportedLeads: Lead[]) => {
-    setLeads((prev) => [...newImportedLeads, ...prev]);
-
-    // Create stage logs
-    const newLogs: LeadStageLog[] = newImportedLeads.map((l) => ({
-      id: `log_imp_${l.id}`,
-      lead_code: l.lead_code,
-      lead_name: l.full_name,
-      from_stage: 'Import Bulk Excel',
-      to_stage: '1. Tiếp Nhận Mới',
-      actor_name: 'Super Admin',
-      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      note: `Import từ file Excel hàng loạt. Gán cho ${l.assigned_sale_name}`,
-    }));
-
-    setStageLogs((prev) => [...newLogs, ...prev]);
-    setSuccessToast(`🎉 Đã nhập thành công ${newImportedLeads.length} Lead mới từ file Excel vào phễu!`);
-    setTimeout(() => setSuccessToast(''), 5000);
+    saveLeadsToStorage([...newImportedLeads, ...leads]);
+    setSuccessToast(`✓ Đã import thành công ${newImportedLeads.length} Lead và liên kết hồ sơ Khách Hàng!`);
+    setTimeout(() => setSuccessToast(''), 4000);
   };
 
-  // HANDLE TRIGGER TEST WEBHOOK INGEST
-  const handleTriggerTestWebhook = async () => {
-    try {
-      const res = await fetch('/api/leads/ingest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: 'Trần Bảo An (Landing Page)',
-          phone: '0988666888',
-          email: 'baoan.tran@beauty.vn',
-          company_name: 'Thương Hiệu Mỹ Phẩm Bảo An',
-          source_name: 'Website GGBingoVN',
-          estimated_budget: 180000000,
-          shop_link: 'shopee.vn/baoan_cosmetics',
-        }),
-      });
+  return (
+    <div className="space-y-6">
+      {/* Toast Notification */}
+      {successToast && (
+        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-500/40 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-3 duration-200">
+          <Sparkles className="w-4 h-4 text-blue-400" />
+          <span>{successToast}</span>
+          <button onClick={() => setSuccessToast('')} className="ml-2 hover:opacity-80">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
-      const data = await res.json();
-      if (data.success && data.data) {
-        const newLead = data.data as Lead;
-        setLeads((prev) => [newLead, ...prev]);
-        setSuccessToast(`⚡ Đã tiếp nhận Lead Webhook mới: ${newLead.full_name} (${newLead.lead_code}) từ Landing Page!`);
-        setTimeout(() => setSuccessToast(''), 5000);
-      }
-    } catch {
-      // fallback
-    }
-  };
-
-  const handleDragStart = (e: React.DragEvent, leadId: string) => {
-    e.dataTransfer.setData('text/plain', leadId);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
-    e.preventDefault();
-    const leadId = e.dataTransfer.getData('text/plain');
-    if (leadId) {
-      moveLeadToStage(leadId, stageId);
-    }
-  };
-
-  return ( <div className="space-y-6"> {/* Toast Notification */}
-      {successToast && ( <div className="p-4 rounded-xl bg-emerald-500 text-white font-medium text-xs shadow-xl flex items-center justify-between animate-in fade-in slide-in-from-top duration-300"> <div className="flex items-center gap-2"> <CheckCircle2 className="w-5 h-5" /> <span>{successToast}</span> </div> <button onClick={() => setSuccessToast('')} className="p-1 hover:bg-emerald-600 rounded-lg"> <X className="w-4 h-4" /> </button> </div> )}
-
-      {/* HEADER BANNER - THEO CHUẨN DASHBOARD */}
-      <ModuleBanner
-        badge={{
-          label: 'Hệ Thống Phễu Bán Hàng & Chăm Sóc Lead TMĐT',
-          icon: UserCheck,
-          variant: 'blue',
-        }}
-        title="Quản Lý Lead & Phễu Chuyển Đổi Khách Hàng"
-        subtitle="Quản lý khách hàng tiềm năng, tỷ lệ chốt đơn theo 7 giai đoạn, phân loại nguồn lead và luân chuyển phễu bán hàng"
-        kpis={[
-          { label: 'Tổng Số Lead', value: `${leads.length} Lead`, subtext: 'Trong hệ thống' },
-          { label: 'Đang Khảo Sát', value: `${leads.filter(l => l.stage_id === 'stage_2' || l.stage_id === 'stage_3').length} Gian hàng`, subtext: 'Tư vấn giải pháp' },
-          { label: 'Đã Ký Hợp Đồng', value: `${leads.filter(l => l.stage_id === 'stage_6').length} Chốt đơn`, subtext: 'Chuyển đổi VIP' },
-        ]}
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setIsChannelDrawerOpen(true)}
-              className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-purple-200 dark:border-purple-800 transition-colors"
-            >
-              <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span>Kênh Lead</span>
-            </button>
-            <button
-              onClick={() => setIsBulkImportModalOpen(true)}
-              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-800 transition-colors"
-            >
-              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Import Excel</span>
-            </button>
-            <button
-              onClick={() => {
-                setSelectedLeadLogFilter('ALL');
-                setIsLogDrawerOpen(true);
-              }}
-              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
-            >
-              <History className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Nhật Ký ({stageLogs.length})</span>
-            </button>
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Tạo Lead Mới</span>
-            </button>
+      {/* 1. TOP BANNER HEADER - THEO CHUẨN MODULE TỔNG QUAN */}
+      <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-900">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>Phân Hệ Phễu Bán Hàng & Chuyển Đổi Lead GGBingo CRM</span>
           </div>
-        }
-      />
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            Quản Lý Phễu Chuyển Đổi Lead 7 Bước
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-xs max-w-2xl leading-relaxed">
+            Liên kết đồng bộ 2 chiều với phân hệ Khách Hàng. Tự động khởi tạo hồ sơ Tiềm Năng (Prospect) khi tạo Lead và chuyển sang Active/VIP khi chốt hợp đồng.
+          </p>
+        </div>
 
-      {/* UNIFIED WORKSPACE CONTAINER: CÙNG 1 KHUNG NHÌN CHỨA CẢ TOOLBAR, BỘ LỌC VÀ CHUYỂN ĐỔI KANBAN / LIST */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden p-4 sm:p-5 space-y-4">
-        {/* UNIFIED TOOLBAR: SEARCH, FILTERS & VIEW MODE SWITCHER */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3 flex-wrap flex-1">
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm Mã Lead, Tên KH, SĐT, Doanh nghiệp..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
-              />
+        <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 p-3.5 sm:p-4 rounded-lg border border-slate-200 dark:border-slate-700 w-full lg:w-auto justify-between lg:justify-start">
+          <div>
+            <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Tỷ Lệ Chuyển Đổi Phễu</p>
+            <p className="text-base font-semibold text-emerald-600 dark:text-emerald-400 tabular-numbers">
+              {leads.length > 0 ? Math.round((leads.filter((l) => l.stage_id === 'stage_6').length / leads.length) * 100) : 0}% (Đạt Chỉ Tiêu)
+            </p>
+          </div>
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center shadow-xs ring-2 ring-emerald-500/20"
+            style={{ background: 'conic-gradient(#10B981 0 75%, #E2E8F0 75% 100%)' }}
+          >
+            <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center font-semibold text-xs text-emerald-600 dark:text-emerald-400">
+              {leads.filter((l) => l.stage_id === 'stage_6').length}/{leads.length}
             </div>
+          </div>
+        </div>
+      </div>
 
+      {/* 2. QUICK LAUNCHER ACTION BAR - THEO CHUẨN TỔNG QUAN */}
+      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-medium">
+        <span className="text-slate-700 dark:text-slate-300 font-semibold flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span>Thao Tác Nhanh:</span>
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => {
+              setAddMode('CREATE_NEW');
+              setSelectedCustomerId('');
+              setIsAddModalOpen(true);
+            }}
+            className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+          >
+            <UserPlus className="w-3.5 h-3.5 text-blue-600" />
+            <span>Tạo Lead Mới</span>
+          </button>
+          <button
+            onClick={() => setIsBulkImportModalOpen(true)}
+            className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Import Excel / CSV</span>
+          </button>
+          <button
+            onClick={() => setIsChannelDrawerOpen(true)}
+            className="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-lg flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-purple-600" />
+            <span>Hiệu Quả Kênh Lead</span>
+          </button>
+          <button
+            onClick={() => setIsLogDrawerOpen(true)}
+            className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+          >
+            <History className="w-3.5 h-3.5 text-slate-600" />
+            <span>Nhật Ký Chuyển Bước</span>
+          </button>
+          <Link
+            href="/customers"
+            className="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg flex items-center gap-1.5 transition-colors font-medium"
+          >
+            <Users className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Mở Module Khách Hàng ({existingCustomers.length})</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* 3. BI ANALYTICS PANEL */}
+      <LeadAnalyticsDashboard leads={leads} />
+
+      {/* 4. CONTROLS BAR: SEARCH, FILTERS & KANBAN / LIST TOGGLE */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm Lead theo mã, tên khách hàng, SĐT hoặc tên công ty..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:border-blue-500 outline-none transition-all font-medium"
+            />
+          </div>
+
+          {/* Source Filter */}
+          <div className="flex items-center gap-2">
             <select
               value={selectedSourceFilter}
               onChange={(e) => setSelectedSourceFilter(e.target.value)}
-              className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200"
+              className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none"
             >
-              <option value="ALL">Tất cả Nguồn Lead</option>
+              <option value="ALL">Nguồn: Tất Cả</option>
               <option value="Facebook Ads">Facebook Ads</option>
-              <option value="Facebook Lead Ads">Facebook Lead Ads Webhook</option>
-              <option value="TikTok Ads">TikTok Ads</option>
-              <option value="TikTok Lead Gen">TikTok Lead Gen</option>
               <option value="Google Ads">Google Ads</option>
-              <option value="Google Ads Form">Google Ads Form</option>
-              <option value="Zalo OA Form">Zalo OA Form</option>
-              <option value="Hotline Zalo">Hotline Zalo</option>
-              <option value="Website GGBingoVN">Website GGBingoVN</option>
               <option value="Event / Hội Thảo">Event / Hội Thảo</option>
               <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
-              <option value="Bulk Import Excel">Bulk Import Excel</option>
-              <option value="Universal Webhook">Universal Webhook API</option>
+              <option value="Website GGBingoVN">Website GGBingoVN</option>
             </select>
 
-            <span className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
-              Hiển thị <strong className="text-slate-900 dark:text-white">{filteredLeads.length}</strong> / {leads.length} Lead
-            </span>
+            {/* Sales Rep Filter */}
+            <select
+              value={selectedRepFilter}
+              onChange={(e) => setSelectedRepFilter(e.target.value)}
+              className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none"
+            >
+              <option value="ALL">Sale: Tất Cả</option>
+              <option value="Trần Văn Hoàng (Đội 1)">Trần Văn Hoàng</option>
+              <option value="Nguyễn Quốc Tuấn (Đội 2)">Nguyễn Quốc Tuấn</option>
+              <option value="Lê Thị Mai (Đội 3)">Lê Thị Mai</option>
+            </select>
           </div>
 
-          {/* VIEW MODE SWITCHER: CHUYỂN ĐỔI TỨC THỜI GIỮA KANBAN VÀ BẢNG TRÊN CÙNG 1 KHUNG NHÌN */}
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            <ViewModeSwitcher
-              currentMode={viewMode === 'LIST' ? 'list' : 'kanban'}
-              onChange={(mode) => setViewMode(mode === 'list' ? 'LIST' : 'KANBAN')}
-              listLabel="Bảng (Danh Sách)"
-              kanbanLabel="Thẻ Kanban (7 Bước)"
-            />
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+            <button
+              onClick={() => setViewMode('KANBAN')}
+              className={`p-1.5 rounded-md font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                viewMode === 'KANBAN'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Kanban</span>
+            </button>
+            <button
+              onClick={() => setViewMode('LIST')}
+              className={`p-1.5 rounded-md font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                viewMode === 'LIST'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>Bảng ({filteredLeads.length})</span>
+            </button>
+            {selectedLead && (
+              <button
+                onClick={() => setViewMode('DETAIL')}
+                className={`p-1.5 rounded-md font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                  viewMode === 'DETAIL'
+                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>Chi Tiết: {selectedLead.lead_code}</span>
+              </button>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* DỮ LIỆU HIỂN THỊ: KANBAN BOARD HOẶC BẢNG DANH SÁCH (TRÊN CÙNG 1 KHUNG NHÌN) */}
-        {viewMode === 'KANBAN' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 overflow-x-auto pb-2 touch-scroll sleek-scrollbar">
-            {SEVEN_STAGES.map((col) => {
-              const stageLeads = filteredLeads.filter((l) => l.stage_id === col.id);
+      {/* FULL-PAGE LEAD DETAIL VIEW */}
+      {viewMode === 'DETAIL' && selectedLead && (
+        <LeadFullPageDetail
+          lead={selectedLead}
+          onBack={() => setViewMode('KANBAN')}
+          onUpdateStage={(leadId, newStageId, newStageName) => {
+            moveLeadToStage(leadId, newStageId);
+            setSelectedLead((prev) => (prev ? { ...prev, stage_id: newStageId as any, stage_name: newStageName } : null));
+          }}
+          onNavigateCustomer={(customerId) => {
+            router.push('/customers');
+          }}
+        />
+      )}
 
-              return (
-                <div
-                  key={col.id}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, col.id)}
-                  className="bg-slate-100/70 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 flex flex-col min-h-[580px] min-w-[200px]"
-                >
-                  <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-700/80">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: col.color }}></span>
-                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] truncate">{col.name}</h3>
-                    </div>
-                    <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-[10px] font-semibold shrink-0">
-                      {stageLeads.length}
+      {/* 5. KANBAN BOARD VIEW */}
+      {viewMode === 'KANBAN' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-3 overflow-x-auto pb-4">
+          {SEVEN_STAGES.map((stage) => {
+            const stageLeads = filteredLeads.filter((l) => l.stage_id === stage.id);
+            const totalStageBudget = stageLeads.reduce((sum, l) => sum + (l.estimated_budget || 0), 0);
+
+            return (
+              <div
+                key={stage.id}
+                className="bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-800 p-3 flex flex-col min-w-[240px]"
+              >
+                {/* Column Header */}
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/60 pb-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: stage.color }}></span>
+                    <span className="font-semibold text-xs text-slate-800 dark:text-slate-200 truncate max-w-[140px]">
+                      {stage.name}
                     </span>
                   </div>
-                  <div className="space-y-3 flex-1 overflow-y-auto pr-0.5">
-                    {stageLeads.length === 0 ? (
-                      <div className="h-28 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-[10px] text-slate-400 font-medium">
-                        Kéo Lead vào đây
-                      </div>
-                    ) : (
-                      stageLeads.map((lead) => (
+                  <span className="px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                    {stageLeads.length}
+                  </span>
+                </div>
+
+                <div className="text-[10px] text-slate-500 font-mono mb-2 flex items-center justify-between">
+                  <span>Dự toán:</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{formatNumber(Math.round(totalStageBudget / 1000000))} Tr ₫</span>
+                </div>
+
+                {/* Lead Cards List */}
+                <div className="space-y-2.5 flex-1 overflow-y-auto max-h-[600px]">
+                  {stageLeads.length === 0 ? (
+                    <div className="p-4 text-center text-slate-400 text-[11px] italic">
+                      Chưa có Lead ở bước này
+                    </div>
+                  ) : (
+                    stageLeads.map((lead) => {
+                      const linkedCustomer = existingCustomers.find((c) => c.id === lead.customer_id);
+
+                      return (
                         <div
                           key={lead.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, lead.id)}
-                          className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing relative space-y-2"
+                          className="p-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-xs hover:border-blue-300 dark:hover:border-blue-700 transition-all space-y-2 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-mono font-semibold text-blue-600 dark:text-blue-400 px-1.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 rounded">
+                            <span className="font-mono text-[10px] font-semibold text-blue-600 dark:text-blue-400">
                               {lead.lead_code}
                             </span>
-                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-                              lead.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
-                            }`}>
-                              {lead.entity_type === 'ENTERPRISE' ? '🏢 DN' : '👤 CN'}
+                            <span className="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                              {lead.source_name}
                             </span>
                           </div>
+
                           <div>
-                            <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-xs truncate">{lead.full_name}</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{lead.company_name}</p>
+                            <p className="font-semibold text-slate-900 dark:text-slate-100">{lead.full_name}</p>
+                            <p className="text-[11px] text-slate-500 truncate">{lead.company_name || 'Cá Nhân'}</p>
                           </div>
-                          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800 text-[10px]">
-                            <span className="text-slate-500 font-semibold flex items-center gap-1">
-                              <Flame className="w-3 h-3 text-orange-500 fill-orange-500" /> Score:
+
+                          {/* Linked Customer Badge */}
+                          {linkedCustomer && (
+                            <div className="pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10.5px]">
+                              <span className="text-slate-400">Hồ sơ KH:</span>
+                              <Link
+                                href="/customers"
+                                className="font-mono text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 font-medium"
+                              >
+                                <span>{linkedCustomer.customer_code}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </Link>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between text-[11px] pt-1">
+                            <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                              {formatNumber(lead.estimated_budget || 0)} ₫
                             </span>
-                            <span className="font-semibold font-mono text-emerald-600 dark:text-emerald-400">{lead.lead_score}/100</span>
+                            <span className="text-slate-400 text-[10px]">{lead.assigned_sale_name.split(' ')[0]}</span>
                           </div>
+
+                          {/* Fast Action Buttons */}
                           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
                             <button
-                              onClick={() => handleOpenLeadSpecificLog(lead.lead_code)}
-                              className="px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-[10px] rounded flex items-center gap-1 border border-slate-200 dark:border-slate-700"
-                              title="Xem Lịch Sử Log Riêng Của Lead Này"
+                              onClick={() => {
+                                setSelectedLead(lead);
+                                setViewMode('DETAIL');
+                              }}
+                              className="px-2 py-1 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded text-[10px] font-medium flex items-center gap-0.5 cursor-pointer"
+                              title="Xem chi tiết toàn màn hình"
                             >
-                              <History className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                              <span>Log Lead</span>
+                              Chi Tiết
                             </button>
+
                             <button
-                              onClick={() => handleConvertLeadToVipCustomer(lead)}
-                              className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-[10px] rounded flex items-center gap-1 shadow-xs transition-all active:scale-95"
+                              onClick={() => handleOpenLeadSpecificLog(lead.lead_code)}
+                              className="px-2 py-1 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-600 dark:text-slate-300 rounded text-[10px] font-medium flex items-center gap-0.5 cursor-pointer"
+                              title="Xem nhật ký"
                             >
-                              <Crown className="w-3 h-3" />
-                              <span>VIP</span>
+                              <History className="w-3 h-3" /> Log
                             </button>
+
+                            {lead.stage_id !== 'stage_6' && (
+                              <button
+                                onClick={() => moveLeadToStage(lead.id, 'stage_6')}
+                                className="px-2 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded text-[10px] font-medium flex items-center gap-0.5 cursor-pointer"
+                              >
+                                <Check className="w-3 h-3" /> Chốt HĐ
+                              </button>
+                            )}
+
+                            {lead.stage_id !== 'stage_6' && (
+                              <button
+                                onClick={() => handleConvertLeadToVipCustomer(lead)}
+                                className="px-2 py-1 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded text-[10px] font-medium flex items-center gap-0.5 cursor-pointer"
+                              >
+                                <Crown className="w-3 h-3 text-amber-500" /> VIP
+                              </button>
+                            )}
                           </div>
                         </div>
-                      ))
-                    )}
-                  </div>
+                      );
+                    })
+                  )}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 6. LIST VIEW */}
+      {viewMode === 'LIST' && (
+        <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600" />
+                <span>Danh Sách Phễu Chuyển Đổi Lead & Khách Hàng Liên Kết</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">Quản lý trạng thái 7 bước và đồng bộ dữ liệu với hồ sơ khách hàng</p>
+            </div>
+            <span className="text-xs font-semibold text-slate-400">{filteredLeads.length} Lead</span>
           </div>
-        ) : (
-          <div className="overflow-x-auto border border-slate-200/80 dark:border-slate-800 rounded-xl">
-            <table className="w-full text-left border-collapse text-xs">
+
+          <div className="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
+            <table className="w-full text-left border-collapse text-xs min-w-[900px]">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wide text-[10.5px]">
-                  <th className="p-4">Mã Lead & Thể Nhân</th>
-                  <th className="p-4">Họ và Tên Lead</th>
-                  <th className="p-4">Doanh Nghiệp / MST</th>
-                  <th className="p-4">Số Điện Thoại</th>
-                  <th className="p-4">Nguồn Lead</th>
-                  <th className="p-4">Giai Đoạn Phễu</th>
-                  <th className="p-4 text-center">Nhật Ký Log Lead</th>
-                  <th className="p-4 text-center">Thao Tác</th>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+                  <th className="pb-3">Mã & Tên Lead</th>
+                  <th className="pb-3">Hồ Sơ Khách Hàng</th>
+                  <th className="pb-3">Thể Nhân & Doanh Nghiệp</th>
+                  <th className="pb-3">SĐT & Email</th>
+                  <th className="pb-3">Nguồn Tiếp Nhận</th>
+                  <th className="pb-3">Bước Phễu Xử Lý</th>
+                  <th className="pb-3 text-right">Dự Toán Ngân Sách</th>
+                  <th className="pb-3 text-right">Thao Tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {filteredLeads.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="p-8 text-center text-slate-400 italic">
-                      Không tìm thấy lead phù hợp.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredLeads.map((lead) => (
+                {filteredLeads.map((lead) => {
+                  const linkedCustomer = existingCustomers.find((c) => c.id === lead.customer_id);
+
+                  return (
                     <tr key={lead.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="p-4">
-                        <span className="text-xs font-mono font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
+                      <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
+                        <div className="font-semibold">{lead.full_name}</div>
+                        <div className="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-medium">
                           {lead.lead_code}
+                        </div>
+                      </td>
+
+                      <td className="py-3">
+                        {linkedCustomer ? (
+                          <Link
+                            href="/customers"
+                            className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-900"
+                          >
+                            <span>{linkedCustomer.customer_code}</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </Link>
+                        ) : (
+                          <span className="text-slate-400 italic text-[11px]">Tự động liên kết</span>
+                        )}
+                      </td>
+
+                      <td className="py-3">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 block">
+                          {lead.company_name || 'Cá Nhân'}
                         </span>
-                        <p className="mt-1">
-                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                            lead.entity_type === 'ENTERPRISE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
-                          }`}>
-                            {lead.entity_type === 'ENTERPRISE' ? '🏢 Doanh Nghiệp' : '👤 Cá Nhân'}
-                          </span>
-                        </p>
+                        <span className="text-[10px] text-slate-400 font-mono">{lead.tax_code || lead.id_card_number || '—'}</span>
                       </td>
-                      <td className="p-4 font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                        {lead.full_name}
+
+                      <td className="py-3">
+                        <div className="font-mono text-slate-800 dark:text-slate-200">{lead.phone}</div>
+                        <div className="text-[10.5px] text-slate-500">{lead.email}</div>
                       </td>
-                      <td className="p-4">
-                        <p className="font-semibold text-slate-800 dark:text-slate-200">{lead.company_name || 'Cá Nhân'}</p>
-                        <p className="text-[10px] font-mono text-slate-500">{lead.tax_code ? `MST: ${lead.tax_code}` : lead.id_card_number ? `CCCD: ${lead.id_card_number}` : ''}</p>
+
+                      <td className="py-3">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                          {lead.source_name}
+                        </span>
                       </td>
-                      <td className="p-4 font-mono font-medium text-slate-800 dark:text-slate-200">
-                        {lead.phone}
-                      </td>
-                      <td className="p-4 font-semibold text-slate-700 dark:text-slate-300">
-                        {lead.source_name}
-                      </td>
-                      <td className="p-4">
+
+                      <td className="py-3">
                         <select
                           value={lead.stage_id}
                           onChange={(e) => moveLeadToStage(lead.id, e.target.value)}
-                          className="p-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500"
+                          className="p-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none"
                         >
                           {SEVEN_STAGES.map((s) => (
                             <option key={s.id} value={s.id}>
@@ -701,150 +976,383 @@ export default function LeadsPage() {
                           ))}
                         </select>
                       </td>
-                      {/* NÚT XEM LOG THEO TỪNG LEAD RIÊNG BIỆT */}
-                      <td className="p-4 text-center">
-                        <button
-                          onClick={() => handleOpenLeadSpecificLog(lead.lead_code)}
-                          className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-semibold rounded-xl text-[11px] flex items-center gap-1 border border-blue-200 dark:border-blue-800 transition-all mx-auto shadow-2xs"
-                        >
-                          <History className="w-3.5 h-3.5" />
-                          <span>Xem Log ({stageLogs.filter((l) => l.lead_code === lead.lead_code).length})</span>
-                        </button>
+
+                      <td className="py-3 text-right font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                        {formatNumber(lead.estimated_budget || 0)} ₫
                       </td>
-                      <td className="p-4 text-center">
-                        <button
-                          onClick={() => handleConvertLeadToVipCustomer(lead)}
-                          className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs rounded-xl flex items-center gap-1 shadow-xs transition-all mx-auto active:scale-95"
-                        >
-                          <Crown className="w-3.5 h-3.5" />
-                          <span>VIP</span>
-                        </button>
+
+                      <td className="py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              setViewMode('DETAIL');
+                            }}
+                            className="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-medium text-[11px] transition-colors cursor-pointer"
+                          >
+                            Chi Tiết
+                          </button>
+                          <button
+                            onClick={() => handleOpenLeadSpecificLog(lead.lead_code)}
+                            className="px-2.5 py-1 rounded-md bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium text-[11px] transition-colors cursor-pointer"
+                          >
+                            Log
+                          </button>
+                          <button
+                            onClick={() => handleConvertLeadToVipCustomer(lead)}
+                            className="px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-medium text-[11px] transition-colors cursor-pointer"
+                          >
+                            VIP
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  ))
-                )}
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* DRAWER / MODAL: NHẬT KÝ CHUYỂN TRẠNG THÁI (LỌC THEO TỪNG LEAD CHI TIẾT) */}
-      {isLogDrawerOpen && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"> <History className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-base text-slate-900">Nhật Ký Lịch Sử Chuyển Trạng Thái</h3> <p className="text-xs text-slate-500">Lọc xem nhật ký toàn hệ thống hoặc xem chi tiết theo từng Lead</p> </div> </div> <button
+      {/* DRAWER / MODAL: NHẬT KÝ CHUYỂN TRẠNG THÁI */}
+      {isLogDrawerOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/80 dark:border-slate-800 w-full max-w-3xl overflow-hidden my-6 flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+                  <History className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base text-slate-900 dark:text-slate-100">
+                    Nhật Ký Chuyển Trạng Thái Phễu Bán Hàng
+                  </h3>
+                  <p className="text-xs text-slate-500">Lịch sử tương tác và ghi nhận chuyển bước của các chuyên viên Sales</p>
+                </div>
+              </div>
+              <button
                 onClick={() => setIsLogDrawerOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              > <X className="w-5 h-5" /> </button> </div> {/* FILTER LOG BY LEAD SELECTOR */} <div className="p-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between gap-4 text-xs"> <div className="flex items-center gap-2"> <Filter className="w-4 h-4 text-blue-600" /> <span className="font-medium text-slate-800">Lọc Nhật Ký Theo Lead:</span> </div> <select
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter Log */}
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-blue-600" />
+                <span className="font-semibold text-slate-800 dark:text-slate-200">Lọc Theo Lead:</span>
+              </div>
+              <select
                 value={selectedLeadLogFilter}
                 onChange={(e) => setSelectedLeadLogFilter(e.target.value)}
-                className="p-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500"
-              > <option value="ALL">🌐 Tất Cả Lead Toàn Hệ Thống ({stageLogs.length} Log)</option> {leads.map((l) => ( <option key={l.id} value={l.lead_code}> [{l.lead_code}] {l.full_name} - {l.company_name || 'Cá Nhân'} </option> ))} </select> </div> <div className="p-6 overflow-y-auto space-y-3 flex-1"> {filteredStageLogs.length === 0 ? ( <div className="p-8 text-center text-slate-400 text-xs italic"> Chưa có nhật ký chuyển bước nào phù hợp với bộ lọc. </div> ) : (
-                filteredStageLogs.map((log) => ( <div key={log.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs"> <div className="flex items-center justify-between"> <span className="font-mono font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded text-[11px]"> [{log.lead_code}] {log.lead_name} </span> <span className="text-[10px] text-slate-400 font-mono">{log.timestamp}</span> </div> <div className="flex items-center gap-2 pt-1 font-semibold text-slate-800"> <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[11px]">{log.from_stage}</span> <ArrowRight className="w-4 h-4 text-blue-600 shrink-0" /> <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[11px] font-medium">{log.to_stage}</span> </div> <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1"> <span>Người thực hiện: <strong className="text-slate-800">{log.actor_name}</strong></span> {log.note && <span className="italic text-slate-600">"{log.note}"</span>} </div> </div> ))
-              )} </div> </div> </div> )}
+                className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200"
+              >
+                <option value="ALL">🌐 Tất Cả Lead Toàn Hệ Thống ({stageLogs.length} Log)</option>
+                {leads.map((l) => (
+                  <option key={l.id} value={l.lead_code}>
+                    [{l.lead_code}] {l.full_name} - {l.company_name || 'Cá Nhân'}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* MODAL: TẠO LEAD */}
-      {isAddModalOpen && ( <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"> <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200"> <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"> <UserPlus className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-base text-slate-900">Tạo Lead Mới Phễu 7 Bước</h3> <p className="text-xs text-slate-500">Thông tin Khách Hàng được tự động liên kết</p> </div> </div> <button
+            <div className="p-6 overflow-y-auto space-y-3 flex-1 text-xs">
+              {filteredStageLogs.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 italic">
+                  Chưa có nhật ký chuyển bước nào phù hợp với bộ lọc.
+                </div>
+              ) : (
+                filteredStageLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-[11px]">
+                        [{log.lead_code}] {log.lead_name}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">{log.timestamp}</span>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1 font-semibold text-slate-800 dark:text-slate-200">
+                      <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[11px]">{log.from_stage}</span>
+                      <ArrowRight className="w-4 h-4 text-blue-600 shrink-0" />
+                      <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 rounded text-[11px] font-medium">
+                        {log.to_stage}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                      <span>Người thực hiện: <strong className="text-slate-800 dark:text-slate-200">{log.actor_name}</strong></span>
+                      {log.note && <span className="italic text-slate-600 dark:text-slate-400">"{log.note}"</span>}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: TẠO LEAD MỚI VÀ LIÊN KẾT KHÁCH HÀNG */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/80 dark:border-slate-800 w-full max-w-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base text-slate-900 dark:text-slate-100">
+                    Tạo Lead Mới Phễu 7 Bước
+                  </h3>
+                  <p className="text-xs text-slate-500">Tự động đồng bộ và liên kết với phân hệ Khách Hàng</p>
+                </div>
+              </div>
+              <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              > <X className="w-5 h-5" /> </button> </div> <form onSubmit={handleAddLeadSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"> {formError && ( <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded-xl flex items-center gap-2 shadow-sm"> <AlertTriangle className="w-5 h-5 shrink-0 text-red-600" /> <span>{formError}</span> </div> )} <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200"> <button
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddLeadSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto text-xs">
+              {formError && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium rounded-lg flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              {/* Mode Selection */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                <button
                   type="button"
                   onClick={() => {
                     setAddMode('EXISTING_CUSTOMER');
                     setFormError('');
                   }}
-                  className={`py-2 px-3 rounded-xl text-xs font-medium transition-all ${
-                    addMode === 'EXISTING_CUSTOMER' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
+                  className={`py-2 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    addMode === 'EXISTING_CUSTOMER' ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs' : 'text-slate-700 dark:text-slate-300'
                   }`}
-                > 🏢 Chọn Khách Hàng Hiện Hữu </button> <button
+                >
+                  🏢 Chọn Khách Hàng Hiện Hữu
+                </button>
+                <button
                   type="button"
                   onClick={() => {
                     setAddMode('CREATE_NEW');
                     setSelectedCustomerId('');
                     setFormError('');
                   }}
-                  className={`py-2 px-3 rounded-xl text-xs font-medium transition-all ${
-                    addMode === 'CREATE_NEW' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-200'
+                  className={`py-2 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    addMode === 'CREATE_NEW' ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs' : 'text-slate-700 dark:text-slate-300'
                   }`}
-                > Tạo Mới Khách Hàng / Lead </button> </div> {addMode === 'EXISTING_CUSTOMER' && ( <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-xl space-y-3"> <label className="block text-xs font-medium text-blue-900">Danh Sách Khách Hàng Đã Xác Thực Trên Hệ Thống *</label> <select
+                >
+                  ✨ Tạo Mới Lead & Khách Hàng
+                </button>
+              </div>
+
+              {addMode === 'EXISTING_CUSTOMER' && (
+                <div className="p-4 bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-xl space-y-2">
+                  <label className="block text-xs font-semibold text-blue-900 dark:text-blue-300">
+                    Chọn Khách Hàng Đã Có Trong Danh Mục ({existingCustomers.length} Hồ sơ) *
+                  </label>
+                  <select
                     value={selectedCustomerId}
                     onChange={(e) => {
                       const found = existingCustomers.find((c) => c.id === e.target.value);
                       if (found) handleSelectExistingCustomer(found);
                     }}
-                    className="w-full p-2.5 bg-white border border-blue-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500"
-                  > <option value="">-- Chọn Khách Hàng Trong Danh Mục --</option> {existingCustomers.map((cust) => ( <option key={cust.id} value={cust.id}> [{cust.customer_code}] {cust.name} - {cust.company_name || 'Cá Nhân'} ({cust.phone}) </option> ))} </select> </div> )} <div className="grid grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Loại Thể Nhân Lead *</label> <select
+                    className="w-full p-2.5 bg-white dark:bg-slate-800 border border-blue-300 dark:border-blue-800 rounded-lg text-xs font-semibold text-slate-800 dark:text-white"
+                  >
+                    <option value="">-- Bấm để chọn Khách Hàng trong danh mục --</option>
+                    {existingCustomers.map((cust) => (
+                      <option key={cust.id} value={cust.id}>
+                        [{cust.customer_code}] {cust.name} - {cust.company_name || cust.household_name || 'Cá Nhân'} ({cust.phone})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Loại Thể Nhân *
+                  </label>
+                  <select
                     value={entityType}
                     onChange={(e) => setEntityType(e.target.value as CustomerEntityType)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
-                  > <option value="ENTERPRISE">🏢 Doanh Nghiệp (B2B)</option> <option value="INDIVIDUAL">👤 Cá Nhân (B2C)</option> </select> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Nguồn Lead Tiếp Nhận *</label> <select
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-800 dark:text-white"
+                  >
+                    <option value="ENTERPRISE">🏢 Doanh Nghiệp</option>
+                    <option value="HOUSEHOLD_BUSINESS">🏪 Hộ Kinh Doanh</option>
+                    <option value="INDIVIDUAL">👤 Cá Nhân</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Nguồn Lead Tiếp Nhận *
+                  </label>
+                  <select
                     value={sourceName}
                     onChange={(e) => setSourceName(e.target.value as LeadSource)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800"
-                  > <option value="Facebook Ads">Facebook Ads</option> <option value="Google Ads">Google Ads</option> <option value="Event / Hội Thảo">Event / Hội Thảo</option> <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option> <option value="Website GGBingoVN">Website GGBingoVN</option> </select> </div> </div> <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Họ và Tên Khách Hàng / Lead <span className="text-red-500">*</span></label> <input
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-800 dark:text-white"
+                  >
+                    <option value="Facebook Ads">Facebook Ads</option>
+                    <option value="Google Ads">Google Ads</option>
+                    <option value="Event / Hội Thảo">Event / Hội Thảo</option>
+                    <option value="Referral / Giới Thiệu">Referral / Giới Thiệu</option>
+                    <option value="Website GGBingoVN">Website GGBingoVN</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Họ và Tên Khách Hàng / Lead <span className="text-red-500">*</span>
+                  </label>
+                  <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Nguyễn Văn Minh"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Số Điện Thoại Khách Hàng <span className="text-red-500">*</span></label> <input
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Số Điện Thoại <span className="text-red-500">*</span>
+                  </label>
+                  <input
                     type="text"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="0988 123 456"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900"
-                  /> </div> </div> <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Email Khách Hàng <span className="text-red-500">*</span></label> <input
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-semibold text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="minh.nguyen@company.com"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Tên Doanh Nghiệp / Công Ty / Hộ KD <span className="text-red-500">*</span></label> <input
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Tên Doanh Nghiệp / HKD
+                  </label>
+                  <input
                     type="text"
-                    required
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="Công ty TNHH Vận Tải SunBeauty"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  /> </div> </div> <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block text-xs font-medium text-slate-700 mb-1"> {entityType === 'ENTERPRISE' ? 'Mã Số Thuế Doanh Nghiệp (MST)' : 'Số CCCD Cá Nhân'} <span className="text-red-500">*</span> </label> <input
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    {entityType === 'ENTERPRISE' ? 'Mã Số Thuế (MST)' : 'Số CCCD Định Danh'}
+                  </label>
+                  <input
                     type="text"
-                    required
                     value={entityType === 'ENTERPRISE' ? taxCode : idCardNumber}
                     onChange={(e) => {
                       if (entityType === 'ENTERPRISE') setTaxCode(e.target.value);
                       else setIdCardNumber(e.target.value);
                     }}
                     placeholder={entityType === 'ENTERPRISE' ? '0108928374' : '001198002345'}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900"
-                  /> </div> <div> <label className="block text-xs font-medium text-slate-700 mb-1">Sản Phẩm / Gói Dịch Vụ Quan Tâm <span className="text-red-500">*</span></label> <select
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Sản Phẩm / Gói Dịch Vụ Quan Tâm <span className="text-red-500">*</span>
+                  </label>
+                  <select
                     value={selectedProductId}
                     onChange={(e) => setSelectedProductId(e.target.value)}
                     required
-                    className="w-full p-2.5 bg-blue-50/80 border border-blue-300 rounded-xl text-xs font-medium text-blue-900 focus:ring-2 focus:ring-blue-500"
-                  > <option value="">-- Bắt Buộc Chọn Sản Phẩm Quan Tâm --</option> {INITIAL_PRODUCTS.map((prod) => ( <option key={prod.id} value={prod.id}> [{prod.sku_code}] {prod.name} ({formatCurrency(prod.base_price)}/{prod.unit}) </option> ))} </select> </div> </div> {/* Vietnam Administrative Address Picker (Integrated 2-Tier Standard) */} <div className="pt-2 border-t border-slate-100"> <VietnamAddressPicker
+                    className="w-full p-2.5 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800 rounded-lg text-xs font-medium text-blue-900 dark:text-blue-300"
+                  >
+                    {INITIAL_PRODUCTS.map((prod) => (
+                      <option key={prod.id} value={prod.id}>
+                        [{prod.sku_code}] {prod.name} ({formatCurrency(prod.base_price)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Address Picker */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <VietnamAddressPicker
                   value={addressData}
                   onChange={setAddressData}
                   required
-                  label="Cấu Hình Địa Chỉ Hành Chính Khách Hàng (Tỉnh/Thành Phố, Phường/Xã/Quận/Huyện & Số Nhà) *"
-                /> </div> <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3"> <button
+                  label="Địa Chỉ Khách Hàng (Tỉnh/Thành Phố, Phường/Xã/Quận/Huyện & Số Nhà)"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs"
-                > Hủy Bỏ </button> <button
+                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs cursor-pointer"
+                >
+                  Hủy Bỏ
+                </button>
+                <button
                   type="submit"
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs shadow-lg shadow-blue-600/30"
-                > Lưu Lead Kèm Kiểm Tra Duy Nhất </button> </div> </form> </div> </div> )}
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Tạo Lead & Đồng Bộ Khách Hàng</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-      {/* MODAL 2: BULK IMPORT LEAD TU EXCEL / CSV */} <BulkLeadImportModal
+      {/* MODAL 2: BULK IMPORT LEAD TU EXCEL / CSV */}
+      <BulkLeadImportModal
         isOpen={isBulkImportModalOpen}
         onClose={() => setIsBulkImportModalOpen(false)}
         onImportSuccess={handleBulkImportSuccess}
         existingPhones={leads.map((l) => l.phone)}
-      /> {/* DRAWER: THỐNG KÊ HIỆU QUẢ KÊNH LEAD ĐA KÊNH */} <ChannelAnalyticsDrawer
+      />
+
+      {/* DRAWER: THỐNG KÊ HIỆU QUẢ KÊNH LEAD ĐA KÊNH */}
+      <ChannelAnalyticsDrawer
         isOpen={isChannelDrawerOpen}
         onClose={() => setIsChannelDrawerOpen(false)}
         leads={leads}
-        onTriggerTestWebhook={handleTriggerTestWebhook}
-      /> </div> );
+      />
+    </div>
+  );
 }

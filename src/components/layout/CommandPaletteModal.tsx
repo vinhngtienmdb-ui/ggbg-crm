@@ -64,7 +64,7 @@ export default function CommandPaletteModal({ isOpen, onClose, onOpenVoIP }: Com
 
   const COMMANDS: CommandItem[] = [
     { id: 'c_dash', title: 'Tổng Quan Executive Dashboard', category: 'Trang Hệ Thống', icon: <Sparkles className="w-4 h-4 text-purple-500" />, path: '/', shortcut: '↵' },
-    { id: 'c_cust', title: 'Quản Lý Khách Hàng 360°', category: 'Trang Hệ Thống', icon: <Users className="w-4 h-4 text-blue-500" />, path: '/customers' },
+    { id: 'c_cust', title: 'Quản Lý Khách Hàng', category: 'Trang Hệ Thống', icon: <Users className="w-4 h-4 text-blue-500" />, path: '/customers' },
     { id: 'c_leads', title: 'Lead & Phễu Ban Hàng 7 Bước (Kanban)', category: 'Trang Hệ Thống', icon: <Kanban className="w-4 h-4 text-emerald-500" />, path: '/leads' },
     { id: 'c_approvals', title: 'Quản Lý Phê Duyệt (22 Mẫu Lark Approval)', category: 'Trang Hệ Thống', icon: <ShieldCheck className="w-4 h-4 text-purple-600" />, path: '/proposals' },
     { id: 'c_hrm', title: 'Quản Lý Nhân Sự HRM & Hồ Sơ', category: 'Trang Hệ Thống', icon: <Briefcase className="w-4 h-4 text-indigo-500" />, path: '/hrm' },

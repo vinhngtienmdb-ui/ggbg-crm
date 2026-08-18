@@ -19,11 +19,41 @@ export interface UserAccount {
   permissions?: string[];
 }
 
-export type CustomerType = 'B2B_Agency_Service' | 'GGBingoVN_Merchant';
 export type CustomerTier = 'Standard' | 'Silver' | 'Gold' | 'VIP';
-export type LifecycleStage = 'VIP' | 'Regular' | 'Prospect' | 'At-Risk' | 'Churned';
-export type CustomerEntityType = 'ENTERPRISE' | 'INDIVIDUAL';
+export type LifecycleStage = 'Prospect' | 'Active' | 'Regular' | 'VIP' | 'At-Risk' | 'Churned';
+export type CustomerEntityType = 'ENTERPRISE' | 'HOUSEHOLD_BUSINESS' | 'INDIVIDUAL';
 export type KycStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+
+export interface CustomerTierRuleConfig {
+  tier: CustomerTier;
+  tier_name: string;
+  min_ltv: number;
+  min_active_contracts: number;
+  color_badge: string;
+  description: string;
+}
+
+export interface CustomerContactPerson {
+  id: string;
+  name: string;
+  role_title: string;
+  phone: string;
+  email?: string;
+  is_primary?: boolean;
+  notes?: string;
+}
+
+export type CreditApprovalStatus = 'NOT_SET' | 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface CustomerCreditLimitInfo {
+  approved_limit: number;
+  status: CreditApprovalStatus;
+  requested_limit?: number;
+  reason?: string;
+  sales_director_approval?: { approver_name: string; approved_at: string; status: 'APPROVED' | 'REJECTED'; note?: string };
+  chief_accountant_approval?: { approver_name: string; approved_at: string; status: 'APPROVED' | 'REJECTED'; note?: string };
+  ceo_approval?: { approver_name: string; approved_at: string; status: 'APPROVED' | 'REJECTED'; note?: string };
+}
 
 export interface KycDocument {
   doc_id: string;
@@ -39,8 +69,14 @@ export interface Customer {
   customer_code: string;
   name: string;
   entity_type: CustomerEntityType;
+  // Thông tin Doanh Nghiệp
   company_name?: string;
   tax_code?: string;
+  // Thông tin Hộ Kinh Doanh
+  household_name?: string;
+  household_reg_num?: string;
+  household_owner_name?: string;
+  // Thông tin Cá Nhân / Chủ thể
   id_card_number?: string;
   id_card_issue_date?: string;
   id_card_issue_place?: string;
@@ -48,17 +84,24 @@ export interface Customer {
   phone: string;
   email?: string;
   address?: string;
-  customer_type: CustomerType;
+  // Danh bạ đa người liên hệ
+  contacts?: CustomerContactPerson[];
+  // Quản trị Vòng đời & Phân hạng tự động
   tier: CustomerTier;
+  tier_auto_updated_at?: string;
   lifecycle_stage: LifecycleStage;
+  lifecycle_auto_updated_at?: string;
+  lifecycle_reason?: string;
   health_score: number;
   ltv_total_spent: number;
-  ecom_platforms: ('Shopee' | 'TikTokShop' | 'Lazada' | 'Amazon' | 'GGBingoVN')[];
-  avg_monthly_gmv: number;
   owner_name: string;
   ops_manager_name?: string;
   cskh_task_assigned?: string;
   contract_r2_file?: string;
+  // Hạn mức tín dụng & ngân hàng
+  credit_limit_info?: CustomerCreditLimitInfo;
+  bank_account?: string;
+  bank_name?: string;
   kyc_status: KycStatus;
   kyc_documents?: KycDocument[];
   tags: string[];
@@ -90,6 +133,7 @@ export interface Lead {
   email?: string;
   company_name?: string;
   tax_code?: string;
+  household_reg_num?: string;
   id_card_number?: string;
   interested_product_id?: string;
   interested_product_name?: string;
@@ -646,6 +690,8 @@ export interface EmployeeProfile {
   bank_name?: string; // Tên ngân hàng
   bank_branch?: string; // Chi nhánh ngân hàng
   direct_manager_name?: string;
+  direct_manager_id?: string;
+  probation_rate?: number;
   approval_status?: EmployeeApprovalStatus;
   direct_manager_approved?: boolean;
   sales_director_approved?: boolean;
@@ -709,6 +755,42 @@ export interface EmployeeProfile {
   // Chấm dứt quan hệ lao động
   termination_date?: string;
   termination_reason?: string;
+  // Dynamic Custom Fields for High Customizability
+  custom_fields?: Record<string, any>;
+}
+
+export interface HrmCustomFieldDefinition {
+  id: string;
+  field_key: string;
+  label: string;
+  target_tab:
+    | 'WORK_INFO'
+    | 'OTHER_INFO'
+    | 'FAMILY_INFO'
+    | 'DOCUMENTS_BAG'
+    | 'WORK_PROCESS'
+    | 'REWARDS_DISCIPLINE'
+    | 'PERSONAL_HISTORY'
+    | 'SALARY_HISTORY';
+  data_type: 'TEXT' | 'NUMBER' | 'DATE' | 'SELECT' | 'CHECKBOX' | 'FILE';
+  options?: string[];
+  placeholder?: string;
+  is_required: boolean;
+  is_active: boolean;
+  default_value?: any;
+}
+
+export interface JobTitleDefinition {
+  id: string;
+  code: string;
+  name: string;
+  position_name: string;
+  grade_code: string;
+  department: string;
+  rank_level: number;
+  description: string;
+  is_active: boolean;
+  created_at: string;
 }
 
 export interface FamilyMember {
@@ -717,8 +799,13 @@ export interface FamilyMember {
   relationship: 'Bố' | 'Mẹ' | 'Vợ' | 'Chồng' | 'Con' | 'Anh/Chị/Em' | 'Khác';
   date_of_birth?: string;
   tax_code?: string;
+  id_card_number?: string;
   phone?: string;
   is_dependent: boolean;
+  deduction_start_date?: string;
+  deduction_end_date?: string;
+  proof_document_name?: string;
+  proof_document_url?: string;
 }
 
 export interface EmergencyContact {

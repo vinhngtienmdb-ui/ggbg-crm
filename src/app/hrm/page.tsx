@@ -249,7 +249,7 @@ function HRMContent() {
           variant: 'purple',
         }}
         title="Quản Trị Nhân Sự & Phát Triển Nguồn Nhân Lực"
-        subtitle="Quản lý hồ sơ 360°, tuyển dụng, onboarding, chấm công, BHXH, sổ lao động và cấu hình chức danh cấp bậc"
+        subtitle="Quản lý hồ sơ nhân sự, tuyển dụng, onboarding, chấm công, BHXH, sổ lao động và cấu hình chức danh cấp bậc"
         kpis={[
           { label: 'Quy Mô Nhân Sự', value: `${employees.length} Nhân Sự`, subtext: 'Chính thức: 94%' },
           { label: 'Đang Thử Việc', value: `${employees.filter(e => e.status === 'Probation').length} Nhân Sự`, subtext: 'Kỳ 60 ngày' },
@@ -418,7 +418,7 @@ function HRMContent() {
                                       </span>
                                     )}
                                     {visibleColumns.includes('employee_code') && (
-                                      <span className="font-semibold text-blue-600 dark:text-blue-400 text-[11px] font-mono">
+                                      <span className="font-semibold text-blue-600 dark:text-blue-400 text-[11px]">
                                         {emp.employee_code}
                                       </span>
                                     )}
@@ -473,14 +473,14 @@ function HRMContent() {
 
                             {/* SĐT Công Việc */}
                             {visibleColumns.includes('work_phone') && (
-                              <td className="p-3.5 font-mono text-slate-800 dark:text-slate-200 text-xs">
+                              <td className="p-3.5 text-slate-800 dark:text-slate-200 text-xs">
                                 {emp.phone || '0912 345 678'}
                               </td>
                             )}
 
                             {/* Email Công Việc */}
                             {visibleColumns.includes('work_email') && (
-                              <td className="p-3.5 font-mono text-blue-600 dark:text-blue-400 text-xs">
+                              <td className="p-3.5 text-blue-600 dark:text-blue-400 text-xs">
                                 {emp.email || `${emp.employee_code.toLowerCase()}@ggbingo.vn`}
                               </td>
                             )}
@@ -582,7 +582,7 @@ function HRMContent() {
 
                             {/* Số Hợp Đồng */}
                             {visibleColumns.includes('contract_number') && (
-                              <td className="p-3.5 font-mono text-xs text-slate-700 dark:text-slate-300">
+                              <td className="p-3.5 text-xs text-slate-700 dark:text-slate-300">
                                 {emp.contract_number}
                               </td>
                             )}
@@ -593,7 +593,7 @@ function HRMContent() {
                                 <button
                                   onClick={() => handleOpenViewModal(emp)}
                                   className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg transition-colors"
-                                  title="Xem Hồ Sơ 360°"
+                                  title="Xem Hồ Sơ Chi Tiết"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
@@ -645,7 +645,7 @@ function HRMContent() {
                         </div>
                         <div>
                           <h4 className="font-semibold text-xs text-slate-900 dark:text-white">{emp.full_name}</h4>
-                          <p className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-medium">{emp.employee_code}</p>
+                          <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">{emp.employee_code}</p>
                         </div>
                       </div>
                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded text-[10px] font-medium">
@@ -672,7 +672,7 @@ function HRMContent() {
                         className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-[11px] font-medium flex items-center gap-1"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        <span>Xem 360°</span>
+                        <span>Chi Tiết</span>
                       </button>
                       <div className="flex items-center gap-1">
                         <button

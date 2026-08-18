@@ -48,7 +48,8 @@ import {
   WorkShift,
   AttendanceSettings,
   FormulaWeights,
-  EvaluationCriterion
+  EvaluationCriterion,
+  HrmCustomFieldDefinition
 } from '@/types';
 import {
   getSalaryGrades,
@@ -70,7 +71,10 @@ import {
   getWorkShifts,
   createWorkShift,
   updateWorkShift,
-  deleteWorkShift
+  deleteWorkShift,
+  getHrmCustomFields,
+  saveHrmCustomField,
+  deleteHrmCustomField
 } from '@/lib/hrmStore';
 import {
   getAttendanceSettings,
@@ -176,6 +180,7 @@ function HrmSettingsContent() {
     | 'TIMEKEEPING_SHIFTS'
     | 'HOLIDAYS_WEEKENDS'
     | 'PERFORMANCE_FORMULA'
+    | 'CUSTOM_FIELDS'
   >('SALARY_GRADES');
 
   // Handle URL Query Params
@@ -196,6 +201,8 @@ function HrmSettingsContent() {
       setActiveTab('JOB_TITLES');
     } else if (initialTab === 'SALARY_GRADES') {
       setActiveTab('SALARY_GRADES');
+    } else if (initialTab === 'CUSTOM_FIELDS') {
+      setActiveTab('CUSTOM_FIELDS');
     }
   }, [initialTab]);
 
@@ -230,6 +237,29 @@ function HrmSettingsContent() {
 
   // Tab 8: Performance Formula Weights State
   const [formulaWeights, setFormulaWeights] = useState<FormulaWeights>(() => getFormulaWeights());
+
+  // Tab 9: Custom Fields State
+  const [customFields, setCustomFields] = useState<HrmCustomFieldDefinition[]>(() => getHrmCustomFields());
+  const [editingCustomField, setEditingCustomField] = useState<HrmCustomFieldDefinition | null>(null);
+  const [isCustomFieldModalOpen, setIsCustomFieldModalOpen] = useState(false);
+  const [selectedTargetTabFilter, setSelectedTargetTabFilter] = useState<string>('ALL');
+
+  const handleSaveCustomField = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCustomField) return;
+    saveHrmCustomField(editingCustomField);
+    setCustomFields([...getHrmCustomFields()]);
+    setIsCustomFieldModalOpen(false);
+    showToast(`💾 Đã lưu trường tùy biến: ${editingCustomField.label}`);
+  };
+
+  const handleDeleteCustomField = (id: string, label: string) => {
+    if (confirm(`Bạn có chắc chắn muốn xóa trường tùy biến "${label}"?`)) {
+      deleteHrmCustomField(id);
+      setCustomFields([...getHrmCustomFields()]);
+      showToast(`Đã xóa trường tùy biến: ${label}`);
+    }
+  };
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -516,6 +546,17 @@ function HrmSettingsContent() {
         >
           <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
           <span>8. Trọng Số Hiệu Suất 3P & Tiêu Chí</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('CUSTOM_FIELDS')}
+          className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'CUSTOM_FIELDS'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 font-semibold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+          <span>9. Trường Tùy Biến Hồ Sơ</span>
         </button>
       </div>
 
@@ -1462,6 +1503,300 @@ function HrmSettingsContent() {
             </div>
           </div>
         </form>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 9: QUẢN LÝ TRƯỜNG TÙY BIẾN HỒ SƠ NHÂN SỰ (CUSTOM FIELDS ENGINE) */}
+      {/* ========================================================================= */}
+      {activeTab === 'CUSTOM_FIELDS' && (
+        <div className="space-y-5">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  Quản Trị Danh Mục Trường Tùy Biến Hồ Sơ (Dynamic Custom Fields)
+                </h2>
+                <p className="text-slate-500 text-xs mt-0.5">
+                  Tự do mở rộng các trường thông tin cho từng Tab hồ sơ nhân viên. Áp dụng tức thì vào toàn bộ hệ thống.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingCustomField({
+                    id: `cf_${Date.now()}`,
+                    field_key: '',
+                    label: '',
+                    target_tab: 'WORK_INFO',
+                    data_type: 'TEXT',
+                    placeholder: '',
+                    options: [],
+                    is_required: false,
+                    is_active: true,
+                  });
+                  setIsCustomFieldModalOpen(true);
+                }}
+                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" /> Thêm Trường Tùy Biến Mới
+              </button>
+            </div>
+
+            {/* Filter by Target Tab */}
+            <div className="flex items-center gap-1.5 overflow-x-auto text-xs py-1">
+              {[
+                { id: 'ALL', name: 'Tất Cả Tab' },
+                { id: 'WORK_INFO', name: 'Tab 1: Làm Việc & Cá Nhân' },
+                { id: 'OTHER_INFO', name: 'Tab 2: Học Vấn & Bằng Cấp' },
+                { id: 'FAMILY_INFO', name: 'Tab 3: Gia Đình & NPT' },
+                { id: 'DOCUMENTS_BAG', name: 'Tab 4: Túi Hồ Sơ' },
+                { id: 'WORK_PROCESS', name: 'Tab 5: Quá Trình Làm Việc' },
+                { id: 'REWARDS_DISCIPLINE', name: 'Tab 6: Khen Thưởng/Kỷ Luật' },
+                { id: 'PERSONAL_HISTORY', name: 'Tab 7: Tiểu Sử' },
+                { id: 'SALARY_HISTORY', name: 'Tab 8: Lịch Sử Lương' },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setSelectedTargetTabFilter(f.id)}
+                  className={`px-3 py-1.5 rounded-lg font-medium shrink-0 transition-colors cursor-pointer ${
+                    selectedTargetTabFilter === f.id
+                      ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {f.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Custom Fields Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              {customFields
+                .filter((cf) => selectedTargetTabFilter === 'ALL' || cf.target_tab === selectedTargetTabFilter)
+                .map((cf) => (
+                  <div
+                    key={cf.id}
+                    className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl space-y-3 flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800">
+                          {cf.field_key}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {cf.is_required && (
+                            <span className="text-[10px] text-rose-600 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded font-semibold border border-rose-200">
+                              Bắt Buộc
+                            </span>
+                          )}
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                              cf.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {cf.is_active ? 'Kích hoạt' : 'Tạm ẩn'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">{cf.label}</h3>
+                      <p className="text-slate-500 text-xs">
+                        Hiển thị tại: <strong className="text-slate-700 dark:text-slate-300">{cf.target_tab}</strong>
+                      </p>
+
+                      <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-400">
+                        <span>Kiểu dữ liệu:</span>
+                        <span className="font-semibold px-2 py-0.5 bg-white dark:bg-slate-700 border rounded text-slate-800 dark:text-slate-200">
+                          {cf.data_type}
+                        </span>
+                      </div>
+
+                      {cf.options && cf.options.length > 0 && (
+                        <div className="text-[11px] text-slate-500">
+                          <span>Lựa chọn: </span>
+                          <span className="italic">{cf.options.join(', ')}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                      <button
+                        onClick={() => {
+                          setEditingCustomField({ ...cf });
+                          setIsCustomFieldModalOpen(true);
+                        }}
+                        className="px-2.5 py-1 bg-white dark:bg-slate-700 hover:bg-slate-100 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-600 flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit className="w-3.5 h-3.5" /> Sửa
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCustomField(cf.id, cf.label)}
+                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Xóa
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: THÊM / CHỈNH SỬA TRƯỜNG TÙY BIẾN HỒ SƠ */}
+      {/* ========================================================================= */}
+      {isCustomFieldModalOpen && editingCustomField && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full max-w-lg shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-indigo-600" />
+                {editingCustomField.field_key ? 'Chỉnh Sửa Trường Tùy Biến' : 'Thêm Trường Tùy Biến Mới Cho Hồ Sơ'}
+              </h3>
+              <button onClick={() => setIsCustomFieldModalOpen(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveCustomField} className="p-5 space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Mã Trường (Field Key) *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: work_laptop_serial"
+                    value={editingCustomField.field_key}
+                    onChange={(e) =>
+                      setEditingCustomField({
+                        ...editingCustomField,
+                        field_key: e.target.value.toLowerCase().replace(/\s+/g, '_'),
+                      })
+                    }
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-mono font-semibold text-indigo-700 dark:text-indigo-300"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Tiêu Đề / Nhãn Trường *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Mã Số Máy Tính Cấp Phát"
+                    value={editingCustomField.label}
+                    onChange={(e) => setEditingCustomField({ ...editingCustomField, label: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Vị Trí Hiển Thị (Tab) *</label>
+                  <select
+                    value={editingCustomField.target_tab}
+                    onChange={(e) => setEditingCustomField({ ...editingCustomField, target_tab: e.target.value as any })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold"
+                  >
+                    <option value="WORK_INFO">Tab 1: Làm Việc & Cá Nhân</option>
+                    <option value="OTHER_INFO">Tab 2: Học Vấn & Bằng Cấp</option>
+                    <option value="FAMILY_INFO">Tab 3: Gia Đình & NPT</option>
+                    <option value="DOCUMENTS_BAG">Tab 4: Túi Hồ Sơ</option>
+                    <option value="WORK_PROCESS">Tab 5: Quá Trình Làm Việc</option>
+                    <option value="REWARDS_DISCIPLINE">Tab 6: Khen Thưởng/Kỷ Luật</option>
+                    <option value="PERSONAL_HISTORY">Tab 7: Tiểu Sử</option>
+                    <option value="SALARY_HISTORY">Tab 8: Lịch Sử Lương</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Loại Dữ Liệu *</label>
+                  <select
+                    value={editingCustomField.data_type}
+                    onChange={(e) => setEditingCustomField({ ...editingCustomField, data_type: e.target.value as any })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2 font-semibold text-blue-700 dark:text-blue-300"
+                  >
+                    <option value="TEXT">Văn bản (Text)</option>
+                    <option value="NUMBER">Số lượng / Tiền (Number)</option>
+                    <option value="DATE">Ngày tháng (Date)</option>
+                    <option value="SELECT">Danh sách chọn (Select Dropdown)</option>
+                    <option value="CHECKBOX">Hộp kiểm / Boolean (Checkbox)</option>
+                  </select>
+                </div>
+              </div>
+
+              {editingCustomField.data_type === 'SELECT' && (
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                    Các Lựa Chọn (phân cách bằng dấu phẩy)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="VD: Lựa chọn A, Lựa chọn B, Lựa chọn C"
+                    value={editingCustomField.options?.join(', ') || ''}
+                    onChange={(e) =>
+                      setEditingCustomField({
+                        ...editingCustomField,
+                        options: e.target.value
+                          .split(',')
+                          .map((s) => s.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                    className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Gợi Ý / Placeholder</label>
+                <input
+                  type="text"
+                  placeholder="VD: Nhập mã số máy..."
+                  value={editingCustomField.placeholder || ''}
+                  onChange={(e) => setEditingCustomField({ ...editingCustomField, placeholder: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div className="flex items-center gap-5 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingCustomField.is_required}
+                    onChange={(e) => setEditingCustomField({ ...editingCustomField, is_required: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 rounded"
+                  />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">Trường Bắt Buộc Nhập</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingCustomField.is_active}
+                    onChange={(e) => setEditingCustomField({ ...editingCustomField, is_active: e.target.checked })}
+                    className="w-4 h-4 text-emerald-600 rounded"
+                  />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">Đang Kích Hoạt</span>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsCustomFieldModalOpen(false)}
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 rounded-lg text-xs font-semibold cursor-pointer"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer"
+                >
+                  Lưu Cấu Hình Trường
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* ========================================================================= */}

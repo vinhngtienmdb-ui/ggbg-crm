@@ -36,11 +36,11 @@ import {
   Globe,
   ExternalLink
 } from 'lucide-react';
-import { SystemConfig, getSystemConfig, saveSystemConfig } from '@/lib/systemConfigStore';
+import { SystemConfig, getSystemConfig, saveSystemConfig, getCustomerTierRules, saveCustomerTierRules } from '@/lib/systemConfigStore';
 import { useModuleToggles } from '@/context/ModuleToggleContext';
 import { useAuth } from '@/context/AuthContext';
 import { useBranding, DEFAULT_BRANDING } from '@/context/BrandingContext';
-import { BrandingConfig } from '@/types';
+import { BrandingConfig, CustomerTierRuleConfig } from '@/types';
 import { ModuleBanner } from '@/components/ui';
 import SystemOverviewDashboard from '@/components/settings/SystemOverviewDashboard';
 
@@ -58,6 +58,7 @@ function SystemSettingsContent() {
   const { branding, updateBranding, resetBranding } = useBranding();
   const searchParams = useSearchParams();
   const [config, setConfig] = useState<SystemConfig>(getSystemConfig());
+  const [tierRules, setTierRules] = useState<CustomerTierRuleConfig[]>(getCustomerTierRules());
   const [saveToast, setSaveToast] = useState('');
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'BRANDING' | 'MODULE_TOGGLES' | 'INFRASTRUCTURE' | 'API_KEYS' | 'SMTP' | 'WEBHOOKS' | 'SECURITY_AUDIT' | 'COMPANY_IDENTITY'>('OVERVIEW');
 
@@ -514,7 +515,7 @@ function SystemSettingsContent() {
                     : 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-60'
                 }`}
               > Khôi Phục Mặc Định (Bật Tất Cả) </button> </div> <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5"> {[
-                { key: 'customers', name: 'Khách Hàng 360°', path: '/customers', desc: 'Hồ sơ KYC B2B/B2C, bảo mật mask SĐT & công nợ' },
+                { key: 'customers', name: 'Hồ Sơ Khách Hàng', path: '/customers', desc: 'Hồ sơ KYC Doanh nghiệp, Hộ kinh doanh & Cá nhân, bảo mật mask SĐT & công nợ' },
                 { key: 'leads', name: 'Lead & Phễu', path: '/leads', desc: 'Phễu Kanban, Webhook lead real-time & chống trùng SĐT' },
                 { key: 'chat', name: 'CSKH Đa Kênh', path: '/chat', desc: 'Tích hợp Zalo OA, Zalo Personal, FB Fanpage & AI Co-Pilot' },
                 { key: 'stores', name: 'Gian Hàng Đa Sàn', path: '/stores', desc: 'Chỉ số sức khỏe Store Rating (Shopee, TikTok, Lazada, Amazon)' },
@@ -524,7 +525,7 @@ function SystemSettingsContent() {
                 { key: 'products', name: 'Sản Phẩm & Dịch Vụ', path: '/products', desc: 'Gói dịch vụ vận hành TMĐT & thuộc tính động JSONB' },
                 { key: 'kpis', name: 'Quản Lý KPIs', path: '/kpis', desc: 'Giao chỉ tiêu GMV, Lead, phút gọi & tính % tiến độ' },
                 { key: 'performance', name: 'Hiệu Suất (S/A/B/C/D)', path: '/performance', desc: 'Xếp loại hiệu suất nhân sự định kỳ từ ngày 1-5' },
-                { key: 'reviews', name: 'Đánh Giá 360°', path: '/reviews', desc: 'Đánh giá đa chiều tự đánh giá / quản lý / đồng nghiệp' },
+                { key: 'reviews', name: 'Đánh Giá Đa Chiều', path: '/reviews', desc: 'Đánh giá đa chiều tự đánh giá / quản lý / đồng nghiệp' },
                 { key: 'audit', name: 'Nhật Ký Audit Trail', path: '/audit', desc: 'Ghi vết 100% thời gian thực thao tác của tất cả người dùng' },
               ].map((mod) => {
                 const isEnabled = toggles[mod.key as keyof typeof toggles];
@@ -555,7 +556,107 @@ function SystemSettingsContent() {
                           isEnabled ? 'translate-x-5' : 'translate-x-0'
                         }`}
                       /> </button> </div> );
-              })} </div> </div> )}
+              })} </div>
+
+            {/* CẤU HÌNH QUY TẮC PHÂN HẠNG THÀNH VIÊN KHÁCH HÀNG */}
+            <div className="mt-8 pt-6 border-t border-slate-200 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>Quy Tắc Tự Động Phân Hạng Khách Hàng (Customer Tier Rules)</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Hệ thống sẽ đọc các tiêu chí LTV và số hợp đồng dưới đây để tự động nâng / hạ hạng khách hàng khi phát sinh giao dịch
+                  </p>
+                </div>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveCustomerTierRules(tierRules);
+                      setSaveToast('Đã lưu thành công quy tắc phân hạng khách hàng!');
+                      setTimeout(() => setSaveToast(''), 4000);
+                    }}
+                    className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 self-start sm:self-auto"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Lưu Bảng Quy Tắc</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tierRules.map((r, idx) => (
+                  <div
+                    key={r.tier}
+                    className="p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${r.color_badge}`}>
+                        {r.tier_name}
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-500">Tier: {r.tier}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                          LTV Tối Thiểu (VNĐ):
+                        </label>
+                        <input
+                          type="number"
+                          disabled={!isAdmin}
+                          value={r.min_ltv}
+                          onChange={(e) => {
+                            const val = Number(e.target.value) || 0;
+                            const next = [...tierRules];
+                            next[idx].min_ltv = val;
+                            setTierRules(next);
+                          }}
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-medium text-slate-900 focus:border-amber-500 outline-none disabled:opacity-60"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                          Số Hợp Đồng Active:
+                        </label>
+                        <input
+                          type="number"
+                          disabled={!isAdmin}
+                          value={r.min_active_contracts}
+                          onChange={(e) => {
+                            const val = Number(e.target.value) || 0;
+                            const next = [...tierRules];
+                            next[idx].min_active_contracts = val;
+                            setTierRules(next);
+                          }}
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-medium text-slate-900 focus:border-amber-500 outline-none disabled:opacity-60"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                        Mô Tả Tiêu Chuẩn & Quyền Lợi:
+                      </label>
+                      <input
+                        type="text"
+                        disabled={!isAdmin}
+                        value={r.description}
+                        onChange={(e) => {
+                          const next = [...tierRules];
+                          next[idx].description = e.target.value;
+                          setTierRules(next);
+                        }}
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:border-amber-500 outline-none disabled:opacity-60"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div> )}
 
         {/* ==================== TAB 1: INFRASTRUCTURE (R2, SUPABASE, VOIP) ==================== */}
         {activeTab === 'INFRASTRUCTURE' && ( <div className="space-y-6"> {/* SECTION 1: CLOUDFLARE OBJECT STORAGE */} <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden"> <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600"> <Cloud className="w-5 h-5" /> </div> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> Cloudflare R2 Storage <span className="px-2 py-0.5 bg-orange-100 text-orange-800 rounded text-[10px] font-medium">PDF & Documents</span> </h3> <p className="text-[11px] text-slate-500">Lưu trữ tập tin Hợp đồng lao động, Ghi âm cuộc gọi và File chứng từ KYC</p> </div> </div> <button
@@ -724,7 +825,7 @@ function SystemSettingsContent() {
                         > {showKeys['openai'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />} </button> </div> </div> </div> </div> </div> </div> </div> )}
 
         {/* ==================== TAB 3: SMTP MAIL SERVER ==================== */}
-        {activeTab === 'SMTP' && ( <div className="space-y-6"> <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-6 space-y-6"> <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <Mail className="w-5 h-5 text-blue-600" /> Máy Chủ Email SMTP </h3> <p className="text-[11px] text-slate-500 mt-0.5"> Gửi email tự động thông báo hợp đồng, thông báo chấm điểm KPI và lịch đánh giá 360 độ. </p> </div> <button
+        {activeTab === 'SMTP' && ( <div className="space-y-6"> <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-6 space-y-6"> <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4"> <div> <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2"> <Mail className="w-5 h-5 text-blue-600" /> Máy Chủ Email SMTP </h3> <p className="text-[11px] text-slate-500 mt-0.5"> Gửi email tự động thông báo hợp đồng, thông báo chấm điểm KPI và lịch đánh giá định kỳ. </p> </div> <button
                   type="button"
                   onClick={handleTestSmtp}
                   disabled={smtpTest.status === 'TESTING'}
@@ -817,7 +918,7 @@ function SystemSettingsContent() {
                         checked={config.webhook.notify_on_kpi_deadline}
                         onChange={(e) => setConfig({ ...config, webhook: { ...config.webhook, notify_on_kpi_deadline: e.target.checked } })}
                         className="w-4 h-4 accent-purple-600 rounded"
-                      /> <span className="text-xs font-medium text-slate-800"> Hạn Chót Chấm KPI / 360°</span> </label> <label className="p-3 bg-white border border-purple-100 rounded-xl flex items-center gap-3 cursor-pointer"> <input
+                      /> <span className="text-xs font-medium text-slate-800"> Hạn Chót Chấm KPI & Đánh Giá</span> </label> <label className="p-3 bg-white border border-purple-100 rounded-xl flex items-center gap-3 cursor-pointer"> <input
                         type="checkbox"
                         checked={config.webhook.notify_on_employee_onboard}
                         onChange={(e) => setConfig({ ...config, webhook: { ...config.webhook, notify_on_employee_onboard: e.target.checked } })}
