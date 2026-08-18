@@ -52,11 +52,6 @@ function daysBetween(from: Date, to: Date) {
 }
 
 export default function HrmDashboard({ employees }: { employees: EmployeeProfile[] }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const today = useMemo(() => new Date(), []);
 
   const stats = useMemo(() => {

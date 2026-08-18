@@ -44,21 +44,25 @@ import {
   ViewMode,
 } from '@/components/ui';
 
-// Direct imported HRM components for instant and reliable rendering
-import EmployeeModal from '@/components/hrm/EmployeeModal';
-import ContractPdfModal from '@/components/hrm/ContractPdfModal';
-import OrgChartTree from '@/components/hrm/OrgChartTree';
-import HrmDashboard from '@/components/hrm/HrmDashboard';
-import LaborBook from '@/components/hrm/LaborBook';
-import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDistributionMap';
-import RecruitmentPipelineView from '@/components/hrm/RecruitmentPipelineView';
-import DocumentsView from '@/components/hrm/DocumentsView';
-import CompensationView from '@/components/hrm/CompensationView';
-import DocumentGeneratorModal from '@/components/hrm/DocumentGeneratorModal';
-import CompensationHistoryModal from '@/components/hrm/CompensationHistoryModal';
-import SocialInsuranceTrackingView from '@/components/hrm/SocialInsuranceTrackingView';
-import ShiftScheduleRoster from '@/components/hrm/ShiftScheduleRoster';
-import EmailAutomationSettingsModal from '@/components/hrm/EmailAutomationSettingsModal';
+import dynamic from 'next/dynamic';
+
+const loadingFallback = () => <div className="p-8 text-center text-xs font-medium text-slate-400 animate-pulse border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50">Đang nạp chức năng...</div>;
+
+const EmployeeModal = dynamic(() => import('@/components/hrm/EmployeeModal'), { ssr: false, loading: loadingFallback });
+const ContractPdfModal = dynamic(() => import('@/components/hrm/ContractPdfModal'), { ssr: false, loading: loadingFallback });
+const OrgChartTree = dynamic(() => import('@/components/hrm/OrgChartTree'), { ssr: false, loading: loadingFallback });
+const HrmDashboard = dynamic(() => import('@/components/hrm/HrmDashboard'), { ssr: false, loading: loadingFallback });
+const LaborBook = dynamic(() => import('@/components/hrm/LaborBook'), { ssr: false, loading: loadingFallback });
+const VietnamEmployeeDistributionMap = dynamic(() => import('@/components/hrm/VietnamEmployeeDistributionMap'), { ssr: false, loading: loadingFallback });
+const RecruitmentPipelineView = dynamic(() => import('@/components/hrm/RecruitmentPipelineView'), { ssr: false, loading: loadingFallback });
+const DocumentsView = dynamic(() => import('@/components/hrm/DocumentsView'), { ssr: false, loading: loadingFallback });
+const CompensationView = dynamic(() => import('@/components/hrm/CompensationView'), { ssr: false, loading: loadingFallback });
+const DocumentGeneratorModal = dynamic(() => import('@/components/hrm/DocumentGeneratorModal'), { ssr: false, loading: loadingFallback });
+const CompensationHistoryModal = dynamic(() => import('@/components/hrm/CompensationHistoryModal'), { ssr: false, loading: loadingFallback });
+const SocialInsuranceTrackingView = dynamic(() => import('@/components/hrm/SocialInsuranceTrackingView'), { ssr: false, loading: loadingFallback });
+const ShiftScheduleRoster = dynamic(() => import('@/components/hrm/ShiftScheduleRoster'), { ssr: false, loading: loadingFallback });
+const EmailAutomationSettingsModal = dynamic(() => import('@/components/hrm/EmailAutomationSettingsModal'), { ssr: false, loading: loadingFallback });
+
 import ColumnVisibilityPopover, { DEFAULT_VISIBLE_COLUMNS } from '@/components/hrm/ColumnVisibilityPopover';
 
 interface OnboardingTask {
