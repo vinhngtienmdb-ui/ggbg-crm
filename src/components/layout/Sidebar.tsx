@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Users,
@@ -94,14 +94,20 @@ function SidebarNavigation({
   onClose?: () => void;
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const { toggles } = useModuleToggles();
   const { user, simulatedRole } = useAuth();
 
   const activeRole = simulatedRole || user?.role || 'SUPER_ADMIN';
   const filteredClusters = getFilteredMenuClusters(activeRole, toggles);
-  const activeTabParam = searchParams.get('tab');
+  const [activeTabParam, setActiveTabParam] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setActiveTabParam(params.get('tab'));
+    }
+  }, [pathname]);
 
   // Accordion state for cluster groups (default: ALL collapsed except active)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
@@ -259,7 +265,7 @@ function SidebarNavigation({
                             if (hasSubItems) {
                               setExpandedKeys((prev) => ({ ...prev, [item.href]: true }));
                             }
-                            if (onClose && !hasSubItems) onClose();
+                            if (onClose) onClose();
                           }}
                           className="flex items-center gap-2.5 min-w-0 flex-1 py-0.5"
                         >
@@ -425,10 +431,8 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* Clustered & RBAC Filtered Navigation Wrapped in Suspense */}
-        <Suspense fallback={<div className="flex-1 p-4 text-xs text-slate-400">Đang tải danh mục...</div>}>
-          <SidebarNavigation onClose={onClose} />
-        </Suspense>
+        {/* Clustered & RBAC Filtered Navigation */}
+        <SidebarNavigation onClose={onClose} />
 
         {/* User Footer */}
         <div className="px-3.5 py-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 bg-slate-50/70 dark:bg-slate-850">
