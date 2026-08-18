@@ -458,6 +458,11 @@ export interface AttendanceRequest {
   proposed_check_in?: string;
   proposed_check_out?: string;
   ot_hours?: number;
+  ot_start_time?: string;
+  ot_end_time?: string;
+  ot_pay_multiplier?: number;
+  ot_calculated_amount?: number;
+  shift_name?: string;
   outside_location_name?: string;
   reason: string;
   proof_file?: string;

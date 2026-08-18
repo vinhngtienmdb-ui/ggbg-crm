@@ -1023,12 +1023,29 @@ function syncApprovedRequestToAttendance(req: AttendanceRequest) {
     if (existingIdx !== -1) {
       attendanceList[existingIdx] = {
         ...attendanceList[existingIdx],
-        ot_hours: req.ot_hours || 2.0,
+        ot_hours: (attendanceList[existingIdx].ot_hours || 0) + (req.ot_hours || 2.0),
         status: 'OVERTIME',
-        notes: `[Đã duyệt tăng ca OT +${req.ot_hours || 2}h] ${attendanceList[existingIdx].notes || ''}`,
+        notes: `[Đã duyệt tăng ca OT +${req.ot_hours || 2}h (${req.ot_start_time || '17:30'}-${req.ot_end_time || '19:30'})] ${attendanceList[existingIdx].notes || ''}`,
       };
       saveAttendance(attendanceList);
     }
+    // Also create or sync into OvertimeRecord list
+    addOvertimeRecord({
+      employee_id: req.employee_id,
+      employee_name: req.employee_name,
+      employee_code: req.employee_code,
+      department: req.department,
+      date: req.date,
+      ot_type: req.ot_pay_multiplier === 3.0 ? 'HOLIDAY' : req.ot_pay_multiplier === 2.0 ? 'WEEKEND' : 'NORMAL_DAY',
+      start_time: req.ot_start_time || '17:30',
+      end_time: req.ot_end_time || '19:30',
+      hours: req.ot_hours || 2.0,
+      pay_multiplier: req.ot_pay_multiplier || 1.5,
+      request_code: req.request_code,
+      approved_by: 'HR Manager (Đặng Kim Anh)',
+      reason: req.reason,
+      calculated_amount: req.ot_calculated_amount || Math.round((req.ot_hours || 2.0) * (15000000 / (26 * 8)) * (req.ot_pay_multiplier || 1.5)),
+    });
   } else if (req.request_type === 'LEAVE') {
     // Sync to leaves list
     createLeaveRequest({

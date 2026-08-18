@@ -81,10 +81,35 @@ import {
   addOvertimeRecord,
   PAYROLL_UPDATED_EVENT
 } from '@/lib/payrollStore';
-import { getEmployees, getWorkShifts } from '@/lib/hrmStore';
+import { getEmployees, getWorkShifts, getShiftAssignments, getHolidays } from '@/lib/hrmStore';
 import AttendanceAnalyticsDashboard from '@/components/attendance/AttendanceAnalyticsDashboard';
 import AttendanceCheckinModal from '@/components/attendance/AttendanceCheckinModal';
 import { formatCurrency } from '@/lib/formatters';
+
+// Helper to calculate hours between two times (HH:mm)
+function calculateHoursBetween(start: string, end: string): number {
+  if (!start || !end) return 2.0;
+  const [sH, sM] = start.split(':').map(Number);
+  const [eH, eM] = end.split(':').map(Number);
+  let startMinutes = (sH || 0) * 60 + (sM || 0);
+  let endMinutes = (eH || 0) * 60 + (eM || 0);
+  if (endMinutes <= startMinutes) {
+    // Overnight OT (e.g. 22:00 to 02:00)
+    endMinutes += 24 * 60;
+  }
+  const diffMinutes = endMinutes - startMinutes;
+  return Math.max(0.5, Math.round((diffMinutes / 60) * 2) / 2); // round to nearest 0.5h
+}
+
+// Helper to calculate end time given start time and hours
+function calculateEndTimeFromHours(start: string, hours: number): string {
+  if (!start) return '19:30';
+  const [sH, sM] = start.split(':').map(Number);
+  const totalMinutes = ((sH || 0) * 60 + (sM || 0) + Math.round(hours * 60)) % (24 * 60);
+  const eH = Math.floor(totalMinutes / 60);
+  const eM = totalMinutes % 60;
+  return `${String(eH).padStart(2, '0')}:${String(eM).padStart(2, '0')}`;
+}
 
 export default function AttendancePage() {
   const [activeTab, setActiveTab] = useState<'reports' | 'daily' | 'ot' | 'requests' | 'timesheet'>('reports');
@@ -117,6 +142,50 @@ export default function AttendancePage() {
 
   // Add OT Modal State
   const [isAddOtModalOpen, setIsAddOtModalOpen] = useState(false);
+
+  // Helper to get effective shift for employee on date
+  const getEmployeeShiftForDate = (empId: string, date: string): WorkShift => {
+    const shiftAssignments = getShiftAssignments();
+    const assigned = shiftAssignments.find((a) => a.employee_id === empId && a.date === date);
+    if (assigned) {
+      const shiftObj = workShifts.find((s) => s.id === assigned.shift_id);
+      if (shiftObj) return shiftObj;
+    }
+    const emp = employees.find((e) => e.id === empId);
+    if (emp?.default_shift_id) {
+      const defaultShift = workShifts.find((s) => s.id === emp.default_shift_id);
+      if (defaultShift) return defaultShift;
+    }
+    return workShifts[0] || {
+      id: 'shift_office',
+      shift_code: 'SHIFT_OFFICE',
+      name: 'Ca Hành Chính',
+      start_time: '08:30',
+      end_time: '17:30',
+      work_hours: 8.0,
+      color: 'emerald',
+      is_active: true,
+      night_shift_bonus_pct: 0,
+      grace_period_late_mins: 15,
+      grace_period_early_mins: 0,
+    };
+  };
+
+  // Helper to determine multiplier & rate for date
+  const getOtMultiplierForDate = (date: string): { multiplier: number; otType: 'NORMAL_DAY' | 'WEEKEND' | 'HOLIDAY'; label: string } => {
+    const holidays = getHolidays();
+    const isHoliday = holidays.some((h) => h.date === date);
+    if (isHoliday) {
+      return { multiplier: 3.0, otType: 'HOLIDAY', label: 'Lễ / Tết (Hệ số x300% - x3.0)' };
+    }
+    const dayOfWeek = new Date(date).getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      return { multiplier: 2.0, otType: 'WEEKEND', label: 'Ngày Nghỉ Cuối Tuần (Hệ số x200% - x2.0)' };
+    }
+    return { multiplier: 1.5, otType: 'NORMAL_DAY', label: 'Ngày Làm Việc Bình Thường (Hệ số x150% - x1.5)' };
+  };
+
+  // Add OT Modal State (Modal Thêm Bản Ghi Tăng Ca)
   const [newOt, setNewOt] = useState({
     employee_id: '',
     date: '2026-07-28',
@@ -124,10 +193,13 @@ export default function AttendancePage() {
     start_time: '17:30',
     end_time: '19:30',
     hours: 2.0,
+    pay_multiplier: 1.5,
+    calculated_amount: 360000,
+    shift_name: 'Ca Hành Chính (08:30 - 17:30)',
     reason: 'Hỗ trợ xử lý chiến dịch bán hàng phát sinh',
   });
 
-  // Unified Request Modal State
+  // Unified Request Modal State (Đơn Đăng Ký Yêu Cầu Chấm Công)
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [newRequest, setNewRequest] = useState<{
     employee_id: string;
@@ -139,6 +211,11 @@ export default function AttendancePage() {
     proposed_check_in: string;
     proposed_check_out: string;
     ot_hours: number;
+    ot_start_time: string;
+    ot_end_time: string;
+    ot_pay_multiplier: number;
+    ot_calculated_amount: number;
+    shift_name: string;
     outside_location_name: string;
     reason: string;
   }>({
@@ -150,10 +227,94 @@ export default function AttendancePage() {
     total_days: 1,
     proposed_check_in: '08:30',
     proposed_check_out: '17:30',
-    ot_hours: 2,
+    ot_hours: 2.0,
+    ot_start_time: '17:30',
+    ot_end_time: '19:30',
+    ot_pay_multiplier: 1.5,
+    ot_calculated_amount: 360000,
+    shift_name: 'Ca Hành Chính',
     outside_location_name: '',
     reason: '',
   });
+
+  // Automatically update newOt calculations when employee or date changes
+  const updateNewOtCalculations = (empId: string, date: string, startT?: string, endT?: string, customHours?: number) => {
+    const activeEmp = employees.find((e) => e.id === empId) || employees[0];
+    const shift = getEmployeeShiftForDate(activeEmp?.id || '', date);
+    const dateInfo = getOtMultiplierForDate(date);
+    
+    const startTime = startT !== undefined ? startT : (shift.end_time || '17:30');
+    let hours = customHours !== undefined ? customHours : (endT !== undefined ? calculateHoursBetween(startTime, endT) : 2.0);
+    const endTime = endT !== undefined ? endT : calculateEndTimeFromHours(startTime, hours);
+
+    const baseSal = activeEmp?.base_salary || 15000000;
+    const hourlyRate = baseSal / (26 * 8);
+    const amount = Math.round(hours * hourlyRate * dateInfo.multiplier);
+
+    setNewOt((prev) => ({
+      ...prev,
+      employee_id: activeEmp?.id || '',
+      date,
+      ot_type: dateInfo.otType,
+      start_time: startTime,
+      end_time: endTime,
+      hours,
+      pay_multiplier: dateInfo.multiplier,
+      calculated_amount: amount,
+      shift_name: `${shift.name} (${shift.start_time} - ${shift.end_time})`,
+    }));
+  };
+
+  // Automatically update newRequest calculations for OT
+  const updateNewRequestOtCalculations = (empId: string, date: string, startT?: string, endT?: string, customHours?: number) => {
+    const activeEmp = employees.find((e) => e.id === empId) || employees[0];
+    const shift = getEmployeeShiftForDate(activeEmp?.id || '', date);
+    const dateInfo = getOtMultiplierForDate(date);
+
+    const startTime = startT !== undefined ? startT : (shift.end_time || '17:30');
+    let hours = customHours !== undefined ? customHours : (endT !== undefined ? calculateHoursBetween(startTime, endT) : 2.0);
+    const endTime = endT !== undefined ? endT : calculateEndTimeFromHours(startTime, hours);
+
+    const baseSal = activeEmp?.base_salary || 15000000;
+    const hourlyRate = baseSal / (26 * 8);
+    const amount = Math.round(hours * hourlyRate * dateInfo.multiplier);
+
+    setNewRequest((prev) => ({
+      ...prev,
+      employee_id: activeEmp?.id || '',
+      date,
+      ot_start_time: startTime,
+      ot_end_time: endTime,
+      ot_hours: hours,
+      ot_pay_multiplier: dateInfo.multiplier,
+      ot_calculated_amount: amount,
+      shift_name: `${shift.name} (${shift.start_time} - ${shift.end_time})`,
+    }));
+  };
+
+  // Open add OT modal with precalculated values
+  const handleOpenAddOtModal = () => {
+    const firstEmp = employees[0];
+    const today = '2026-07-28';
+    updateNewOtCalculations(firstEmp?.id || '', today);
+    setIsAddOtModalOpen(true);
+  };
+
+  // Open unified request modal
+  const handleOpenRequestModal = (type: AttendanceRequestType = 'LATE_EARLY_EXCUSE') => {
+    const firstEmp = employees[0];
+    const today = '2026-07-29';
+    setNewRequest((prev) => ({
+      ...prev,
+      employee_id: firstEmp?.id || '',
+      request_type: type,
+      date: today,
+    }));
+    if (type === 'OVERTIME_REQUEST') {
+      updateNewRequestOtCalculations(firstEmp?.id || '', today);
+    }
+    setIsRequestModalOpen(true);
+  };
 
   const reloadData = () => {
     setAttendance(getAttendance());
@@ -203,6 +364,11 @@ export default function AttendancePage() {
       proposed_check_in: newRequest.proposed_check_in,
       proposed_check_out: newRequest.proposed_check_out,
       ot_hours: newRequest.request_type === 'OVERTIME_REQUEST' ? newRequest.ot_hours : undefined,
+      ot_start_time: newRequest.request_type === 'OVERTIME_REQUEST' ? newRequest.ot_start_time : undefined,
+      ot_end_time: newRequest.request_type === 'OVERTIME_REQUEST' ? newRequest.ot_end_time : undefined,
+      ot_pay_multiplier: newRequest.request_type === 'OVERTIME_REQUEST' ? newRequest.ot_pay_multiplier : undefined,
+      ot_calculated_amount: newRequest.request_type === 'OVERTIME_REQUEST' ? newRequest.ot_calculated_amount : undefined,
+      shift_name: newRequest.request_type === 'OVERTIME_REQUEST' ? newRequest.shift_name : undefined,
       outside_location_name: newRequest.outside_location_name,
       reason: newRequest.reason,
     });
@@ -218,7 +384,12 @@ export default function AttendancePage() {
       total_days: 1,
       proposed_check_in: '08:30',
       proposed_check_out: '17:30',
-      ot_hours: 2,
+      ot_hours: 2.0,
+      ot_start_time: '17:30',
+      ot_end_time: '19:30',
+      ot_pay_multiplier: 1.5,
+      ot_calculated_amount: 360000,
+      shift_name: 'Ca Hành Chính',
       outside_location_name: '',
       reason: '',
     });
@@ -261,11 +432,6 @@ export default function AttendancePage() {
     const emp = employees.find((x) => x.id === (newOt.employee_id || employees[0]?.id)) || employees[0];
     if (!emp) return;
 
-    const multiplier = newOt.ot_type === 'NORMAL_DAY' ? 1.5 : newOt.ot_type === 'WEEKEND' ? 2.0 : 3.0;
-    const baseSal = emp.base_salary || 15000000;
-    const hourlyRate = baseSal / (26 * 8);
-    const amount = Math.round(newOt.hours * hourlyRate * multiplier);
-
     addOvertimeRecord({
       employee_id: emp.id,
       employee_name: emp.full_name,
@@ -276,15 +442,15 @@ export default function AttendancePage() {
       start_time: newOt.start_time,
       end_time: newOt.end_time,
       hours: newOt.hours,
-      pay_multiplier: multiplier,
+      pay_multiplier: newOt.pay_multiplier,
       request_code: `OT-${Date.now().toString().slice(-6)}`,
       approved_by: 'Trần Giám Đốc',
       reason: newOt.reason,
-      calculated_amount: amount,
+      calculated_amount: newOt.calculated_amount,
     });
 
     setIsAddOtModalOpen(false);
-    showToast(`🎉 Đã thêm bản ghi tăng ca cho ${emp.full_name}!`);
+    showToast(`🎉 Đã thêm bản ghi tăng ca cho ${emp.full_name} (${newOt.hours}h - ${formatCurrency(newOt.calculated_amount)})!`);
   };
 
   // Filters
@@ -1149,33 +1315,40 @@ export default function AttendancePage() {
       {/* ========================================================================= */}
       {isAddOtModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-lg p-6 space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
               <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-purple-600" />
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Thêm Bản Ghi Tăng Ca (Overtime - OT)
-                </h3>
+                <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                    Ghi Nhận Bản Ghi Tăng Ca (Overtime - OT)
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Tự động nhận diện ca làm việc, tính giờ OT và hệ số lương theo quy chuẩn.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsAddOtModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleAddOtSubmit} className="space-y-3.5 text-xs">
+            <form onSubmit={handleAddOtSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Nhân Sự Tăng Ca *</label>
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nhân Sự Tăng Ca *</label>
                 <select
                   value={newOt.employee_id || employees[0]?.id || ''}
-                  onChange={(e) => setNewOt({ ...newOt, employee_id: e.target.value })}
+                  onChange={(e) => updateNewOtCalculations(e.target.value, newOt.date, newOt.start_time, newOt.end_time)}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
                 >
                   {employees.map((e) => (
                     <option key={e.id} value={e.id}>
-                      {e.full_name} ({e.employee_code}) - {e.department}
+                      {e.full_name} ({e.employee_code}) - {e.department} (Lương CB: {formatCurrency(e.base_salary || 15000000)})
                     </option>
                   ))}
                 </select>
@@ -1183,64 +1356,106 @@ export default function AttendancePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Ngày Tăng Ca *</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ngày Tăng Ca *</label>
                   <input
                     type="date"
                     required
                     value={newOt.date}
-                    onChange={(e) => setNewOt({ ...newOt, date: e.target.value })}
+                    onChange={(e) => updateNewOtCalculations(newOt.employee_id, e.target.value, newOt.start_time, newOt.end_time)}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Loại Tăng Ca *</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Loại Tăng Ca *</label>
                   <select
                     value={newOt.ot_type}
-                    onChange={(e) => setNewOt({ ...newOt, ot_type: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold text-purple-600"
+                    onChange={(e) => {
+                      const otType = e.target.value as 'NORMAL_DAY' | 'WEEKEND' | 'HOLIDAY';
+                      const mult = otType === 'HOLIDAY' ? 3.0 : otType === 'WEEKEND' ? 2.0 : 1.5;
+                      const activeEmp = employees.find((emp) => emp.id === (newOt.employee_id || employees[0]?.id)) || employees[0];
+                      const hourlyRate = (activeEmp?.base_salary || 15000000) / (26 * 8);
+                      setNewOt((prev) => ({
+                        ...prev,
+                        ot_type: otType,
+                        pay_multiplier: mult,
+                        calculated_amount: Math.round(prev.hours * hourlyRate * mult),
+                      }));
+                    }}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-purple-600 dark:text-purple-300"
                   >
-                    <option value="NORMAL_DAY">Ngày Thường (x150%)</option>
-                    <option value="WEEKEND">Cuối Tuần (x200%)</option>
-                    <option value="HOLIDAY">Lễ Tết (x300%)</option>
+                    <option value="NORMAL_DAY">Ngày Thường (Hệ số x150% - x1.5)</option>
+                    <option value="WEEKEND">Cuối Tuần (Hệ số x200% - x2.0)</option>
+                    <option value="HOLIDAY">Lễ Tết (Hệ số x300% - x3.0)</option>
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              {/* Shift auto-detection banner */}
+              <div className="p-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
+                  <Clock className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Ca làm việc chuẩn ngày này:</span>
+                    <span className="font-bold text-xs">{newOt.shift_name}</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300/40 shrink-0">
+                  Tự động căn chỉnh
+                </span>
+              </div>
+
+              {/* Time inputs */}
+              <div className="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Từ Giờ</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Từ Giờ</label>
                   <input
                     type="time"
                     value={newOt.start_time}
-                    onChange={(e) => setNewOt({ ...newOt, start_time: e.target.value })}
-                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
+                    onChange={(e) => updateNewOtCalculations(newOt.employee_id, newOt.date, e.target.value, newOt.end_time)}
+                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Đến Giờ</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Đến Giờ</label>
                   <input
                     type="time"
                     value={newOt.end_time}
-                    onChange={(e) => setNewOt({ ...newOt, end_time: e.target.value })}
-                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
+                    onChange={(e) => updateNewOtCalculations(newOt.employee_id, newOt.date, newOt.start_time, e.target.value)}
+                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Số Giờ (h) *</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Số Giờ OT (h) *</label>
                   <input
                     type="number"
                     step={0.5}
                     min={0.5}
                     max={12}
                     value={newOt.hours}
-                    onChange={(e) => setNewOt({ ...newOt, hours: Number(e.target.value) })}
-                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-purple-600 text-center"
+                    onChange={(e) => updateNewOtCalculations(newOt.employee_id, newOt.date, newOt.start_time, undefined, Number(e.target.value))}
+                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-purple-600 dark:text-purple-300 text-center"
                   />
                 </div>
               </div>
 
+              {/* Realtime Salary Calculation Box */}
+              <div className="p-3.5 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-xl space-y-1.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-slate-600 dark:text-slate-400 font-medium">Hệ số lương tăng ca:</span>
+                  <span className="font-bold text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60">
+                    x{newOt.pay_multiplier * 100}% ({newOt.pay_multiplier}x)
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-purple-200/60 dark:border-purple-800/60">
+                  <span className="font-bold text-slate-800 dark:text-slate-200">Tiền tăng ca dự kiến:</span>
+                  <span className="font-bold text-sm text-purple-700 dark:text-purple-300">
+                    {formatCurrency(newOt.calculated_amount)}
+                  </span>
+                </div>
+              </div>
+
               <div>
-                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Lý Do / Công Việc OT *</label>
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Lý Do / Công Việc OT *</label>
                 <textarea
                   rows={2}
                   required
@@ -1255,7 +1470,7 @@ export default function AttendancePage() {
                 <button
                   type="button"
                   onClick={() => setIsAddOtModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-medium"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold"
                 >
                   Hủy
                 </button>
@@ -1263,7 +1478,7 @@ export default function AttendancePage() {
                   type="submit"
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow-md active:scale-95 transition-all"
                 >
-                  Lưu Bản Ghi OT
+                  Lưu Bản Ghi OT ({formatCurrency(newOt.calculated_amount)})
                 </button>
               </div>
             </form>
@@ -1271,20 +1486,29 @@ export default function AttendancePage() {
         </div>
       )}
 
-      {/* CREATE UNIFIED REQUEST MODAL */}
+      {/* ========================================================================= */}
+      {/* MODAL: TẠO ĐƠN YÊU CẦU CHẤM CÔNG & ĐĂNG KÝ OT */}
+      {/* ========================================================================= */}
       {isRequestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
               <div className="flex items-center gap-2">
-                <FileCheck className="w-5 h-5 text-purple-600" />
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Tạo Đơn Yêu Cầu Chấm Công / Giải Trình
-                </h3>
+                <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300">
+                  <FileCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                    Tạo Đơn Yêu Cầu Chấm Công / Phiếu Đăng Ký
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Gửi đơn duyệt nghỉ phép, đi muộn về sớm, công tác hoặc đăng ký làm thêm giờ (OT).
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsRequestModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1292,25 +1516,38 @@ export default function AttendancePage() {
 
             <form onSubmit={handleCreateRequestSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Chọn Loại Đơn *</label>
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Chọn Loại Đơn *</label>
                 <select
                   value={newRequest.request_type}
-                  onChange={(e) => setNewRequest({ ...newRequest, request_type: e.target.value as AttendanceRequestType })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold text-purple-700 dark:text-purple-300"
+                  onChange={(e) => {
+                    const reqType = e.target.value as AttendanceRequestType;
+                    setNewRequest((prev) => ({ ...prev, request_type: reqType }));
+                    if (reqType === 'OVERTIME_REQUEST') {
+                      updateNewRequestOtCalculations(newRequest.employee_id, newRequest.date);
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-purple-700 dark:text-purple-300"
                 >
                   <option value="LATE_EARLY_EXCUSE">1. Đơn Xin Vào Trễ / Về Sớm (Lý Do Bất Khả Kháng)</option>
                   <option value="OUTSIDE_WORK">2. Đơn Xin Đi Ra Ngoài / Công Tác Thị Trường</option>
                   <option value="MISSED_PUNCH_EXPLANATION">3. Giải Trình Quên Chấm Công (Vào/Ra)</option>
                   <option value="LEAVE">4. Đơn Xin Nghỉ Phép (Phép Năm / Nghỉ Ốm / Không Lương)</option>
-                  <option value="OVERTIME_REQUEST">5. Đơn Đăng Ký Tăng Ca (OT)</option>
+                  <option value="OVERTIME_REQUEST">5. Đơn Đăng Ký Tăng Ca (OT) - Tự động tính hệ số & giờ</option>
                 </select>
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Nhân Viên Làm Đơn *</label>
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nhân Viên Làm Đơn *</label>
                 <select
                   value={newRequest.employee_id || employees[0]?.id || ''}
-                  onChange={(e) => setNewRequest({ ...newRequest, employee_id: e.target.value })}
+                  onChange={(e) => {
+                    const empId = e.target.value;
+                    if (newRequest.request_type === 'OVERTIME_REQUEST') {
+                      updateNewRequestOtCalculations(empId, newRequest.date, newRequest.ot_start_time, newRequest.ot_end_time);
+                    } else {
+                      setNewRequest((prev) => ({ ...prev, employee_id: empId }));
+                    }
+                  }}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
                 >
                   {employees.map((e) => (
@@ -1324,19 +1561,26 @@ export default function AttendancePage() {
               {/* Conditional fields based on type */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Ngày Áp Dụng *</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ngày Áp Dụng *</label>
                   <input
                     type="date"
                     required
                     value={newRequest.date}
-                    onChange={(e) => setNewRequest({ ...newRequest, date: e.target.value })}
+                    onChange={(e) => {
+                      const d = e.target.value;
+                      if (newRequest.request_type === 'OVERTIME_REQUEST') {
+                        updateNewRequestOtCalculations(newRequest.employee_id, d, newRequest.ot_start_time, newRequest.ot_end_time);
+                      } else {
+                        setNewRequest((prev) => ({ ...prev, date: d }));
+                      }
+                    }}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
                   />
                 </div>
 
                 {newRequest.request_type === 'LEAVE' && (
                   <div>
-                    <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Loại Nghỉ Phép</label>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Loại Nghỉ Phép</label>
                     <select
                       value={newRequest.leave_type}
                       onChange={(e) => setNewRequest({ ...newRequest, leave_type: e.target.value as LeaveType })}
@@ -1352,7 +1596,7 @@ export default function AttendancePage() {
 
                 {(newRequest.request_type === 'LATE_EARLY_EXCUSE' || newRequest.request_type === 'MISSED_PUNCH_EXPLANATION') && (
                   <div>
-                    <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Giờ Vào/Ra Đề Xuất</label>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Giờ Vào/Ra Đề Xuất</label>
                     <div className="flex items-center gap-1.5">
                       <input
                         type="time"
@@ -1366,42 +1610,98 @@ export default function AttendancePage() {
 
                 {newRequest.request_type === 'OVERTIME_REQUEST' && (
                   <div>
-                    <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Số Giờ Tăng Ca (OT)</label>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Số Giờ Tăng Ca (OT)</label>
                     <input
                       type="number"
                       step={0.5}
                       min={0.5}
-                      max={8}
+                      max={12}
                       value={newRequest.ot_hours}
-                      onChange={(e) => setNewRequest({ ...newRequest, ot_hours: Number(e.target.value) })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold"
+                      onChange={(e) => updateNewRequestOtCalculations(newRequest.employee_id, newRequest.date, newRequest.ot_start_time, undefined, Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-purple-600 dark:text-purple-300 text-center"
                     />
                   </div>
                 )}
               </div>
 
+              {/* Extra OT Controls inside Request Modal */}
+              {newRequest.request_type === 'OVERTIME_REQUEST' && (
+                <div className="space-y-2.5 pt-1">
+                  {/* Shift banner */}
+                  <div className="p-2.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-blue-800 dark:text-blue-300">
+                      <Clock className="w-4 h-4 text-blue-600 shrink-0" />
+                      <span className="font-semibold">{newRequest.shift_name}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100/80 dark:bg-blue-900 px-2 py-0.5 rounded">
+                      Ca Tiêu Chuẩn
+                    </span>
+                  </div>
+
+                  {/* Start time - End time */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Bắt Đầu Tăng Ca</label>
+                      <input
+                        type="time"
+                        value={newRequest.ot_start_time}
+                        onChange={(e) => updateNewRequestOtCalculations(newRequest.employee_id, newRequest.date, e.target.value, newRequest.ot_end_time)}
+                        className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Kết Thúc Tăng Ca</label>
+                      <input
+                        type="time"
+                        value={newRequest.ot_end_time}
+                        onChange={(e) => updateNewRequestOtCalculations(newRequest.employee_id, newRequest.date, newRequest.ot_start_time, e.target.value)}
+                        className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-mono font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Live Calculation Banner */}
+                  <div className="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl flex items-center justify-between text-xs">
+                    <div className="space-y-0.5">
+                      <span className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium block">
+                        Hệ số lương: <strong className="text-purple-700 dark:text-purple-300">x{newRequest.ot_pay_multiplier * 100}% ({newRequest.ot_pay_multiplier}x)</strong>
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        {newRequest.ot_hours} giờ làm thêm • Tính theo luật LĐ
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-500 block">Dự tính phụ cấp OT:</span>
+                      <span className="font-bold text-sm text-purple-700 dark:text-purple-300">
+                        {formatCurrency(newRequest.ot_calculated_amount)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {newRequest.request_type === 'OUTSIDE_WORK' && (
                 <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Địa Điểm Làm Việc / Khách Hàng</label>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Địa Điểm Làm Việc / Khách Hàng</label>
                   <input
                     type="text"
                     placeholder="VD: Gặp khách hàng đối tác tại Aeon Mall Hà Đông..."
                     value={newRequest.outside_location_name}
                     onChange={(e) => setNewRequest({ ...newRequest, outside_location_name: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Lý Do Chi Tiết / Giải Trình *</label>
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Lý Do Chi Tiết / Giải Trình *</label>
                 <textarea
                   rows={2}
                   required
                   value={newRequest.reason}
                   onChange={(e) => setNewRequest({ ...newRequest, reason: e.target.value })}
                   placeholder="Nhập lý do chi tiết giải trình..."
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
                 />
               </div>
 
@@ -1409,7 +1709,7 @@ export default function AttendancePage() {
                 <button
                   type="button"
                   onClick={() => setIsRequestModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-medium"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold"
                 >
                   Hủy
                 </button>
@@ -1417,7 +1717,9 @@ export default function AttendancePage() {
                   type="submit"
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow-md active:scale-95 transition-all"
                 >
-                  Gửi Đơn Yêu Cầu
+                  {newRequest.request_type === 'OVERTIME_REQUEST'
+                    ? `Gửi Đơn Đăng Ký OT (${newRequest.ot_hours}h - ${formatCurrency(newRequest.ot_calculated_amount)})`
+                    : 'Gửi Đơn Yêu Cầu'}
                 </button>
               </div>
             </form>
