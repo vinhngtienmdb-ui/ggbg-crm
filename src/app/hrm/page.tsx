@@ -43,24 +43,22 @@ import {
   ViewModeSwitcher,
   ViewMode,
 } from '@/components/ui';
-import dynamic from 'next/dynamic';
 
-// Dynamic loaded components
-const EmployeeModal = dynamic(() => import('@/components/hrm/EmployeeModal'), { ssr: false });
-const ContractPdfModal = dynamic(() => import('@/components/hrm/ContractPdfModal'), { ssr: false });
-const OrgChartTree = dynamic(() => import('@/components/hrm/OrgChartTree'), { ssr: false });
-const HrmDashboard = dynamic(() => import('@/components/hrm/HrmDashboard'), { ssr: false });
-const LaborBook = dynamic(() => import('@/components/hrm/LaborBook'), { ssr: false });
-const VietnamEmployeeDistributionMap = dynamic(() => import('@/components/hrm/VietnamEmployeeDistributionMap'), { ssr: false });
-
-const RecruitmentPipelineView = dynamic(() => import('@/components/hrm/RecruitmentPipelineView'), { ssr: false });
-const DocumentsView = dynamic(() => import('@/components/hrm/DocumentsView'), { ssr: false });
-const CompensationView = dynamic(() => import('@/components/hrm/CompensationView'), { ssr: false });
-const DocumentGeneratorModal = dynamic(() => import('@/components/hrm/DocumentGeneratorModal'), { ssr: false });
-const CompensationHistoryModal = dynamic(() => import('@/components/hrm/CompensationHistoryModal'), { ssr: false });
-const SocialInsuranceTrackingView = dynamic(() => import('@/components/hrm/SocialInsuranceTrackingView'), { ssr: false });
-const ShiftScheduleRoster = dynamic(() => import('@/components/hrm/ShiftScheduleRoster'), { ssr: false });
-const EmailAutomationSettingsModal = dynamic(() => import('@/components/hrm/EmailAutomationSettingsModal'), { ssr: false });
+// Direct imported HRM components for instant and reliable rendering
+import EmployeeModal from '@/components/hrm/EmployeeModal';
+import ContractPdfModal from '@/components/hrm/ContractPdfModal';
+import OrgChartTree from '@/components/hrm/OrgChartTree';
+import HrmDashboard from '@/components/hrm/HrmDashboard';
+import LaborBook from '@/components/hrm/LaborBook';
+import VietnamEmployeeDistributionMap from '@/components/hrm/VietnamEmployeeDistributionMap';
+import RecruitmentPipelineView from '@/components/hrm/RecruitmentPipelineView';
+import DocumentsView from '@/components/hrm/DocumentsView';
+import CompensationView from '@/components/hrm/CompensationView';
+import DocumentGeneratorModal from '@/components/hrm/DocumentGeneratorModal';
+import CompensationHistoryModal from '@/components/hrm/CompensationHistoryModal';
+import SocialInsuranceTrackingView from '@/components/hrm/SocialInsuranceTrackingView';
+import ShiftScheduleRoster from '@/components/hrm/ShiftScheduleRoster';
+import EmailAutomationSettingsModal from '@/components/hrm/EmailAutomationSettingsModal';
 import ColumnVisibilityPopover, { DEFAULT_VISIBLE_COLUMNS } from '@/components/hrm/ColumnVisibilityPopover';
 
 interface OnboardingTask {
