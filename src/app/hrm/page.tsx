@@ -54,6 +54,8 @@ const LaborBook = dynamic(() => import('@/components/hrm/LaborBook'), { ssr: fal
 const VietnamEmployeeDistributionMap = dynamic(() => import('@/components/hrm/VietnamEmployeeDistributionMap'), { ssr: false });
 
 const RecruitmentPipelineView = dynamic(() => import('@/components/hrm/RecruitmentPipelineView'), { ssr: false });
+const DocumentsView = dynamic(() => import('@/components/hrm/DocumentsView'), { ssr: false });
+const CompensationView = dynamic(() => import('@/components/hrm/CompensationView'), { ssr: false });
 const DocumentGeneratorModal = dynamic(() => import('@/components/hrm/DocumentGeneratorModal'), { ssr: false });
 const CompensationHistoryModal = dynamic(() => import('@/components/hrm/CompensationHistoryModal'), { ssr: false });
 const SocialInsuranceTrackingView = dynamic(() => import('@/components/hrm/SocialInsuranceTrackingView'), { ssr: false });
@@ -79,8 +81,8 @@ const INITIAL_ONBOARDING: OnboardingTask[] = [
 ];
 
 type HRMTabType =
-  | 'DASHBOARD'
   | 'PROFILE'
+  | 'DASHBOARD'
   | 'RECRUITMENT'
   | 'DOCUMENTS'
   | 'BHXH'
@@ -88,7 +90,8 @@ type HRMTabType =
   | 'ONBOARDING'
   | 'SHIFTS'
   | 'LABOR_BOOK'
-  | 'ORG_GIS';
+  | 'ORG_CHART'
+  | 'MAP';
 
 function HRMContent() {
   const searchParams = useSearchParams();
@@ -96,7 +99,7 @@ function HRMContent() {
 
   const [employees, setEmployees] = useState<EmployeeProfile[]>(() => getEmployees());
   const [onboardingList, setOnboardingList] = useState<OnboardingTask[]>(INITIAL_ONBOARDING);
-  const [activeTab, setActiveTab] = useState<HRMTabType>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<HRMTabType>('PROFILE');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState<string>('ALL');
@@ -140,8 +143,8 @@ function HRMContent() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const tab = initialTabParam;
-    if (tab === 'overview') {
+    const tab = initialTabParam?.toLowerCase();
+    if (tab === 'overview' || tab === 'dashboard') {
       setActiveTab('DASHBOARD');
     } else if (tab === 'directory' || tab === 'profile') {
       setActiveTab('PROFILE');
@@ -149,16 +152,22 @@ function HRMContent() {
       setActiveTab('RECRUITMENT');
     } else if (tab === 'shifts') {
       setActiveTab('SHIFTS');
-    } else if (tab === 'bhxh') {
+    } else if (tab === 'bhxh' || tab === 'insurance') {
       setActiveTab('BHXH');
-    } else if (tab === 'documents') {
+    } else if (tab === 'documents' || tab === 'contracts') {
       setActiveTab('DOCUMENTS');
-    } else if (tab === 'org_chart' || tab === 'map') {
-      setActiveTab('ORG_GIS');
+    } else if (tab === 'compensation' || tab === 'salary') {
+      setActiveTab('COMPENSATION');
+    } else if (tab === 'org_chart' || tab === 'org') {
+      setActiveTab('ORG_CHART');
+    } else if (tab === 'map' || tab === 'gis') {
+      setActiveTab('MAP');
     } else if (tab === 'labor_book') {
       setActiveTab('LABOR_BOOK');
     } else if (tab === 'onboarding') {
       setActiveTab('ONBOARDING');
+    } else {
+      setActiveTab('PROFILE');
     }
   }, [initialTabParam]);
 
@@ -248,37 +257,83 @@ function HRMContent() {
           icon: Briefcase,
           variant: 'purple',
         }}
-        title="Quản Trị Nhân Sự & Phát Triển Nguồn Nhân Lực"
-        subtitle="Quản lý hồ sơ nhân sự, tuyển dụng, onboarding, chấm công, BHXH, sổ lao động và cấu hình chức danh cấp bậc"
+        title={
+          activeTab === 'PROFILE'
+            ? 'Hồ Sơ & Danh Bạ Nhân Sự'
+            : activeTab === 'DOCUMENTS'
+            ? 'Quản Lý Hợp Đồng & Biểu Mẫu Pháp Lý'
+            : activeTab === 'COMPENSATION'
+            ? 'Quản Trị Lương Đa Tầng & Lịch Sử Biến Động'
+            : activeTab === 'RECRUITMENT'
+            ? 'Quy Trình & Phễu Tuyển Dụng'
+            : activeTab === 'SHIFTS'
+            ? 'Phân Ca Làm Việc & Lịch Trực Tuần'
+            : activeTab === 'BHXH'
+            ? 'Quản Trị Bảo Hiểm Xã Hội (BHXH)'
+            : activeTab === 'ONBOARDING'
+            ? 'Quy Trình Onboarding Nhân Viên Mới'
+            : activeTab === 'LABOR_BOOK'
+            ? 'Sổ Quản Lý Lao Động (NĐ 145/2020/NĐ-CP)'
+            : activeTab === 'ORG_CHART'
+            ? 'Sơ Đồ Cây Phân Cấp Tổ Chức (Org Chart)'
+            : activeTab === 'MAP'
+            ? 'Bản Đồ Phân Bổ Nhân Lực 63 Tỉnh Thành'
+            : 'Báo Cáo Tổng Quan Quản Trị Nhân Lực'
+        }
+        subtitle={
+          activeTab === 'PROFILE'
+            ? 'Quản lý chi tiết danh sách nhân sự, thông tin cá nhân, chức vụ, ngạch bậc lương 3P và trạng thái công tác'
+            : activeTab === 'DOCUMENTS'
+            ? 'Quản lý hợp đồng lao động, quyết định bổ nhiệm, nâng lương và ký số điện tử'
+            : activeTab === 'COMPENSATION'
+            ? 'Theo dõi lịch sử điều chỉnh lương, nâng ngạch bậc 3P và phê duyệt quyết định vượt khung'
+            : activeTab === 'RECRUITMENT'
+            ? 'Theo dõi hồ sơ ứng viên, lịch phỏng vấn và quy trình tiếp nhận nhân sự mới'
+            : activeTab === 'SHIFTS'
+            ? 'Xếp ca làm việc, điều chỉnh khung giờ ca và theo dõi phân công nhân sự'
+            : activeTab === 'BHXH'
+            ? 'Theo dõi danh sách tham gia BHXH, mức đóng bảo hiểm và báo cáo biến động'
+            : activeTab === 'ONBOARDING'
+            ? 'Checklist bàn giao máy tính, cấp tài khoản CRM và đào tạo hội nhập'
+            : activeTab === 'LABOR_BOOK'
+            ? 'Theo dõi lao động theo quy định của Bộ Lao Động - Thương Binh và Xã Hội'
+            : activeTab === 'ORG_CHART'
+            ? 'Cấu trúc phòng ban, đội nhóm và tuyến báo cáo phân cấp nhân sự'
+            : activeTab === 'MAP'
+            ? 'Trực quan hóa mạng lưới nhân sự và chi nhánh trên bản đồ số'
+            : 'Phân tích cơ cấu nhân sự, tỷ lệ biến động, tình trạng hợp đồng và tổng quỹ lương'
+        }
         kpis={[
           { label: 'Quy Mô Nhân Sự', value: `${employees.length} Nhân Sự`, subtext: 'Chính thức: 94%' },
           { label: 'Đang Thử Việc', value: `${employees.filter(e => e.status === 'Probation').length} Nhân Sự`, subtext: 'Kỳ 60 ngày' },
           { label: 'Đang Hoạt Động', value: `${employees.filter(e => e.status === 'Active').length} Active`, subtext: 'Đầy đủ hồ sơ' },
         ]}
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setIsEmailAutomationOpen(true)}
-              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
-            >
-              <Mail className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-              <span>Mẫu Email</span>
-            </button>
-            <button
-              onClick={() => setIsCompensationHistoryOpen(true)}
-              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
-            >
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Lịch Sử Lương</span>
-            </button>
-            <button
-              onClick={handleOpenCreateModal}
-              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Thêm Nhân Sự</span>
-            </button>
-          </div>
+          activeTab === 'PROFILE' ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setIsEmailAutomationOpen(true)}
+                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
+              >
+                <Mail className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <span>Mẫu Email</span>
+              </button>
+              <button
+                onClick={() => setIsCompensationHistoryOpen(true)}
+                className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              >
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>Lịch Sử Lương</span>
+              </button>
+              <button
+                onClick={handleOpenCreateModal}
+                className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Thêm Nhân Sự</span>
+              </button>
+            </div>
+          ) : undefined
         }
       />
 
@@ -702,55 +757,13 @@ function HRMContent() {
         {activeTab === 'RECRUITMENT' && <RecruitmentPipelineView onCandidateConverted={reloadEmployees} />}
 
         {/* TAB 4: DOCUMENT GENERATOR (EMBEDDED VIEW) */}
-        {activeTab === 'DOCUMENTS' && (
-          <div className="space-y-4">
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  Hệ Thống Soạn Thảo Văn Bản & Trình Ký Số Tự Động
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Trích xuất tự động dữ liệu từ HRM, tự động lập HĐLĐ, Quyết định Bổ nhiệm, Nâng lương, Khen thưởng, Kỷ luật và gửi Email
-                </p>
-              </div>
-              <button
-                onClick={() => setIsDocGeneratorOpen(true)}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-xs active:scale-95 transition-all shrink-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Mở Trình Soạn Thảo Văn Bản</span>
-              </button>
-            </div>
-          </div>
-        )}
+        {activeTab === 'DOCUMENTS' && <DocumentsView />}
 
         {/* TAB 5: SOCIAL INSURANCE TRACKING */}
         {activeTab === 'BHXH' && <SocialInsuranceTrackingView />}
 
         {/* TAB 6: COMPENSATION & ALLOWANCES */}
-        {activeTab === 'COMPENSATION' && (
-          <div className="space-y-4">
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-emerald-600" />
-                  Quản Trị Lương Đa Tầng & Lịch Sử Biến Động Phụ Cấp
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Theo dõi toàn bộ lịch sử nâng lương, điều chỉnh phụ cấp chức vụ và quyết định phê duyệt của từng nhân sự
-                </p>
-              </div>
-              <button
-                onClick={() => setIsCompensationHistoryOpen(true)}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-xs active:scale-95 transition-all shrink-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Xem & Tạo Điều Chỉnh Lương</span>
-              </button>
-            </div>
-          </div>
-        )}
+        {activeTab === 'COMPENSATION' && <CompensationView targetEmployee={selectedEmployee} />}
 
         {/* TAB 7: ONBOARDING CHECKLIST */}
         {activeTab === 'ONBOARDING' && (
@@ -823,23 +836,25 @@ function HRMContent() {
         {/* TAB 9: LABOR BOOK (NĐ 145) */}
         {activeTab === 'LABOR_BOOK' && <LaborBook employees={employees} />}
 
-        {/* TAB 10: ORG CHART TREE & GIS MAP */}
-        {activeTab === 'ORG_GIS' && (
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-blue-600" />
-                Sơ Đồ Cây Phân Cấp Tổ Chức (Org Chart)
-              </h3>
-              <OrgChartTree rootData={getOrgChartTree()} />
-            </div>
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-emerald-600" />
-                Bản Đồ Phân Bổ Nhân Lực 63 Tỉnh Thành
-              </h3>
-              <VietnamEmployeeDistributionMap employees={employees} />
-            </div>
+        {/* TAB 10: ORG CHART TREE */}
+        {activeTab === 'ORG_CHART' && (
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-blue-600" />
+              Sơ Đồ Cây Phân Cấp Tổ Chức (Org Chart)
+            </h3>
+            <OrgChartTree rootData={getOrgChartTree()} />
+          </div>
+        )}
+
+        {/* TAB 11: GIS MAP */}
+        {activeTab === 'MAP' && (
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-emerald-600" />
+              Bản Đồ Phân Bổ Nhân Lực 63 Tỉnh Thành
+            </h3>
+            <VietnamEmployeeDistributionMap employees={employees} />
           </div>
         )}
       </div>

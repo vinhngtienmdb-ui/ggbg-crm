@@ -246,10 +246,13 @@ export const MENU_CLUSTERS: MenuGroupDefinition[] = [
         allowedRoles: ['SUPER_ADMIN', 'DIRECTOR', 'HR_MANAGER', 'TEAM_LEADER'],
         subItems: [
           { name: 'Hồ Sơ Nhân Sự', href: '/hrm?tab=directory', tabKey: 'directory' },
+          { name: 'Tổng Quan Báo Cáo', href: '/hrm?tab=overview', tabKey: 'overview' },
           { name: 'Tuyển Dụng', href: '/hrm?tab=recruitment', tabKey: 'recruitment' },
           { name: 'Phân Ca', href: '/hrm?tab=shifts', tabKey: 'shifts' },
           { name: 'Bảo Hiểm Xã Hội', href: '/hrm?tab=bhxh', tabKey: 'bhxh' },
+          { name: 'Lương & Phụ Cấp', href: '/hrm?tab=compensation', tabKey: 'compensation' },
           { name: 'Hợp Đồng & Biểu Mẫu', href: '/hrm?tab=documents', tabKey: 'documents' },
+          { name: 'Quy Trình Onboarding', href: '/hrm?tab=onboarding', tabKey: 'onboarding' },
           { name: 'Sơ Đồ Tổ Chức', href: '/hrm?tab=org_chart', tabKey: 'org_chart' },
           { name: 'Sổ Lao Động', href: '/hrm?tab=labor_book', tabKey: 'labor_book' },
           { name: 'Bản Đồ Nhân Sự', href: '/hrm?tab=map', tabKey: 'map' },
