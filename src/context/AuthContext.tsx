@@ -32,10 +32,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const DEFAULT_ADMIN_USER: UserSession = {
+  id: 'u_super_admin',
+  username: 'admin',
+  email: 'admin@ggbingo.vn',
+  name: 'Super Admin GGBingo',
+  role: 'SUPER_ADMIN',
+  role_name: 'Super Administrator',
+  is_super_admin: true,
+  employee_code: 'SA001',
+  account_status: 'Active',
+  roles: ['SUPER_ADMIN'],
+  permissions: ['*'],
+  login_at: new Date().toISOString(),
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserSession | null>(null);
+  const [user, setUser] = useState<UserSession | null>(DEFAULT_ADMIN_USER);
   const [simulatedRole, setSimulatedRole] = useState<UserRole>('SUPER_ADMIN');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();

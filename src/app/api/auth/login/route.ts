@@ -133,7 +133,7 @@ export async function POST(request: Request) {
       httpOnly: true,
       path: '/',
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Tương thích 100% với cả http://localhost và production
       maxAge: SESSION_MAX_AGE,
     });
 
